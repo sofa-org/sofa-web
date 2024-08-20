@@ -52,7 +52,8 @@ export function useProjectChange() {
 
 export function useProductSelect() {
   const query = useQuery();
-  const productType = (query['product-type'] as ProductType) || ProductType.DNT;
+  const productType =
+    (query['product-type'] as ProductType) || ProductType.BullSpread;
   const setProductType = useLazyCallback(
     (action: SetStateAction<ProductType>) => {
       const nextProductType = calcVal(action, productType);

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@douyinfe/semi-ui';
+import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteResult,
@@ -10,12 +11,13 @@ import {
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
 import { MsIntervals, next8h } from '@sofa/utils/expiry';
-import { useLazyCallback } from '@sofa/utils/hooks';
+import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import { displayTenor } from '@sofa/utils/time';
 import Big from 'big.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
+import { omit } from 'lodash-es';
 import { nanoid } from 'nanoid';
 import { parse, stringify } from 'qs';
 
@@ -131,6 +133,33 @@ const RecommendedCard = (props: RecommendedCardProps) => {
 
   const investModalRef = useRef<InvestModalPropsRef>(null);
 
+  const leverageQuote = useAsyncMemo(async () => {
+    if (vault?.riskType !== RiskType.PROTECTED || !data?.[0]) return undefined;
+    const leverageVault = ProductsService.findVault(ContractsService.vaults, {
+      chainId: vault.chainId,
+      forCcy: vault.forCcy,
+      domCcy: vault.domCcy,
+      depositCcy: vault.depositCcy,
+      productType: vault.productType,
+      riskType: RiskType.LEVERAGE,
+    });
+    if (!leverageVault) return undefined;
+    return useProductsState
+      .quote({
+        vault: leverageVault,
+        expiry: data?.[0].expiry,
+        anchorPrices: data[0].anchorPrices,
+        depositAmount: data[0].amounts.own,
+      })
+      .catch((err) => console.error(11112, err));
+  }, [vault, data?.[0]]);
+
+  console.log(
+    1111,
+    riskType === RiskType.RISKY
+      ? data?.slice(0, 2)
+      : ([data?.[0], leverageQuote].filter(Boolean) as ProductQuoteResult[]),
+  );
   return (
     <div className={styles['recommended-card-wrapper']}>
       <div
@@ -190,7 +219,12 @@ const RecommendedCard = (props: RecommendedCardProps) => {
           loading={!data?.length}
         >
           <div className={styles['products']}>
-            {data?.slice(0, 2).map((it, i) => (
+            {(riskType === RiskType.RISKY
+              ? data?.slice(0, 2)
+              : ([data?.[0], leverageQuote, data?.[1]]
+                  .filter(Boolean)
+                  .slice(0, 2) as ProductQuoteResult[])
+            )?.map((it, i) => (
               <div
                 key={`${it.vault.vault.toLowerCase()}-${it.vault.vault}-${
                   it.expiry
@@ -260,6 +294,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
               >
                 {riskType !== RiskType.RISKY ? (
                   <Payoff
+                    riskType={it.vault.riskType}
                     productType={it.vault.productType}
                     forCcy={props.forCcy}
                     depositCcy={it.vault.depositCcy}

@@ -60,78 +60,6 @@ export const RiskTypeRefs = {
 };
 
 export const ProductTypeRefs = {
-  [ProductType.DNT]: {
-    label: (t: TFunction) => t('Rangebound'),
-    desc: (t: TFunction) => t('Win if price always in Range before expiry.'),
-    suitableDesc: (t: TFunction) =>
-      t(
-        "Rangebound products are suitable for boring, sideways markets!  Users will get a higher chance of earning upside payoffs when volatility is low and prices aren't moving much!",
-      ),
-    settlementPriceDesc: (t: TFunction) =>
-      t(
-        'Price Source: <span class="txt-gradient">COINBASE - BTC/USDT spot prices</span>. \n\nAt settlement, the vault will automatically check the asset price changes during the subscription period.',
-      ),
-    strikeDesc: (t: TFunction) =>
-      t(
-        `If the asset price is always within the range (Lower Barrier ~ Upper Barrier) until settlement,<br/>users will earn Upside Returns at maturity.`,
-      ),
-    returnSituationsDesc: (t: TFunction) => ({
-      max: t('Price stays fully within the range prior to settlement'),
-      min: t('Price touches either of the barriers prior to settlement'),
-      middle: undefined as
-        | { situation: string; description: string }
-        | undefined,
-    }),
-    extraDesc: (t: TFunction) =>
-      t(
-        'Users can take advantage of sideways markets with the Rangebound.<br/>If the asset price remains within the preset range during the period, users will earn Potential Yield.<br/>Should the price touch either the lower or upper barriers, users will still receive the Base Yield and RCH tokens.',
-      ),
-    quoteExplain: (t: TFunction, risk: RiskType) =>
-      t(
-        '* Price Source: Coinbase via Chainlink<br/>* {{name}} calculations are indicative and estimated based on current market conditions',
-        { name: risk !== RiskType.RISKY ? t('Yield') : t('Payout') },
-      ),
-    alias: 'Rangebound',
-    value: ProductType.DNT,
-    img: <ImgDNT />,
-    icon: (riskType: RiskType, inverse: boolean) =>
-      ({
-        [`${RiskType.PROTECTED}-false`]: {
-          icon: iconDntProtected,
-          color:
-            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
-        },
-        [`${RiskType.PROTECTED}-true`]: {
-          icon: iconDntProtectedInverse,
-          color:
-            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
-        },
-        [`${RiskType.LEVERAGE}-false`]: {
-          icon: iconDntProtected,
-          color:
-            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
-        },
-        [`${RiskType.LEVERAGE}-true`]: {
-          icon: iconDntProtectedInverse,
-          color:
-            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
-        },
-        [`${RiskType.RISKY}-false`]: {
-          icon: iconDntRisky,
-          color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
-        },
-        [`${RiskType.RISKY}-true`]: {
-          icon: iconDntRiskyInverse,
-          color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
-        },
-      })[`${riskType}-${inverse}`],
-    tag: 'Hot',
-    tagStyle: {
-      background: 'linear-gradient(to left, #FFFA00 0, #FFA82E 100%)',
-      color: '#000',
-    },
-    disabled: false,
-  },
   [ProductType.BullSpread]: {
     label: (t: TFunction) => t('Bull Trend'),
     desc: (t: TFunction) =>
@@ -200,6 +128,78 @@ export const ProductTypeRefs = {
         },
         [`${RiskType.RISKY}-true`]: {
           icon: iconSpreadRiskyInverse,
+          color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
+        },
+      })[`${riskType}-${inverse}`],
+    tag: 'Hot',
+    tagStyle: {
+      background: 'linear-gradient(to left, #FFFA00 0, #FFA82E 100%)',
+      color: '#000',
+    },
+    disabled: false,
+  },
+  [ProductType.DNT]: {
+    label: (t: TFunction) => t('Rangebound'),
+    desc: (t: TFunction) => t('Win if price always in Range before expiry.'),
+    suitableDesc: (t: TFunction) =>
+      t(
+        "Rangebound products are suitable for boring, sideways markets!  Users will get a higher chance of earning upside payoffs when volatility is low and prices aren't moving much!",
+      ),
+    settlementPriceDesc: (t: TFunction) =>
+      t(
+        'Price Source: <span class="txt-gradient">COINBASE - BTC/USDT spot prices</span>. \n\nAt settlement, the vault will automatically check the asset price changes during the subscription period.',
+      ),
+    strikeDesc: (t: TFunction) =>
+      t(
+        `If the asset price is always within the range (Lower Barrier ~ Upper Barrier) until settlement,<br/>users will earn Upside Returns at maturity.`,
+      ),
+    returnSituationsDesc: (t: TFunction) => ({
+      max: t('Price stays fully within the range prior to settlement'),
+      min: t('Price touches either of the barriers prior to settlement'),
+      middle: undefined as
+        | { situation: string; description: string }
+        | undefined,
+    }),
+    extraDesc: (t: TFunction) =>
+      t(
+        'Users can take advantage of sideways markets with the Rangebound.<br/>If the asset price remains within the preset range during the period, users will earn Potential Yield.<br/>Should the price touch either the lower or upper barriers, users will still receive the Base Yield and RCH tokens.',
+      ),
+    quoteExplain: (t: TFunction, risk: RiskType) =>
+      t(
+        '* Price Source: Coinbase via Chainlink<br/>* {{name}} calculations are indicative and estimated based on current market conditions',
+        { name: risk !== RiskType.RISKY ? t('Yield') : t('Payout') },
+      ),
+    alias: 'Rangebound',
+    value: ProductType.DNT,
+    img: <ImgDNT />,
+    icon: (riskType: RiskType, inverse: boolean) =>
+      ({
+        [`${RiskType.PROTECTED}-false`]: {
+          icon: iconDntProtected,
+          color:
+            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
+        },
+        [`${RiskType.PROTECTED}-true`]: {
+          icon: iconDntProtectedInverse,
+          color:
+            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
+        },
+        [`${RiskType.LEVERAGE}-false`]: {
+          icon: iconDntProtected,
+          color:
+            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
+        },
+        [`${RiskType.LEVERAGE}-true`]: {
+          icon: iconDntProtectedInverse,
+          color:
+            'linear-gradient(135deg, #00FFFF 0%, rgba(15, 71, 122, 0.8) 100%)',
+        },
+        [`${RiskType.RISKY}-false`]: {
+          icon: iconDntRisky,
+          color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
+        },
+        [`${RiskType.RISKY}-true`]: {
+          icon: iconDntRiskyInverse,
           color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
         },
       })[`${riskType}-${inverse}`],

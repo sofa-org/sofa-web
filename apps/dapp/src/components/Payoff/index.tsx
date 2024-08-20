@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { useTranslation } from '@sofa/services/i18n';
-import { ProductType, VaultInfo } from '@sofa/services/products';
+import { ProductType, RiskType, VaultInfo } from '@sofa/services/products';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { simplePlus } from '@sofa/utils/object';
 import { useSize } from 'ahooks';
@@ -32,6 +32,7 @@ export interface PayoffChartProps extends BaseProps {
 }
 
 export interface PayoffProps extends PayoffChartProps {
+  riskType?: RiskType;
   forCcy: CCY;
   depositCcy: VaultInfo['depositCcy'];
   depositAmount: number;
@@ -358,6 +359,9 @@ const Payoff = (props: PayoffProps) => {
         <span>
           {displayPercentage(maxApy).replace('%', '')}
           <span>%</span>
+          {props.riskType === RiskType.LEVERAGE && (
+            <span className={styles['badge-leverage']}>Lev.</span>
+          )}
         </span>
         <ApyDesc>{t('type')}</ApyDesc>
       </div>

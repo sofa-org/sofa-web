@@ -119,7 +119,7 @@ export const useProductsState = Object.assign(
       if (error) throw error;
       const vault = params.vault;
       return ProductsService.quote(vault.productType, {
-        ...omit(params, 'id'),
+        ...params,
         takerWallet: useWalletStore.getState().address,
       } as ProductQuoteParams).then((res) => {
         const key = ProductsService.productKey(params as ProductQuoteParams);
@@ -134,6 +134,7 @@ export const useProductsState = Object.assign(
             [key]: res,
           },
         }));
+        return res;
       });
     },
     delQuote: (quoteInfo: ProductQuoteResult) => {

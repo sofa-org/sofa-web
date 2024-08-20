@@ -1,15 +1,10 @@
 import { useMemo, useRef } from 'react';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo, PositionsService } from '@sofa/services/positions';
-import {
-  ProductsService,
-  ProductType,
-  RiskType,
-} from '@sofa/services/products';
+import { ProductType, RiskType } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
-import { useAsyncMemo } from '@sofa/utils/hooks';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -219,10 +214,10 @@ const PositionCard = (props: PositionCardProps) => {
       ),
     [product.vault.depositCcy, product.vault.riskType, productTypeRef],
   );
-  const leverageInfo = useAsyncMemo(
-    () => ProductsService.vaultLeverageInfo(product.vault, position.createdAt),
-    [product.vault, position.createdAt],
-  );
+  // const leverageInfo = useAsyncMemo(
+  //   () => ProductsService.vaultLeverageInfo(product.vault, position.createdAt),
+  //   [product.vault, position.createdAt],
+  // );
 
   const pnlPrecision = useMemo(
     () => (product.vault.depositCcy.startsWith('USD') ? 2 : 4),
@@ -369,7 +364,7 @@ const PositionCard = (props: PositionCardProps) => {
             </span>
           </div>
           <div className={styles['risk-type']}>
-            {productTypeRef.alias}
+            {productTypeRef.alias}_{product.vault.forCcy.replace(/^W/i, '')}
             {product.vault.riskType === RiskType.LEVERAGE && (
               <span className={styles['badge-leverage']}>Lev.</span>
             )}
