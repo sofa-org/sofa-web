@@ -1,0 +1,24 @@
+.c-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1030;
+  background: rgba(#000, 0.9);
+  pointer-events: none;
+  opacity: 0;
+
+  &.c-overlay-visible {
+    pointer-events: initial;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .c-overlay-content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    padding: 4px 0;
+    background: #fff;
+    border-radius: var(--semi-border-radius-medium);
+    transform: translate(-50%, -50%);
+  }
+}

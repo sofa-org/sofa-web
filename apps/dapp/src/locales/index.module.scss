@@ -1,0 +1,31 @@
+.lang-selector.lang-selector {
+  border: none;
+  background: transparent !important;
+
+  :global {
+    .semi-select-selection {
+      @include header-btn;
+
+      width: 32px;
+      height: 32px;
+      margin: 0;
+      border-radius: 50%;
+      background: rgba(#fff, 0.16);
+
+      .semi-select-selection-text {
+        @include flex-center;
+
+        width: 32px;
+        height: 32px;
+
+        > svg {
+          max-width: 1.8em;
+        }
+      }
+    }
+
+    .semi-select-arrow {
+      display: none;
+    }
+  }
+}

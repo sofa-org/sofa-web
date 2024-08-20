@@ -1,0 +1,15 @@
+.timezone-selector {
+  @include header-btn;
+
+  display: none;
+  border: none !important;
+  border-radius: 20px;
+  color: #fff !important;
+  background: rgb(255 255 255 / 16%) !important;
+}
+
+@media (orientation: portrait) {
+  .timezone-selector {
+    height: 32px;
+  }
+}

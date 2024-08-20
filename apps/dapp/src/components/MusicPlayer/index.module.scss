@@ -1,0 +1,12 @@
+.music-player {
+  @include flex-center;
+  @include header-btn;
+
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+
+  svg {
+    width: 20px;
+  }
+}

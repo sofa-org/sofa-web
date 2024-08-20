@@ -1,0 +1,14 @@
+.semi-table-wrapper {
+  .semi-table-thead > .semi-table-row > .semi-table-row-head,
+  .semi-table-tbody > .semi-table-row > .semi-table-row-cell {
+    padding: 0 10px;
+  }
+
+  .semi-table-placeholder {
+    // background-color: #fff;
+  }
+}
+
+table {
+  table-layout: auto !important;
+}

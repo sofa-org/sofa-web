@@ -1,0 +1,68 @@
+.tick {
+  @include gradient-txt;
+  @include bold;
+
+  margin: 0;
+  white-space: nowrap;
+}
+
+.unit {
+  padding: 0 0 0 4px;
+}
+
+.icon {
+  width: 24px;
+  margin: 0 -8px 0 0;
+}
+
+.ticket-item {
+  @include flex-center;
+  @include bold;
+
+  justify-content: flex-start;
+  width: 100%;
+
+  img {
+    width: 1em;
+  }
+}
+
+.ticket-type-selector.ticket-type-selector.ticket-type-selector.ticket-type-selector {
+  height: 36px;
+  font-size: 14px;
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(#fff, 0.16);
+
+  &:hover {
+    background: rgba(#fff, 0.26);
+  }
+
+  :global {
+    .semi-select-arrow {
+      margin-right: 10px;
+
+      > svg {
+        width: 20px;
+      }
+    }
+  }
+}
+
+.ticket-type-dropdown {
+  :global {
+    .semi-select-option-icon {
+      display: none;
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .ticket-type-selector.ticket-type-selector.ticket-type-selector.ticket-type-selector {
+    width: 100%;
+    height: 44px;
+    padding: 0;
+    border-radius: 0;
+    background: #000;
+  }
+}

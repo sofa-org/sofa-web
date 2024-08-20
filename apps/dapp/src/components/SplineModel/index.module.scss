@@ -1,0 +1,23 @@
+.spline-model {
+  @include flex-center;
+
+  position: relative;
+
+  img,
+  video {
+    flex: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  > div {
+    flex: none;
+    pointer-events: none;
+  }
+}
+
+.loading {
+  position: absolute;
+  left: 0;
+  top: 0;
+}

@@ -1,0 +1,84 @@
+.semi-select-arrow {
+  svg {
+    width: 16px;
+  }
+}
+
+.semi-select-option-icon {
+  display: none !important;
+}
+
+.semi-select-option-selected {
+  .semi-select-option-text {
+    @include gradient-txt;
+    @include bold;
+  }
+}
+
+.semi-select-selection {
+  svg {
+    max-width: 1.5em;
+  }
+}
+
+.c-select-overlay.c-select-overlay {
+  .c-overlay-content {
+    transform: none;
+    inset: auto 0 0;
+    max-height: 70vh;
+    overflow: hidden auto;
+    background: #fff;
+  }
+
+  .c-select-option {
+    @include flex-center;
+
+    justify-content: flex-start;
+    position: relative;
+    height: 48px;
+    padding: 0 16px;
+    color: rgba(#000, 0.75);
+
+    span {
+      @include flex-center;
+
+      gap: 8px;
+
+      svg,
+      img {
+        max-width: 1.4em;
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: -0.5px;
+      height: 1px;
+      background: rgba(#fff, 0.04);
+    }
+
+    &:active {
+      background: rgba(#000, 0.05);
+    }
+
+    &.c-select-option-selected {
+      @include bold;
+
+      color: #5fe2ff;
+      background: rgba(#000, 0.1);
+
+      span {
+        @include gradient-txt;
+      }
+    }
+
+    &:last-child {
+      &::before {
+        content: none;
+      }
+    }
+  }
+}

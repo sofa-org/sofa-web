@@ -1,0 +1,312 @@
+.title {
+  @include bold;
+
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.badge-est {
+  display: inline-block;
+  width: 36px;
+  padding: 0 0 0 6px;
+  font-size: 12px;
+  opacity: 0.5;
+  transform: scale(0.8);
+  transform-origin: left center;
+}
+
+.value-desc {
+  flex: none;
+  width: 100%;
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+  transform: scale(0.9);
+  transform-origin: right center;
+  text-align: right;
+}
+
+.icon-plus {
+  @include regular;
+
+  color: rgba(#000, 0.3);
+}
+
+.rch {
+  margin: 0;
+  color: var(--color-rch);
+
+  .unit {
+    color: inherit;
+    color: rgba($color-rch, 0.7) !important;
+  }
+}
+
+.label {
+  @include medium;
+
+  font-size: 12px;
+  line-height: 22px;
+  opacity: 0.8;
+}
+
+.barrier {
+  @include bold;
+
+  position: absolute;
+  right: 0;
+  margin: 0;
+  transform: translate(0, -50%);
+
+  &:nth-last-child(2) {
+    top: 86%;
+  }
+
+  &:last-child {
+    top: 11%;
+  }
+}
+
+.barrier-1 {
+  @include bold;
+
+  position: absolute;
+  bottom: -20px;
+  margin: 0;
+  transform: translate(-50%, 0);
+
+  &:nth-child(2) {
+    left: 23%;
+  }
+
+  &:nth-child(3) {
+    left: 42%;
+  }
+}
+
+.return-min,
+.return-max {
+  position: absolute;
+  left: 67.5%;
+  margin: 0;
+  white-space: nowrap;
+  transform: translate(0, -50%);
+
+  &.return-max {
+    top: 0;
+  }
+
+  &.return-min {
+    top: 99%;
+  }
+}
+
+.rangebound-img {
+  position: relative;
+  flex: 400;
+  min-width: 300px;
+
+  svg {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.trend-img {
+  position: relative;
+  flex: 400;
+  min-width: 300px;
+  margin: 0;
+
+  > svg {
+    width: 65%;
+  }
+}
+
+.profit-brief {
+  font-size: 12px;
+  color: rgba(#000, 0.5);
+
+  > b {
+    color: #000;
+  }
+}
+
+.highlight {
+  .right {
+    background: rgba(#fff, 0.9) !important;
+  }
+}
+
+.profit-scenario {
+  @include flex-center;
+
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 0;
+
+  .value {
+    @include bold;
+
+    flex: 1;
+    font-size: 16px;
+    line-height: 22px;
+    text-align: right;
+  }
+
+  .unit {
+    @include regular;
+
+    padding: 0 0 0 3px;
+    font-size: 12px;
+    color: rgba($color-main, 0.4);
+  }
+
+  .item {
+    @include flex-center;
+
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    font-size: 12px;
+    gap: 0;
+
+    &:last-child {
+      padding-top: 10px;
+      border-top: 1px solid rgba(#000, 0.05);
+
+      .value {
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  .left {
+    flex: 400;
+    min-width: 300px;
+    margin: min(30px, 5vw);
+    margin-left: 0;
+  }
+
+  .right {
+    @include flex-column-center;
+
+    gap: 10px;
+    flex: 400;
+    min-width: 300px;
+    margin: 0;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 12px;
+  }
+}
+
+.profit-scenario-wrapper {
+  flex: 1;
+  margin: 0;
+  min-width: 290px;
+  padding: min(40px, 5vw);
+
+  &.highlight {
+    background: var(--color-rise);
+    border-color: var(--color-rise);
+    border-radius: 24px;
+
+    .highlight-line {
+      path[class] {
+        fill: #fff;
+      }
+    }
+  }
+
+  &.highlight-red {
+    background: rgba(#000, 0.12);
+    border-color: transparent;
+
+    .highlight-line {
+      path[class] {
+        fill: #000;
+      }
+    }
+  }
+}
+
+.out-left {
+  flex: 400;
+  min-width: 300px;
+  margin: min(20px, 3vw) min(30px, 5vw);
+
+  > div {
+    width: 100%;
+  }
+}
+
+.out-right {
+  flex: 550;
+  margin: 0;
+}
+
+.profit-scenarios {
+  @include flex-center;
+
+  flex-wrap: wrap;
+  gap: 16px 0;
+  border: 1px solid rgba(#000, 0.12);
+  border-radius: min(24px, 2.4vw);
+  overflow: hidden;
+
+  &.highlight {
+    background: var(--color-rise);
+    border-color: var(--color-rise);
+  }
+
+  &.highlight-red {
+    background: rgba(#000, 0.12);
+    border-color: transparent;
+  }
+
+  &.is-trend {
+    padding: 20px 0;
+
+    .profit-scenario-wrapper {
+      padding-top: min(20px, 3vw);
+      padding-bottom: min(20px, 3vw);
+
+      &:not(:last-child) {
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  &:not(.is-trend) {
+    .profit-scenario-wrapper:not(:last-child) {
+      border-bottom: 1px solid rgba(#000, 0.12);
+    }
+
+    &.expired {
+      .profit-scenario-wrapper:not(.highlight, .highlight-red) {
+        opacity: 0.4;
+        border-bottom: none;
+      }
+    }
+  }
+}
+
+.h {
+  @include bold;
+
+  margin: min(40px, 4vw) 0 min(30px, 4vw);
+  font-size: min(20px, 5vw);
+  text-align: center;
+}
+
+.content {
+  gap: 40px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.section {
+  margin: 0;
+}

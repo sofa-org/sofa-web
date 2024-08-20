@@ -1,0 +1,7 @@
+.semi-checkbox.semi-checkbox {
+  align-items: center;
+}
+
+.semi-checkbox-inner-display {
+  @include flex-center;
+}

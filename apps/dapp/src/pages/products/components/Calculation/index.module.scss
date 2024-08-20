@@ -1,0 +1,130 @@
+.calculation {
+  @include pointer;
+
+  width: 20px;
+  height: 20px;
+}
+
+.table,
+.list {
+  border-collapse: collapse;
+  text-align: left;
+
+  th,
+  .th {
+    @include regular;
+
+    padding: 8px;
+    line-height: 18px;
+  }
+
+  td,
+  .td {
+    padding: 8px;
+    line-height: 18px;
+
+    svg,
+    img {
+      width: 1.1em;
+      height: 1.1em;
+      margin: 0 0 0 4px;
+      line-height: 18px;
+      vertical-align: middle;
+    }
+
+    &:nth-child(1) {
+      width: 300px;
+    }
+
+    &:nth-child(2) {
+      width: 180px;
+    }
+
+    &:nth-child(3) {
+      width: 500px;
+    }
+  }
+
+  td:not(:last-child) {
+    border-right: 1px solid rgba(#000, 0.06);
+  }
+
+  thead tr,
+  .thead .tr {
+    background: #000 !important;
+    color: #fff;
+  }
+
+  tbody tr,
+  .tbody .tr {
+    &:nth-child(2n + 1) {
+      background: #fff;
+    }
+
+    &.gray,
+    &:nth-child(2n) {
+      background: #f4f4f4;
+    }
+
+    &.white {
+      background: #fff;
+
+      td {
+        border: none;
+      }
+    }
+
+    &.highlight {
+      background: #e3f2fd;
+    }
+
+    &.highlight-1 {
+      @include bold;
+
+      background: #e3f8d9;
+    }
+  }
+
+  &.list {
+    font-size: 12px;
+
+    .thead .tr {
+      @include flex-center;
+
+      justify-content: space-between;
+      background: #2c2f34 !important;
+    }
+
+    .tbody .tr {
+      @include flex-center;
+
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      .td {
+        width: auto;
+
+        &:nth-child(1) {
+          @include medium;
+
+          min-width: 40%;
+        }
+
+        &:nth-child(2) {
+          @include bold;
+        }
+
+        &:nth-child(3) {
+          @include regular;
+
+          // flex: none;
+          min-width: 50%;
+          padding-top: 0;
+          margin-top: -10px;
+          opacity: 0.4;
+          word-break: break-all;
+        }
+      }
+    }
+  }
+}

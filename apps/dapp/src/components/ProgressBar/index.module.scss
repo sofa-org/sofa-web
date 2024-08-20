@@ -1,0 +1,39 @@
+.progress {
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex: 1;
+  height: 8px;
+  margin: 0 -8px;
+  background: #e0e0e0;
+  cursor: pointer;
+}
+
+.progress-bar {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(
+    90deg,
+    #d665a3 0%,
+    #e05e2b 21.35%,
+    #f8d748 45.31%,
+    #36af73 70.31%,
+    #2d6fb9 100%
+  );
+  transform: skewX(-20deg);
+  transition: 0.3s linear width;
+
+  &::after {
+    content: "";
+    display: block;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      #e0e0e000,
+      #e0e0e000 95%,
+      #e0e0e033 95%
+    );
+    background-repeat: repeat-x;
+    background-size: 10px 100%;
+  }
+}

@@ -1,0 +1,62 @@
+.tips-wrapper {
+  @include flex-center;
+
+  width: 100vw;
+  background: #1a1b20;
+}
+
+.tips {
+  @include flex-center;
+
+  width: $width-content;
+  min-height: 88px;
+  padding: 16px 0;
+  gap: 24px;
+  color: rgba(#fff, 0.85);
+
+  img {
+    flex: none;
+    width: 64px;
+    height: 64px;
+  }
+
+  svg {
+    @include pointer;
+
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    flex: 1;
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tips {
+    @include flex-column-center;
+
+    gap: 6px;
+    position: relative;
+    padding: 12px 0;
+
+    img {
+      width: 20vw;
+      height: 20vw;
+      margin: -12px 0 0;
+    }
+
+    svg {
+      position: absolute;
+      right: 0;
+      top: 12px;
+    }
+
+    span {
+      font-size: 12px;
+    }
+  }
+}

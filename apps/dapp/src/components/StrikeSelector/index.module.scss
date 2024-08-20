@@ -1,0 +1,83 @@
+.strike-selector {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.strike-selector-atm {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  margin: -1px;
+  font-size: 10px;
+  color: rgba(#0069a7, 0.85);
+  font-weight: 700;
+
+  // background: #172b43;
+  border-radius: 2px;
+
+  > span:nth-child(1),
+  > span:nth-child(2) {
+    @include bold;
+
+    display: block;
+    height: 10px;
+    line-height: 10px;
+    transform: scale(0.8);
+    transform-origin: 50% 50%;
+  }
+
+  > span:nth-child(1) {
+    margin: 0 0 1px;
+  }
+}
+
+.strikes.strikes {
+  display: flex;
+  flex-direction: column;
+}
+
+.strike-price-radio-btn-group.strike-price-radio-btn-group {
+  flex-wrap: wrap;
+
+  &:first-child {
+    margin: 0 0 4px;
+  }
+
+  > div {
+    position: relative;
+    flex: none;
+    width: 60px;
+    padding: 0;
+    height: 24px;
+    line-height: 24px;
+  }
+}
+
+.call-put-wrapper {
+  display: none;
+  align-items: stretch;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  background: #4e4f56;
+
+  /* border: 1px solid #4e4f56; */
+  border-radius: 2px;
+  overflow: hidden;
+
+  &.show {
+    display: flex;
+  }
+}
+
+.disabled {
+  color: #fff;
+  opacity: 0.3;
+  cursor: not-allowed;
+}

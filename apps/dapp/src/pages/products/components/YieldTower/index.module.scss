@@ -1,0 +1,168 @@
+.section {
+  margin: 0;
+}
+
+.title {
+  @include bold;
+
+  margin: min(64px, 6vw) 0 min(40px, 4vw);
+  font-size: min(24px, 5vw);
+  text-align: center;
+}
+
+.icon {
+  display: block;
+  margin: 0 0 6px;
+  line-height: 54px;
+  font-size: 36px;
+}
+
+.content {
+  @include flex-center;
+
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: min(40px, 4vw);
+  margin: 0;
+  padding: min(40px, 5vw);
+  border-radius: min(24px, 2.4vw);
+  border: 1px solid $color-border;
+}
+
+.leverage > svg:first-child > path:nth-last-child(2) {
+  fill: #eb4476 !important;
+  fill-opacity: 1 !important;
+}
+
+.apy {
+  @include bold;
+  @include flex-column-center;
+
+  margin: 0;
+  font-size: min(16px, 3vw);
+}
+
+.label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.value {
+  margin: 0;
+}
+
+.unit {
+  @include regular;
+
+  margin: 0;
+  opacity: 0.5;
+  font-size: 14px;
+}
+
+.full-width {
+  max-width: min(100%, 633px);
+  margin: 20px auto;
+}
+
+.left {
+  position: relative;
+  flex: 420;
+  min-width: min(300px, calc(100vw - 24px - 24px - 24px - 2px - 32px));
+
+  svg {
+    width: 100%;
+  }
+
+  .projected-apy {
+    @include bold;
+
+    position: relative;
+    z-index: 1;
+    display: block;
+    padding: 30px 0 12px;
+    margin: 0 auto -50px;
+    color: $color-rise;
+    border-radius: 12px;
+    background: #fafafa;
+    text-align: center;
+  }
+
+  .tower {
+    position: relative;
+  }
+
+  .apy {
+    &:nth-child(2),
+    &:nth-child(3),
+    &:nth-child(4) {
+      @include bold;
+      @include flex-center;
+
+      flex-wrap: wrap;
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      font-size: min(14px, 2vw);
+      transform: translate(-50%, -50%);
+    }
+
+    &:nth-child(2) {
+      top: 75%;
+      width: 28%;
+    }
+
+    &:nth-child(3) {
+      top: 61%;
+    }
+
+    &:nth-child(4) {
+      top: 37.4%;
+    }
+  }
+}
+
+.right {
+  flex: 550;
+  min-width: min(360px, calc(100vw - 24px - 24px - 24px - 2px - 32px));
+  padding: 0 0 0 min(34px, 3.4vw);
+  margin: 0;
+
+  .apy-infos {
+    @include flex-center;
+
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 12px;
+    margin: 0 0 30px;
+
+    .apy {
+      color: $color-rise;
+
+      &:global(.rch) {
+        color: $color-rch;
+      }
+    }
+
+    .unit {
+      color: $color-main;
+      opacity: 0.45;
+    }
+  }
+}
+
+.desc {
+  position: relative;
+  margin: 0;
+  font-size: 14px;
+
+  p {
+    margin: 0 0 12px;
+  }
+
+  &::before {
+    content: "✦";
+    position: absolute;
+    top: 0;
+    left: max(-34px, -3.4vw);
+  }
+}

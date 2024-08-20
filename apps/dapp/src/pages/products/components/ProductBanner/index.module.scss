@@ -1,0 +1,133 @@
+.product-banner-wrapper {
+  height: 560px;
+  margin: -$header-height 0 0;
+  padding: 80px 0 0;
+  background: linear-gradient(0deg, #000 13.89%, #0000 100%),
+    linear-gradient(
+      93deg,
+      rgb(56 135 223 / 40%) 0.25%,
+      rgb(0 179 115 / 40%) 95.88%
+    );
+
+  &.risky {
+    background: linear-gradient(0deg, #000 13.89%, #000a 100%),
+      $color-gradient-2;
+  }
+}
+
+.content {
+  @include bold;
+
+  position: relative;
+  width: $width-content;
+  margin: 0 auto;
+  font-size: 24px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.product-brief {
+  @include flex-center;
+
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 36px;
+  width: $width-content;
+  min-height: 328px;
+  padding: 24px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 24px;
+}
+
+.left {
+  flex: 1;
+  min-width: 300px;
+  margin: 0;
+}
+
+.title {
+  @include bold;
+  @include bold;
+
+  margin: 0;
+  margin: 0 0 24px;
+  font-size: 30px;
+  text-transform: uppercase;
+}
+
+.desc {
+  margin: 0;
+  line-height: 28px;
+  font-size: 14px;
+}
+
+.right {
+  width: min(380px, calc(100vw - 48px));
+  margin: 0 0 24px;
+
+  .carousel {
+    width: min(380px, calc(100vw - 48px));
+    height: min(240px, calc((100vw - 48px) * 240 / 380));
+  }
+
+  .img {
+    width: 100%;
+    height: auto;
+  }
+
+  :global {
+    .semi-carousel-indicator-center {
+      justify-content: center;
+      gap: 24px;
+      bottom: -24px;
+
+      .semi-carousel-indicator-item {
+        display: inline-block;
+        flex: none;
+        width: 16px;
+        border-radius: 2px;
+
+        &.semi-carousel-indicator-item-active {
+          width: 32px;
+        }
+      }
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .product-banner-wrapper {
+    background: linear-gradient(0deg, #000 80%, #0000 100%),
+      linear-gradient(
+        93deg,
+        rgb(56 135 223 / 40%) 0.25%,
+        rgb(0 179 115 / 40%) 95.88%
+      );
+
+    &.risky {
+      background: linear-gradient(0deg, #000 80%, #000a 100%), $color-gradient-2;
+    }
+  }
+
+  .product-brief {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .title {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+
+  .desc {
+    line-height: 24px;
+    font-size: 14px;
+  }
+
+  .right {
+    img {
+      width: 100%;
+    }
+  }
+}

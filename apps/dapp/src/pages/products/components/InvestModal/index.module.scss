@@ -1,0 +1,257 @@
+.link-to-customize {
+  @include flex-center;
+  @include pointer;
+
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  color: #006ea7;
+
+  > svg {
+    width: 1em;
+  }
+}
+
+.expand-widget {
+  @include pointer;
+  @include flex-center;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 44px;
+  padding: 0 0 12px;
+  margin: 0 -24px;
+  background: url("./assets/bg-expand.svg") no-repeat center / 100% 100%;
+  text-transform: capitalize;
+
+  svg {
+    width: 12px;
+    transition: 0.3s ease transform;
+  }
+
+  &.expanded {
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.deposit-modal {
+  :global {
+    .semi-modal-content {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .semi-modal-header {
+      background-color: #fff;
+    }
+
+    .semi-modal-header .semi-modal-title {
+      @include flex-center;
+
+      gap: 10px;
+
+      span {
+        @include flex-center;
+
+        svg {
+          height: 1em;
+        }
+      }
+    }
+  }
+}
+
+.unit-1 {
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.form {
+  @include flex-center;
+
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 40px;
+  position: relative;
+  margin: -24px -24px 0;
+  padding: 24px 24px 60px;
+  background: #fff;
+  border-radius: 0 0 24px 24px;
+  overflow: hidden;
+}
+
+.info {
+  @include flex-center;
+
+  justify-content: space-between;
+  gap: 48px;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+}
+
+.item {
+  margin: 0;
+}
+
+.label {
+  margin: 0 0 4px;
+  opacity: 0.3;
+}
+
+.value {
+  @include flex-center;
+  @include bold;
+
+  margin: 0;
+  font-size: 18px;
+
+  .term {
+    @include flex-center;
+    @include regular;
+
+    padding: 0 8px;
+    font-size: 14px;
+    border: 1px solid rgba(#000, 0.12);
+    border-radius: 3px;
+  }
+}
+
+.index-price {
+  @include flex-center;
+
+  height: 42px;
+  padding: 0 12px;
+  margin: 40px 0 0 136px;
+  line-height: 16px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(#000, 0.12);
+  white-space: nowrap;
+}
+
+.right {
+  margin: 0;
+
+  > .label {
+    margin: 0 0 16px;
+    line-height: 16px;
+    font-size: 16px;
+    opacity: 0.65;
+  }
+}
+
+.unit {
+  padding: 0 0 0 2px;
+}
+
+.balance {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: 12px 0 0;
+
+  .label {
+    opacity: 0.7;
+    margin: 0;
+  }
+
+  .unit {
+    @include regular;
+
+    font-size: 12px;
+    opacity: 0.3;
+  }
+}
+
+.estimated-profits {
+  gap: 16px;
+  padding: 16px;
+  margin: 24px 0;
+  background: #fafafa;
+  border-radius: 4px;
+}
+
+.chart {
+  position: relative;
+  padding: 0 0 24px;
+
+  .item {
+    width: fit-content;
+    margin: 0 0 50px;
+  }
+
+  :global(.semi-spin-children) {
+    padding: 24px;
+    background: #fafafa;
+
+    > div:not(.item) {
+      width: 560px;
+      height: 200px;
+    }
+  }
+
+  .payoff-chart {
+    padding-left: 220px;
+
+    :global {
+      .y-axis,
+      .x-axis {
+        left: 220px;
+      }
+
+      .x-axis {
+        .anchor-price {
+          font-size: 18px;
+          transform: translate(-50%, 15px);
+
+          &::before {
+            transform: translate(0, -15px);
+          }
+        }
+
+        .atm-price {
+          span {
+            display: block;
+            transform: translate(0, -10px) scale(0.8);
+          }
+
+          &::before {
+            height: 4px;
+            bottom: 28px;
+          }
+        }
+      }
+
+      .y-axis .label {
+        width: calc(220px - 6px);
+
+        span {
+          transform: none;
+        }
+
+        span:nth-child(2) {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+.btn-gradient {
+  margin: 0;
+}
+
+.calculation {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}

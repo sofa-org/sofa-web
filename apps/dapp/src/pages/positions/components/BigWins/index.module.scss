@@ -1,0 +1,43 @@
+.earning {
+  @include flex-column-center;
+
+  align-items: flex-start;
+  margin: 0;
+}
+
+.deposit-amount {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.container {
+  margin: 0;
+
+  th {
+    height: min(40px, 12vw);
+    color: rgba(#000, 0.65) !important;
+    border: none !important;
+    white-space: nowrap;
+  }
+
+  td {
+    height: min(72px, 15vw);
+    color: #000 !important;
+    border: none !important;
+    white-space: nowrap;
+  }
+
+  tr {
+    &:nth-child(2n + 1) {
+      background-color: #fafafa;
+    }
+  }
+
+  :global {
+    .address {
+      justify-content: flex-start;
+      padding: 0;
+    }
+  }
+}

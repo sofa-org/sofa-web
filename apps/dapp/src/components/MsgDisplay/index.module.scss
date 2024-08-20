@@ -1,0 +1,16 @@
+.more-info {
+  max-width: 100%;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.unfold {
+    white-space: initial;
+  }
+}
+
+.more {
+  color: #1d83d2;
+  cursor: pointer;
+}

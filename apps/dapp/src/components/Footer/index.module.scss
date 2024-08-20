@@ -1,0 +1,89 @@
+.nav {
+  @include flex-center;
+
+  justify-content: space-between;
+  width: min(1080px, 90vw);
+  height: 60px;
+  margin: 0 auto;
+  background: $color-main;
+  text-transform: uppercase;
+}
+
+.left {
+  @include flex-center;
+
+  gap: 40px;
+  text-transform: uppercase;
+
+  a {
+    color: rgba(#fff, 0.65);
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.copyright {
+  @include flex-center;
+
+  gap: 12px;
+  color: rgba(#fff, 0.65);
+
+  svg {
+    height: 20px;
+  }
+}
+
+.bar {
+  position: relative;
+  height: 48px;
+  background: $color-main-gradient;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("@/assets/star.svg") repeat-x 48px / 48px;
+  }
+
+  &.no-decoration {
+    background: #000;
+
+    &::after {
+      content: none;
+    }
+  }
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 1px 0 rgba(#fff, 0.3);
+}
+
+@media (orientation: portrait) {
+  .nav {
+    @include flex-column-center;
+
+    align-items: stretch;
+    gap: 0;
+    width: 100vw;
+    height: auto;
+  }
+
+  .left {
+    flex-wrap: wrap;
+    gap: 12px min(40px, 5vw);
+    padding: 12px;
+  }
+
+  .copyright {
+    @include flex-column-center;
+
+    padding: 18px 0;
+    font-size: 12px;
+    color: rgba(#fff, 0.3);
+    border-top: 1px solid rgba(#fff, 0.1);
+  }
+}

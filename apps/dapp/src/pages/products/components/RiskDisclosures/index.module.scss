@@ -1,0 +1,38 @@
+@import "../YieldTower/index.module";
+
+.brief {
+  margin: 0 0 min(60px, 5vw);
+}
+
+.p {
+  width: 100%;
+  padding: 0 0 0 min(30px, 5vw);
+  margin: 0 0 12px;
+  min-height: 24px;
+  line-height: 24px;
+
+  > b {
+    @include bold;
+
+    display: inline-block;
+    position: relative;
+    font-size: 20px;
+    margin: 0 0 4px;
+
+    &::before {
+      content: "✦";
+      position: absolute;
+      left: max(-30px, -5vw);
+      top: 0;
+      text-align: center;
+    }
+  }
+}
+
+.content {
+  gap: 0;
+}
+
+.section {
+  margin: min(64px, 5vw) 0 0;
+}

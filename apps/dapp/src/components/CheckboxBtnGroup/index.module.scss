@@ -1,0 +1,57 @@
+.checkbox-btn-group {
+  display: inline-flex;
+  flex-flow: row wrap;
+  gap: 4px;
+
+  .checkbox-btn {
+    @include flex-center;
+
+    flex: none;
+    padding: 0 8px;
+    font-size: inherit;
+    line-height: 22px;
+    color: rgba(#000, 0.85);
+    background: #f0f0f0;
+
+    // border: 1px solid #282d32;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+      color: #000;
+      background: #e0e0e0;
+    }
+
+    &.disabled {
+      color: rgba(#000, 0.5);
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    &.checkbox-active {
+      @include bold;
+
+      color: #fff;
+      background: #092038;
+    }
+  }
+}
+
+:global(.semi-always-dark) {
+  .checkbox-btn-group {
+    .checkbox-btn {
+      color: #fff;
+      background: rgba(#fff, 0.12);
+
+      &:hover {
+        background: rgba(#fff, 0.2);
+      }
+
+      &.checkbox-active {
+        color: #092038;
+        background: rgba(#fff, 1);
+      }
+    }
+  }
+}

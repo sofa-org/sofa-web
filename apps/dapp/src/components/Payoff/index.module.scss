@@ -1,0 +1,188 @@
+.pre {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 0;
+  font-size: 12px;
+  transform: translate(-50%, 0);
+}
+
+.apy {
+  @include bold;
+
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  font-size: 12px;
+  color: $color-rise;
+  transform: translate(-50%, 0);
+
+  > span {
+    @include regular;
+
+    padding: 0 0 0 2px;
+  }
+}
+
+.y-axis {
+  position: absolute;
+  left: 136px;
+  bottom: 20px;
+  width: 1px;
+  height: calc(100% - 20px);
+  background: rgba($color-main, 0.05);
+}
+
+.x-axis {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.anchor-price,
+.atm-price {
+  @include flex-column-center;
+  @include bold;
+
+  justify-content: flex-end;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  font-size: 12px;
+  transform: translate(-50%, 0);
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 20px;
+    border-right: 1px solid #fff;
+  }
+}
+
+.anchor-price {
+  &:nth-child(1)::before {
+    margin-left: -1px;
+  }
+}
+
+.atm-price {
+  @include regular;
+
+  bottom: -12px;
+  color: rgba(#000, 0.7);
+
+  span {
+    display: block;
+    transform: scale(0.8);
+  }
+
+  &::before {
+    top: auto;
+    height: 12px;
+    border-right: 1px dashed rgba(#000, 0.7);
+  }
+}
+
+.label {
+  @include flex-center;
+
+  align-items: flex-start;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 7px;
+  right: 6px;
+  width: calc(136px - 6px);
+  line-height: 14px;
+  font-size: 12px;
+  white-space: nowrap;
+
+  > span {
+    @include bold;
+
+    display: inline-block;
+    flex: none;
+    color: rgba(#000, 0.7);
+    z-index: 1;
+
+    > span {
+      @include regular;
+
+      display: inline-block;
+      opacity: 0.7;
+      transform: scale(0.7);
+      transform-origin: left center;
+    }
+
+    &:first-child {
+      width: 1px;
+      flex: 1;
+      transform: scale(0.8);
+      transform-origin: left center;
+      overflow: visible;
+    }
+  }
+}
+
+.payoff-chart {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  padding: 0 0 20px;
+}
+
+.show-axis {
+  padding-left: 136px;
+
+  .x-axis {
+    left: 136px;
+  }
+}
+
+.payoff {
+  @include flex-column-center;
+
+  margin: 0;
+  padding: 20px;
+  color: $color-main;
+
+  .max-apy {
+    font-size: 12px;
+    color: #b3b3b3;
+    text-align: center;
+
+    > span {
+      @include bold;
+
+      display: inline-block;
+      margin: 0 6px 0 0;
+      line-height: 26px;
+      font-size: 24px;
+      color: $color-rise;
+
+      > span {
+        @include regular;
+      }
+    }
+
+    > div {
+      svg {
+        display: inline-block;
+        width: 10px;
+        margin: 0 0 0 6px;
+      }
+    }
+
+    :global {
+      .apy-desc {
+        text-decoration: underline dashed rgba(#000, 0.12);
+      }
+    }
+  }
+
+  .payoff-chart {
+    height: 120px;
+  }
+}

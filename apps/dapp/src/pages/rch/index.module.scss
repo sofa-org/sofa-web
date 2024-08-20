@@ -1,0 +1,64 @@
+.banner.banner {
+  background: linear-gradient(to right, rgba(#000, 0.9), rgba(#000, 0.9)),
+    var(--color-gradient);
+}
+
+.container.container {
+  margin: 0;
+  background:
+    linear-gradient(to bottom, #000, #0000) no-repeat center bottom / 100vw
+      34.9vw,
+    url("./assets/bg.jpg") no-repeat center bottom -100px / 100%;
+}
+
+.bee {
+  position: absolute;
+  top: 30px;
+  z-index: 2;
+  left: max(-24px, calc((100vw - 1080px) / 2 - 110px));
+}
+
+.title {
+  @include flex-center;
+
+  gap: 16px;
+  font-size: 24px;
+  color: #fff;
+}
+
+.tips {
+  @include flex-center;
+
+  height: 25vh;
+  font-size: 24px;
+  color: #fff;
+}
+
+@mixin rewrite() {
+  .container {
+    margin-top: -412px;
+  }
+
+  .bee {
+    top: 20px;
+    left: auto;
+    right: max(-24px, calc((100vw - 1080px) / 2 - 110px));
+    transform: rotateY(180deg);
+  }
+
+  .title {
+    margin: -24px 0 24px;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <= 1000px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

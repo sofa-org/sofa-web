@@ -1,0 +1,13 @@
+.semi-tabs-pane:focus-visible {
+  outline: none !important;
+}
+
+@media (orientation: portrait) {
+  .semi-tabs-tab-line.semi-tabs-tab-top.semi-tabs-tab {
+    padding: 10px 4px 8px;
+  }
+
+  .semi-tabs-bar-line.semi-tabs-bar-top .semi-tabs-tab:not(:last-of-type) {
+    margin-right: 10px;
+  }
+}

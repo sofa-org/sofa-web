@@ -1,0 +1,10 @@
+.auto-bg {
+  display: block;
+  height: 400px;
+  background: #000;
+
+  > .mouse-rotate-3d {
+    width: 100%;
+    height: 100%;
+  }
+}

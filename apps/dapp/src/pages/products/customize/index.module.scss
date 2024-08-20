@@ -1,0 +1,438 @@
+.header {
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: $width-content;
+  margin: -480px auto 0;
+}
+
+.form {
+  width: $width-content;
+  margin: 24px auto 40px;
+}
+
+.product-name {
+  @include bold;
+  @include flex-center;
+
+  justify-content: flex-start;
+  margin: 0 0 45px;
+  font-size: 16px;
+  white-space: nowrap;
+
+  svg {
+    margin: 0 4px 0 0;
+  }
+}
+
+.content {
+  @include flex-center;
+
+  align-items: stretch;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0;
+  background: #fff;
+  border-radius: 24px;
+}
+
+.left {
+  min-width: min(718px, calc(100vw - 48px));
+  flex: 1;
+  padding: min(40px, 4vw);
+  margin: 0;
+  border-right: 1px dashed $color-border;
+}
+
+.form-item {
+  margin: 0 0 min(40px, 3.6vw);
+
+  &:last-child {
+    margin: 0;
+  }
+}
+
+.label {
+  @include bold;
+
+  margin: 0 0 min(14px, 1.5vw);
+  font-size: 16px;
+}
+
+.input-wrapper {
+  margin: 0;
+
+  :global {
+    .semi-datepicker-input {
+      margin: 8px 0 0;
+      overflow: hidden;
+
+      .semi-input-wrapper {
+        margin: 0;
+        border-radius: 20px;
+      }
+
+      input {
+        @include bold;
+      }
+    }
+
+    .radio-btn-group {
+      display: flex;
+    }
+  }
+}
+
+.atm-el {
+  @include bold;
+  @include flex-column-center;
+
+  gap: 0;
+  height: 22px;
+  color: #0069a7;
+  font-size: 12px;
+  line-height: 10px;
+
+  span {
+    transform: scale(0.7);
+  }
+}
+
+.desc {
+  display: block;
+  margin: 0 0 8px;
+  color: rgba($color-main, 0.45);
+}
+
+.barrier {
+  margin: 0 0 24px;
+}
+
+.right {
+  flex: 1;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  min-width: calc(1080px - 718px);
+  padding: 40px 24px;
+  margin: 0;
+  background: #fff;
+  border-radius: 0 12px 12px;
+
+  .form-item {
+    max-width: calc(100vw - 24px);
+  }
+
+  > :global(.semi-button) {
+    max-width: calc(100vw - 24px);
+  }
+
+  > div:last-child,
+  > button:last-child {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.balance {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: 16px 0 0;
+
+  .label {
+    @include regular;
+
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.3;
+  }
+
+  .value {
+    opacity: 0.6;
+  }
+}
+
+.deposit-ccy-selector.deposit-ccy-selector {
+  height: 48px;
+  margin: 0 -16px 0 0;
+  border: none !important;
+  background: #d7d7d7;
+  border-radius: 0;
+
+  &:hover {
+    background: #d7d7d7;
+  }
+
+  :global {
+    .semi-select-arrow {
+      padding-right: 10px;
+    }
+  }
+}
+
+.btn-expand {
+  @include pointer;
+  @include flex-center;
+
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  color: rgba(#000, 0.3);
+  background: rgba(#000, 0.12);
+
+  > svg {
+    display: block;
+    width: 1em;
+    animation: arrow 1s infinite;
+  }
+
+  &.expanded {
+    transform: rotate(0);
+  }
+
+  &.folded {
+    transform: rotate(180deg);
+  }
+}
+
+.quote-infos {
+  position: relative;
+  width: 100%;
+  padding: 10px 10px 30px;
+  margin: -20px 0 -40px;
+  background: #fafafa;
+  border-radius: 4px;
+  overflow: hidden;
+
+  & + :global(.semi-button),
+  & + :global(.wallet-connector) {
+    margin: 20px 0 0;
+  }
+
+  .details {
+    display: block;
+  }
+
+  .brief {
+    @include flex-center;
+
+    display: none;
+    justify-content: space-between;
+
+    .label {
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .value {
+      @include bold;
+    }
+
+    .amount {
+      color: $color-rise;
+    }
+
+    .sep {
+      @include regular;
+
+      padding: 0 4px;
+      color: rgba(#000, 0.3);
+    }
+
+    .amount-rch {
+      color: var(--color-rch);
+    }
+
+    .unit {
+      @include regular;
+
+      padding: 0 0 0 2px;
+    }
+  }
+
+  &.expanded {
+    .brief {
+      display: none;
+    }
+
+    .details {
+      display: block;
+    }
+  }
+
+  &.folded {
+    .brief {
+      display: flex;
+    }
+
+    .details {
+      display: none;
+    }
+  }
+}
+
+.chart {
+  margin: 10px 0 40px;
+
+  :global {
+    .anchor-price {
+      &::before {
+        border-right: 1px solid #fafafa;
+      }
+    }
+  }
+}
+
+.product-desc-wrapper {
+  width: $width-content;
+  margin: 40px auto;
+}
+
+@media (orientation: portrait) {
+  .header {
+    width: 100vw;
+    gap: 0;
+    border-radius: 4vw 4vw 0 0;
+    overflow: hidden;
+  }
+
+  .form {
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .form-item {
+    margin: 0 0 16px;
+  }
+
+  .label {
+    margin: 0 0 8px;
+  }
+
+  .left,
+  .right {
+    padding: 12px;
+    border: none;
+
+    .product-name {
+      display: none;
+    }
+  }
+
+  .right {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    border-radius: 0;
+    box-shadow: 0 -1px 2px 0 rgba(#000, 0.1);
+
+    .form-item {
+      margin: 0;
+    }
+
+    .label {
+      @include regular;
+
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .balance {
+      margin: 8px 0 0;
+      font-size: 12px;
+    }
+
+    > div:last-child,
+    > button:last-child {
+      position: relative;
+      z-index: 2;
+      margin: 12px 0 0;
+    }
+
+    .quote-infos {
+      margin: 12px 0 -32px;
+
+      &:not(.expanded, .folded) {
+        .details {
+          display: none;
+        }
+
+        .brief {
+          display: flex;
+        }
+
+        .btn-expand {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .input-wrapper {
+      :global {
+        .amount-input-wrapper {
+          height: 40px;
+          font-size: 24px;
+
+          > div:nth-child(2) {
+            margin: 8px 0 0;
+
+            .semi-button:not(:last-child) {
+              width: 24px;
+              height: 24px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .product-desc-wrapper {
+    margin: 12px auto;
+  }
+
+  .placeholder {
+    display: block;
+    height: 100px;
+  }
+}
+
+.calculation {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    .btn-expand {
+      display: flex;
+    }
+
+    .details {
+      max-height: 35vh;
+      overflow: auto;
+    }
+  }
+}
+
+@media (width <= 1100px) {
+  :global(.is-pc) {
+    .btn-expand {
+      display: flex;
+    }
+
+    .details {
+      max-height: 25vh;
+      overflow: auto;
+    }
+  }
+}

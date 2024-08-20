@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <title>SOFA.org</title>
+    <meta
+      name="description"
+      content="SOFA.org is a decentralized, non-profit, open-source technology organization for handling all financial assets on-chain. Earn $RCH via protocol use, liquidity provision, or governance. $SOFA lets holders vote on proposals shaping SOFA.org's future."
+    />
+    <meta
+      name="keywords"
+      content="DeFi, RCH, SOFA, decentralized finance, crypto structured products, blockchain, protocol safety, community rewards, financial technology, governance token, decentralized organization, DeFi education, capital efficiency, non-profit finance"
+    />
+    <script>
+      function cContent(initialScale) {
+        var s =
+          "width=device-width, initial-scale=" +
+          initialScale +
+          ", minimum-scale=" +
+          initialScale;
+
+        s += ", maximum-scale=" + initialScale;
+
+        var meta = document.head.querySelector("meta[name=viewport]");
+        meta.setAttribute("content", s);
+        window.winScale = initialScale;
+        window.px2rem = function (val) {
+          return parseFloat(val) + "rem";
+        };
+      }
+      // cContent(
+      //   window.innerWidth < window.innerHeight && window.innerWidth < 1100
+      //     ? window.innerWidth / 1100
+      //     : 1
+      // );
+      var ua = navigator.userAgent || navigator.vendor || window.opera;
+      var isMobile =
+        /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+          ua
+        );
+      var disableScale = /QHBrowser|quark|CKBrowser|Lark|safari/i.test(ua);
+      var scale = (function () {
+        return 1;
+        if (!isMobile || disableScale) return 1;
+        return window.devicePixelRatio ? 1 / window.devicePixelRatio : 1;
+      })();
+      cContent(scale);
+    </script>
+    <style>
+      * {
+        max-height: 1000000rem;
+      }
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+    <script>
+      document.documentElement.style.fontSize = 1 / window.winScale + "px";
+    </script>
+    <%- extraScript %>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <div
+      class="cf-turnstile"
+      data-sitekey="<%- sitekey %>"
+      data-callback="javascriptCallback"
+    ></div>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+.regular,
+.tips {
+  line-height: 28px;
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.tips {
+  margin-top: 40px;
+}
+
+.p {
+  @include bold;
+
+  line-height: 36px;
+  font-size: 16px;
+  margin: 0 0 40px;
+}
+
+.item {
+  display: block;
+}

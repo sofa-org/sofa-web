@@ -1,0 +1,295 @@
+.amount {
+  @include bold;
+
+  margin: 0;
+  font-size: 16px;
+
+  > span {
+    color: rgba(#000, 0.5);
+  }
+}
+
+.unit {
+  margin: 0;
+  padding: 0 0 0 6px;
+  font-size: 12px;
+
+  > span {
+    display: inline-block;
+    width: 24px;
+    margin: 0 0 0 -3px;
+    padding: 0 0 0 8px;
+    transform: scale(0.7);
+    transform-origin: left center;
+    white-space: nowrap;
+  }
+}
+
+.form-item {
+  @include flex-column-center;
+
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 18px;
+  flex: 1;
+  margin: 0;
+  padding: 0 0 10px;
+}
+
+.label {
+  height: 26px;
+  line-height: 18px;
+  color: rgba(#000, 0.65);
+
+  .return {
+    white-space: nowrap;
+  }
+
+  .rch-return {
+    display: block;
+    font-size: 12px;
+    color: var(--color-rch);
+
+    .amount,
+    .unit {
+      @include regular;
+
+      font-size: inherit;
+      color: inherit;
+    }
+  }
+}
+
+.value {
+  @include flex-center;
+
+  gap: 0;
+  justify-content: flex-start;
+  min-width: 130px;
+  height: 32px;
+  margin: 0;
+
+  :global {
+    .semi-datepicker {
+      .semi-input-wrapper {
+        border-radius: 16px;
+      }
+    }
+  }
+}
+
+.left {
+  @include flex-center;
+
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  flex: 3;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: min(20px, 2.2vw);
+  box-shadow: 1px 1px 0 0 rgba(#000, 0.05);
+
+  .label {
+    padding: 12px 0 0;
+  }
+}
+
+.right {
+  flex: 1;
+  min-width: 196px;
+  padding: min(20px, 2.2vw);
+
+  .form-item {
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+
+    .label {
+      @include flex-center;
+
+      gap: 0 6px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+.amount-input {
+  position: relative;
+  min-width: 148px;
+  height: 32px;
+  font-size: 14px;
+
+  > div {
+    padding-left: 12px;
+  }
+
+  input {
+    transform: none;
+  }
+
+  .unit-in-input {
+    position: absolute;
+    right: 62px;
+    top: 8px;
+    height: 14px;
+    font-size: 12px;
+    opacity: 0.5;
+    text-align: right;
+    transform: scale(0.8);
+    transform-origin: right center;
+  }
+}
+
+.icon {
+  @include bold;
+
+  font-size: 12px;
+  padding: 0 4px 0 0;
+}
+
+.icon-del {
+  @include flex-center;
+  @include pointer;
+
+  display: none;
+  flex: none;
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 32px;
+  height: 32px;
+  border: 8px 0 8px 0;
+
+  > svg {
+    width: 12px;
+  }
+
+  &:hover {
+    background: rgba(#000, 0.05);
+  }
+}
+
+.btn-add.btn-add {
+  height: min(40px, 8vw);
+  border-radius: 8px;
+  border-color: #e0e0e0;
+
+  svg {
+    width: 1em;
+  }
+}
+
+.custom-ticket {
+  @include flex-center;
+  @include pointer;
+
+  justify-content: stretch;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 1px;
+  position: relative;
+  margin: 0 0 min(20px, 2.2vw);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+
+  &.active {
+    @include gradient-border(1px, #fff, 8px);
+  }
+
+  &:hover {
+    .icon-del {
+      display: flex;
+    }
+  }
+}
+
+.custom-tickets {
+  flex: 1;
+  margin: 0;
+}
+
+.date-picker {
+  min-width: 128px;
+}
+
+.date-picker-dropdown {
+  :global {
+    .semi-datepicker-quick-control-top-content {
+      @include flex-center;
+
+      justify-content: flex-start;
+      flex-wrap: wrap;
+
+      .semi-button {
+        border: 1px solid rgba(#000, 0.12);
+        background: transparent;
+
+        &:hover {
+          border: 1px solid rgba(#000, 0.5);
+          background: transparent;
+        }
+      }
+
+      .semi-datepicker-quick-control-top-content-item-ellipsis,
+      .semi-datepicker-quick-control-bottom-content-item-ellipsis {
+        width: auto;
+      }
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .right {
+    padding: 12px 12px 12px 10px;
+
+    .form-item {
+      gap: 8px;
+
+      .label {
+        height: auto;
+
+        .return {
+          .icon {
+            font-size: 12px;
+          }
+
+          .amount {
+            font-size: 12px;
+          }
+        }
+
+        .rch-return {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
+  .left {
+    gap: 12px;
+    padding: 12px;
+
+    .form-item {
+      gap: 8px;
+
+      .label {
+        height: auto;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .custom-ticket {
+    margin: 0 0 12px;
+  }
+
+  .icon-del {
+    display: flex;
+    background: rgba(#000, 0.03);
+  }
+}

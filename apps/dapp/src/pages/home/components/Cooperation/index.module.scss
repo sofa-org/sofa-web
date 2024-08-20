@@ -1,0 +1,70 @@
+.home-cooperation-wrapper {
+  height: auto;
+  margin: -1rem 0 0;
+}
+
+.home-cooperation {
+  @include flex-column-center;
+
+  gap: 0;
+  position: sticky;
+  left: 0;
+  top: 0;
+  min-height: 100vh;
+  padding: 160px 0;
+  background: #fff;
+  overflow: hidden;
+}
+
+.section {
+  width: min(90vw, 1080px);
+}
+
+.cloud {
+  position: relative;
+  z-index: 1;
+  margin: -16px auto -20px;
+  transform: scale(0.8);
+}
+
+.logo {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(336px, 90vw);
+  margin: 32px auto;
+}
+
+.slogan {
+  display: inline-block;
+  margin: 0 0 80px;
+  font-size: min(24px, 4.5vw);
+  text-align: center;
+  color: rgb(0 0 0 / 50%);
+}
+
+.agencies {
+  @include flex-center;
+
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 0;
+}
+
+.agency {
+  @include flex-center;
+  @include gradient-border(1px, #fff, 8px);
+
+  width: min(280px, calc((90vw - 24px) / 2));
+  height: auto;
+  margin: 0;
+
+  svg,
+  img {
+    width: 100%;
+  }
+
+  &::after {
+    opacity: 0.32;
+  }
+}

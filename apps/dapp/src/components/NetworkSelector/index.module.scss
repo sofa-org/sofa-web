@@ -1,0 +1,52 @@
+.network-selector {
+  @include flex-center;
+  @include header-btn;
+
+  width: 40px;
+  height: 32px;
+  border-radius: 16px;
+
+  svg,
+  img {
+    width: 20px;
+  }
+}
+
+.network-selector-modal {
+  .tips {
+    @include regular;
+
+    color: rgba(#000, 0.7);
+    text-align: center;
+  }
+
+  :global(.semi-modal-body) button {
+    height: 40px;
+    margin: 24px auto 0;
+    border-radius: 20px;
+    opacity: 0.6;
+
+    :global(.semi-button-content) {
+      @include flex-center;
+
+      gap: 6px;
+    }
+
+    svg,
+    img {
+      width: 16px;
+    }
+
+    &.active {
+      opacity: 1;
+      outline: 3px solid rgba(#08f, 0.2);
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .network-selector {
+    width: 32px;
+    height: 32px;
+  }
+}

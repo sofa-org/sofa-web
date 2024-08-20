@@ -1,0 +1,103 @@
+@import "../PositionCard/index.module";
+
+.profits {
+  @extend %product;
+
+  padding: 40px 12px 56px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(#000, 0.6);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    z-index: 1;
+    background: var(--color-rise);
+  }
+}
+
+.product-icon {
+  position: absolute;
+  left: -120px;
+  top: -100px;
+  z-index: 0;
+  width: 400px;
+  margin: 0;
+  filter: blur(10px);
+  opacity: 0.3;
+}
+
+.level-icon {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  margin: 0;
+  line-height: 60px;
+  font-size: 60px;
+}
+
+.profit {
+  margin: 0 20px;
+  line-height: 24px;
+  color: var(--color-rise);
+
+  .value {
+    @include bold;
+
+    font-size: 24px;
+  }
+
+  .unit {
+    padding: 0 0 0 8px;
+    font-size: 20px;
+  }
+}
+
+.others {
+  padding: 12px;
+  margin: 0;
+}
+
+.infos {
+  .expiry,
+  .prices {
+    color: #000;
+    background: rgba(#262626, 0.12);
+  }
+}
+
+.amounts {
+  margin: 12px 0 0;
+  padding: 0;
+
+  .amount {
+    @include regular;
+
+    margin: 0 0 4px;
+    font-size: 14px;
+    line-height: 18px;
+
+    .label {
+      color: rgba(#000, 0.5);
+    }
+  }
+}
+
+.icon-info {
+  @include pointer;
+
+  width: 40px;
+}
+
+.rule-descriptions {
+  max-width: 100%;
+}

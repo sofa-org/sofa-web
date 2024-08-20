@@ -1,0 +1,18 @@
+{
+  "name": "@sofa/alg",
+  "private": true,
+  "version": "0.0.0",
+  "module": "./pkg/index.js",
+  "types": "./pkg/index.d.ts",
+  "scripts": {
+    "watch": "watchexec -e rs \"pnpm run build\"",
+    "build": "wasm-pack build --out-dir pkg --target web --release --out-name index",
+    "prepare": "(shx which cargo || (curl https://sh.rustup.rs -sSf | sh -s -- -y && cargo install watchexec-cli)) && cargo install wasm-pack --vers 0.12.1 && cargo install watchexec-cli --vers 1.25.1",
+    "test": "cargo test"
+  },
+  "nx": {
+    "tags": [
+      "type:shared"
+    ]
+  }
+}

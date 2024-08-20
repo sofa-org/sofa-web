@@ -1,0 +1,105 @@
+.title {
+  @include bold;
+
+  margin: 0 12px 12px 0;
+  font-size: 12px;
+}
+
+.value-desc {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+  transform: scale(0.9);
+  transform-origin: left center;
+}
+
+.rch {
+  margin: 0;
+  color: var(--color-rch);
+
+  .unit {
+    color: inherit;
+    color: rgba($color-rch, 0.6) !important;
+  }
+}
+
+.label {
+  @include medium;
+
+  font-size: 12px;
+  line-height: 14px;
+  opacity: 0.3;
+}
+
+.profit-brief {
+  font-size: 12px;
+  color: rgba(#000, 0.5);
+
+  > b {
+    color: #000;
+  }
+}
+
+.profit-render {
+  @include flex-center;
+
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0;
+
+  .value {
+    @include bold;
+
+    justify-content: flex-start;
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .unit {
+    @include regular;
+
+    padding: 0 0 0 3px;
+    font-size: 12px;
+    color: rgba($color-main, 0.3);
+
+    > span {
+      display: inline-block;
+      width: 24px;
+      margin: 0 0 0 -3px;
+      padding: 0 0 0 4px;
+      transform: scale(0.7);
+      transform-origin: left center;
+      white-space: nowrap;
+    }
+  }
+
+  .item {
+    @include flex-column-center;
+
+    align-items: flex-start;
+    font-size: 12px;
+
+    &:last-child {
+      .value {
+        justify-content: flex-end;
+      }
+    }
+  }
+}
+
+.profit-render-wrapper {
+  flex: 1;
+  margin: 0;
+  min-width: 290px;
+}
+
+.profits-render {
+  @include flex-center;
+
+  flex-wrap: wrap;
+  gap: 16px 32px;
+
+  &:not(:last-child) {
+    margin: 0 0 16px;
+  }
+}

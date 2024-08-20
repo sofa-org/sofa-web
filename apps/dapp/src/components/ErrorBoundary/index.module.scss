@@ -1,0 +1,32 @@
+.error-boundary {
+  @include flex-column-center;
+
+  background: #000;
+
+  --semi-color-primary: rgb(80 153 212);
+
+  :global {
+    .semi-empty-title,
+    .semi-empty-description {
+      color: #fff;
+    }
+
+    .semi-empty-footer {
+      @include flex-center;
+    }
+  }
+
+  button {
+    min-width: 100px;
+    margin: 24px 0 0;
+    border-radius: 20px;
+  }
+}
+
+.error-stack {
+  width: 50vw;
+  margin: 0;
+  padding: 0 0 0 16px;
+  text-align: left;
+  text-indent: -16px;
+}

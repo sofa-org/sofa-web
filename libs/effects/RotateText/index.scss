@@ -1,0 +1,19 @@
+.rotate-text {
+  display: block;
+  margin: 0;
+  transition:
+    width 1s ease,
+    height 1s ease;
+}
+
+:global {
+  @keyframes rotate {
+    0% {
+      transform: rotate(0);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}

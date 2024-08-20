@@ -1,0 +1,268 @@
+.link {
+  display: inline-block;
+  margin: 14px 0 0;
+  text-decoration: underline;
+}
+
+.account {
+  @include flex-center;
+
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+  width: $width-content;
+  margin: 0 auto;
+}
+
+.left {
+  flex: 346;
+  min-width: min(346px, calc(100vw - 24px));
+  margin: 0;
+  padding: 36px;
+  border-radius: 20px;
+  color: #fff;
+  background: url("./assets/left-card-bg.jpg") no-repeat center / 100% 100%;
+  box-shadow: 0 0 16px 0 rgb(0 0 0 / 16%);
+}
+
+.avatar {
+  margin: 0 0 40px;
+}
+
+.info-item {
+  margin: 0 0 20px;
+}
+
+.label {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: rgba(#fff, 0.3);
+}
+
+.value {
+  margin: 0;
+  color: var(--color-rch);
+
+  :global {
+    .address {
+      justify-content: flex-start;
+      width: 100%;
+      padding: 0;
+    }
+  }
+}
+
+.rch-amount {
+  @include bold;
+
+  margin: 0;
+  font-size: 24px;
+  color: var(--color-rch);
+}
+
+.cvt-value {
+  margin: 0;
+}
+
+.logo {
+  width: 18px;
+}
+
+.right {
+  flex: 630;
+  min-width: min(630px, calc(100vw - 24px));
+  margin: 0;
+}
+
+.claimable-infos {
+  position: relative;
+  margin: 0 0 24px;
+  padding: 36px;
+  border-radius: 20px;
+  color: #fff;
+  background: #141414;
+  box-shadow: 0 0 16px 0 rgb(0 0 0 / 16%);
+
+  .label {
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  .value {
+    @include bold;
+
+    margin: 15px 0;
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .cvt-value {
+    font-size: 16px;
+    line-height: 20px;
+    opacity: 0.65;
+  }
+
+  > button {
+    position: absolute;
+    right: 36px;
+    top: 36px;
+    height: 44px;
+    padding: 0 32px;
+    font-size: 16px;
+    text-transform: uppercase;
+    border-radius: 22px;
+    border: 1px solid #fff;
+    background-color: transparent !important;
+    opacity: 0.65;
+
+    > span {
+      @include bold;
+
+      letter-spacing: 1px;
+    }
+  }
+}
+
+.btn.btn {
+  width: 100%;
+  height: 44px;
+  margin: 36px 0 20px;
+  font-size: 16px;
+  color: #fff9;
+  border-radius: 22px;
+
+  > span {
+    @include flex-center;
+
+    color: #fff;
+  }
+}
+
+.btn-game-center {
+  padding: 0 10px;
+  font-size: 14px;
+  height: 44px;
+  line-height: 44px;
+  color: #51acf1;
+  text-align: center;
+  margin-top: 0 !important;
+  margin-bottom: 10px !important;
+  display: block;
+  background: linear-gradient(
+    89.98deg,
+    #ff1010 -6.63%,
+    #ff6e5b 50.73%,
+    #fdbd0f 104.04%
+  );
+  position: relative;
+
+  > img {
+    width: 24px;
+    height: 24px;
+    vertical-align: center;
+    display: inline-block;
+    margin-bottom: -4px;
+    margin-right: 8px;
+  }
+
+  > span {
+    color: #fff;
+    display: inline-block !important;
+    padding-right: 20px;
+  }
+
+  > i {
+    width: 35px;
+    height: 21px;
+    background: url("./assets/new.svg") no-repeat;
+    color: #fff;
+    margin-left: -14px;
+    top: 11px;
+    position: absolute;
+  }
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.desc-game-center {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(#fff, 0.65);
+}
+
+.history {
+  min-height: 640px;
+  margin: 0 0 80px;
+  padding: 36px;
+  border-radius: 20px;
+  color: #fff;
+  background: #141414;
+  box-shadow: 0 0 16px 0 rgb(0 0 0 / 16%);
+
+  .total {
+    margin: 0 0 24px;
+
+    .value {
+      @include bold;
+
+      font-size: 16px;
+
+      .cvt-value {
+        @include regular;
+
+        padding: 0 0 0 6px;
+        font-size: 14px;
+        opacity: 0.65;
+      }
+    }
+  }
+
+  th {
+    height: 40px;
+    color: rgba(#fff, 0.85) !important;
+    background: #000 !important;
+    white-space: nowrap;
+  }
+
+  td {
+    height: 48px;
+    color: #fff;
+    border: none !important;
+    white-space: nowrap;
+  }
+
+  tbody tr:nth-child(2n) td {
+    background: #000 !important;
+  }
+
+  tbody tr:nth-child(2n + 1) td {
+    background: #000 !important;
+  }
+}
+
+@mixin rewrite {
+  .account {
+    gap: 12px;
+  }
+
+  .left,
+  .claimable-infos,
+  .history {
+    padding: 24px;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <= 1000px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

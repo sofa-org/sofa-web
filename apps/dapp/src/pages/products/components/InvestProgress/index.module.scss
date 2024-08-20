@@ -1,0 +1,109 @@
+.chain {
+  img {
+    width: 14px;
+  }
+}
+
+.deposit-progress {
+  margin: 0;
+
+  > svg:first-child {
+    display: block;
+    width: 80px;
+    margin: 0 auto;
+  }
+}
+
+.deposit-progress-title {
+  @include bold;
+
+  display: block;
+  margin: 20px 0 0;
+  font-size: 16px;
+  text-align: center;
+
+  > a {
+    @include pointer;
+
+    color: #2d6fb9 !important;
+  }
+}
+
+.deposit-progress-status-dec {
+  margin: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentcolor;
+}
+
+.deposit-progress-table {
+  max-width: 100%;
+  margin: 30px 0 0;
+  border: 1px solid var(--semi-color-border);
+  border-bottom: none;
+
+  th {
+    height: 30px;
+    background: var(--semi-color-border) !important;
+    border-bottom: none !important;
+  }
+
+  td {
+    height: 28px;
+    white-space: nowrap;
+  }
+
+  tr:hover {
+    td {
+      background: #fff !important;
+    }
+  }
+}
+
+.deposit-progress-list {
+  @include flex-column-center;
+
+  gap: 12px;
+  margin: 30px 0 0;
+}
+
+.progress-info {
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  flex: 1;
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(#000, 0.12);
+}
+
+.progress-info-item {
+  @include flex-column-center;
+
+  align-items: flex-start;
+  margin: 0;
+
+  &.row {
+    flex: none;
+    width: 100%;
+  }
+}
+
+.label {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.value {
+  @include flex-center;
+
+  justify-content: flex-start;
+  min-height: 24px;
+  margin: 0;
+}

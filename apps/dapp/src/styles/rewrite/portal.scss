@@ -1,0 +1,31 @@
+@mixin rewrite {
+  .semi-portal {
+    position: fixed;
+    inset: 0 !important;
+    background: rgba(#000, 0.7);
+  }
+
+  .semi-portal-inner {
+    position: absolute;
+    inset: auto 0 0 !important;
+    transform: none !important;
+  }
+
+  .semi-popover-wrapper {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: none;
+  }
+}
+
+@media (orientation: portrait) {
+  .is-mobile {
+    @include rewrite;
+  }
+}
+
+@media screen and (width <= 500px) {
+  .is-pc {
+    @include rewrite;
+  }
+}

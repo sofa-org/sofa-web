@@ -1,0 +1,48 @@
+@mixin rewrite {
+  .semi-popover .semi-datepicker {
+    width: 100%;
+
+    .semi-datepicker-quick-control {
+      max-width: none;
+    }
+
+    .semi-datepicker-month-grid {
+      > div {
+        flex: 1;
+      }
+    }
+
+    .semi-datepicker-month {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .semi-datepicker-week,
+    .semi-datepicker-weekday {
+      display: grid;
+      grid-template-columns: repeat(7, calc(100% / 7));
+
+      > div {
+        width: auto;
+      }
+    }
+
+    > div:not(.semi-datepicker-quick-control) {
+      > div {
+        flex: 1;
+      }
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .is-mobile {
+    @include rewrite;
+  }
+}
+
+@media screen and (width <= 500px) {
+  .is-pc {
+    @include rewrite;
+  }
+}

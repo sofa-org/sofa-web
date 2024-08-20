@@ -1,0 +1,42 @@
+.sfx-text-wrapper {
+  @include flex-center;
+
+  width: 100%;
+  transform: translateZ(0);
+}
+
+.sfx-text {
+  flex: none;
+  display: block;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+
+  // // background: $color-main-gradient;
+  // -webkit-background-clip: text;
+  // color: transparent;
+  // background-clip: text;
+  // -webkit-text-fill-color: transparent; /* 用于Webkit内核浏览器 */
+  // -webkit-text-stroke: 1px #ff0099;
+  text {
+    @include bold;
+
+    font-size: inherit;
+    text-align: center;
+  }
+}
+
+.sfx-text-stroke {
+  fill: none;
+
+  // stroke-dasharray: 100% 0;
+  // animation: stroke-offset 9s ease;
+}
+
+// @keyframes stroke-offset {
+//   0% {
+//     stroke-dasharray: 0 100%;
+//   }
+//   100% {
+//     stroke-dasharray: 100% 0;
+//   }
+// }

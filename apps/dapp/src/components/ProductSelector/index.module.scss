@@ -1,0 +1,159 @@
+.risk-item {
+  @include flex-center;
+
+  white-space: nowrap;
+}
+
+.product-item {
+  @include flex-center;
+
+  justify-content: flex-start;
+  gap: 8px;
+  white-space: nowrap;
+
+  img,
+  svg {
+    width: 1.5em;
+  }
+}
+
+.logo {
+  flex: none;
+  height: 16px;
+  max-width: none !important;
+  margin: 0 0 -4px;
+}
+
+.product-type-selector.product-type-selector.product-type-selector {
+  height: 36px;
+  min-height: auto;
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(#fff, 0.16);
+
+  &:hover {
+    background: rgba(#fff, 0.26);
+  }
+
+  :global {
+    .semi-select-arrow {
+      margin-right: 10px;
+
+      > svg {
+        width: 20px;
+      }
+    }
+
+    .semi-select-selection {
+      @include bold;
+
+      padding: 0 10px 0 0;
+    }
+  }
+}
+
+.product-selector.product-selector.product-selector {
+  height: 32px;
+  min-height: auto;
+  border-radius: 16px;
+  border: none !important;
+  color: #fff;
+  background: #000;
+
+  .risk-item {
+    gap: 4px !important;
+
+    svg {
+      height: 14px;
+    }
+  }
+
+  :global {
+    .semi-select-arrow {
+      width: 14px;
+      margin-right: 10px;
+    }
+
+    .semi-select-selection {
+      @include bold;
+
+      padding: 0 2px 0 10px;
+      margin: 0;
+
+      .semi-select-selection-text {
+        @include flex-center;
+
+        justify-content: flex-start;
+        gap: 16px;
+        width: 160px;
+      }
+    }
+  }
+
+  &:hover {
+    color: #fff;
+    background: #000;
+  }
+}
+
+.product-type-dropdown.product-type-dropdown,
+.product-dropdown.product-dropdown {
+  :global {
+    .semi-select-option-icon {
+      display: none;
+    }
+
+    .semi-select-option-selected {
+      .semi-select-option-text,
+      .product-item {
+        @include bold;
+      }
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .logo {
+    height: 12px;
+  }
+
+  .risk-item {
+    gap: 4px;
+    font-size: 12px;
+
+    > img {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .product-item {
+    img:first-child,
+    svg:first-child {
+      display: none;
+    }
+  }
+
+  .product-selector.product-selector.product-selector {
+    margin: 0 -4px;
+
+    :global {
+      .semi-select-arrow {
+        margin-right: 8px;
+      }
+
+      .semi-select-selection-text {
+        gap: 8px !important;
+        width: 124px !important;
+      }
+    }
+  }
+
+  .product-type-selector.product-type-selector.product-type-selector {
+    width: 100%;
+    height: 44px;
+    padding: 0;
+    border-radius: 0;
+    background: #000;
+  }
+}

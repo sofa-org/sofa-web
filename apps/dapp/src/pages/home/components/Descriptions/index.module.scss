@@ -1,0 +1,150 @@
+.desc {
+  margin: 0;
+  line-height: 32px;
+  font-size: 14px;
+  color: rgba(#fff, 0.65);
+}
+
+.content {
+  margin: 0;
+}
+
+.img {
+  margin: 0;
+}
+
+.sub-title {
+  @include bold;
+
+  margin: max(-24px, -2vw) 0 min(40px, 5vw);
+  font-size: min(20px, 3vw);
+}
+
+.desc-bright {
+  margin: min(40px, 5vw) auto min(8px, 1vw);
+  line-height: min(32px, 4vw);
+  font-size: min(14px, 2.4vw);
+
+  svg {
+    width: 18px;
+    margin: 0 9px 0 0;
+  }
+}
+
+.btn-more {
+  @include bold;
+
+  display: inline-block;
+  padding: 32px 0 0;
+  font-size: 18px;
+  text-decoration: underline;
+
+  svg {
+    width: 16px;
+    margin: 0 0 0 16px;
+  }
+}
+
+.section {
+  position: relative;
+  z-index: 1;
+  margin: 200px auto;
+  width: min(90vw, 1080px);
+  color: #fff;
+
+  &:nth-child(2n) {
+    margin: 0 auto;
+    padding: 200px 0;
+  }
+
+  h2 {
+    @include bold;
+
+    margin: 0 0 min(40px, 5vw);
+    line-height: min(50px, 7vw);
+    font-size: min(48px, 6vw);
+  }
+
+  &.row {
+    @include flex-center;
+
+    justify-content: space-between;
+    gap: 120px;
+
+    &:nth-child(1) {
+      flex-direction: row-reverse;
+    }
+  }
+
+  &.column-center {
+    @include flex-column-center;
+
+    width: min(820px, 90vw);
+    margin-bottom: 200px;
+    text-align: center;
+
+    h2 {
+      width: auto;
+      margin-top: 40px;
+    }
+
+    .content {
+      @include flex-column-center;
+    }
+
+    .desc {
+      width: min(640px, 90vw);
+    }
+  }
+}
+
+.bg-decoration {
+  position: relative;
+}
+
+:global {
+  #home-txt-circle {
+    position: absolute; /* 或者 absolute，取决于布局需求 */
+    top: 0;
+    left: 0;
+    transform: translate(100vw, 0);
+    transform-origin: center center; /* 设置变换的原点为元素的中心 */
+    width: 360px; /* 元素的宽度 */
+    height: 360px; /* 元素的高度 */
+    opacity: 0.8;
+  }
+}
+
+.home-descriptions-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+@media (orientation: portrait) {
+  .section {
+    flex-direction: column !important;
+    margin: 20vh auto !important;
+    padding: 0 !important;
+    gap: 10vh !important;
+
+    h2,
+    .sub-title,
+    .desc,
+    .desc-bright {
+      text-align: center;
+    }
+
+    .desc-bright {
+      width: 80vw;
+    }
+
+    &.column-center {
+      gap: 5vw !important;
+      margin-bottom: 20vh !important;
+
+      h2 {
+        margin-top: 0;
+      }
+    }
+  }
+}

@@ -1,0 +1,110 @@
+.mechanism-cards {
+  margin: 200px auto;
+  color: #fff;
+  overflow: visible !important;
+
+  :global {
+    .swiper-slide {
+      width: min(60vw, 800px);
+    }
+
+    .swiper-pagination {
+      @include flex-center;
+
+      bottom: auto;
+      top: calc(100% + 40px);
+    }
+
+    .swiper-pagination-bullet {
+      display: inline-block;
+      width: 38px;
+      height: 38px;
+      margin: 0 !important;
+      background: url("../../assets/page.svg") no-repeat center / 100%;
+      transition: all 0.5s ease;
+
+      &.swiper-pagination-bullet-active {
+        width: 64px;
+        height: 64px;
+        background: url("../../assets/page-active.svg") no-repeat center / 100%;
+      }
+    }
+  }
+}
+
+.card {
+  position: relative;
+  height: min(46.5vw, 650px);
+  margin: 0;
+  background: #141414;
+  border-radius: 24px;
+  box-sizing: border-box;
+
+  h2 {
+    @include bold;
+
+    position: absolute;
+    left: 0;
+    top: 40px;
+    width: 100%;
+    margin: 0;
+    line-height: min(36px, 6vw);
+    font-size: min(22px, 3.5vw);
+    text-align: center;
+  }
+
+  :global {
+    .floating-border-content {
+      @include flex-column-center;
+
+      height: 100%;
+    }
+  }
+
+  &::after {
+    background: #141414;
+  }
+}
+
+.process-svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.icon-coop {
+  display: block;
+  height: 40px;
+  margin: 0 auto 24px;
+}
+
+.link {
+  @include gradient-txt;
+  @include bold;
+
+  margin: 0;
+  font-size: min(20px, 4.5vw);
+  border-bottom: 1px solid transparent;
+  border-image: $color-main-gradient 0 0 1 0;
+}
+
+.desc {
+  margin: 40px 0;
+  font-size: min(14px, 3vw);
+  text-align: center;
+  opacity: 0.65;
+}
+
+@media (orientation: portrait) {
+  .mechanism-cards {
+    margin: 20vw auto;
+  }
+
+  .card {
+    width: 90vw;
+    height: auto;
+    margin: 5vw auto;
+  }
+}

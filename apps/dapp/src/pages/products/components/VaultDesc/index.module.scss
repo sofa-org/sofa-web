@@ -1,0 +1,8 @@
+@import "../YieldTower/index.module";
+
+.address {
+  @include flex-center;
+  @include bold;
+
+  margin: 0 auto;
+}

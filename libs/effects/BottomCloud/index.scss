@@ -1,0 +1,68 @@
+.bottom-cloud {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: max(100vw, 170vh);
+  height: 20vh;
+  overflow: visible;
+  transform: translateZ(1px) translateX(-50%);
+
+  > div,
+  > canvas,
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    left: -10%;
+    bottom: 0;
+    width: 120%;
+    height: 150%;
+  }
+
+  > div {
+    background: linear-gradient(to top, #fff, #fff0 15%);
+    z-index: 2;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: url("./assets/clouds2.png") repeat-x center bottom / 100% 80%;
+      animation: move 45s infinite linear;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, #fff, #fff0 20%);
+    }
+  }
+
+  &::before {
+    background: url("./assets/clouds1.png") repeat-x center bottom -15px / 100% 80%;
+    z-index: 1;
+    animation: move 90s infinite linear;
+  }
+
+  &::after {
+    background: url("./assets/clouds3.png") repeat-x center bottom / 100% 80%;
+    animation: move 75s infinite linear reverse;
+  }
+}
+
+@keyframes move {
+  from {
+    background-position-x: 0;
+  }
+
+  to {
+    background-position-x: 120vw;
+  }
+}

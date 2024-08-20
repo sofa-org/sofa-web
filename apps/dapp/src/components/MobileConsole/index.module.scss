@@ -1,0 +1,27 @@
+.test-infos-trigger {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.test-infos-modal {
+  margin: 0;
+
+  :global {
+    .semi-modal-wrap {
+      align-items: flex-end;
+      justify-content: flex-start;
+
+      .semi-modal {
+        width: min(calc(100vw - 24px), max(70vw, 700px));
+        margin: 0 0 12px 12px;
+      }
+    }
+
+    .semi-modal-content.semi-modal-content {
+      border-radius: 12px;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+.how-to-play {
+  @include pointer;
+  @include regular;
+
+  font-size: 14px;
+  text-decoration: underline;
+  opacity: 0.75;
+}
+
+.img {
+  max-width: 100%;
+  width: 1000px;
+  margin: 0 0 24px;
+}

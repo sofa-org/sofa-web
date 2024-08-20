@@ -1,0 +1,51 @@
+.ccy-item {
+  @include flex-center;
+
+  img {
+    width: 1em;
+  }
+}
+
+.ccy-selector.ccy-selector.ccy-selector.ccy-selector {
+  height: 36px;
+  font-size: 14px;
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(#fff, 0.16);
+
+  &:hover {
+    background: rgba(#fff, 0.26);
+  }
+
+  :global {
+    .semi-select-arrow {
+      margin-right: 10px;
+
+      > svg {
+        width: 20px;
+      }
+    }
+
+    .semi-select-selection {
+      @include bold;
+    }
+  }
+}
+
+.ccy-dropdown {
+  :global {
+    .semi-select-option-icon {
+      display: none;
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .ccy-selector.ccy-selector.ccy-selector.ccy-selector {
+    width: 100%;
+    height: 44px;
+    padding: 0;
+    border-radius: 0;
+    background: #000;
+  }
+}

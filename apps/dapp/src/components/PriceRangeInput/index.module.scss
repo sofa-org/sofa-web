@@ -1,0 +1,196 @@
+.input {
+  @include flex-center;
+
+  gap: 0;
+  flex: 1;
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--semi-color-fill-0);
+
+  .prefix {
+    padding: 0 4px 0 0;
+  }
+
+  input {
+    @include bold;
+
+    flex: 1;
+    width: 0;
+    height: 24px;
+    font-size: 12px;
+    color: #000;
+    outline: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  :global {
+    .semi-input-prefix {
+      margin-right: 8px;
+    }
+  }
+}
+
+.sep {
+  @include flex-column-center;
+
+  gap: 2px;
+  margin: 0;
+  font-size: 12px;
+
+  > span {
+    @include gradient-txt;
+
+    display: block;
+    line-height: 12px;
+    white-space: nowrap;
+    transform: scale(0.8);
+  }
+}
+
+.atm {
+  margin: 0;
+}
+
+.left {
+  margin: 0;
+}
+
+.right {
+  margin: 0;
+}
+
+.price-range-input {
+  @include flex-center;
+
+  justify-content: flex-start;
+  gap: 12px;
+  min-width: 160px;
+  height: 32px;
+  padding: 0 12px;
+  margin: 0;
+  background: #f0f0f0;
+  border-radius: 16px;
+  border: 1px solid transparent;
+}
+
+.value {
+  margin: 0;
+}
+
+.value.placeholder {
+  margin: 0;
+  opacity: 0.5;
+}
+
+.inputs {
+  @include flex-center;
+
+  justify-content: space-between;
+  gap: 30px;
+  margin: 0;
+  padding: 12px;
+  border-bottom: 1px solid var(--semi-color-border);
+
+  .sep {
+    display: block;
+    flex: none;
+    width: 64px;
+  }
+}
+
+.quick-selects {
+  @include flex-center;
+
+  justify-content: space-between;
+  align-items: stretch;
+  margin: 0;
+
+  > div,
+  .left,
+  .right {
+    flex: 1;
+    width: 50%;
+    padding: 12px;
+  }
+
+  .left {
+    border-right: 1px dashed var(--semi-color-border);
+  }
+
+  :global(.disabled) {
+    background-color: transparent !important;
+  }
+}
+
+.atm-el.atm-el {
+  @include bold;
+  @include flex-column-center;
+
+  gap: 0;
+  height: 22px;
+  font-size: 12px;
+  line-height: 10px;
+  background: $color-main-gradient;
+
+  span {
+    color: #000;
+
+    &:first-child {
+      transform: scale(0.6);
+    }
+
+    &:nth-child(2) {
+      transform: scale(0.8);
+    }
+  }
+}
+
+.inputs-wrapper-2 {
+  .inputs {
+    padding: 8px 0;
+    border: none;
+
+    .input {
+      height: 32px;
+      border-radius: 16px;
+
+      input {
+        height: 30px;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .quick-selects {
+    > div,
+    .left,
+    .right {
+      padding: 8px 0;
+    }
+  }
+}
+
+.popover.popover {
+  width: min(596px, calc(100vw - 24px));
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background-color: transparent;
+}
+
+.price-range-input-overlay {
+  :global {
+    .c-overlay-content {
+      transform: none;
+      inset: auto 0 0;
+      max-height: 70vh;
+      padding: 0;
+      overflow: hidden auto;
+    }
+  }
+}

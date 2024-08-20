@@ -1,0 +1,117 @@
+// 注意：这个文件只能有变量、@mixin、@function
+
+$color-main: #000;
+$color-main-gradient: linear-gradient(96deg, #50d113 0.36%, #ffe500 100%);
+$color-gradient-1: linear-gradient(to right, #fffa00, #ffa82e);
+$color-gradient-2: linear-gradient(
+  90deg,
+  #d665a3 0,
+  #e05e2b 21.35%,
+  #f8d748 45.31%,
+  #36af73 70.31%,
+  #2d6fb9 100%
+);
+$color-rise: #50d113;
+$color-fall: #eb4476;
+$color-gray: #666;
+$color-border: rgba(#000, 0.12);
+$color-rch: #51acf1;
+$width-content: min(1080px, calc(100vw - 24px));
+$header-height: 48px;
+
+@mixin flex-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+@mixin flex-column-center {
+  @include flex-center;
+
+  flex-direction: column;
+}
+
+@mixin regular {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+}
+
+@mixin medium {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+}
+
+@mixin bold {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+@mixin font-poppins {
+  /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+  font-family: Poppins;
+}
+
+@mixin font-poppins-bold {
+  font-weight: bold;
+  /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+  font-family: "Poppins Bold";
+}
+
+@mixin header-btn {
+  background: rgba(#fff, 0.16);
+  transition: ease-in-out 0.2s background;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(#fff, 0.26);
+  }
+}
+
+@mixin gradient-border($border-width, $bg, $border-radius) {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: calc($border-radius - $border-width / 2);
+    background: $bg;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -$border-width;
+    z-index: 0;
+    border-radius: $border-radius;
+    background: $color-main-gradient;
+  }
+
+  > * {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+@mixin pointer {
+  cursor: pointer;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+@mixin gradient-txt() {
+  background: $color-main-gradient;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@mixin gradient-txt-1() {
+  background: linear-gradient(to right, #fffa00, #ffa82e);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

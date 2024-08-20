@@ -1,0 +1,52 @@
+.option {
+  @include flex-center;
+
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: $color-main;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-main;
+  }
+
+  svg,
+  img {
+    width: 20px;
+  }
+}
+
+.options {
+  padding: 8px 0;
+}
+
+.txt {
+  color: #fff;
+}
+
+.community {
+  &:global(.semi-select) {
+    background: transparent !important;
+  }
+}
+
+@media (orientation: portrait) {
+  .community {
+    height: 40px;
+    background: transparent !important;
+    border: none !important;
+
+    :global {
+      .semi-select-selection {
+        margin: 0;
+        background: transparent;
+      }
+
+      .semi-select-arrow {
+        display: none;
+      }
+    }
+  }
+}

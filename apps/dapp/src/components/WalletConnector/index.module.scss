@@ -1,0 +1,42 @@
+.wallet-connector {
+  @include flex-center;
+  @include header-btn;
+
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 50px;
+  color: #fff;
+  white-space: nowrap;
+
+  .logo {
+    width: 20px;
+  }
+
+  svg:not(.logo),
+  img:not(.logo) {
+    width: 16px;
+  }
+}
+
+.address {
+  height: auto;
+  margin: 0 auto 12px;
+  padding: 4px 0;
+}
+
+@media (orientation: portrait) {
+  .wallet-connector {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+
+    :global(.address) {
+      display: none;
+    }
+
+    svg:not(.logo),
+    img:not(.logo) {
+      display: none;
+    }
+  }
+}

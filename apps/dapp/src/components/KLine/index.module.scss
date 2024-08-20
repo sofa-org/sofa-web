@@ -1,0 +1,49 @@
+.k-line-wrapper.k-line-wrapper.k-line-wrapper {
+  background: #fafafa;
+
+  // box-shadow: inset 0 0 0 1px #eee;
+  :global {
+    .semi-spin-children {
+      position: relative;
+      height: 100%;
+    }
+  }
+}
+
+.k-line {
+  width: 100%;
+  min-height: 400px;
+  height: 100%;
+  overflow: hidden;
+
+  canvas {
+    transform: translate(-1px, 0);
+  }
+}
+
+.k-line-extra-content {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.k-line-relative-line {
+  animation: fade 2s ease;
+  opacity: 0;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (orientation: portrait) {
+  .k-line {
+    min-height: 300px;
+  }
+}

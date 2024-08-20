@@ -1,0 +1,107 @@
+.title {
+  color: rgba(#fff, 0.45);
+}
+
+.content {
+  @include flex-center;
+
+  flex-wrap: wrap;
+  display: none;
+  gap: 32px;
+  margin: 0 40px;
+}
+
+.arrow,
+.arrow-1 {
+  @include flex-column-center;
+
+  align-items: flex-start;
+  gap: 0;
+  margin: 0;
+  font-size: 12px;
+  color: rgba(#fff, 0.45);
+
+  &::before {
+    content: url("./assets/arrow.svg");
+  }
+
+  > span {
+    white-space: nowrap;
+  }
+}
+
+.arrow-1 {
+  color: #ffe601;
+
+  &::before {
+    content: url("./assets/arrow-1.svg");
+  }
+}
+
+.txt-gradient {
+  margin: 0;
+}
+
+.icon-expand {
+  width: 12px;
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
+}
+
+.flow-wrapper {
+  @include pointer;
+  @include flex-column-center;
+
+  justify-content: space-between;
+  padding: 64px 0 16px;
+  gap: 35px;
+
+  &.expanded {
+    .content {
+      display: flex;
+    }
+
+    .icon-expand {
+      transform: rotate(0);
+    }
+  }
+}
+
+@mixin rewrite() {
+  .flow-wrapper.expanded .content {
+    @include flex-column-center;
+
+    gap: 24px;
+    margin: 0;
+  }
+
+  .arrow,
+  .arrow-1 {
+    position: relative;
+
+    &::before {
+      display: inline-block;
+      margin: -20px 0;
+      transform: rotate(90deg) scale(0.3, 1);
+    }
+
+    > span {
+      position: absolute;
+      left: calc(50% + 6px);
+      top: 50%;
+      transform: translate(0, -50%);
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <= 500px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

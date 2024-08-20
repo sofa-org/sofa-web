@@ -1,0 +1,60 @@
+// semi 全局样式替换 - modal
+.semi-modal-wrap-center {
+  .semi-modal-body {
+    max-height: calc(100vh - 180px);
+    overflow: auto;
+  }
+}
+
+.semi-modal {
+  max-width: calc(100vw - 24px);
+}
+
+.semi-modal-body-wrapper {
+  margin-bottom: 0;
+
+  > .semi-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+}
+
+.semi-modal-header.semi-modal-header {
+  align-items: center;
+  position: relative;
+  height: 40px;
+  margin: 0 -24px 24px;
+  border-bottom: 1px solid rgba(#000, 0.12);
+
+  .semi-modal-title {
+    @include flex-center;
+  }
+
+  .semi-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    transform: scale(0.8);
+  }
+}
+
+.semi-modal-content.semi-modal-content {
+  border: none;
+  padding-bottom: 24px;
+  border-radius: min(24px, 5vw);
+
+  .semi-modal-footer {
+    margin-bottom: 0;
+  }
+}
+
+@media (orientation: portrait) {
+  .semi-modal-header.semi-modal-header {
+    margin: 0 -12px 12px;
+  }
+
+  .semi-modal-content.semi-modal-content {
+    padding: 0 12px 12px;
+  }
+}

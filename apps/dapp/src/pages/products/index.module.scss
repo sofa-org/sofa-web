@@ -1,0 +1,159 @@
+.container {
+  margin: 0;
+}
+
+.title {
+  @include flex-center;
+
+  gap: 16px;
+  margin: -24px 0 24px;
+  font-size: 24px;
+  color: #fff;
+
+  svg,
+  img {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+.product-type {
+  @include flex-center;
+  @include pointer;
+
+  justify-content: flex-start;
+  gap: 12px;
+
+  svg {
+    flex: none;
+    width: 36px;
+    height: 32px;
+  }
+}
+
+.section-title {
+  @include flex-column-center;
+
+  position: relative;
+  margin: 0 auto 40px;
+  font-size: min(18px, 3.6vw);
+  max-width: min(calc(100vw - 24px), 1200px);
+
+  > span {
+    z-index: 2;
+    color: #fff;
+  }
+
+  .icon {
+    position: relative;
+    z-index: 2;
+    width: min(112px, 24vw);
+    height: min(52px, 9vw);
+
+    svg {
+      width: 100%;
+      height: auto;
+    }
+
+    img {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: min(32px, 6.8vw);
+      transform: translate(-50%, 0);
+    }
+
+    img:global(.rch) {
+      width: min(24px, 5.1vw);
+      height: min(24px, 5.1vw);
+      margin: min(4px, 0.8vw) 0 0;
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(min(52px, 9vw) - 1px);
+    border-bottom: 1px dashed var(--color-line);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(min(52px, 9vw) - 1px);
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      rgba(#000, 0.8),
+      rgba(#000, 0.2) 40%,
+      rgba(#000, 0.2) 60%,
+      rgba(#000, 0.8)
+    );
+  }
+}
+
+.recommended-list {
+  @include flex-center;
+
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.recommend-section {
+  max-width: min(calc(100vw - 24px), 1200px);
+  margin: 0 auto 64px;
+  border-radius: 24px;
+}
+
+.customize {
+  height: 156px;
+
+  .btn-link {
+    @include pointer;
+    @include flex-center;
+    @include gradient-border(1px, #000, 24px);
+
+    width: min(320px, 75vw);
+    height: min(48px, 10vw);
+    margin: 0 auto;
+    font-size: min(20px, 5vw);
+  }
+}
+
+.tag {
+  @include bold;
+
+  padding: 0 6px;
+  line-height: 18px;
+  font-size: 12px;
+  color: #000;
+  border-radius: 2px;
+  background-clip: none !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+@media (orientation: portrait) {
+  .title {
+    @include flex-center;
+
+    margin: 12px 0;
+    font-size: 14px;
+    color: #fff;
+
+    svg,
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  :global(.top-tabs .semi-select-selection) .product-type {
+    svg {
+      display: none;
+    }
+  }
+}
