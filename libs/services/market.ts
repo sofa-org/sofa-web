@@ -29,6 +29,14 @@ export interface CandleInfo {
 
 const RCHPrice = new UserStorage<number>('rch-price', () => 'curr');
 
+http
+  .get<unknown, HttpResponse<{ prices: [number, number][] }>>(
+    'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=usd&days=0',
+  )
+  .then((res) => {
+    console.log(1111, res, res.value, res.value.prices[0][1]);
+  });
+
 export class MarketService {
   static get binanceWs() {
     return singleton(
@@ -141,6 +149,14 @@ export class MarketService {
         const token1 = /btc/i.test(info.token1) ? 'BTC' : 'ETH';
         const token1Price = await MarketService.$$fetchIndexPx(token1);
         return info.price * token1Price;
+      })
+      .catch((err) => {
+        console.error(err);
+        return http
+          .get<unknown, HttpResponse<{ prices: [number, number][] }>>(
+            'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=usd&days=0',
+          )
+          .then((res) => res.value.prices[0][1]);
       })
       .then((p) => {
         RCHPrice.set(p);
