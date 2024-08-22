@@ -24,7 +24,7 @@ export interface PositionParams {
   claimed?: boolean; // 是否已被赎回，没传表示查询所有状态的头寸
   expired?: boolean; // 是否到期，没传表示查询所有状态的头寸
   exceededPrincipalReturn?: boolean; // 是否获得了超过本金的回报，没传表示查询所有头寸
-  limit?: number; // 查询数量，默认为 1000
+  limit?: number; // 查询数量，默认为 100，最大为 1000
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   endDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   orderBy?: 'updatedAt' | 'return'; // 排序方式，updatedAt（更新时间，默认），return（回报）
@@ -43,7 +43,7 @@ export interface ClaimParams {
 export interface TransactionParams {
   chainId?: number; //
   vaults?: string[]; // 合约地址集合，没传表示查询全部合约
-  limit?: number; // 查询数量，默认为 1000
+  limit?: number; // 查询数量，默认为 100，最大为 1000
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   endDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   orderDirection?: 'desc' | 'asc'; // "desc" | "asc", 默认为 desc（按时间戳降序）
@@ -207,8 +207,10 @@ export class PositionsService {
       params,
       true,
     ).map((it) => it.vault.toLowerCase());
-    const list = await pollingUntil<PageResult<PositionInfo>>(
-      (i) =>
+    const list = await pollingUntil<
+      PageResult<PositionInfo, EmptyObj, 'cursor'>
+    >(
+      (i, pre) =>
         http
           .post<unknown, HttpResponse<OriginPositionInfo[]>>(
             '/rfq/position-list',
@@ -216,6 +218,7 @@ export class PositionsService {
               chainId: params.chainId,
               wallet: params.owner,
               vaults: vault_in,
+              endDateTime: pre?.cursor,
               claimed: false,
               limit: 1000,
             } as PositionParams,
@@ -232,7 +235,7 @@ export class PositionsService {
                 {},
               ),
             })),
-            offset: (i - 0) * 1000,
+            cursor: res.value[res.value.length - 1].updatedAt,
             limit: 1000,
             hasMore: res.value.length >= 1000,
           })),
@@ -295,7 +298,7 @@ export class PositionsService {
       params,
       true,
     ).map((it) => it.vault.toLowerCase());
-    const limit = extra?.limit ?? 1000;
+    const limit = extra?.limit ?? 20;
     const res = await http.post<unknown, HttpResponse<PositionInfo[]>>(
       '/rfq/position-list',
       {
@@ -350,7 +353,7 @@ export class PositionsService {
     >,
     extra?: PageParams<'cursor'>,
   ): Promise<PageResult<TransactionInfo, Record<string, unknown>, 'cursor'>> {
-    const limit = extra?.limit ?? 1000;
+    const limit = extra?.limit ?? 20;
     const vault_in = params.vault
       ? [params.vault]
       : ProductsService.filterVaults(ContractsService.vaults, params, true).map(

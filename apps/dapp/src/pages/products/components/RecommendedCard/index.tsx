@@ -17,7 +17,6 @@ import { displayTenor } from '@sofa/utils/time';
 import Big from 'big.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { omit } from 'lodash-es';
 import { nanoid } from 'nanoid';
 import { parse, stringify } from 'qs';
 
@@ -154,12 +153,6 @@ const RecommendedCard = (props: RecommendedCardProps) => {
       .catch((err) => console.error(11112, err));
   }, [vault, data?.[0]]);
 
-  console.log(
-    1111,
-    riskType === RiskType.RISKY
-      ? data?.slice(0, 2)
-      : ([data?.[0], leverageQuote].filter(Boolean) as ProductQuoteResult[]),
-  );
   return (
     <div className={styles['recommended-card-wrapper']}>
       <div
