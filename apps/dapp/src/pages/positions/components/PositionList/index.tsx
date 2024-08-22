@@ -9,9 +9,10 @@ import {
 } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { Env } from '@sofa/utils/env';
-import { getErrorMsg, isNullLike } from '@sofa/utils/fns';
+import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
-import { useInfiniteScroll, useRequest } from 'ahooks';
+import { useInfiniteScroll } from 'ahooks';
+import { uniqBy } from 'lodash-es';
 
 import CEmpty from '@/components/Empty';
 import { useProjectChange } from '@/components/ProductSelector';
@@ -34,36 +35,48 @@ addI18nResources(locale, 'PositionList');
 const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   const [t] = useTranslation('PositionList');
   const wallet = useWalletStore();
+
   const {
-    data: positions,
+    data: $data,
     loading,
     mutate,
-  } = useRequest(
-    async () =>
-      !wallet.address
-        ? undefined
-        : PositionsService.query({
-            chainId: wallet.chainId,
-            owner: wallet.address,
-            riskType: props.riskType,
-            productType: props.productType,
-          }),
+  } = useInfiniteScroll(
+    async (d) => {
+      if (!wallet.address) return { list: [], hasMore: false, limit: 300 };
+      return PositionsService.history(
+        {
+          chainId: wallet.chainId,
+          owner: wallet.address,
+          riskType: props.riskType,
+          productType: props.productType,
+        },
+        { limit: 300, cursor: d?.cursor },
+      );
+    },
     {
-      refreshDeps: [
+      target: () => document.querySelector('#root'),
+      isNoMore: (d) => !d?.hasMore,
+      onError: (err) => Toast.error(getErrorMsg(err)),
+      reloadDeps: [
         wallet.chainId,
         wallet.address,
         props.riskType,
         props.productType,
       ],
-      onSuccess: (list) => console.info('Positions', list),
     },
   );
+
+  const data = useMemo(() => {
+    const list = uniqBy($data?.list, (it) => it.id);
+    console.info('Positions', list);
+    return list as PositionInfo[];
+  }, [$data]);
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
 
   const unClaimedList = useMemo(
     () =>
-      positions?.filter((it) => {
+      data?.filter((it) => {
         if (
           judgeSettled(it.product.expiry) &&
           (it.claimParams.maker || it.amounts.redeemable)
@@ -79,7 +92,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
         }
         return false;
       }) || [],
-    [positions],
+    [data],
   );
 
   const [claimAllList, setClaimAllList] = useState(unClaimedList);
@@ -87,7 +100,26 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     if (!wallet.address) return;
     setClaimAllList(unClaimedList);
     return PositionsService.claimBatch(
-      (it) => claimProgressRef.current?.update(it),
+      (it) => {
+        claimProgressRef.current?.update(it);
+        if (['Success', 'Partial Failed'].includes(it.status)) {
+          const successIds = it.details?.flatMap((d) => {
+            if (d[1].status === PositionStatus.CLAIMED) return d[1].positionIds;
+            return [];
+          });
+          if (successIds) {
+            mutate(
+              (pre) =>
+                pre && {
+                  ...pre,
+                  list: pre?.list.map((it) =>
+                    successIds.includes(it.id) ? { ...it, claimed: true } : it,
+                  ),
+                },
+            );
+          }
+        }
+      },
       unClaimedList.map((it) => ({
         positionId: it.id,
         vault: it.product.vault.vault,
@@ -113,31 +145,23 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
       setSelectedPosition((pre) => pre && { ...pre, status });
       mutate(
         (pre) =>
-          pre?.map((it) => (position.id === it.id ? { ...it, status } : it)),
+          pre && {
+            ...pre,
+            list: pre?.list.map((it) =>
+              position.id === it.id
+                ? { ...it, claimed: status === PositionStatus.CLAIMED }
+                : it,
+            ),
+          },
       );
-    },
-  );
-
-  const { data } = useInfiniteScroll(
-    async (d) => {
-      const limit = 20;
-      const offset = isNullLike(d?.offset) ? 0 : d.offset + limit;
-      const list = positions?.slice(offset, offset + limit) || [];
-      return { list, offset, limit, isNoMore: list.length < limit };
-    },
-    {
-      target: () => document.querySelector('#root'),
-      isNoMore: (d) => d?.isNoMore,
-      onError: (err) => Toast.error(getErrorMsg(err)),
-      reloadDeps: [positions?.length],
     },
   );
 
   return (
     <>
       <Spin wrapperClassName={styles['list']} spinning={loading}>
-        {data?.list.map((it) =>
-          it.status === PositionStatus.CLAIMED ? (
+        {data.map((it) =>
+          it.claimed ? (
             <Fragment key={it.id} />
           ) : (
             <PositionCard
@@ -148,7 +172,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
             />
           ),
         )}
-        {!positions?.length && !loading && (
+        {!data?.length && !loading && (
           <CEmpty
             className={styles['empty']}
             style={{ margin: '100px auto 0' }}

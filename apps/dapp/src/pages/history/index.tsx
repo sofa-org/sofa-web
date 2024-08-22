@@ -27,6 +27,8 @@ import { Comp as IconDetails } from './assets/icon-details.svg';
 import locale from './locale';
 
 addI18nResources(locale, 'History');
+import { uniqBy } from 'lodash-es';
+
 import styles from './index.module.scss';
 
 const OrderHistory = () => {
@@ -35,7 +37,7 @@ const OrderHistory = () => {
   const [t] = useTranslation('History');
   const [project] = useProjectChange();
 
-  const { data, loading } = useInfiniteScroll(
+  const { data: $data, loading } = useInfiniteScroll(
     async (pre) => {
       if (!wallet.address) return new Promise(() => {});
       const params = {
@@ -48,20 +50,23 @@ const OrderHistory = () => {
         cursor: pre?.cursor,
         limit,
       };
-      return PositionsService.history(params, page).then((res) => ({
-        ...res,
-        list: res.list || [],
-        ...params,
-        isNoMore: (res.list || []).length < limit,
-      }));
+      return PositionsService.history(params, page);
     },
     {
       target: () => document.querySelector('#root'),
-      isNoMore: (d) => d?.isNoMore,
+      isNoMore: (d) => !d?.hasMore,
       onError: (err) => Toast.error(getErrorMsg(err)),
       reloadDeps: [wallet.chainId, wallet.address],
     },
   );
+
+  const data = useMemo(() => {
+    if (!$data) return null;
+    return {
+      ...$data,
+      list: uniqBy($data.list, (it) => it.id) as PositionInfo[],
+    };
+  }, [$data]);
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>(() => []);
 

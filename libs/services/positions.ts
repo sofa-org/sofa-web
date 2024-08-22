@@ -1,8 +1,5 @@
-import { asyncCache } from '@sofa/utils/decorators';
-import { MsIntervals } from '@sofa/utils/expiry';
 import { safeRun } from '@sofa/utils/fns';
 import { http, pollingUntil } from '@sofa/utils/http';
-import { objectKeyCvt } from '@sofa/utils/object';
 import { UserStorage } from '@sofa/utils/storage';
 
 import { ContractsService, ProductType, TransactionStatus } from './contracts';
@@ -24,7 +21,7 @@ export interface PositionParams {
   claimed?: boolean; // 是否已被赎回，没传表示查询所有状态的头寸
   expired?: boolean; // 是否到期，没传表示查询所有状态的头寸
   exceededPrincipalReturn?: boolean; // 是否获得了超过本金的回报，没传表示查询所有头寸
-  limit?: number; // 查询数量，默认为 100，最大为 1000
+  limit?: number; // 查询数量，默认为 100，最大为 300
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   endDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   orderBy?: 'updatedAt' | 'return'; // 排序方式，updatedAt（更新时间，默认），return（回报）
@@ -43,7 +40,7 @@ export interface ClaimParams {
 export interface TransactionParams {
   chainId?: number; //
   vaults?: string[]; // 合约地址集合，没传表示查询全部合约
-  limit?: number; // 查询数量，默认为 100，最大为 1000
+  limit?: number; // 查询数量，默认为 100，最大为 300
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   endDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   orderDirection?: 'desc' | 'asc'; // "desc" | "asc", 默认为 desc（按时间戳降序）
@@ -63,6 +60,7 @@ export interface OriginPositionInfo extends CalculatedInfo, SettlementInfo {
   id: PositionInfoInGraph['productId'];
   owner: string; // 所有人的地址
   product: ProductInfo;
+  claimed: boolean;
   updatedAt: number; // 更新时间，秒
   createdAt: number; // 创建时间，秒
   claimParams: ClaimParams;
@@ -76,7 +74,7 @@ export interface PositionInfo extends OriginPositionInfo {
 export interface OriginTransactionInfo
   extends Omit<
     OriginPositionInfo,
-    'id' | 'owner' | 'claimParams' | 'updatedAt'
+    'id' | 'owner' | 'claimParams' | 'updatedAt' | 'claimed'
   > {
   hash: string;
   takerWallet: string;
@@ -189,97 +187,6 @@ export class PositionsService {
       );
   }
 
-  @asyncCache({
-    until: (v, createdAt) =>
-      !v ||
-      !createdAt ||
-      Date.now() - createdAt >= MsIntervals.min ||
-      Number(PositionUpdateTime.get()?.timeMs) > createdAt,
-  })
-  static async query(params: {
-    chainId: number;
-    owner: string;
-    riskType?: RiskType;
-    productType?: ProductType;
-  }): Promise<PositionInfo[]> {
-    const vault_in = ProductsService.filterVaults(
-      ContractsService.vaults,
-      params,
-      true,
-    ).map((it) => it.vault.toLowerCase());
-    const list = await pollingUntil<
-      PageResult<PositionInfo, EmptyObj, 'cursor'>
-    >(
-      (i, pre) =>
-        http
-          .post<unknown, HttpResponse<OriginPositionInfo[]>>(
-            '/rfq/position-list',
-            {
-              chainId: params.chainId,
-              wallet: params.owner,
-              vaults: vault_in,
-              endDateTime: pre?.cursor,
-              claimed: false,
-              limit: 1000,
-            } as PositionParams,
-          )
-          .then((res) => ({
-            list: res.value.map((it) => ({
-              ...it,
-              vault: ContractsService.getVaultInfo(
-                it.product.vault.vault,
-                it.product.vault.chainId,
-              ),
-              pricesForCalculation: it.relevantDollarPrices.reduce(
-                (pre, it) => ({ ...pre, [it.ccy]: it.price }),
-                {},
-              ),
-            })),
-            cursor: res.value[res.value.length - 1].updatedAt,
-            limit: 1000,
-            hasMore: res.value.length >= 1000,
-          })),
-      (res) => !res.hasMore,
-    ).then((res) => res.flatMap((it) => it.list || []));
-
-    const balances = await (async () => {
-      const groups = list.reduce(
-        (pre, it) => {
-          const vault = it.product.vault.vault.toLowerCase();
-          if (!pre[vault]) pre[vault] = [];
-          pre[vault]!.push(it.id);
-          return pre;
-        },
-        {} as Record<string /* vault */, string[] /* position ids */>,
-      );
-      const results = await Promise.all(
-        Object.entries(groups).map(([vault, ids]) =>
-          PositionsService.balanceOfPositions(
-            vault,
-            params.chainId,
-            ids.map((it) => [params.owner, it]),
-          )
-            .then((res) => objectKeyCvt(res, (k) => `${vault}-${k}`)) // 不同 vault 的头寸的 product id 可能会相同
-            .catch((err) => {
-              console.error(err, vault, ids);
-              return {};
-            }),
-        ),
-      );
-      return Object.assign({}, ...results) as Record<
-        string /* `${vault}-${position id}` */,
-        number
-      >;
-    })();
-
-    return list
-      .map((it) => ({
-        ...it,
-        size: balances[`${it.product.vault.vault.toLowerCase()}-${it.id}`],
-      }))
-      .filter((it) => it.size);
-  }
-
   static async history(
     params: {
       chainId: number;
@@ -292,7 +199,7 @@ export class PositionsService {
       exceededPrincipalReturn?: boolean;
     },
     extra?: PageParams<'cursor', 'updatedAt' | 'return'>,
-  ): Promise<PageResult<PositionInfo, Record<string, unknown>, 'cursor'>> {
+  ): Promise<PageResult<PositionInfo, { hasMore: boolean }, 'cursor'>> {
     const vault_in = ProductsService.filterVaults(
       ContractsService.vaults,
       params,

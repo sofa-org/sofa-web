@@ -81,7 +81,7 @@ declare type PageResult<
   orderDirection?: 'desc' | 'asc';
   total?: number;
   hasMore?: boolean;
-  list?: T[];
+  list: T[];
 } & (K extends 'offset' ? { offset: number } : { cursor?: string | number }) &
   Extra;
 
