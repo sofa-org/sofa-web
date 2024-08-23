@@ -47,6 +47,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
         {
           chainId: wallet.chainId,
           owner: wallet.address,
+          claimed: false,
           riskType: props.riskType,
           productType: props.productType,
         },
