@@ -377,7 +377,7 @@ export class WalletConnect {
     let address = await getAddress();
     const handler = (accounts: string[]) => {
       WalletConnect._wallet = undefined;
-      cb(accounts[0].toLowerCase());
+      cb(accounts[0]?.toLowerCase());
     };
     handler([address]);
     if ('on' in provider) {
