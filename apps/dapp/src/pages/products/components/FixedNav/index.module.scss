@@ -30,10 +30,11 @@
   flex-wrap: wrap;
   position: relative;
   width: fit-content;
-  min-width: 86px;
+  min-width: 94px;
   margin: 16px 0 0;
   padding: 0 0 0 22px;
   line-height: 20px;
+  font-size: 16px;
   color: rgba(#fff, 0.6);
 
   img:first-child {
@@ -41,8 +42,8 @@
     height: 16px;
   }
 
-  .img-hot {
-    width: 64px;
+  .icon {
+    width: 16px;
   }
 
   &:global(.steth) img {
@@ -80,9 +81,8 @@
     color: #fff;
 
     &::before {
-      border: 1px solid #b5dc49;
-      outline: 1px solid #b5dc49;
-      background-color: transparent;
+      background: linear-gradient(96deg, #50d113 0.36%, #ffe500 100%);
+      transform: scale(1.1);
     }
   }
 

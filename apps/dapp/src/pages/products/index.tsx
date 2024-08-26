@@ -108,24 +108,12 @@ const Index = () => {
             }
             key={ccy}
           >
-            {depositCcyList.length > 1 && (
-              <div className={styles['section-title']}>
-                <span style={{ color: config?.color }} id={`recommend-${ccy}`}>
-                  {t('Deposit')} {ccy}
+            <div className={styles['section-title']}>
+              <div className={styles['left']}>
+                <span className={styles['ccy']} id={`recommend-${ccy}`}>
+                  {t('Deposit')} <span className={styles['bold']}>{ccy}</span>
                 </span>
                 <div className={styles['icon']}>
-                  <svg
-                    width="106"
-                    height="36"
-                    viewBox="0 0 106 36"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M32.1218 25.7863C42.8075 39.2028 63.1925 39.2028 73.8782 25.7863C78.9802 19.3803 85.2179 13.9683 92.2795 9.82075L104.47 2.66068C105.726 1.92324 105.203 0 103.746 0H2.25358C0.797483 0 0.274451 1.92324 1.53 2.66068L13.7205 9.82074C20.782 13.9683 27.0198 19.3803 32.1218 25.7863Z"
-                      fill={config?.color}
-                    />
-                  </svg>
                   <img
                     className={ccy.toLowerCase()}
                     src={config?.icon}
@@ -133,7 +121,21 @@ const Index = () => {
                   />{' '}
                 </div>
               </div>
-            )}
+              <div className={styles['customize']}>
+                <Link
+                  className={styles['btn-link']}
+                  to={joinUrl(
+                    `/products/customize`,
+                    window.location.search,
+                    `?deposit-ccy=${ccy}&product-type=${productType}&expanded=`,
+                  )}
+                >
+                  <span className="txt-gradient">
+                    {t('CUSTOMIZE')}&nbsp;&nbsp;{'>'}
+                  </span>
+                </Link>
+              </div>
+            </div>
             <div className={styles['recommended-list']}>
               <RecommendedCard forCcy="BTC" depositCcy={ccy} />
               <RecommendedCard forCcy="ETH" depositCcy={ccy} />
@@ -141,19 +143,6 @@ const Index = () => {
           </div>
         );
       })}
-
-      <div className={styles['customize']}>
-        <Link
-          className={styles['btn-link']}
-          to={joinUrl(
-            `/products/customize`,
-            window.location.search,
-            '?expanded=',
-          )}
-        >
-          <span className="txt-gradient">{t('CUSTOMIZE')}</span>
-        </Link>
-      </div>
     </TopTabs>
   );
 };

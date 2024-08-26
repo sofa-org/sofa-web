@@ -166,18 +166,13 @@ const RecommendedCard = (props: RecommendedCardProps) => {
           <span>{props.forCcy}</span>
           <span>{t('Reference')}</span>
         </h3>
-        <div className={styles['risk-type']}>
+        <div />
+        {/* <div className={styles['risk-type']}>
           {riskTypeRef.icon}
           {riskTypeRef.label2(t)}
-        </div>
-        {riskType !== RiskType.RISKY ? (
+        </div> */}
+        {/* {riskType !== RiskType.RISKY ? (
           <div className={styles['amount-wrapper']}>
-            {/* <div>
-              <span className={styles['amount']}>
-                {vault?.depositMinAmount}
-              </span>
-              <span className={styles['unit']}>{vault?.depositCcy}</span>
-            </div> */}
             <div>
               <span className={styles['amount']}>
                 {t('Deposit')} {vault?.depositCcy}
@@ -192,7 +187,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
             </div>
             <span className={styles['desc']}>{t('Per Ticket')}</span>
           </div>
-        )}
+        )} */}
         <Skeleton
           className={styles['products']}
           placeholder={

@@ -53,10 +53,17 @@
   @include flex-column-center;
 
   justify-content: space-between;
-  padding: 64px 0 16px;
-  gap: 35px;
+  padding: 54px 0 16px;
+  gap: 10px;
 
   &.expanded {
+    padding: 64px 0 16px;
+    gap: 35px;
+
+    .title {
+      display: none;
+    }
+
     .content {
       display: flex;
     }

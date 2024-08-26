@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@douyinfe/semi-illustrations": "^2.51.0",
-    "@douyinfe/semi-ui": "^2.46.0",
+    "@douyinfe/semi-ui": "^2.65.0",
     "@fingerprintjs/fingerprintjs": "^4.1.0",
     "@livelybone/scroll-get": "^6.2.1",
     "@livelybone/singleton": "^1.3.6",

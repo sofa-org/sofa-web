@@ -212,7 +212,7 @@
   min-width: 170px;
 
   .tag {
-    background: $color-gradient-1;
+    background: rgba(#fff, 0.2);
   }
 
   &.product,
@@ -233,7 +233,7 @@
   gap: 20px;
   width: 100%;
   margin: -16px 0 0;
-  min-height: 166px;
+  min-height: 136px;
 }
 
 .recommended-card {

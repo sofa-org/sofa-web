@@ -21,11 +21,7 @@ export const FlowEarn = () => {
       })}
       onClick={() => setExpanded((pre) => (pre === '1' ? '0' : '1'))}
     >
-      {expanded !== '1' && (
-        <div className={styles['title']}>
-          Getting Started with Earn Products
-        </div>
-      )}
+      <div className={styles['title']}>Getting Started with Earn Products</div>
       <div className={styles['content']}>
         <Step1 width={127 / window.winScale} />
         <div className={styles['arrow']} />

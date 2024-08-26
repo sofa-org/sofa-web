@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isElementInView, scrollToElement } from '@livelybone/scroll-get';
 import { VaultInfo } from '@sofa/services/base-type';
-import { CCYService } from '@sofa/services/ccy';
 import classNames from 'classnames';
 
 import { addI18nResources } from '@/locales';
 
-import hotImg from './assets/hot.png';
+import { Comp as HotImg } from './assets/icon-hot.svg';
+import { Comp as NewImg } from './assets/icon-new.svg';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -43,7 +43,6 @@ export const ProductsFixedNav = (props: ProductsFixedNavProps) => {
       <div className={styles['products-fixed-nav']}>
         <span className={styles['title']}>{t('Deposit')}</span>
         {props.depositCcyList.map((ccy) => {
-          const config = CCYService.ccyConfigs[ccy];
           return (
             <div
               key={ccy}
@@ -57,11 +56,9 @@ export const ProductsFixedNav = (props: ProductsFixedNavProps) => {
                 })
               }
             >
-              <img src={config?.icon} alt="" />
               {ccy}
-              {ccy === 'RCH' && (
-                <img className={styles['img-hot']} src={hotImg} alt="" />
-              )}
+              {ccy === 'RCH' && <HotImg className={styles['icon']} />}
+              {ccy === 'stETH' && <NewImg className={styles['icon']} />}
             </div>
           );
         })}

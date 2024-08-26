@@ -1,12 +1,12 @@
 .banner {
   @include flex-column-center;
 
-  min-height: 136px;
+  min-height: 109px;
   margin: 0;
 }
 
 .banner-txt {
-  margin: 72px 0 24px;
+  margin: 54px 0 16px;
   font-size: 24px;
   color: #fff;
 }
