@@ -48,7 +48,7 @@ const campaignMenuItems = (location: ReturnType<typeof useLocation>) => {
     {
       label: (t: TFunction) => t('Competition & Claim Prize'),
       path: joinUrl(
-        import.meta.env.VITE_SOFA_LINK,
+        import.meta.env.VITE_CAMPAIGN_LINK,
         '/fest-competition',
       ).replace(window.location.origin, ''),
       target: '_top',
@@ -61,10 +61,10 @@ const campaignMenuItems = (location: ReturnType<typeof useLocation>) => {
           enUS: 'RCH Celebrity',
           zhCN: 'RCH 名人堂',
         }),
-      path: joinUrl(import.meta.env.VITE_SOFA_LINK, '/rch-celebrity').replace(
-        window.location.origin,
-        '',
-      ),
+      path: joinUrl(
+        import.meta.env.VITE_CAMPAIGN_LINK,
+        '/rch-celebrity',
+      ).replace(window.location.origin, ''),
       target: '_top',
       noNavLinkWrap: true,
       newIcon: true,
@@ -77,7 +77,7 @@ const campaignMenuItems = (location: ReturnType<typeof useLocation>) => {
           zhCN: 'RCH 游戏中心',
         }),
       path: joinUrl(
-        import.meta.env.VITE_SOFA_LINK,
+        import.meta.env.VITE_CAMPAIGN_LINK,
         '/rch-game-center/btc-adventure',
       ).replace(window.location.origin, ''),
       target: '_top',
@@ -127,7 +127,7 @@ const allMenuItems = (location: ReturnType<typeof useLocation>) => {
           enUS: 'Campaign',
           zhCN: '活动中心',
         }),
-      path: 'https://sofa.org/rch-game-center',
+      path: '',
       target: '_top',
       noNavLinkWrap: true,
       isCampaignCSelect: true,
