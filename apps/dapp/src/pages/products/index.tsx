@@ -9,6 +9,7 @@ import {
   RiskType,
 } from '@sofa/services/products';
 import { joinUrl } from '@sofa/utils/url';
+import classNames from 'classnames';
 import { color } from 'echarts/core';
 
 import {
@@ -90,6 +91,9 @@ const Index = () => {
       <ProductsFixedNav depositCcyList={depositCcyList} />
       {depositCcyList.map((ccy) => {
         const config = CCYService.ccyConfigs[ccy];
+        const ticketMeta = ProductsService.TicketTypeOptions.find(
+          (it) => it.value === ccy,
+        );
         return (
           <div
             className={styles['recommend-section']}
@@ -120,6 +124,16 @@ const Index = () => {
                     alt=""
                   />{' '}
                 </div>
+                {project === RiskType.RISKY && ticketMeta && (
+                  <div className={styles['per-ticket']}>
+                    <span
+                      className={classNames('txt-gradient', styles['amount'])}
+                    >
+                      {ticketMeta.per} {ticketMeta.ccy}
+                    </span>
+                    {t('Per Ticket')}
+                  </div>
+                )}
               </div>
               <div className={styles['customize']}>
                 <Link

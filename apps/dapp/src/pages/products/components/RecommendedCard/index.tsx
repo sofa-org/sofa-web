@@ -25,7 +25,6 @@ import {
   useProductSelect,
   useProjectChange,
 } from '@/components/ProductSelector';
-import { RiskTypeRefs } from '@/components/ProductSelector/enums';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import { useGlobalState } from '@/store';
@@ -52,7 +51,6 @@ const RecommendedCard = (props: RecommendedCardProps) => {
   const riskType =
     project === RiskType.RISKY ? RiskType.RISKY : RiskType.PROTECTED;
   const [productType] = useProductSelect();
-  const riskTypeRef = RiskTypeRefs[riskType];
   const vault = useGlobalState((state) =>
     ProductsService.findVault(state.vaults, {
       chainId: wallet.chainId,
@@ -119,14 +117,6 @@ const RecommendedCard = (props: RecommendedCardProps) => {
 
   const precision = useMemo(
     () => (vault?.depositCcy.startsWith('USD') ? 2 : 4),
-    [vault?.depositCcy],
-  );
-
-  const ticketMeta = useMemo(
-    () =>
-      ProductsService.TicketTypeOptions.find(
-        (it) => it.value === vault?.depositCcy,
-      ),
     [vault?.depositCcy],
   );
 

@@ -31,6 +31,24 @@
   }
 }
 
+.per-ticket {
+  @include flex-center;
+
+  margin: 0 0 0 6px;
+  line-height: 14px;
+  font-size: min(12px, 2.4vw);
+  color: rgba(#fff, 0.75);
+  border-width: 4px 14px 4px 6px;
+  border-style: solid;
+  border-image: url("./assets/icon-border.svg");
+  border-image-slice: 4 14 4 6;
+  border-radius: 3px;
+
+  .amount {
+    @include bold;
+  }
+}
+
 .section-title {
   @include flex-center;
 
@@ -40,12 +58,13 @@
   padding: 0 8px;
   font-size: min(18px, 3.6vw);
   max-width: min(calc(100vw - 24px), 1200px);
+  white-space: nowrap;
 
   .left {
     @include flex-center;
 
     .ccy {
-      font-size: 18px;
+      font-size: min(18px, 3.6vw);
       color: rgba(#fff, 0.45);
     }
 
@@ -75,7 +94,7 @@
       @include flex-center;
 
       margin: 0 auto;
-      font-size: min(16px, 4vw);
+      font-size: min(16px, 3.6vw);
     }
   }
 }

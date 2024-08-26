@@ -4,6 +4,7 @@ export default {
     'Choose Your Product': 'Choose Your Product',
     CUSTOMIZE: 'CUSTOMIZE',
     Deposit: 'Deposit',
+    'Per Ticket': 'Per Ticket',
   },
   'ja-JP': {
     Product: '製品',
@@ -22,6 +23,7 @@ export default {
     'Choose Your Product': '选择您的产品',
     CUSTOMIZE: '自定义',
     Deposit: '存款',
+    'Per Ticket': '每张',
   },
   'zh-HK': {
     Product: '產品',
