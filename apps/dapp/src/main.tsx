@@ -15,6 +15,7 @@ import { configReactI18next, t } from '@sofa/services/i18n';
 import { ReferralCode } from '@sofa/services/referral';
 import { Env } from '@sofa/utils/env';
 import { useQuery } from '@sofa/utils/hooks';
+import { joinUrl } from '@sofa/utils/url';
 import { versionGuardian } from '@sofa/utils/version';
 
 import ErrorBoundary from '@/components/ErrorBoundary/index';
@@ -99,6 +100,16 @@ window.$router = createBrowserRouter([
   {
     path: '*',
     Component: () => {
+      if (
+        /fest-competition|rch-game-center|rch-celebrity/.test(location.pathname)
+      ) {
+        window.location.href = joinUrl(
+          import.meta.env.VITE_CAMPAIGN_LINK,
+          location.pathname,
+        );
+        return <></>;
+      }
+
       // 处理 wallet connect 手机端跳转加 /wc 的逻辑
       // 处理 okx wallet 推荐链接可能在路径后面加 %20 的逻辑
       if (/%20$|\/wc$/.test(location.pathname)) {
