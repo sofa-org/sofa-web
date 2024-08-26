@@ -225,7 +225,7 @@ export class PositionsService {
       cursor:
         extra?.orderBy === 'return'
           ? undefined
-          : res.value[res.value.length - 1].createdAt,
+          : res.value[res.value.length - 1]?.createdAt,
       limit,
       list: res.value.map((it) => ({
         ...it,
