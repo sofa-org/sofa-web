@@ -2,7 +2,7 @@ import { parse, stringify } from 'qs';
 
 export function joinUrl(...urls: string[]) {
   if (urls.length <= 1) return urls[0] || '';
-  const url = urls.reduce(
+  const url = urls.filter(Boolean).reduce(
     (pre, url) => {
       const res = url.match(
         /^((https?:)?\/\/[^/?#]+)?([^?#]+)?(\?[^#]+)?(#.*)?$/,
