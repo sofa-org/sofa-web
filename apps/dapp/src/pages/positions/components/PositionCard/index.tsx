@@ -68,7 +68,7 @@ const ProtectedAmounts = (
     [product.vault.depositCcy],
   );
 
-  const claimable = !!position.amounts.redeemable && hasSettled;
+  const claimable = Number(position.amounts.redeemable) > 0 && hasSettled;
 
   return !hasExpired ? (
     <div className={styles['amounts']}>
@@ -146,7 +146,7 @@ const RiskyAmounts = (
     [product.vault.depositCcy],
   );
 
-  const claimable = !!position.amounts.redeemable && hasSettled;
+  const claimable = Number(position.amounts.redeemable) > 0 && hasSettled;
 
   return !hasExpired ? (
     <div className={styles['amounts']}>
@@ -192,7 +192,7 @@ const RiskyAmounts = (
               return props.onClaim();
             }}
           >
-            {(loading) => (loading ? t('CLAIM') : t('CLAIMING...'))}
+            {(loading) => (!loading ? t('CLAIM') : t('CLAIMING...'))}
           </AsyncButton>
         </div>
       )}

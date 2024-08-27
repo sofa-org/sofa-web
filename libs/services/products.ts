@@ -156,7 +156,8 @@ export class ProductsService {
     const vault = product.vault?.vault.toLowerCase();
     const prices = product.anchorPrices?.map(Number).join('-');
     const protectedApy =
-      product.vault?.riskType === RiskType.LEVERAGE
+      product.vault?.riskType === RiskType.LEVERAGE ||
+      product.vault?.riskType === RiskType.RISKY
         ? 0
         : (() => {
             const v =
