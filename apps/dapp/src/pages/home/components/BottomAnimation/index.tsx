@@ -14,6 +14,9 @@ import { Comp as CardAmount } from '../../assets/card-amount.svg';
 import { Comp as CardExpiry } from '../../assets/card-expiry.svg';
 import { Comp as CardPnl } from '../../assets/card-pnl.svg';
 import { Comp as CardStrike } from '../../assets/card-strike.svg';
+import logoCode4rena from '../../assets/logo-code4rena.png';
+import logoPeckshield from '../../assets/logo-peckshield.png';
+import logoSigmaprime from '../../assets/logo-sigmaprime.png';
 
 import locale from './locale';
 
@@ -95,16 +98,35 @@ export const BottomAnimation = (props: BaseProps) => {
       <div className={styles['top']}>
         <h2
           dangerouslySetInnerHTML={{
-            __html: t('Begin your journey with <br/>our Protocols'),
+            __html: t(
+              'The initial SOFA protocols<br/>have passed a Smart Contract Audits.',
+            ),
           }}
         />
-        <a
-          className={'btn-gradient'}
-          href={RiskTypeRefs[RiskType.PROTECTED].link}
-          target={Env.isMetaMaskAndroid ? undefined : RiskType.PROTECTED}
-        >
-          {t('Got To Dapp')}
-        </a>
+        <div className={styles['btns']}>
+          <a
+            className={styles['btn']}
+            href={
+              'https://github.com/sigp/public-audits/blob/master/reports/sofa/review.pdf'
+            }
+          >
+            <img src={logoSigmaprime} alt="" />
+          </a>
+          <a
+            className={styles['btn']}
+            href={'https://code4rena.com/reports/2024-05-sofa-pro-league'}
+          >
+            <img src={logoCode4rena} alt="" />
+          </a>
+          <a
+            className={styles['btn']}
+            href={
+              'https://github.com/peckshield/publications/blob/master/audit_reports/PeckShield-Audit-Report-Sofa-v1.0.pdf'
+            }
+          >
+            <img src={logoPeckshield} alt="" />
+          </a>
+        </div>
         {/* <LightFlow /> */}
       </div>
       <div className={styles['galaxy']} id="galaxy" style={galaxyStyle}>

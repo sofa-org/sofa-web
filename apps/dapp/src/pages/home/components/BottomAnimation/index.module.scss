@@ -50,17 +50,17 @@
   mask-position: 0 bottom;
   mask-repeat: repeat-x;
 
-  // animation: wave 50s linear infinite;
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    width: 100vw;
-    height: min(410px, 41vw);
-    background: url("/src/pages/home/assets/rainbow.png") no-repeat bottom
-      max(-100px, -10vw) center / auto 100%;
-    pointer-events: none;
-  }
+  // // animation: wave 50s linear infinite;
+  // &::after {
+  //   content: "";
+  //   position: absolute;
+  //   bottom: 0;
+  //   width: 100vw;
+  //   height: min(410px, 41vw);
+  //   background: url("/src/pages/home/assets/rainbow.png") no-repeat bottom
+  //     max(-100px, -10vw) center / auto 100%;
+  //   pointer-events: none;
+  // }
 }
 
 .galaxy {
@@ -207,6 +207,25 @@
   :global {
     .spline-model {
       position: absolute;
+    }
+  }
+}
+
+.btns {
+  @include flex-center;
+
+  gap: 64px;
+
+  .btn {
+    @include flex-center;
+
+    width: 280px;
+    height: 120px;
+    border-radius: 60px;
+    background: #000;
+
+    img {
+      width: 200px;
     }
   }
 }

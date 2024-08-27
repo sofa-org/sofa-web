@@ -2,8 +2,6 @@ import { RefObject, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 
-import { MouseRotate3D } from '../MouseRotate3D';
-
 import { Particles } from './particles';
 import { Pipeline } from './pipeline';
 import { Starry } from './starry';
