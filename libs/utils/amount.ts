@@ -69,6 +69,7 @@ export function amountFormatter(
   forcePrecision = false,
 ) {
   if (!isLegalNum(amount)) return '-';
+  if (!Number(amount)) return '0';
   const exponent = -Number(amount).toExponential().split('e')[1] || 0;
   const precision = forcePrecision
     ? $precision

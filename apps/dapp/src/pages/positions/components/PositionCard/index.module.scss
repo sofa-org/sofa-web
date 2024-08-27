@@ -10,6 +10,7 @@
     &:first-child {
       position: relative;
       width: 72px;
+      height: 72px;
       z-index: 2;
     }
 
@@ -159,13 +160,14 @@
   padding: 0 12px;
   line-height: 30px;
   font-size: 30px;
+  white-space: nowrap;
   background: rgba(#000, 0.5);
 
   .range {
     display: block;
     padding: 36px 0 8px;
+    line-height: 22px;
     font-size: 20px;
-    white-space: nowrap;
 
     > span {
       @include regular;
@@ -182,6 +184,14 @@
     right: 0;
     height: 16px;
     background: currentcolor;
+  }
+
+  &.lose {
+    background: rgba(#000, 0.7);
+
+    &::before {
+      opacity: 0.3;
+    }
   }
 }
 

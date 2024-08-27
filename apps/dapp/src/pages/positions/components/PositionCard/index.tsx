@@ -9,6 +9,7 @@ import { displayTenor, formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
+import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
 import {
   ProductTypeRefs,
@@ -244,7 +245,7 @@ const PositionCard = (props: PositionCardProps) => {
   );
   const isWin = useMemo(() => {
     if (position.product.vault.riskType === RiskType.RISKY)
-      return +position.amounts.redeemable! >= 0;
+      return +position.amounts.redeemable! > 0;
     return +position.amounts.redeemable! - +position.amounts.own >= 0;
   }, [
     position.amounts.own,
@@ -306,7 +307,9 @@ const PositionCard = (props: PositionCardProps) => {
             </span>
           ) : (
             <span
-              className={styles['pnl']}
+              className={classNames(styles['pnl'], {
+                [styles['lose']]: !isWin && hasSettled,
+              })}
               style={{
                 color: isWin ? 'var(--color-rise)' : 'var(--color-fall)',
               }}
@@ -330,13 +333,15 @@ const PositionCard = (props: PositionCardProps) => {
               </span>
               {product.vault.riskType !== RiskType.RISKY ? (
                 <>
-                  {pnl >= 0 ? '+' : ''}
-                  {amountFormatter(pnl, pnlPrecision)}{' '}
+                  <AmountDisplay amount={pnl} precision={pnlPrecision} signed />{' '}
                   {product.vault.depositCcy}
                 </>
               ) : Number(position.amounts.redeemable) ? (
                 <>
-                  {amountFormatter(position.amounts.redeemable, pnlPrecision)}{' '}
+                  <AmountDisplay
+                    amount={position.amounts.redeemable}
+                    precision={pnlPrecision}
+                  />{' '}
                   {product.vault.depositCcy}
                 </>
               ) : (
