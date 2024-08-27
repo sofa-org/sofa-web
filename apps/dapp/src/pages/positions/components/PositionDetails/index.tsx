@@ -55,7 +55,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
     () => product.expiry * 1000 - Date.now(),
     [product.expiry],
   );
-  const hasExpiry = leftTime < -10 * MsIntervals.min;
+  const hasExpired = leftTime < -10 * MsIntervals.min;
 
   const isWin = useMemo(() => {
     if (position.product.vault.riskType === RiskType.RISKY)
@@ -286,7 +286,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
     <>
       <div
         className={classNames(styles['infos-wrapper'], {
-          [styles['has-progress']]: status === PositionStatus.MINTED,
+          [styles['has-progress']]: !position.claimed && !hasExpired,
         })}
       >
         <div className={styles['infos']}>
@@ -301,7 +301,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
             className={styles['calculation']}
           />
         </div>
-        {product.vault.riskType === RiskType.RISKY && hasExpiry && (
+        {product.vault.riskType === RiskType.RISKY && hasExpired && (
           <div
             className={styles['result-badge']}
             style={{
@@ -311,13 +311,11 @@ const PositionDetails = (props: PositionDetailsProps) => {
             {isWin ? t('WIN') : t('LOSE')}
           </div>
         )}
-        {status === PositionStatus.CLAIMED ? (
+        {position.claimed ? (
           <span className={styles['status']}>{t('CLAIMED')}</span>
-        ) : status === PositionStatus.CLAIMING ? (
-          <span className={styles['status']}>{t('CLAIMING')}</span>
-        ) : status === PositionStatus.EXPIRED ? (
+        ) : hasExpired ? (
           !!Number(position.amounts.redeemable) &&
-          hasExpiry && (
+          hasExpired && (
             <AsyncButton
               type="primary"
               theme="solid"
@@ -330,7 +328,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                 }, params)
               }
             >
-              {t('CLAIM')}
+              {(loading) => (loading ? t('CLAIMING') : t('CLAIM'))}
             </AsyncButton>
           )
         ) : (

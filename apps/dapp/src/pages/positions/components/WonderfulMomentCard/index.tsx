@@ -124,7 +124,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
             )}
           </span>
           <span className={styles['prices']}>
-            {product.anchorPrices.map((it) => amountFormatter(it, 0)).join('-')}
+            {product.anchorPrices.join('-')}
           </span>
         </div>
         <div className={styles['amounts']}>

@@ -74,20 +74,25 @@ const ProtectedAmounts = (
   return !hasExpired ? (
     <div className={styles['amounts']}>
       <div className={styles['amount']}>
-        {amountFormatter(position.amounts.own, pnlPrecision)}{' '}
-        {product.vault.depositCcy}
+        <span>
+          <AmountDisplay
+            amount={position.amounts.own}
+            precision={pnlPrecision}
+          />{' '}
+          {product.vault.depositCcy}
+        </span>
       </div>
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Min Payout')}</span>{' '}
         <span>
-          {amountFormatter(minRedemption, pnlPrecision)}{' '}
+          <AmountDisplay amount={minRedemption} precision={pnlPrecision} />{' '}
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Max Payout')}</span>{' '}
         <span>
-          {amountFormatter(maxRedemption, pnlPrecision)}{' '}
+          <AmountDisplay amount={maxRedemption} precision={pnlPrecision} />{' '}
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
@@ -95,7 +100,10 @@ const ProtectedAmounts = (
   ) : (
     <div className={styles['amounts']}>
       <div className={classNames(styles['amount'], styles['amount-for-claim'])}>
-        {amountFormatter(+position.amounts.own + pnl, pnlPrecision)}{' '}
+        <AmountDisplay
+          amount={+position.amounts.own + pnl}
+          precision={pnlPrecision}
+        />{' '}
         {product.vault.depositCcy}
         {claimable && (
           <span className={styles['badge-est']}>| {t('Est.')}</span>
@@ -158,14 +166,20 @@ const RiskyAmounts = (
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Cost')}</span>{' '}
         <span>
-          {amountFormatter(position.amounts.own, pnlPrecision)}{' '}
+          <AmountDisplay
+            amount={position.amounts.own}
+            precision={pnlPrecision}
+          />{' '}
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Maximum Payout')}</span>{' '}
         <span>
-          {amountFormatter(position.amounts.maxRedeemable, pnlPrecision)}{' '}
+          <AmountDisplay
+            amount={position.amounts.maxRedeemable}
+            precision={pnlPrecision}
+          />{' '}
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
@@ -179,7 +193,10 @@ const RiskyAmounts = (
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Cost')}</span>{' '}
         <span>
-          {amountFormatter(position.amounts.own, pnlPrecision)}{' '}
+          <AmountDisplay
+            amount={position.amounts.own}
+            precision={pnlPrecision}
+          />{' '}
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
@@ -287,7 +304,7 @@ const PositionCard = (props: PositionCardProps) => {
     <>
       <div
         className={classNames(styles['card'], {
-          [styles['has-rch-amount']]: true,
+          [styles['has-rch-amount']]: !position.claimParams.maker,
         })}
         onClick={() => props.onClick?.()}
       >
@@ -363,9 +380,7 @@ const PositionCard = (props: PositionCardProps) => {
               )}
             </span>
             <span className={styles['prices']}>
-              {product.anchorPrices
-                .map((it) => amountFormatter(it, 0))
-                .join('-')}
+              {product.anchorPrices.join('-')}
             </span>
           </div>
           <div className={styles['risk-type']}>

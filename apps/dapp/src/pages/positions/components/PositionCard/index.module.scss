@@ -9,8 +9,7 @@
 
     &:first-child {
       position: relative;
-      width: 72px;
-      height: 72px;
+      height: min(72px, 12vw);
       z-index: 2;
     }
 
@@ -31,9 +30,9 @@
 
   justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: min(12px, 2.4vw);
   position: relative;
-  padding: 28px 12px 36px;
+  padding: min(28px, 4.8vw) min(12px, 2.4vw) min(36px, 9vw);
   overflow: hidden;
 
   * {
@@ -60,7 +59,7 @@
   left: 0;
   right: 0;
   height: 48px;
-  padding: 0 12px 0 140px;
+  padding: 0 min(12px, 2.4vw) 0 140px;
   margin: 0;
   font-size: 20px;
   color: #fff;
@@ -80,7 +79,7 @@
   left: 0;
   right: 0;
   height: min(36px, 6vw);
-  padding: 0 12px 0 50%;
+  padding: 0 min(12px, 2.4vw) 0 50%;
   margin: 0;
   font-size: min(18px, 3vw);
   color: #fff;
@@ -93,6 +92,7 @@
 
   justify-content: space-between;
   margin: 0;
+  font-size: min(14px, 2.8vw);
 
   > span {
     &:last-child {
@@ -101,7 +101,7 @@
       .unit {
         @include regular;
 
-        font-size: 12px;
+        font-size: min(12px, 2.4vw);
       }
     }
   }
@@ -119,7 +119,7 @@
 
     display: inline-block;
     width: 30px;
-    font-size: 12px;
+    font-size: min(12px, 2.4vw);
     opacity: 0.5;
     transform: scale(0.8);
     transform-origin: left bottom;
@@ -134,14 +134,13 @@
   @include flex-center;
 
   justify-content: flex-start;
-  flex-wrap: wrap;
   gap: 2px;
-  line-height: 22px;
-  font-size: 12px;
+  line-height: min(22px, 4.4vw);
+  font-size: min(12px, 2.4vw);
 
   .expiry,
   .prices {
-    padding: 0 6px;
+    padding: 0 min(6px, 0.8vw);
     color: #fff;
     background: rgba(#000, 0.5);
     white-space: nowrap;
@@ -156,18 +155,18 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 172px;
-  padding: 0 12px;
-  line-height: 30px;
-  font-size: 30px;
+  height: min(172px, 40vw);
+  padding: 0 min(12px, 2.4vw);
+  line-height: min(30px, 5.4vw);
+  font-size: min(30px, 5.4vw);
   white-space: nowrap;
   background: rgba(#000, 0.5);
 
   .range {
     display: block;
-    padding: 36px 0 8px;
-    line-height: 22px;
-    font-size: 20px;
+    padding: min(36px, 8vw) 0 8px;
+    line-height: min(22px, 5.1vw);
+    font-size: min(20px, 5vw);
 
     > span {
       @include regular;
@@ -182,7 +181,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 16px;
+    height: min(16px, 2.8vw);
     background: currentcolor;
   }
 
@@ -202,9 +201,10 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  padding: 0 12px;
+  padding: 0 min(12px, 2.4vw);
   line-height: 24px;
-  font-size: 14px;
+  font-size: min(14px, 3vw);
+  white-space: nowrap;
   background: #fff;
   border-radius: 0 min(16px, 3vw) 0 0;
 
@@ -216,8 +216,8 @@
   .badge-leverage {
     position: relative;
     padding: 4px !important;
-    line-height: 12px !important;
-    font-size: 12px;
+    line-height: min(12px, 2.4vw) !important;
+    font-size: min(12px, 2.4vw);
     color: #fff;
     background: linear-gradient(
       to right,
@@ -242,7 +242,7 @@
 }
 
 .amounts {
-  padding: 12px;
+  padding: min(12px, 2.4vw);
   margin: 0;
   white-space: nowrap;
 
@@ -250,12 +250,12 @@
     @include flex-center;
 
     justify-content: flex-end;
-    margin: 12px 0 0;
+    margin: min(12px, 2.4vw) 0 0;
 
     button {
-      height: 40px;
-      padding: 0 20px;
-      font-size: 16px;
+      height: min(40px, 8.4vw);
+      padding: 0 min(20px, 4vw);
+      font-size: min(16px, 3.6vw);
       letter-spacing: 1px;
       border-radius: 20px;
     }
@@ -265,7 +265,7 @@
 .label {
   margin: 0;
   color: rgba($color-main, 0.6);
-  font-size: 12px;
+  font-size: min(12px, 2.4vw);
 }
 
 .rch-amount {
@@ -274,9 +274,9 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 32px;
+  height: min(32px, 5vw);
   margin: 0;
-  font-size: 12px;
+  font-size: min(12px, 2.4vw);
   color: var(--color-rch);
   background: #f4f4f4;
 }
@@ -286,8 +286,8 @@
 
   position: relative;
   width: min(260px, calc((100vw - 24px - 3vw) / 2));
-  min-width: 200px;
-  min-height: 300px;
+  min-width: min(calc((100vw - 24px - 3vw) / 2), 200px);
+  min-height: min(55vw, 300px);
   margin: 0;
   background: #fff;
   border-radius: min(25px, 2.5vw);
@@ -309,7 +309,7 @@
   }
 
   &.has-rch-amount {
-    padding: 0 0 32px;
+    padding: 0 0 min(32px, 5vw);
   }
 }
 
@@ -317,6 +317,7 @@
   :global(.is-mobile) {
     .card {
       flex-grow: 1;
+      max-width: calc((100vw - 24px - 3vw) / 2);
     }
   }
 }
@@ -325,6 +326,7 @@
   :global(.is-pc) {
     .card {
       flex-grow: 1;
+      max-width: calc((100vw - 24px - 3vw) / 2);
     }
   }
 }

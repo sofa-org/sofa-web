@@ -156,4 +156,10 @@
     border-radius: 0;
     background: #000;
   }
+
+  :global(.semi-select-option) {
+    .risk-item {
+      font-size: 14px;
+    }
+  }
 }

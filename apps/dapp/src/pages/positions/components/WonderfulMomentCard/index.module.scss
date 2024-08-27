@@ -3,7 +3,7 @@
 .profits {
   @extend %product;
 
-  padding: 40px 12px 56px;
+  padding: min(40px, 8vw) min(12px, 2.4vw) min(56px, 11vw);
 
   &::before {
     content: "";
@@ -19,7 +19,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 16px;
+    height: min(16px, 3vw);
     z-index: 1;
     background: var(--color-rise);
   }
@@ -27,10 +27,10 @@
 
 .product-icon {
   position: absolute;
-  left: -120px;
-  top: -100px;
+  left: max(-120px, -40vw);
+  top: max(-100px, -32vw);
   z-index: 0;
-  width: 400px;
+  width: min(400px, 100vw);
   margin: 0;
   filter: blur(10px);
   opacity: 0.3;
@@ -38,32 +38,31 @@
 
 .level-icon {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: min(12px, 2.4vw);
+  bottom: min(12px, 2.4vw);
   margin: 0;
-  line-height: 60px;
-  font-size: 60px;
+  line-height: min(60px, 12vw);
+  font-size: min(60px, 12vw);
 }
 
 .profit {
-  margin: 0 20px;
-  line-height: 24px;
+  line-height: min(24px, 4.8vw);
   color: var(--color-rise);
 
   .value {
     @include bold;
 
-    font-size: 24px;
+    font-size: min(24px, 4.5vw);
   }
 
   .unit {
-    padding: 0 0 0 8px;
-    font-size: 20px;
+    padding: 0 0 0 min(8px, 1.6vw);
+    font-size: min(20px, 4vw);
   }
 }
 
 .others {
-  padding: 12px;
+  padding: min(12px, 2.4vw);
   margin: 0;
 }
 
@@ -76,15 +75,15 @@
 }
 
 .amounts {
-  margin: 12px 0 0;
+  margin: min(12px, 2.4vw) 0 0;
   padding: 0;
 
   .amount {
     @include regular;
 
     margin: 0 0 4px;
-    font-size: 14px;
-    line-height: 18px;
+    font-size: min(14px, 3vw);
+    line-height: min(18px, 3.6vw);
 
     .label {
       color: rgba(#000, 0.5);
@@ -95,7 +94,7 @@
 .icon-info {
   @include pointer;
 
-  width: 40px;
+  width: min(40px, 8vw);
 }
 
 .rule-descriptions {
