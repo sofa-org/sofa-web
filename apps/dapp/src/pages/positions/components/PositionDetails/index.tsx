@@ -316,7 +316,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
         ) : status === PositionStatus.CLAIMING ? (
           <span className={styles['status']}>{t('CLAIMING')}</span>
         ) : status === PositionStatus.EXPIRED ? (
-          !!position.amounts.redeemable &&
+          !!Number(position.amounts.redeemable) &&
           hasExpiry && (
             <AsyncButton
               type="primary"
@@ -376,7 +376,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
               <div
                 className={styles['value']}
                 style={{
-                  color: position.amounts.redeemable
+                  color: Number(position.amounts.redeemable)
                     ? 'var(--color-rise)'
                     : 'var(--color-fall)',
                 }}

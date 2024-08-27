@@ -80,7 +80,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
       data?.filter((it) => {
         if (
           judgeSettled(it.product.expiry) &&
-          (it.claimParams.maker || it.amounts.redeemable)
+          (it.claimParams.maker || Number(it.amounts.redeemable))
         ) {
           return true;
         }

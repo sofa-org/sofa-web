@@ -334,7 +334,7 @@ const PositionCard = (props: PositionCardProps) => {
                   {amountFormatter(pnl, pnlPrecision)}{' '}
                   {product.vault.depositCcy}
                 </>
-              ) : position.amounts.redeemable ? (
+              ) : Number(position.amounts.redeemable) ? (
                 <>
                   {amountFormatter(position.amounts.redeemable, pnlPrecision)}{' '}
                   {product.vault.depositCcy}

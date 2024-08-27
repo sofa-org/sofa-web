@@ -1,9 +1,8 @@
 import { singleton } from '@livelybone/singleton';
-import { asyncCache } from '@sofa/utils/decorators';
+import { asyncCache, asyncRetry } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { jsonSafeParse } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
-import { UserStorage } from '@sofa/utils/storage';
 import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
 
@@ -26,8 +25,6 @@ export interface CandleInfo {
   close: number;
   volume?: number;
 }
-
-const RCHPrice = new UserStorage<number>('rch-price', () => 'curr');
 
 export class MarketService {
   static get binanceWs() {
@@ -123,6 +120,7 @@ export class MarketService {
       .then((res) => +res.value.price);
   }
 
+  @asyncRetry()
   @asyncCache({
     persist: true,
     until: (v, t) => !v || !t || Date.now() - t > MsIntervals.min,
@@ -149,14 +147,6 @@ export class MarketService {
             'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=usd&days=0',
           )
           .then((res) => res.value.prices[0][1]);
-      })
-      .then((p) => {
-        RCHPrice.set(p);
-        return p;
-      })
-      .catch((err) => {
-        console.error(err);
-        return RCHPrice.get() ?? 0.85;
       });
   }
 

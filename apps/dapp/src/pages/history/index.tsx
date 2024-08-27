@@ -230,7 +230,7 @@ const OrderHistory = () => {
                       )
                     </>
                   ) : (
-                    t('In Range')
+                    '-'
                   )}
                 </span>
               </div>
