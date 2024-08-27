@@ -148,7 +148,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
           y: y(apyList[0][1]) - 8 / window.winScale,
           txt: displayPercentage(apyList[0][1]),
         },
-        ...(props.productType
+        ...(props.productType === ProductType.DNT
           ? [
               {
                 x: (3 / 6) * size.width,

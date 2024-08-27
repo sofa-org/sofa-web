@@ -46,6 +46,12 @@
   }
 }
 
+.semi-select.semi-select:focus,
+.semi-select-open.semi-select-open,
+.semi-select-focus.semi-select-focus {
+  border-color: transparent;
+}
+
 @mixin rewrite() {
   .semi-select-option {
     height: 48px;

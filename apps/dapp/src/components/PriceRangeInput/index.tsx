@@ -15,7 +15,7 @@ import {
   useIsPortrait,
   useLazyCallback,
 } from '@sofa/utils/hooks';
-import { useDebounceEffect } from 'ahooks';
+import { useDebounceEffect, useSize } from 'ahooks';
 import classNames from 'classnames';
 import { isEqual } from 'lodash-es';
 import { nanoid } from 'nanoid';
@@ -55,6 +55,9 @@ export const PriceRangeInputEl = (
   const [t] = useTranslation('PriceRangeInput');
   const id = useMemo(() => `range-input-${nanoid()}`, []);
   const atm = useIndexPrices((state) => state.prices[props.forCcy]);
+  const size = useSize(() =>
+    document.querySelector(`#${id} .${styles['quick-selects']}`),
+  );
   const [tempValue, $setTempValue] = useState(() => props.value?.map(toNum));
 
   const checkRange = useLazyCallback(
@@ -136,7 +139,7 @@ export const PriceRangeInputEl = (
     { wait: 300 },
   );
 
-  const strikeOptions = useAsyncMemo(async () => {
+  const $strikeOptions = useAsyncMemo(async () => {
     if (!atm) return undefined;
     const strikes = await ProductsService.genStrikes(
       atm,
@@ -160,6 +163,19 @@ export const PriceRangeInputEl = (
       ...upper.map((value) => ({ label: value, value }) as RadioBtnOption),
     ];
   }, [atm]);
+  const strikeOptions = useMemo(() => {
+    if (!size?.width || !$strikeOptions) return $strikeOptions;
+    const rowCount = Math.floor((size.width + 4) / (72 + 4));
+    const emptyCount = rowCount - ($strikeOptions.length % rowCount);
+    return $strikeOptions.concat(
+      [...Array(emptyCount)].map(() => ({
+        className: styles['empty-el'],
+        label: '',
+        value: NaN,
+        disabled: true,
+      })),
+    );
+  }, [$strikeOptions, size]);
 
   useEffect(() => {
     if (!strikeOptions || !props.autoInitial || props.value) return;
@@ -193,29 +209,9 @@ export const PriceRangeInputEl = (
         </div>
       </div>
       <div className={styles['quick-selects']}>
-        {/* <div className={styles['left']}>
-              <RadioBtnGroup
-                radioStyle={{ width: 60 / window.winScale }}
-                options={lowerStrikeOptions}
-                value={tempValue?.[0]}
-                onChange={(v) =>
-                  setTempValue((pre) => [v ? +v : undefined, pre?.[1]])
-                }
-              />
-            </div>
-            <div className={styles['right']}>
-              <RadioBtnGroup
-                radioStyle={{ width: 60 / window.winScale }}
-                options={upperStrikeOptions}
-                value={tempValue?.[1]}
-                onChange={(v) =>
-                  setTempValue((pre) => [pre?.[0], v ? +v : undefined])
-                }
-              />
-            </div> */}
         <div>
           <CheckboxBtnGroup
-            checkboxStyle={{ width: 60 / window.winScale }}
+            className={styles['checkbox-btn-group']}
             options={strikeOptions}
             value={tempValue as never}
             onChange={($v) => {
