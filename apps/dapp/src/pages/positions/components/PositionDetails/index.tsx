@@ -68,7 +68,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
   ]);
 
   const observationStart = useMemo(
-    () => next8h(position.createdAt),
+    () => next8h(position.createdAt * 1000) / 1000,
     [position.createdAt],
   );
 
