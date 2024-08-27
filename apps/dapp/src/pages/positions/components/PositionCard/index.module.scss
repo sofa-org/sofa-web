@@ -164,9 +164,9 @@
 
   .range {
     display: block;
-    padding: min(36px, 8vw) 0 8px;
+    padding: min(36px, 5vw) 0 8px;
     line-height: min(22px, 5.1vw);
-    font-size: min(20px, 5vw);
+    font-size: min(20px, 4vw);
 
     > span {
       @include regular;
