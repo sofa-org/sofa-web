@@ -29,6 +29,8 @@ import locale from './locale';
 addI18nResources(locale, 'History');
 import { uniqBy } from 'lodash-es';
 
+import { judgeSettled } from '../positions/components/PositionCard';
+
 import styles from './index.module.scss';
 
 const OrderHistory = () => {
@@ -205,6 +207,7 @@ const OrderHistory = () => {
             prices,
             record.product.vault.depositCcy,
           );
+          const hasSettled = judgeSettled(record.product.expiry);
           return (
             <div className={styles['extra']}>
               <div className={styles['extra-item']}>
@@ -229,6 +232,9 @@ const OrderHistory = () => {
                       />
                       )
                     </>
+                  ) : record.product.vault.productType === ProductType.DNT &&
+                    hasSettled ? (
+                    t('In Range')
                   ) : (
                     '-'
                   )}
