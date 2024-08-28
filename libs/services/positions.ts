@@ -58,7 +58,7 @@ export interface SettlementInfo {
 
 export interface OriginPositionInfo extends CalculatedInfo, SettlementInfo {
   id: PositionInfoInGraph['productId'];
-  owner: string; // 所有人的地址
+  wallet: string; // 所有人的地址
   product: ProductInfo;
   claimed: boolean;
   updatedAt: number; // 更新时间，秒
@@ -74,7 +74,7 @@ export interface PositionInfo extends OriginPositionInfo {
 export interface OriginTransactionInfo
   extends Omit<
     OriginPositionInfo,
-    'id' | 'owner' | 'claimParams' | 'updatedAt' | 'claimed'
+    'id' | 'wallet' | 'claimParams' | 'updatedAt' | 'claimed'
   > {
   hash: string;
   takerWallet: string;

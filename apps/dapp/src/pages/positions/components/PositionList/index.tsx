@@ -122,7 +122,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
         vault: it.product.vault.vault,
         productType: it.product.vault.productType,
         chainId: it.product.vault.chainId,
-        owner: it.owner,
+        owner: it.wallet,
         term: it.claimParams.term,
         expiry: it.product.expiry,
         anchorPrices: it.claimParams.anchorPrices,

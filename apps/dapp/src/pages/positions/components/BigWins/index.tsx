@@ -48,7 +48,7 @@ const BigWins = () => {
         {
           title: t('Address'),
           key: 'address',
-          render: (_, it) => <Address address={it.owner} />,
+          render: (_, it) => <Address address={it.wallet} />,
         },
         {
           title: t('Product'),
