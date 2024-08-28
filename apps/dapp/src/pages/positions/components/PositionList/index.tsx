@@ -78,12 +78,8 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   const unClaimedList = useMemo(
     () =>
       data?.filter((it) => {
-        if (
-          judgeSettled(it.product.expiry) &&
-          (it.claimParams.maker || Number(it.amounts.redeemable))
-        ) {
-          return true;
-        }
+        if (!Number(it.amounts.redeemable)) return false;
+        if (judgeSettled(it.product.expiry)) return true;
         if (
           Env.isPre &&
           it.product.vault.productType === ProductType.DNT &&
