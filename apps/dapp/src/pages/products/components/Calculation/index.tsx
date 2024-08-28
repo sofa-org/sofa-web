@@ -137,7 +137,7 @@ export const Calculation = (props: CalculationProps) => {
               ),
               // Premium Amount used for the following calculation.
               desc: t(
-                'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido Return) * Deposit Amount / (1 + Trading Fee Rate))',
+                'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa Return) * Deposit Amount / (1 + Trading Fee Rate))',
               ),
               className: styles['gray'],
             },
@@ -627,14 +627,14 @@ export const Calculation = (props: CalculationProps) => {
                 desc: t('Expiry Time - Execution Time (in EpochSeconds)'),
               },
               {
-                name: t('Estimated Aave/Lido Yield'),
+                name: t('Estimated Aave/Lido/Sofa Yield'),
                 value: <>{displayPercentage(quote.apyInfo?.interest)}</>,
                 desc: t(
-                  'Min(1 Month Aave/Lido Average, current Aave/Lido Apy). (Aave/Lido APY)',
+                  'Min(1 Month Aave/Lido/Sofa Average, current Aave/Lido/Sofa Apy). (Aave/Lido/Sofa APY)',
                 ),
               },
               {
-                name: t('Estimated Aave/Lido Return'),
+                name: t('Estimated Aave/Lido/Sofa Return'),
                 value: (
                   <>
                     {amountFormatter(
@@ -647,14 +647,14 @@ export const Calculation = (props: CalculationProps) => {
                   </>
                 ),
                 desc: t(
-                  '(Deposit * (1 + Aave/Lido APY Estimate) ^ (Tenor / 365) - Deposit)',
+                  '(Deposit * (1 + Aave/Lido/Sofa APY Estimate) ^ (Tenor / 365) - Deposit)',
                 ),
               },
               {
                 name: t('Earn | Base Yield(APY)'),
                 value: <>{displayPercentage(quote.apyInfo?.min)}</>,
                 desc: t(
-                  "User's Selection. Base Yield can be achieved if actual Aave/Lido return is equal to current estimate",
+                  "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa return is equal to current estimate",
                 ),
               },
               {
@@ -684,7 +684,7 @@ export const Calculation = (props: CalculationProps) => {
                 ),
                 // Premium Amount used for the following calculation.
                 desc: t(
-                  'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido Return) * Deposit Amount / (1 + Trading Fee Rate))',
+                  'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa Return) * Deposit Amount / (1 + Trading Fee Rate))',
                 ),
                 className: styles['gray'],
               },
@@ -713,7 +713,7 @@ export const Calculation = (props: CalculationProps) => {
                   </>
                 ),
                 desc: t(
-                  '(MM Collateral + Premium) * ((1 + Aave/Lido interest rate) ^ (Tenor / 365) - 1). From Market Maker Price',
+                  '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa interest rate) ^ (Tenor / 365) - 1). From Market Maker Price',
                 ),
                 className: styles['gray'],
               },
@@ -764,7 +764,7 @@ export const Calculation = (props: CalculationProps) => {
                   </>
                 ),
                 desc: t(
-                  'Premium * Trading Fee Rate * ((1 + Aave/Lido interest rate) ^ (Tenor / 365)-1)',
+                  'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa interest rate) ^ (Tenor / 365)-1)',
                 ),
                 className: styles['gray'],
               },

@@ -31,7 +31,7 @@ export const ProductStrategy = (product: Partial<ProductQuoteResult>) => {
             <p
               dangerouslySetInnerHTML={{
                 __html: t(
-                  'For EARN Products (Secured), all invested amounts will be staked in the Aave/Lido protocol to generate passive returns.',
+                  'For EARN Products (Secured), all invested amounts will be staked in the Aave/Lido/Sofa protocol to generate passive returns.',
                 ),
               }}
             />
@@ -40,7 +40,7 @@ export const ProductStrategy = (product: Partial<ProductQuoteResult>) => {
             <p
               dangerouslySetInnerHTML={{
                 __html: t(
-                  'Moreover, a portion of the Aave/Lido returns will be retained as Base Yield, and the remaining part will be deployed to option strategies to generate potential Upside returns.',
+                  'Moreover, a portion of the Aave/Lido/Sofa returns will be retained as Base Yield, and the remaining part will be deployed to option strategies to generate potential Upside returns.',
                 ),
               }}
             />

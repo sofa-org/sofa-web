@@ -1,6 +1,6 @@
 import { ProductType, RiskType } from '../base-type';
 
-export default [
+const USDTVaults = [
   // SmartBullVault(USDT)
   {
     chainId: 11155111,
@@ -185,3 +185,46 @@ export default [
     usePermit2: false,
   },
 ];
+
+const RCHVaults = [
+  //RCHDNTVault(ETH/USDT)
+  {
+    chainId: 11155111,
+    vault: '0x813E8398E16A87622608669513A32B3CA8E09632',
+    productType: ProductType.DNT,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 50,
+    usePermit2: false,
+  },
+  //RCHBullTrendVault(ETH/USDT)
+  {
+    chainId: 11155111,
+    vault: '0xA6A6A5eE909D9dFF2f6Ee0d7a1416A4FFDf4f4e6',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 50,
+    usePermit2: false,
+  },
+  //RCHBearTrendVault(ETH/USDT)
+  {
+    chainId: 11155111,
+    vault: '0xC24aE9C2a94F569FA3E6D33EF1B2193728387A73',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 50,
+    usePermit2: false,
+  },
+];
+
+const Vaults = [...USDTVaults, ...RCHVaults];
+
+export default Vaults;

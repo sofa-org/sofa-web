@@ -251,7 +251,7 @@ export class MarketService {
   }
 
   private static async $interestRate(
-    ccy: 'WETH' | 'WBTC' | 'USDT' | 'USDC' | 'stETH',
+    ccy: 'WETH' | 'WBTC' | 'USDT' | 'USDC' | 'stETH' | 'RCH',
     chainId: number,
   ) {
     return http
@@ -327,12 +327,14 @@ export class MarketService {
       apyDefinition: ApyDefinition.AaveLendingAPY,
     };
     const interestRates = await Promise.all(
-      (['WBTC', 'WETH', 'USDT', 'USDC', 'stETH'] as const).map(async (ccy) => [
-        ccy,
-        !ccyList.includes(ccy)
-          ? defaultApy
-          : await MarketService.$interestRate(ccy, chainId),
-      ]),
+      (['WBTC', 'WETH', 'USDT', 'USDC', 'stETH', 'RCH'] as const).map(
+        async (ccy) => [
+          ccy,
+          !ccyList.includes(ccy)
+            ? defaultApy
+            : await MarketService.$interestRate(ccy, chainId),
+        ],
+      ),
     ).then(Object.fromEntries);
     return Promise.resolve().then(() => ({
       ...interestRates,

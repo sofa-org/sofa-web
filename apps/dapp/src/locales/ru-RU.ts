@@ -28,8 +28,8 @@ export default {
   Earn: 'Earn',
   'Capital Secured Earnings': 'Доходы с обеспечением капитала',
   Secured: 'Обеспеченные',
-  'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.':
-    'Искусное сочетание безопасности доходов от сбережений с встроенными опционами позволяет вашему капиталу надежно генерировать доход в доверенных DeFi-протоколах, таких как Aave/Lido, при этом часть дохода пойдет на финансирование опционных структур для получения дополнительных прибылей. Идеально для пользователя, осознающего риски и желающего получить максимальную прибыль при минимальных рисках.',
+  'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.':
+    'Искусное сочетание безопасности доходов от сбережений с встроенными опционами позволяет вашему капиталу надежно генерировать доход в доверенных DeFi-протоколах, таких как Aave/Lido/Sofa, при этом часть дохода пойдет на финансирование опционных структур для получения дополнительных прибылей. Идеально для пользователя, осознающего риски и желающего получить максимальную прибыль при минимальных рисках.',
   Leverage: 'Кредитное плечо',
   Surge: 'Surge',
   'ApxWinnings Tickets': 'Приблизительно выигрышные билеты',

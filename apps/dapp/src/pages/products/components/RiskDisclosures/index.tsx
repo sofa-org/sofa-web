@@ -21,13 +21,13 @@ export const RiskDisclosures = () => {
         {t(
           `<b>1.Payoff Variability & Losses</b>
 · Surge-based products are prone to full capital losses as a result of unfavourable market outcomes.
-· Earn-based products could see fluctuations in realized yields from external factors, such as changes in Aave/Lido's prevailing interest rates.
+· Earn-based products could see fluctuations in realized yields from external factors, such as changes in Aave/Lido/Sofa's prevailing interest rates.
 
 <b>2.DeFi Extensibility Risks with External Protocols</b>
 · SOFA protocols are fully extensible with 3rd party DeFi projects beyond our control, and exploits to these external protocols could bring unforeseen negative impact.
 
 <b>3.Staking Yield Deficit</b>
-· A short-fall in staking income from Aave/Lido (extreme case = 0%) could cause Earn-based products to return a total payout that is slightly less than the original deposit.
+· A short-fall in staking income from Aave/Lido/Sofa (extreme case = 0%) could cause Earn-based products to return a total payout that is slightly less than the original deposit.
 
 <b>4.Blockchain Systemic Risks</b>
 · SOFA protocols are reliant on Ethereum and EVM-compatible L1s/L2s for overall network and asset security.

@@ -27,7 +27,7 @@ export const RiskTypeRefs = {
     label2: (t: TFunction) => t('Secured'),
     desc: (t: TFunction) =>
       t(
-        'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
+        'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
       ),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.PROTECTED,
@@ -39,7 +39,7 @@ export const RiskTypeRefs = {
     label2: (t: TFunction) => t('Leverage'),
     desc: (t: TFunction) =>
       t(
-        'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
+        'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
       ),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.LEVERAGE,

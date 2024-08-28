@@ -31,6 +31,7 @@ export const ChainMap: Record<
     hlPriceOracle: Record<'BTC' | 'ETH', string>;
     spotPriceOracle: Record<'BTC' | 'ETH', string>;
     aaveGraphUrl: string;
+    stRCHAddress: string;
   }
 > = omitBy(
   {
@@ -66,6 +67,7 @@ export const ChainMap: Record<
         ETH: '0x6417084B8Df644e1d7E32BE39B54F3a5BbEA645B',
       },
       aaveGraphUrl: 'https://api.thegraph.com/subgraphs/name/aave/protocol-v3',
+      stRCHAddress: '',
     },
     42161: {
       chainId: 42161,
@@ -100,6 +102,7 @@ export const ChainMap: Record<
       },
       aaveGraphUrl:
         'https://api.thegraph.com/subgraphs/name/aave/protocol-v3-arbitrum',
+      stRCHAddress: '',
     },
     11155111: {
       chainId: 11155111,
@@ -134,6 +137,7 @@ export const ChainMap: Record<
         ETH: '0x8Daeb7DcB6a1103b7a601017a479B0e5D10402af',
       },
       aaveGraphUrl: 'https://api.thegraph.com/subgraphs/name/aave/protocol-v3',
+      stRCHAddress: '0x2845aD1636F2273687850108581E8Cf321AAbD6d',
     },
   },
   (val) => (Env.isDaily ? !val.isTest : val.isTest),
