@@ -301,7 +301,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
             className={classNames(styles['label'], 'label')}
             style={{ height: yAxisLabelHeight[2] }}
           >
-            <span>{t('Potential Yield')}</span>
+            <span>{t('Potential Yield(APY)')}</span>
             <span style={{ color: maxApy < 0 ? '#B9B3BE' : '#50D113' }}>
               {displayPercentage(maxApy)}
             </span>
