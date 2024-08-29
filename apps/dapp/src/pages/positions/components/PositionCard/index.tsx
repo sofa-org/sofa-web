@@ -35,7 +35,7 @@ export interface PositionCardProps {
   onClick?(): void;
 }
 
-export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 10;
+export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 5;
 export function judgeSettled(expiry: number) {
   return Date.now() - expiry * 1000 > BUFFER_TIME_FOR_SETTLEMENT;
 }
@@ -318,9 +318,17 @@ const PositionCard = (props: PositionCardProps) => {
             <img src={icon.icon} alt="" />
             <img src={icon.icon} alt="" />
           </div>
-          {!hasSettled ? (
+          {!hasExpired ? (
             <span className={styles['count-down']}>
               {formatDuration(leftTime).replace(/\d+s/, '') || '0m'}
+            </span>
+          ) : !hasSettled ? (
+            <span
+              className={styles['pnl']}
+              style={{ color: 'var(--color-rise)' }}
+            >
+              <span className={styles['range']} />
+              {t('Settling...')}
             </span>
           ) : (
             <span

@@ -16,6 +16,7 @@ export default {
     Profits: 'Profits',
     protected: 'protected',
     Lose: 'Lose',
+    'Settling...': 'Settling...',
   },
   'ja-JP': {
     'Min Payout': '最小支払い',
@@ -34,6 +35,7 @@ export default {
     Profits: '利益',
     protected: '保護された',
     Lose: '損失',
+    'Settling...': 'Settling...',
   },
   'ru-RU': {
     'Min Payout': 'Мин. выплата',
@@ -52,6 +54,7 @@ export default {
     Profits: 'Прибыль',
     protected: 'защищен',
     Lose: 'Потеря',
+    'Settling...': 'Settling...',
   },
   'zh-CN': {
     'Min Payout': '最小收益',
@@ -70,6 +73,7 @@ export default {
     Profits: '利润',
     protected: '受保护',
     Lose: '损失',
+    'Settling...': '结算中...',
   },
   'zh-HK': {
     'Min Payout': '最低支付',
@@ -88,6 +92,7 @@ export default {
     Profits: '利潤',
     protected: '受保護',
     Lose: '損失',
+    'Settling...': 'Settling...',
   },
   'zh-TW': {
     'Min Payout': '最小支付',
@@ -106,5 +111,6 @@ export default {
     Profits: '利潤',
     protected: '受保護',
     Lose: '損失',
+    'Settling...': 'Settling...',
   },
 };
