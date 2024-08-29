@@ -171,7 +171,7 @@ export const PriceRangeInputEl = (
       [...Array(emptyCount)].map(() => ({
         className: styles['empty-el'],
         label: '',
-        value: NaN,
+        value: Math.random(),
         disabled: true,
       })),
     );
