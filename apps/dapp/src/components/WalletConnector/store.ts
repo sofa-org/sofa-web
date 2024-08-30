@@ -264,7 +264,7 @@ export const useWalletStore = Object.assign(
     subscribeAccountChange: async () => {
       return WalletConnect.subscribeAccountChange((address) => {
         const originState = useWalletStore.getState();
-        useWalletStore.setState({ address });
+        if (originState.address) useWalletStore.setState({ address });
         if (
           originState.serverAuth &&
           originState.serverAuth.wallet?.toLowerCase() != address?.toLowerCase()
