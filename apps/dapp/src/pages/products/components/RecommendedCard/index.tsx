@@ -206,7 +206,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
               <div
                 key={`${it.vault.vault.toLowerCase()}-${it.vault.vault}-${
                   it.expiry
-                }-${it.anchorPrices.join('-')}-${i}`}
+                }-${it.anchorPrices.join('-')}-${it.vault.riskType}-${i}`}
                 className={classNames(styles['product'], {
                   [styles['active']]: it === product,
                   [styles['risky']]: riskType === RiskType.RISKY,

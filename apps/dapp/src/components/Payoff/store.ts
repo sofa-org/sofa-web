@@ -1,13 +1,25 @@
-import { ProductType } from '@sofa/services/contracts';
+import { ProductType, VaultInfo } from '@sofa/services/contracts';
 import { dirtyArrayOmit, objectValCvt } from '@sofa/utils/object';
 import { computed } from '@sofa/utils/zustand';
 import { create } from 'zustand';
 
 export interface PayoffStoreState {
-  maxYields: PartialRecord<ProductType, number[]>;
-  minYields: PartialRecord<ProductType, number[]>;
-  computedMaxYield(): PartialRecord<ProductType, number>;
-  computedMinYield(): PartialRecord<ProductType, number>;
+  maxYields: PartialRecord<
+    `${VaultInfo['depositCcy']}-${ProductType}`,
+    number[]
+  >;
+  minYields: PartialRecord<
+    `${VaultInfo['depositCcy']}-${ProductType}`,
+    number[]
+  >;
+  computedMaxYield(): PartialRecord<
+    `${VaultInfo['depositCcy']}-${ProductType}`,
+    number
+  >;
+  computedMinYield(): PartialRecord<
+    `${VaultInfo['depositCcy']}-${ProductType}`,
+    number
+  >;
 }
 
 export const usePayoffStore = Object.assign(
@@ -28,34 +40,48 @@ export const usePayoffStore = Object.assign(
     ),
   })),
   {
-    addMaxYield: (productType: ProductType, y: number) => {
+    addMaxYield: (
+      depositCcy: VaultInfo['depositCcy'],
+      productType: ProductType,
+      y: number,
+    ) => {
       usePayoffStore.setState((pre) => ({
         maxYields: {
           ...pre.maxYields,
-          [productType]: [...(pre.maxYields[productType] || []), y].sort(
-            (a, b) => a - b,
-          ),
+          [`${depositCcy}-${productType}`]: [
+            ...(pre.maxYields[`${depositCcy}-${productType}`] || []),
+            y,
+          ].sort((a, b) => a - b),
         },
       }));
     },
-    addMinYield: (productType: ProductType, y: number) => {
+    addMinYield: (
+      depositCcy: VaultInfo['depositCcy'],
+      productType: ProductType,
+      y: number,
+    ) => {
       usePayoffStore.setState((pre) => ({
         minYields: {
           ...pre.minYields,
-          [productType]: [...(pre.minYields[productType] || []), y].sort(
-            (a, b) => a - b,
-          ),
+          [`${depositCcy}-${productType}`]: [
+            ...(pre.minYields[`${depositCcy}-${productType}`] || []),
+            y,
+          ].sort((a, b) => a - b),
         },
       }));
     },
-    removeMaxYield: (productType: ProductType, y: number) => {
+    removeMaxYield: (
+      depositCcy: VaultInfo['depositCcy'],
+      productType: ProductType,
+      y: number,
+    ) => {
       usePayoffStore.setState((pre) => {
         let removed = false;
         return {
           maxYields: {
             ...pre.maxYields,
-            [productType]: dirtyArrayOmit(
-              pre.maxYields[productType] || [],
+            [`${depositCcy}-${productType}`]: dirtyArrayOmit(
+              pre.maxYields[`${depositCcy}-${productType}`] || [],
               (it) => {
                 if (removed || it !== y) return false;
                 removed = true;
@@ -66,14 +92,18 @@ export const usePayoffStore = Object.assign(
         };
       });
     },
-    removeMinYield: (productType: ProductType, y: number) => {
+    removeMinYield: (
+      depositCcy: VaultInfo['depositCcy'],
+      productType: ProductType,
+      y: number,
+    ) => {
       usePayoffStore.setState((pre) => {
         let removed = false;
         return {
           minYields: {
             ...pre.minYields,
-            [productType]: dirtyArrayOmit(
-              pre.minYields[productType] || [],
+            [`${depositCcy}-${productType}`]: dirtyArrayOmit(
+              pre.minYields[`${depositCcy}-${productType}`] || [],
               (it) => {
                 if (removed || it !== y) return false;
                 removed = true;

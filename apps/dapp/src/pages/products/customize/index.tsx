@@ -387,6 +387,7 @@ const ProductCustomize = () => {
                 <div className={styles['details']}>
                   <PayoffChart
                     className={styles['chart']}
+                    depositCcy={quoteInfo.vault.depositCcy}
                     productType={quoteInfo.vault.productType}
                     anchorPrices={quoteInfo.anchorPrices}
                     protectedYield={Number(quoteInfo.apyInfo?.min)}

@@ -161,6 +161,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
             </div>
             <PayoffChart
               className={styles['payoff-chart']}
+              depositCcy={data.vault.depositCcy}
               productType={data.vault.productType}
               anchorPrices={data.anchorPrices}
               protectedYield={Number(data.apyInfo?.min)}

@@ -19,6 +19,7 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'Payoff');
 
 export interface PayoffChartProps extends BaseProps {
+  depositCcy: VaultInfo['depositCcy'];
   productType: ProductType;
   atm?: number;
   anchorPrices: (string | number)[];
@@ -58,13 +59,27 @@ export const PayoffChart = (props: PayoffChartProps) => {
 
   useLayoutEffect(() => {
     if (!props.affectByOther) return;
-    usePayoffStore.addMaxYield(props.productType, maxApy);
-    usePayoffStore.addMinYield(props.productType, baseApy);
+    usePayoffStore.addMaxYield(props.depositCcy, props.productType, maxApy);
+    usePayoffStore.addMinYield(props.depositCcy, props.productType, baseApy);
     return () => {
-      usePayoffStore.removeMaxYield(props.productType, maxApy);
-      usePayoffStore.removeMinYield(props.productType, baseApy);
+      usePayoffStore.removeMaxYield(
+        props.depositCcy,
+        props.productType,
+        maxApy,
+      );
+      usePayoffStore.removeMinYield(
+        props.depositCcy,
+        props.productType,
+        baseApy,
+      );
     };
-  }, [baseApy, maxApy, props.affectByOther, props.productType]);
+  }, [
+    baseApy,
+    maxApy,
+    props.affectByOther,
+    props.depositCcy,
+    props.productType,
+  ]);
 
   const apyList: [{ x: number; value: string | number }, number][] =
     useMemo(() => {
@@ -96,12 +111,14 @@ export const PayoffChart = (props: PayoffChartProps) => {
 
   const maxYield = usePayoffStore(
     (state) =>
-      (props.affectByOther && state.computedMaxYield()[props.productType]) ||
+      (props.affectByOther &&
+        state.computedMaxYield()[`${props.depositCcy}-${props.productType}`]) ||
       maxApy,
   );
   const minYield = usePayoffStore(
     (state) =>
-      (props.affectByOther && state.computedMinYield()[props.productType]) ||
+      (props.affectByOther &&
+        state.computedMinYield()[`${props.depositCcy}-${props.productType}`]) ||
       Math.min(props.rchYield || 0, props.protectedYield || 0),
   );
   const y = useCallback(
@@ -113,9 +130,12 @@ export const PayoffChart = (props: PayoffChartProps) => {
           (val - minYield) * (maxHeight / ((maxYield || 1) - minYield)));
       if (props.affectByOther) {
         const { maxYields } = usePayoffStore.getState();
-        const len = maxYields[props.productType]?.length;
+        const len =
+          maxYields[`${props.depositCcy}-${props.productType}`]?.length;
         const index =
-          maxYields[props.productType]?.findIndex((it) => it === maxApy) ?? -1;
+          maxYields[`${props.depositCcy}-${props.productType}`]?.findIndex(
+            (it) => it === maxApy,
+          ) ?? -1;
         if (len && index !== -1) {
           const minY =
             size!.height -
@@ -128,7 +148,15 @@ export const PayoffChart = (props: PayoffChartProps) => {
       if (apy === maxYield) return minY;
       return Math.max(minY + 10, calc(apy));
     },
-    [size, minYield, maxYield, props.affectByOther, props.productType, maxApy],
+    [
+      size,
+      props.affectByOther,
+      props.depositCcy,
+      props.productType,
+      maxYield,
+      minYield,
+      maxApy,
+    ],
   );
   const [path, texts] = useMemo(() => {
     if (!size) return [];
@@ -367,6 +395,7 @@ const Payoff = (props: PayoffProps) => {
       </div>
       <PayoffChart
         atm={atm}
+        depositCcy={props.depositCcy}
         productType={props.productType}
         anchorPrices={props.anchorPrices}
         protectedYield={props.protectedYield}
