@@ -68,7 +68,11 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   );
 
   const data = useMemo(() => {
-    const list = uniqBy($data?.list, (it) => `${it.id}-${it.createdAt}`);
+    const list = uniqBy(
+      $data?.list,
+      (it: PositionInfo) =>
+        `${it.id}-${it.product.vault.vault}-${it.createdAt}`,
+    );
     console.info('Positions', list);
     return list as PositionInfo[];
   }, [$data]);
