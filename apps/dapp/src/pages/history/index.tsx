@@ -66,7 +66,10 @@ const OrderHistory = () => {
     if (!$data) return null;
     return {
       ...$data,
-      list: uniqBy($data.list, (it) => it.id) as PositionInfo[],
+      list: uniqBy(
+        $data.list,
+        (it) => `${it.id}-${it.createdAt}`,
+      ) as PositionInfo[],
     };
   }, [$data]);
 
@@ -123,7 +126,12 @@ const OrderHistory = () => {
         {
           title: t('Basic PnL'),
           render: (_, record) => {
-            if (!record.amounts.redeemable) return '-';
+            if (
+              !record.amounts.redeemable ||
+              !judgeSettled(record.product.expiry)
+            ) {
+              return '-';
+            }
             const pnl = Number(record.amounts.redeemable) - +record.amounts.own;
             if (!pnl) return '-';
             return (

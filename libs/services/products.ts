@@ -360,7 +360,12 @@ export class ProductsService {
     }).then((res) => ProductsService.dealOriginQuote(res.value));
   }
 
-  static genProtectedApyList(apy: number | undefined) {
+  static genProtectedApyList(apy: number | undefined, dev = false) {
+    if (dev) {
+      return [...Array(30)].map(
+        (_, i) => +Big(-0.1).plus(+Big(i).times(0.005)),
+      );
+    }
     // 优先级：
     // 1. 保证用户 1% 的保底年化
     // 2. 至少让用户拿 3% 的年化去赌

@@ -95,6 +95,8 @@ const ProductCustomize = () => {
     [forCcy, productType, riskType, wallet.chainId],
   );
 
+  const customDev = useMemo(() => currQuery()['custom-dev'] === '1', []);
+
   const depositCcyOptions = useMemo(
     () =>
       uniqBy(vaultOptions, (it) => it.vault.depositCcy).map((it) => ({
@@ -173,7 +175,7 @@ const ProductCustomize = () => {
 
   const protectedApyOptions = useMemo(
     () =>
-      ProductsService.genProtectedApyList(interestRate?.apyUsed).map(
+      ProductsService.genProtectedApyList(interestRate?.apyUsed, customDev).map(
         (value) => ({
           label: `${displayPercentage(value)} Yield`,
           value,
@@ -239,7 +241,10 @@ const ProductCustomize = () => {
           <div className={styles['left']}>
             {vault?.riskType === RiskType.PROTECTED && (
               <div className={styles['form-item']}>
-                <div className={styles['label']}>{t('Base Yield(APY)')}</div>
+                <div className={styles['label']}>
+                  {t('Base Yield(APY)')}
+                  {customDev && `(${displayPercentage(interestRate?.apyUsed)})`}
+                </div>
                 <div className={styles['input-wrapper']}>
                   <RadioBtnGroup
                     radioStyle={{ width: 120 / window.winScale }}
