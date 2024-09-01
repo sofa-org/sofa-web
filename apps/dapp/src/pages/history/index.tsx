@@ -151,8 +151,7 @@ const OrderHistory = () => {
         {
           title: t('RCH PnL'),
           render: (_, record) =>
-            record.claimParams.maker ||
-            Date.now() <= next8h(record.createdAt * 1000) ? (
+            record.claimParams.maker || !judgeSettled(record.product.expiry) ? (
               '-'
             ) : (
               <span className={styles['amount-rch']}>
