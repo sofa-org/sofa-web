@@ -301,7 +301,7 @@ export class MarketService {
 
   @asyncCache({
     persist: true,
-    id: (_, [chainId]) => `interest-rate-${chainId}`,
+    id: (_, [chainId]) => `interest-rate-1-${chainId}`,
     until: (cache, createdAt) =>
       !cache || !createdAt || Date.now() - createdAt > MsIntervals.min * 2,
   })
