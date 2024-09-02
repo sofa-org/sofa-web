@@ -84,13 +84,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
       data?.filter((it) => {
         if (!Number(it.amounts.redeemable)) return false;
         if (judgeSettled(it.product.expiry)) return true;
-        if (
-          Env.isPre &&
-          it.product.vault.productType === ProductType.DNT &&
-          it.triggerPrice
-        ) {
-          return true;
-        }
+        if (it.claimParams.maker && it.triggerPrice) return true;
         return false;
       }) || [],
     [data],

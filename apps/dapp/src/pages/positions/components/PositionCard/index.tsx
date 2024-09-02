@@ -47,14 +47,11 @@ const ProtectedAmounts = (
   const position = props.position;
   const product = position.product;
 
-  const hasExpired = useMemo(
-    () => product.expiry * 1000 < Date.now(),
-    [product.expiry],
-  );
-
   const hasSettled = useMemo(
-    () => judgeSettled(product.expiry),
-    [product.expiry],
+    () =>
+      judgeSettled(product.expiry) ||
+      !!(position.claimParams.maker && position.triggerTime),
+    [position.claimParams.maker, position.triggerTime, product.expiry],
   );
 
   const pnl = useMemo(
@@ -71,7 +68,7 @@ const ProtectedAmounts = (
 
   const claimable = Number(position.amounts.redeemable) > 0 && hasSettled;
 
-  return !hasExpired ? (
+  return !hasSettled ? (
     <div className={styles['amounts']}>
       <div className={styles['amount']}>
         <span>
@@ -134,14 +131,11 @@ const RiskyAmounts = (
   const position = props.position;
   const product = position.product;
 
-  const hasExpired = useMemo(
-    () => product.expiry * 1000 < Date.now(),
-    [product.expiry],
-  );
-
   const hasSettled = useMemo(
-    () => judgeSettled(product.expiry),
-    [product.expiry],
+    () =>
+      judgeSettled(product.expiry) ||
+      !!(position.claimParams.maker && position.triggerTime),
+    [position.claimParams.maker, position.triggerTime, product.expiry],
   );
 
   const pnlPrecision = useMemo(
@@ -157,7 +151,7 @@ const RiskyAmounts = (
 
   const claimable = Number(position.amounts.redeemable) > 0 && hasSettled;
 
-  return !hasExpired ? (
+  return !hasSettled ? (
     <div className={styles['amounts']}>
       <div className={styles['amount']}>
         {amountFormatter(+position.amounts.own / ticketMeta.per, 0)}{' '}
@@ -248,8 +242,10 @@ const PositionCard = (props: PositionCardProps) => {
   );
 
   const hasSettled = useMemo(
-    () => judgeSettled(product.expiry),
-    [product.expiry],
+    () =>
+      judgeSettled(product.expiry) ||
+      !!(position.claimParams.maker && position.triggerTime),
+    [position.claimParams.maker, position.triggerTime, product.expiry],
   );
 
   const leftTime = useMemo(

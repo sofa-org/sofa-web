@@ -5,7 +5,7 @@ import { ProductType, RiskType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
-import { displayExpiry, next8h } from '@sofa/utils/expiry';
+import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { displayTenor } from '@sofa/utils/time';
 import { useInfiniteScroll } from 'ahooks';
@@ -151,7 +151,8 @@ const OrderHistory = () => {
         {
           title: t('RCH PnL'),
           render: (_, record) =>
-            record.claimParams.maker || !judgeSettled(record.product.expiry) ? (
+            record.claimParams.maker ||
+            Date.now() - next8h() > MsIntervals.min * 10 ? (
               '-'
             ) : (
               <span className={styles['amount-rch']}>
