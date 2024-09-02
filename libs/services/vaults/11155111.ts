@@ -187,7 +187,7 @@ const USDTVaults = [
 ];
 
 const RCHVaults = [
-  //RCHDNTVault(ETH/USDT)
+  // RCHDNTVault(ETH/USDT)
   {
     chainId: 11155111,
     vault: '0x813E8398E16A87622608669513A32B3CA8E09632',
@@ -199,7 +199,7 @@ const RCHVaults = [
     rchMultiplier: 50,
     usePermit2: false,
   },
-  //RCHBullTrendVault(ETH/USDT)
+  // RCHBullTrendVault(ETH/USDT)
   {
     chainId: 11155111,
     vault: '0xA6A6A5eE909D9dFF2f6Ee0d7a1416A4FFDf4f4e6',
@@ -211,7 +211,7 @@ const RCHVaults = [
     rchMultiplier: 50,
     usePermit2: false,
   },
-  //RCHBearTrendVault(ETH/USDT)
+  // RCHBearTrendVault(ETH/USDT)
   {
     chainId: 11155111,
     vault: '0xC24aE9C2a94F569FA3E6D33EF1B2193728387A73',

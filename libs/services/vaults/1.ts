@@ -173,7 +173,7 @@ const USDTVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //LeverageDNTVault(ETH/USDT)
+  // LeverageDNTVault(ETH/USDT)
   {
     chainId: 1,
     vault: '0xF4A60252B139E29A415C341a0D21261496D27d02',
@@ -185,7 +185,7 @@ const USDTVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //LeverageDNTVault(WBTC/USDT)
+  // LeverageDNTVault(WBTC/USDT)
   {
     chainId: 1,
     vault: '0x50752522d249230FE60C855098BB4a7a0974E746',
@@ -197,7 +197,7 @@ const USDTVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //LeverageBullSpreadVault(ETH/USDT)
+  // LeverageBullSpreadVault(ETH/USDT)
   {
     chainId: 1,
     vault: '0x8Ea9638f2587b20396ec8c45dd639dEB115F5211',
@@ -209,7 +209,7 @@ const USDTVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //LeverageBullSpreadVault(WBTC/USDT)
+  // LeverageBullSpreadVault(WBTC/USDT)
   {
     chainId: 1,
     vault: '0x8F9259a355933737F8F11f95d32460eCd5ED0706',
@@ -221,7 +221,7 @@ const USDTVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //LeverageBearSpreadVault(ETH/USDT)
+  // LeverageBearSpreadVault(ETH/USDT)
   {
     chainId: 1,
     vault: '0x3AbC7053ec29e26c1429195fd971F280422ecA80',
@@ -233,7 +233,7 @@ const USDTVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //LeverageBearSpreadVault(WBTC/USDT)
+  // LeverageBearSpreadVault(WBTC/USDT)
   {
     chainId: 1,
     vault: '0x071E0C2BE2b16c8B00173c6535eF8331b8e1feeD',
@@ -248,6 +248,78 @@ const USDTVaults = [
 ];
 
 const RCHVaults = [
+  // RCHDNTVault(ETH/RCH)
+  {
+    chainId: 1,
+    vault: '0xe517772Fa1EeDAF3F69917240Da5f6dC3294499D',
+    productType: ProductType.DNT,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // RCHDNTVault(WBTC/RCH)
+  {
+    chainId: 1,
+    vault: '0x53EE67c562A7e933679425e6C0070E2b810387A3',
+    productType: ProductType.DNT,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // RCHBearTrendVault(ETH/RCH)
+  {
+    chainId: 1,
+    vault: '0xf07d6B83433876e79b656c008034c687509d77a7',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // RCHBearTrendVault(WBTC/RCH)
+  {
+    chainId: 1,
+    vault: '0xc0BAA3440F14137e4Af0C60cf181812ddF791f38',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // RCHBullTrendVault(ETH/RCH)
+  {
+    chainId: 1,
+    vault: '0x13Ef7013E98197Ef850969a21ef1b42e71dD6cfa',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // RCHBullTrendVault(WBTC/RCH)
+  {
+    chainId: 1,
+    vault: '0x4cFc3A41d652af5Cd5f1c3E729048890B0173123',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'RCH',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
   // DNTVault(ETH/RCH)
   {
     chainId: 1,
@@ -323,7 +395,7 @@ const RCHVaults = [
 ];
 
 const stETHVaults = [
-  //StETHDNTPrincipalVault(ETH/STETH)
+  // StETHDNTPrincipalVault(ETH/STETH)
   {
     chainId: 1,
     vault: '0x141B893e4ae446e634E92116000e54d7fc72Bc65',
@@ -335,7 +407,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHDNTPrincipalVault(WBTC/STETH)
+  // StETHDNTPrincipalVault(WBTC/STETH)
   {
     chainId: 1,
     vault: '0xC0f6d3B7B4073Df68DB5897C0884264D03A780C1',
@@ -347,7 +419,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHSmartBullPrincipalVault(ETH/STETH)
+  // StETHSmartBullPrincipalVault(ETH/STETH)
   {
     chainId: 1,
     vault: '0x5bbEB889339CE028dC57a1C9A721eAa085BE2368',
@@ -359,7 +431,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHSmartBullPrincipalVault(WBTC/STETH)
+  // StETHSmartBullPrincipalVault(WBTC/STETH)
   {
     chainId: 1,
     vault: '0x22D6201FF78854713CED5542658F16244335ae69',
@@ -371,7 +443,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHSmartBearPrincipalVault(ETH/STETH)
+  // StETHSmartBearPrincipalVault(ETH/STETH)
   {
     chainId: 1,
     vault: '0xBEB059D623ac9817fc2F0414F1dCc61416da4540',
@@ -383,7 +455,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHSmartBearPrincipalVault(WBTC/STETH)
+  // StETHSmartBearPrincipalVault(WBTC/STETH)
   {
     chainId: 1,
     vault: '0x4f8Abbc658338E4065acb154679931648195b793',
@@ -395,7 +467,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHLeverageDNTVault(ETH/STETH)
+  // StETHLeverageDNTVault(ETH/STETH)
   {
     chainId: 1,
     vault: '0x6014784FC074706ab810130f77135bfb24463f06',
@@ -407,7 +479,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHLeverageDNTVault(WBTC/STETH)
+  // StETHLeverageDNTVault(WBTC/STETH)
   {
     chainId: 1,
     vault: '0xD94A2BB8059E3bA3041592deeaF2B2eF4CcDec71',
@@ -419,7 +491,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHLeverageBullSpreadVault(ETH/STETH)
+  // StETHLeverageBullSpreadVault(ETH/STETH)
   {
     chainId: 1,
     vault: '0x1361fa1398c22D6644DcC1AA619F1B84F6DB4366',
@@ -431,7 +503,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHLeverageBullSpreadVault(WBTC/STETH)
+  // StETHLeverageBullSpreadVault(WBTC/STETH)
   {
     chainId: 1,
     vault: '0xB8610F07D25C3B0D7D589bDe8be1b07Ffae1A0A5',
@@ -443,7 +515,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHLeverageBearSpreadVault(ETH/STETH)
+  // StETHLeverageBearSpreadVault(ETH/STETH)
   {
     chainId: 1,
     vault: '0x36Ac0331D03e40ab67Af564bC453314Cb58E0629',
@@ -455,7 +527,7 @@ const stETHVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
-  //StETHLeverageBearSpreadVault(WBTC/STETH)
+  // StETHLeverageBearSpreadVault(WBTC/STETH)
   {
     chainId: 1,
     vault: '0x858Af7297a3D20f61E0F7A2487c686e0A3353f2C',
