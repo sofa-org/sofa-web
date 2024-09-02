@@ -310,8 +310,9 @@ export class ProductsService {
   ]
     .map((it) => {
       const per =
-        ContractsService.vaults.find((v) => v.depositCcy === it.value)
-          ?.depositMinAmount || 0;
+        ContractsService.vaults.find(
+          (v) => v.riskType === RiskType.RISKY && v.depositCcy === it.value,
+        )?.depositMinAmount || 0;
       return {
         ...it,
         per,
