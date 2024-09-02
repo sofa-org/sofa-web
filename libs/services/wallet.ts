@@ -156,12 +156,9 @@ export class WalletService {
         ...(gasLimit ? [{ gasLimit }] : []),
       ],
     );
+    const network = await signer.provider._detectNetwork();
     const succ = await pollingUntil(
-      () =>
-        WalletService.transactionResult(
-          hash,
-          Number(signer.provider._network.chainId),
-        ),
+      () => WalletService.transactionResult(hash, Number(network.chainId)),
       (res) => res !== TransactionStatus.PENDING,
       1000,
     ).then((res) => res[res.length - 1] === TransactionStatus.SUCCESS);
