@@ -142,10 +142,12 @@
     position: sticky;
     top: -44px;
     z-index: 8;
+    pointer-events: none;
 
     .top-tabs-tab {
       position: relative;
       overflow: hidden;
+      pointer-events: initial;
 
       &::before {
         content: "";

@@ -86,12 +86,6 @@
     }
   }
 
-  &.hot {
-    &::after {
-      height: 60px;
-    }
-  }
-
   &:last-child {
     &::after {
       content: none;
