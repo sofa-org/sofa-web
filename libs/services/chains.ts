@@ -67,7 +67,7 @@ export const ChainMap: Record<
         ETH: '0x6417084B8Df644e1d7E32BE39B54F3a5BbEA645B',
       },
       aaveGraphUrl: 'https://api.thegraph.com/subgraphs/name/aave/protocol-v3',
-      stRCHAddress: '',
+      stRCHAddress: '0x2B9aeA129B85F51A468274e7271434A83c3BB6b4',
     },
     42161: {
       chainId: 42161,

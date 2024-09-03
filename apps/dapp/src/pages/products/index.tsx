@@ -87,6 +87,7 @@ const Index = () => {
           {t('Choose Your Product')}
         </div>
       }
+      sticky
     >
       <ProductsFixedNav depositCcyList={depositCcyList} />
       {depositCcyList.map((ccy) => {

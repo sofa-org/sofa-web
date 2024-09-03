@@ -138,6 +138,25 @@
     height: 64px;
   }
 
+  &.sticky {
+    position: sticky;
+    top: -44px;
+    z-index: 8;
+
+    .top-tabs-tab {
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: #000;
+      }
+    }
+  }
+
   &.top-btn-tabs {
     .tabs {
       gap: 12px;

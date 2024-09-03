@@ -17,6 +17,7 @@ export interface TopTabsProps extends BaseInputProps<string | number> {
   prefix?: ReactNode;
   suffix?: ReactNode;
   bannerClassName?: string;
+  sticky?: boolean;
 }
 
 const TopTabs = (props: TopTabsProps) => {
@@ -48,6 +49,7 @@ const TopTabs = (props: TopTabsProps) => {
           'banner-expandable': props.type === 'banner-expandable',
           [styles['banner-expandable']]: props.type === 'banner-expandable',
           [styles['dark']]: props.dark,
+          [styles['sticky']]: props.sticky,
         })}
       >
         {props.extraTopContent && (
