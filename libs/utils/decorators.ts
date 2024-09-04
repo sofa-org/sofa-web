@@ -9,7 +9,7 @@ import { sentry } from './sentry';
 declare const storage: Global['storage'];
 declare const asyncStorage: Global['asyncStorage'];
 
-export interface CacheRequestOptions {
+export interface CacheRequestOptions<T extends 'ASYNC' | 'SYNC' = 'SYNC'> {
   // @desc 是否保存在本地缓存，使用 localStorage，注意空间利用
   persist?: boolean;
   /**
@@ -23,7 +23,7 @@ export interface CacheRequestOptions {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ctx: any,
     args: unknown[],
-  ) => boolean;
+  ) => T extends 'ASYNC' ? Promise<boolean> | boolean : boolean;
 
   /**
    * @desc 缓存 id。 ctx 为方法对应调用上下文
@@ -103,7 +103,7 @@ export function asyncShare(
   };
 }
 
-export function asyncCache(options?: CacheRequestOptions) {
+export function asyncCache(options?: CacheRequestOptions<'ASYNC'>) {
   const getCacheValue = async (
     id: string,
   ): Promise<{ value: unknown; createdAt: number } | null | undefined> => {

@@ -127,11 +127,10 @@ export class MarketService {
     id: () => 'index-price-RCH_USDT',
   })
   static async getRchPriceInUsd() {
-    const provider = await WalletService.readonlyConnect(defaultChain.chainId);
     return ContractsService.getUniswapPairPrice(
       ContractsService.rchUniswapAddress(),
       ContractsService.rchAddress(),
-      provider,
+      defaultChain.chainId,
       defaultChain.rchUniswapVersion,
     )
       .then(async (info) => {

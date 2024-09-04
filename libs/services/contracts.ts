@@ -39,6 +39,7 @@ import {
   VaultInfo,
 } from './base-type';
 import { ChainMap, defaultChain } from './chains';
+import { WalletConnect } from './wallet-connect';
 
 export { ProductType, RiskType, TransactionStatus };
 export type { VaultInfo };
@@ -414,16 +415,17 @@ export class ContractsService {
   @asyncCache({
     persist: true,
     until: (v, t) => !v || !t || Date.now() - t > 60000,
-    id: (_, args) => `uniswap-pair-reserves-${args[0]}-${defaultChain.chainId}`,
+    id: (_, args) => `uniswap-pair-reserves-${args[0]}-${args[1]}`,
   })
   static async getUniswapPairReserves(
     pairAddress: string,
-    signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider,
+    chainId: number,
   ): Promise<{ ccy: string; address: string; reserve: number }[]> {
+    const provider = await WalletConnect.getProvider(chainId);
     const pairContract = new ethers.Contract(
       pairAddress,
       IUniswapV2PairABI,
-      signerOrProvider,
+      provider,
     );
     const [[$reserve0, $reserve1], token0Address, token1Address] =
       await Promise.all([
@@ -432,36 +434,30 @@ export class ContractsService {
         pairContract.token1(),
       ]);
     return Promise.all([
-      ContractsService.tokenInfo(token0Address, signerOrProvider).then(
-        (info) => ({
-          ccy: info.symbol,
-          address: token0Address,
-          reserve: Number($reserve0 / BigInt(10 ** info.decimal)),
-        }),
-      ),
-      ContractsService.tokenInfo(token1Address, signerOrProvider).then(
-        (info) => ({
-          ccy: info.symbol,
-          address: token1Address,
-          reserve: Number($reserve1 / BigInt(10 ** info.decimal)),
-        }),
-      ),
+      ContractsService.tokenInfo(token0Address, provider).then((info) => ({
+        ccy: info.symbol,
+        address: token0Address,
+        reserve: Number($reserve0 / BigInt(10 ** info.decimal)),
+      })),
+      ContractsService.tokenInfo(token1Address, provider).then((info) => ({
+        ccy: info.symbol,
+        address: token1Address,
+        reserve: Number($reserve1 / BigInt(10 ** info.decimal)),
+      })),
     ]);
   }
 
   @asyncCache({
     persist: true,
     until: (v, t) => !v || !t || Date.now() - t > 60000,
-    id: (_, args) => `uniswap-pair-price-${args[0]}-${defaultChain.chainId}`,
+    id: (_, args) => `uniswap-pair-price-${args[0]}-${args[1]}`,
   })
-  static async getUniswapPairPriceV3(
-    pairAddress: string,
-    signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider,
-  ) {
+  static async getUniswapPairPriceV3(pairAddress: string, chainId: number) {
+    const provider = await WalletConnect.getProvider(chainId);
     const pairContract = new ethers.Contract(
       pairAddress,
       IUniswapV3PairABI,
-      signerOrProvider,
+      provider,
     );
     const [{ sqrtPriceX96 }, token0Address, token1Address] = await Promise.all([
       pairContract.slot0() as Promise<{ sqrtPriceX96: bigint }>,
@@ -469,8 +465,8 @@ export class ContractsService {
       pairContract.token1(),
     ]);
     const [token0Info, token1Info] = await Promise.all([
-      ContractsService.tokenInfo(token0Address, signerOrProvider),
-      ContractsService.tokenInfo(token1Address, signerOrProvider),
+      ContractsService.tokenInfo(token0Address, provider),
+      ContractsService.tokenInfo(token1Address, provider),
     ]).then((list) =>
       list.map((info, i) => ({
         ccy: info.symbol,
@@ -490,15 +486,12 @@ export class ContractsService {
   static async getUniswapPairPrice(
     pairAddress: string,
     ccyAddress: string,
-    signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider,
+    chainId: number,
     version: 'v2' | 'v3',
   ) {
     if (version === 'v2') {
       const [reserve0, reserve1] =
-        await ContractsService.getUniswapPairReserves(
-          pairAddress,
-          signerOrProvider,
-        );
+        await ContractsService.getUniswapPairReserves(pairAddress, chainId);
       // 确定哪个储备是哪个代币，如果需要的话可以调换它们
       if (reserve0.address.toUpperCase() == ccyAddress.toUpperCase()) {
         // 计算 price = reserve1 / reserve0
@@ -516,10 +509,7 @@ export class ContractsService {
       };
     }
     const { price, token0Info, token1Info } =
-      await ContractsService.getUniswapPairPriceV3(
-        pairAddress,
-        signerOrProvider,
-      );
+      await ContractsService.getUniswapPairPriceV3(pairAddress, chainId);
     if (token0Info.address.toUpperCase() == ccyAddress.toUpperCase()) {
       // 计算 price = reserve1 / reserve0
       return { price, token0: token0Info.ccy, token1: token1Info.ccy };

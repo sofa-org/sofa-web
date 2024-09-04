@@ -291,22 +291,24 @@ export const useWalletStore = Object.assign(
   },
 );
 
-// 判断是否钱包是否还保持连接
-(async () => {
-  const state = useWalletStore.getState();
-  const stillConnected = await (() => {
-    if (!state.address) return false;
-    return WalletService.isConnected(state.address);
+setTimeout(() => {
+  // 判断是否钱包是否还保持连接
+  (async () => {
+    const state = useWalletStore.getState();
+    const stillConnected = await (() => {
+      if (!state.address) return false;
+      return WalletService.isConnected(state.address);
+    })();
+
+    if (stillConnected) return;
+
+    useWalletStore.disconnect();
   })();
 
-  if (stillConnected) return;
-
-  useWalletStore.disconnect();
-})();
-
-// 修正 chainId
-(async () => {
-  const state = useWalletStore.getState();
-  if (ChainMap[state.chainId]) return;
-  useWalletStore.setChain(defaultChain.chainId);
-})();
+  // 修正 chainId
+  (async () => {
+    const state = useWalletStore.getState();
+    if (ChainMap[state.chainId]) return;
+    useWalletStore.setChain(defaultChain.chainId);
+  })();
+}, 100);

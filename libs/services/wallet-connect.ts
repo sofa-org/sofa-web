@@ -188,7 +188,13 @@ export class WalletConnect {
     );
   }
 
-  @asyncCache()
+  @asyncCache({
+    until: async (pre, t, _, __, [chainId]) => {
+      if (!pre || !t) return true;
+      const network = await (pre as JsonRpcProvider)._detectNetwork();
+      return Number(network.chainId) !== chainId;
+    },
+  })
   static async getProvider(chainId: number) {
     const modal = await WalletConnect.getModal();
     const modalProvider = modal.getWalletProvider();
