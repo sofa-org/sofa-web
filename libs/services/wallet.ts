@@ -163,7 +163,9 @@ export class WalletService {
       1000,
     ).then((res) => res[res.length - 1] === TransactionStatus.SUCCESS);
     if (!succ)
-      throw new Error('Please approve Permit2 to proceed with the transaction');
+      throw new Error(
+        `Please approve ${approveTo} to proceed with the transaction`,
+      );
   }
 
   private static async $approve(
