@@ -9,6 +9,7 @@ import { getErrorMsg } from '@sofa/utils/fns';
 import { useRequest } from 'ahooks';
 
 import Address from '@/components/Address';
+import AmountDisplay from '@/components/AmountDisplay';
 import CEmpty from '@/components/Empty';
 import { useProductSelect } from '@/components/ProductSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
@@ -33,7 +34,7 @@ const BigWins = () => {
         chainId: wallet.chainId,
         productType,
       };
-      const limit = 20;
+      const limit = 40;
       const page = { limit };
       return PositionsService.bigWins(params, page);
     },
@@ -42,6 +43,7 @@ const BigWins = () => {
       onError: (err) => Toast.error(getErrorMsg(err)),
     },
   );
+
   const columns = useMemo(
     () =>
       [
@@ -86,7 +88,8 @@ const BigWins = () => {
             const count = +it.amounts.own / ticketMeta.per;
             return (
               <span className={styles['earning']}>
-                {it.amounts.redeemable} {it.product.vault.depositCcy}
+                {amountFormatter(it.amounts.redeemable)}{' '}
+                {it.product.vault.depositCcy}
                 <span className={styles['deposit-amount']}>
                   Cost: {ticketMeta.per} {ticketMeta.value} * {count}
                 </span>
@@ -116,7 +119,9 @@ const BigWins = () => {
       dataSource={data}
       pagination={false}
       loading={loading && !data?.length}
-      rowKey={(it) => it?.id || String(Math.random())}
+      rowKey={(it) =>
+        it?.id ? `${it.id}-${it.createdAt}` : String(Math.random())
+      }
       empty={<CEmpty />}
     />
   );
