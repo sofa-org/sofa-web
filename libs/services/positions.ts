@@ -621,7 +621,7 @@ export class PositionsService {
         productType: params.productType,
       },
       { ...pageParams },
-    ).then((res) => res.list);
+    ).then((res) => res.list.filter((it) => !it.claimParams.maker));
   }
 
   // big win：谁谁谁，赚了多少，倒序
@@ -637,6 +637,6 @@ export class PositionsService {
         exceededPrincipalReturn: true,
       },
       { ...pageParams, orderBy: 'return' },
-    ).then((res) => res.list);
+    ).then((res) => res.list.filter((it) => !it.claimParams.maker));
   }
 }

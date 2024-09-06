@@ -33,7 +33,7 @@ const BuyingSpree = () => {
         chainId: wallet.chainId,
         productType,
       };
-      const limit = 20;
+      const limit = 40;
       const page = { limit };
       return PositionsService.buyingSpree(params, page);
     },
@@ -92,7 +92,9 @@ const BuyingSpree = () => {
       dataSource={data}
       pagination={false}
       loading={loading && !data?.length}
-      rowKey={(it) => it?.id || String(Math.random())}
+      rowKey={(it) =>
+        it?.id ? `${it.id}-${it.createdAt}` : String(Math.random())
+      }
       empty={<CEmpty />}
     />
   );
