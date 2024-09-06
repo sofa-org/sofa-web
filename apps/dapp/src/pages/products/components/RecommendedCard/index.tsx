@@ -133,14 +133,12 @@ const RecommendedCard = (props: RecommendedCardProps) => {
       riskType: RiskType.LEVERAGE,
     });
     if (!leverageVault) return undefined;
-    return useProductsState
-      .quote({
-        vault: leverageVault,
-        expiry: data?.[0].expiry,
-        anchorPrices: data[0].anchorPrices,
-        depositAmount: data[0].amounts.own,
-      })
-      .catch((err) => console.error(11112, err));
+    return useProductsState.quote({
+      vault: leverageVault,
+      expiry: data?.[0].expiry,
+      anchorPrices: data[0].anchorPrices,
+      depositAmount: data[0].amounts.own,
+    });
   }, [vault, data?.[0]]);
 
   return (
