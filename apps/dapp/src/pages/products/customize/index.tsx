@@ -14,13 +14,12 @@ import {
   RiskType,
 } from '@sofa/services/products';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
-import { day8h, displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
+import { day8h, displayExpiry, next8h, pre8h } from '@sofa/utils/expiry';
 import { calcVal } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
-import { useLazyCallback } from '@sofa/utils/hooks';
+import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
 import { uniqBy } from 'lodash-es';
 import { nanoid } from 'nanoid';
 
@@ -181,7 +180,7 @@ const ProductCustomize = () => {
           value,
         }),
       ),
-    [interestRate?.apyUsed],
+    [customDev, interestRate?.apyUsed],
   );
   useEffect(() => {
     if (
@@ -193,16 +192,20 @@ const ProductCustomize = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [protectedApyOptions, vault?.vault, updateProduct]);
 
-  const expiries = useMemo(
-    () =>
-      ProductsService.genExpiries(productType).map((value) => ({
-        label: displayExpiry(value),
-        value: value / 1000,
-      })),
-    [productType],
+  const expiries = useAsyncMemo(
+    async () =>
+      vault &&
+      ProductsService.genExpiries(vault).then((res) =>
+        res.map((value) => ({
+          label: displayExpiry(value),
+          value: value / 1000,
+        })),
+      ),
+    [vault],
   );
   useLayoutEffect(() => {
-    if (!product?.expiry) updateProduct({ expiry: expiries[3].value });
+    if (!product?.expiry && expiries)
+      updateProduct({ expiry: expiries[3].value });
   }, [product?.expiry, expiries, updateProduct]);
 
   const quoteInfo = useProductsState(
@@ -214,20 +217,12 @@ const ProductCustomize = () => {
   );
 
   const { min, max } = useMemo(() => {
-    const min = next8h(undefined, 1);
-    const max = (() => {
-      const next = next8h(undefined, 31);
-      let i = 1;
-      while (i) {
-        const d = dayjs(next).add(i, 'day');
-        if (d.day() === 5) return +d;
-        i += 1;
-      }
-      return next;
-    })();
-
-    return { min, max };
-  }, []);
+    if (!expiries) return { min: next8h(), max: pre8h() };
+    return {
+      min: expiries[0].value * 1000,
+      max: expiries[expiries.length - 1].value * 1000,
+    };
+  }, [expiries]);
 
   return (
     <>

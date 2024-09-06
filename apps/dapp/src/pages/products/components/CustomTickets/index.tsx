@@ -8,10 +8,9 @@ import {
   VaultInfo,
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
-import { day8h, next8h } from '@sofa/utils/expiry';
-import { useLazyCallback } from '@sofa/utils/hooks';
+import { day8h, next8h, pre8h } from '@sofa/utils/expiry';
+import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 
 import { Comp as IconDel } from '@/assets/icon-del.svg';
@@ -60,21 +59,14 @@ const CustomTicket = (props: CustomTicketProps) => {
     (state) => state.quoteInfos[ProductsService.productKey(props.product)],
   );
 
+  const expiries = useAsyncMemo(
+    async () => vault && ProductsService.genExpiries(vault),
+    [vault],
+  );
   const { min, max } = useMemo(() => {
-    const min = next8h(undefined, 1);
-    const max = (() => {
-      const next = next8h(undefined, 8);
-      let i = 1;
-      while (i) {
-        const d = dayjs(next).add(i, 'day');
-        if (d.day() === 5) return +d;
-        i += 1;
-      }
-      return next;
-    })();
-
-    return { min, max };
-  }, []);
+    if (!expiries) return { min: next8h(), max: pre8h() };
+    return { min: expiries[0], max: expiries[expiries.length - 1] };
+  }, [expiries]);
 
   if (!vault || !ticketMeta) return <></>;
 

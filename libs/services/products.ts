@@ -382,16 +382,13 @@ export class ProductsService {
     return list;
   }
 
-  static genExpiries(productType: ProductType) {
-    // 30天以内
-    const today = next8h();
-    const expiries: number[] = [];
-    const start = productType === ProductType.DNT ? 1 : 1;
-    for (let i = start; i < 30; i += 1) {
-      const date = today + i * MsIntervals.day;
-      if (i <= 2 || dayjs(date).day() === 5 || i === 5) expiries.push(date);
-    }
-    return uniq(expiries);
+  static async genExpiries(vault: VaultInfo) {
+    return http
+      .get<unknown, HttpResponse<{ timestamp: number; expiries: number[] }>>(
+        '/rfq/expiry-list',
+        { params: { chainId: vault.chainId, vault: vault.vault } },
+      )
+      .then((res) => res.value?.expiries.map((it) => it * 1000));
   }
 
   static async genStrikes(atm: number, forCcy?: VaultInfo['forCcy']) {
