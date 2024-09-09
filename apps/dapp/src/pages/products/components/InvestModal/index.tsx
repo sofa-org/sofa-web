@@ -14,9 +14,11 @@ import {
   ProductQuoteResult,
   ProductsService,
   ProductType,
+  RiskType,
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry } from '@sofa/utils/expiry';
+import { isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { displayTenor } from '@sofa/utils/time';
@@ -82,7 +84,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
     [props.product.vault.chainId, props.product.vault.vault],
   );
 
-  const [leverageVault, $setLeverageVault] = useState<string>();
+  const [vaultAddress, $setVaultAddress] = useState<string>();
   const vault = useGlobalState((state) =>
     ProductsService.findVault(state.vaults, {
       ...omit($vault, [
@@ -92,9 +94,9 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
         'usePermit2',
         'balanceDecimal',
       ]),
-      ...(!leverageVault
+      ...(!vaultAddress
         ? { riskType: $vault?.riskType }
-        : { vault: leverageVault }),
+        : { vault: vaultAddress }),
     }),
   );
 
@@ -103,7 +105,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
       vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]?.[0],
   );
 
-  const setLeverageVault = useLazyCallback((v?: string) => {
+  const setVaultAddress = useLazyCallback((v?: string) => {
     if (!$vault) return;
     const nextVault = ProductsService.findVault(
       useGlobalState.getState().vaults,
@@ -118,12 +120,24 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
         ...(!v ? { riskType: $vault?.riskType } : { vault: v }),
       },
     )!;
+    const protectedApy = (() => {
+      if ($vault.riskType === RiskType.PROTECTED) return product?.protectedApy;
+      if (nextVault.riskType === RiskType.LEVERAGE) return undefined;
+      const interestRate =
+        useGlobalState.getState().interestRate[nextVault.chainId]?.[
+          nextVault.depositCcy
+        ]?.apyUsed;
+      return isNullLike(interestRate)
+        ? 0.01
+        : (Math.floor(interestRate * 100) - 3) / 100;
+    })();
     useProductsState.updateCart({
       id: nanoid(),
       ...product,
       vault: nextVault,
+      protectedApy,
     });
-    $setLeverageVault(v);
+    $setVaultAddress(v);
   });
 
   const preDataRef = useRef<ProductQuoteResult>();
@@ -238,7 +252,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
               depositAmount={data.amounts.own}
               borrowFee={+data.amounts.borrowCost}
               vault={vault}
-              onChange={(v) => setLeverageVault(v.vault)}
+              onChange={(v) => setVaultAddress(v.vault)}
             />
           )}
           <Spin
