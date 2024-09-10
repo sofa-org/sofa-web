@@ -46,7 +46,7 @@ const Footer = () => {
           [styles['no-decoration']]: !isSOFA,
         })}
       />
-      {(Env.isDev || (!Env.isProd && Env.isMobile)) && <MobileConsole />}
+      {!Env.isProd && <MobileConsole />}
     </footer>
   );
 };
