@@ -84,8 +84,9 @@ const Index = () => {
                     <a
                       href={ref.link}
                       className={styles['link1']}
-                      target={Env.isMetaMaskAndroid ? undefined : it}
-                      // onClick={(e) => e.preventDefault()}
+                      target={
+                        Env.isMetaMaskAndroid || Env.isTelegram ? undefined : it
+                      }
                     >
                       {t('Go To Dapp')}
                     </a>

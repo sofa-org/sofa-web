@@ -103,7 +103,11 @@ export const RCHHistory = forwardRef<RCHHistoryRef>((_, ref) => {
           <a
             className={classNames('btn-gradient', styles['btn-link'])}
             href={RiskTypeRefs[RiskType.PROTECTED].link}
-            target={Env.isMetaMaskAndroid ? undefined : RiskType.PROTECTED}
+            target={
+              Env.isMetaMaskAndroid || Env.isTelegram
+                ? undefined
+                : RiskType.PROTECTED
+            }
           >
             {t('Deposit & GET REWARDS')}
           </a>

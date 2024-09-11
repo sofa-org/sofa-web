@@ -171,15 +171,6 @@ export const HomeDescriptions = () => {
               'Or opt for the more aggressive Surge products for a chance at substantial upside.',
             )}
           </p>
-          {/* <a
-            className={classNames(styles['btn-more'], 'pointer txt-gradient')}
-            href="https://ainxbawxjd.larksuite.com/docx/GMa4dKmwuovZfAxtMvWuxANisLf"
-            target={Env.isMetaMaskAndroid ? undefined : '_blank'}
-            rel="noopener noreferrer"
-          >
-            {t('Learn More')}
-            <IconArrow />
-          </a> */}
         </div>
       </section>
       <section className={classNames(styles['section'], styles['row'])}>

@@ -306,7 +306,14 @@ const Header = () => {
                       styles['link'],
                       it.active ? styles['active'] : undefined,
                     )}
-                    target={Env.isMetaMaskAndroid ? undefined : it.target}
+                    target={
+                      Env.isMetaMaskAndroid ||
+                      (Env.isTelegram &&
+                        it.path.includes('sofa.org') &&
+                        !it.path.includes('docs.sofa.org'))
+                        ? undefined
+                        : it.target
+                    }
                     rel="noopener noreferrer"
                   >
                     {it.label(t)}
@@ -360,7 +367,9 @@ const Header = () => {
                 [styles['active']]: location.pathname.startsWith('/rch'),
               })}
               href={import.meta.env.VITE_RCH_LINK}
-              target={Env.isMetaMaskAndroid ? undefined : 'rch'}
+              target={
+                Env.isMetaMaskAndroid || Env.isTelegram ? undefined : 'rch'
+              }
             >
               <span>{t('Claim')}</span>
               {t('RCH')}
