@@ -7,8 +7,8 @@ export interface AuthValue {
 }
 
 export class Env {
-  static version = '0.0.1';
-  static deviceID = (async () => {
+  static readonly version = '0.0.1';
+  static readonly deviceID = (async () => {
     const key = 'device-id';
     const id = localStorage.getItem(key);
     if (id) return id;
@@ -19,14 +19,23 @@ export class Env {
         return res.visitorId;
       });
   })();
-  static isDev = import.meta.env.DEV;
-  static isDaily = ['daily', 'demo'].includes(import.meta.env.VITE_ENV);
-  static isPre = import.meta.env.VITE_ENV === 'pre';
-  static isProd = import.meta.env.VITE_ENV === 'prod';
+  static readonly isDev = import.meta.env.DEV;
+  static readonly isDaily = ['daily', 'demo'].includes(
+    import.meta.env.VITE_ENV,
+  );
+  static readonly isPre = import.meta.env.VITE_ENV === 'pre';
+  static readonly isProd = import.meta.env.VITE_ENV === 'prod';
   private static _isMobile?: boolean;
   static get isMobile() {
     if (Env._isMobile === undefined) Env._isMobile = mobile();
     return Env._isMobile;
+  }
+
+  private static _isTelegram?: boolean;
+  static get isTelegram() {
+    if (Env._isTelegram === undefined)
+      Env._isTelegram = !!window.TelegramWebviewProxy;
+    return Env._isTelegram;
   }
 
   // Android metamask app 浏览器无法在应用内打开新的 tab page

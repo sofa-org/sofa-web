@@ -23,6 +23,7 @@
     "@types/lodash-es": "^4.17.11",
     "@types/papaparse": "^5.3.14",
     "@uniswap/permit2-sdk": "^1.2.0",
+    "@uxuycom/web3-tg-sdk": "^0.0.5",
     "@web3modal/ethers": "^4.2.3",
     "big.js": "^6.2.1",
     "crypto-js": "^4.2.0",

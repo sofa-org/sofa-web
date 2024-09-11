@@ -110,6 +110,10 @@ declare interface GlobalVal {
   >;
   winScale: number;
   px2rem(val: string | number): string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TelegramWebviewProxy?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tgSdk?: any;
 }
 
 interface Window extends GlobalVal {}

@@ -236,6 +236,7 @@ importers:
       '@types/lodash-es': ^4.17.11
       '@types/papaparse': ^5.3.14
       '@uniswap/permit2-sdk': ^1.2.0
+      '@uxuycom/web3-tg-sdk': ^0.0.5
       '@web3modal/ethers': ^4.2.3
       big.js: ^6.2.1
       crypto-js: ^4.2.0
@@ -255,6 +256,7 @@ importers:
       '@types/lodash-es': 4.17.12
       '@types/papaparse': 5.3.14
       '@uniswap/permit2-sdk': 1.2.0
+      '@uxuycom/web3-tg-sdk': 0.0.5
       '@web3modal/ethers': 4.2.3_ethers@6.9.2
       big.js: 6.2.1
       crypto-js: 4.2.0
@@ -4806,6 +4808,16 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    dev: false
+
+  /@uxuycom/web3-tg-sdk/0.0.5:
+    resolution: {integrity: sha512-P6nXQATFX+YHSltJJrs2ZiVjYfCg5dnh1xyQpnJ+EgerkUBK9lmIX6vtaFNNS/I6fvl+HVt5zElGjDYw6g/OGw==}
+    dependencies:
+      axios: 1.6.2
+      buffer: 6.0.3
+      eventemitter3: 5.0.1
+    transitivePeerDependencies:
+      - debug
     dev: false
 
   /@vitejs/plugin-react-swc/3.5.0_vite@4.5.1:
