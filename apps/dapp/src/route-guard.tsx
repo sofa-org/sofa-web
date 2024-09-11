@@ -1,8 +1,9 @@
 import { ComponentType } from 'react';
 import { Navigate } from 'react-router-dom';
+import { Env } from '@sofa/utils/env';
 
 export const RouteGuard = (props: { Comp: ComponentType }) => {
-  if (/fest-competition/.test(location.pathname)) return <props.Comp />;
+  if (Env.isTelegram) return <props.Comp />;
 
   const isSubProject =
     /earn|surge/i.test(location.origin) ||

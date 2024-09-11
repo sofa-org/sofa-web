@@ -5,6 +5,7 @@ import { Env } from '@sofa/utils/env';
 import classNames from 'classnames';
 
 import { Comp as Logo } from '@/assets/logo';
+import { EnvLinks } from '@/env-links';
 
 import { LinkItems } from '../Community/config';
 import { MobileConsole } from '../MobileConsole';
@@ -36,7 +37,7 @@ const Footer = () => {
         </div>
         <div className={styles['copyright']}>
           © 2024 sofa.org All Right Reserved.
-          <a href={import.meta.env.VITE_SOFA_LINK}>
+          <a href={EnvLinks.config.VITE_SOFA_LINK}>
             <Logo />
           </a>
         </div>

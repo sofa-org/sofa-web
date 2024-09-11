@@ -13,7 +13,9 @@ export function joinUrl(...urls: string[]) {
       if (/^(https?:)?\/\//.test(pathname)) {
         pre.pathname = pathname;
       } else {
-        pre.pathname = `${pre.pathname}///${pathname}`.replace(/\/{3,}/, '/');
+        pre.pathname = `${pre.pathname}///${pathname}`
+          .replace(/\/{3,}/, '/')
+          .replace(/\/+$/, '');
       }
       pre.search = {
         ...pre.search,

@@ -8,9 +8,9 @@ import { useScroll } from 'ahooks';
 import classNames from 'classnames';
 
 import { Comp as Logo } from '@/assets/logo';
+import { EnvLinks } from '@/env-links';
 import { addI18nResources, LangSelector } from '@/locales';
 
-import Community from '../Community';
 import IndexPrices from '../IndexPrices';
 import LaunchApp from '../LaunchApp';
 import NetworkSelector from '../NetworkSelector';
@@ -27,70 +27,18 @@ addI18nResources(locale, 'Header');
 
 declare const winScale: Global['winScale'];
 
-function getCampaignStatus(location: { pathname: string }) {
-  const isFest = location.pathname == '/fest-competition';
-  const isBtcAdventure = /\/btc-adventure/i.test(location.pathname);
-  const isCelebrity = /\/rch-celebrity/i.test(location.pathname);
-  const isCampaign = isFest || isBtcAdventure || isCelebrity;
-  return {
-    isFest,
-    isBtcAdventure,
-    isCampaign,
-    isCelebrity,
-  };
+interface MenuItem {
+  label(t: TFunction): string;
+  path: string;
+  type?: 1 | 2;
+  target?: string;
+  newIcon?: boolean;
+  children?: MenuItem[];
 }
 
-const campaignMenuItems = (location: ReturnType<typeof useLocation>) => {
+const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
   // 下面这行被注释掉的code 告诉 ai18n 下面的 t 都是在 Header 包下
   // const [t] = useTranslation('Header');
-  const campaign = getCampaignStatus(location);
-  return [
-    {
-      label: (t: TFunction) => t('Competition & Claim Prize'),
-      path: joinUrl(
-        import.meta.env.VITE_CAMPAIGN_LINK,
-        '/fest-competition',
-      ).replace(window.location.origin, ''),
-      target: '_top',
-      active: campaign.isFest,
-      noNavLinkWrap: true,
-    },
-    {
-      label: (t: TFunction) =>
-        t({
-          enUS: 'RCH Celebrity',
-          zhCN: 'RCH 名人堂',
-        }),
-      path: joinUrl(
-        import.meta.env.VITE_CAMPAIGN_LINK,
-        '/rch-celebrity',
-      ).replace(window.location.origin, ''),
-      target: '_top',
-      noNavLinkWrap: true,
-      newIcon: true,
-      active: campaign.isCelebrity,
-    },
-    {
-      label: (t: TFunction) =>
-        t({
-          enUS: 'RCH Game Center',
-          zhCN: 'RCH 游戏中心',
-        }),
-      path: joinUrl(
-        import.meta.env.VITE_CAMPAIGN_LINK,
-        '/rch-game-center/btc-adventure',
-      ).replace(window.location.origin, ''),
-      target: '_top',
-      noNavLinkWrap: true,
-      active: campaign.isBtcAdventure,
-    },
-  ];
-};
-
-const allMenuItems = (location: ReturnType<typeof useLocation>) => {
-  // 下面这行被注释掉的code 告诉 ai18n 下面的 t 都是在 Header 包下
-  // const [t] = useTranslation('Header');
-  const campaign = getCampaignStatus(location);
   return [
     { label: (t: TFunction) => t('home'), path: '/', type: 1 },
     { label: (t: TFunction) => t('Project'), path: '/mechanism', type: 1 },
@@ -101,39 +49,57 @@ const allMenuItems = (location: ReturnType<typeof useLocation>) => {
       path: 'https://docs.sofa.org',
       type: 1,
     },
-    {
-      label: (t: TFunction) => t('Trade'),
-      path: joinUrl(
-        campaign.isCampaign ? import.meta.env.VITE_SURGE_LINK : '/products',
-        '/products',
-      )
-        .replace('/products', '')
-        .replace(window.location.origin, ''),
-      type: 2,
-    },
-    {
-      label: (t: TFunction) => t('Position'),
-      path: joinUrl(
-        campaign.isCampaign ? import.meta.env.VITE_SURGE_LINK : '/products',
-        '/positions',
-      )
-        .replace('/products', '')
-        .replace(window.location.origin, ''),
-      type: 2,
-    },
+    { label: (t: TFunction) => t('Trade'), path: '/products', type: 2 },
+    { label: (t: TFunction) => t('Position'), path: '/positions', type: 2 },
     {
       label: (t: TFunction) =>
         t({
           enUS: 'Campaign',
           zhCN: '活动中心',
         }),
-      path: '',
       target: '_top',
-      noNavLinkWrap: true,
-      isCampaignCSelect: true,
-      active: campaign.isCampaign,
       newIcon: true,
       type: 2,
+      ...(Env.isTelegram
+        ? { path: EnvLinks.config.VITE_CAMPAIGN_LINK }
+        : {
+            path: '',
+            children: [
+              {
+                label: (t: TFunction) => t('Competition & Claim Prize'),
+                path: joinUrl(
+                  EnvLinks.config.VITE_CAMPAIGN_LINK,
+                  '/fest-competition',
+                ).replace(window.location.origin, ''),
+                target: '_top',
+              },
+              {
+                label: (t: TFunction) =>
+                  t({
+                    enUS: 'RCH Celebrity',
+                    zhCN: 'RCH 名人堂',
+                  }),
+                path: joinUrl(
+                  EnvLinks.config.VITE_CAMPAIGN_LINK,
+                  '/rch-celebrity',
+                ).replace(window.location.origin, ''),
+                target: '_top',
+                newIcon: true,
+              },
+              {
+                label: (t: TFunction) =>
+                  t({
+                    enUS: 'RCH Game Center',
+                    zhCN: 'RCH 游戏中心',
+                  }),
+                path: joinUrl(
+                  EnvLinks.config.VITE_CAMPAIGN_LINK,
+                  '/rch-game-center/btc-adventure',
+                ).replace(window.location.origin, ''),
+                target: '_top',
+              },
+            ],
+          }),
     },
   ];
 };
@@ -168,26 +134,18 @@ const Header = () => {
 
   const opacity = useOpacity();
 
-  const campaign = useMemo(() => getCampaignStatus(location), [location]);
-
   const type = useMemo<number>(() => {
-    if (campaign.isCampaign) return 2;
     if (/^\/$|rch/.test(location.pathname)) return 1;
     return (
       allMenuItems(location).find(
         (it) => it.path !== '/' && location.pathname.startsWith(it.path),
-      )?.type || 2
+      )?.type ?? 2
     );
-  }, [location, campaign]);
+  }, [location]);
 
   const menusForRender = useMemo(
     () => allMenuItems(location).filter((it) => it.type === type),
     [type, location],
-  );
-
-  const campaignMenus = useMemo(
-    () => campaignMenuItems(location),
-    [location, campaign],
   );
 
   const more = useMemo(
@@ -209,162 +167,134 @@ const Header = () => {
     >
       <div className={styles['bg']} style={{ opacity }} />
       <nav className={styles['left']}>
-        {campaign.isBtcAdventure ? undefined : (
-          <>
-            <div className={styles['logo-wrapper']}>
-              {campaign.isFest ? (
-                <Logo
-                  className={styles['logo']}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.location.href = import.meta.env.VITE_SOFA_LINK;
-                  }}
-                />
-              ) : type === 2 ? (
-                <ProjectSelector className={styles['product-selector']} />
-              ) : (
-                <Logo
-                  className={styles['logo']}
-                  onClick={() => navigate('/')}
-                />
-              )}
-              <IconMenu
-                className={styles['icon-menu']}
-                onClick={() => setExpanded((pre) => !pre)}
-              />
-            </div>
+        <div className={styles['logo-wrapper']}>
+          {type === 2 ? (
+            <ProjectSelector className={styles['product-selector']} />
+          ) : (
+            <Logo className={styles['logo']} onClick={() => navigate('/')} />
+          )}
+          <IconMenu
+            className={styles['icon-menu']}
+            onClick={() => setExpanded((pre) => !pre)}
+          />
+        </div>
 
-            {menusForRender.map((it) =>
-              /^http/.test(it.path) ||
-              it.noNavLinkWrap ||
-              it.isCampaignCSelect ? (
-                it.isCampaignCSelect ? (
-                  <Dropdown
-                    key={it.label(t)}
-                    trigger={'hover'}
-                    className={styles['nav-selector']}
-                    position={'bottomLeft'}
-                    render={
-                      <Dropdown.Menu className={styles['nav-selector-items']}>
-                        {campaignMenus.map((m) => {
-                          const selected = m.active;
-
-                          return (
-                            <Dropdown.Item
-                              key={m.path}
-                              type={selected ? 'primary' : undefined}
+        {menusForRender.map((it) => {
+          if (it.path && !it.path.startsWith('http')) {
+            return (
+              <NavLink
+                key={it.label(t)}
+                to={joinUrl(it.path, location.search)}
+                className={classNames(styles['link'], {
+                  [styles['active']]:
+                    it.path === '/'
+                      ? it.path === location.pathname
+                      : location.pathname.startsWith(
+                          it.path.replace(/\?.*$/, ''),
+                        ),
+                })}
+              >
+                {it.label(t)}
+                {it.newIcon ? (
+                  <span className={styles['new-icon']} />
+                ) : undefined}
+              </NavLink>
+            );
+          }
+          if (!it.children) {
+            return (
+              <a
+                key={it.label(t)}
+                href={it.path}
+                className={classNames(styles['link'])}
+                target={
+                  Env.isMetaMaskAndroid ||
+                  (Env.isTelegram &&
+                    it.path.includes('sofa.org') &&
+                    !it.path.includes('docs.sofa.org'))
+                    ? undefined
+                    : it.target
+                }
+                rel="noopener noreferrer"
+              >
+                {it.label(t)}
+                {it.newIcon ? (
+                  <span
+                    className={classNames(styles['new-icon'], 'new-icon')}
+                  />
+                ) : undefined}
+              </a>
+            );
+          }
+          return (
+            <Dropdown
+              key={it.label(t)}
+              trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
+              className={styles['nav-selector']}
+              position={'bottomLeft'}
+              render={
+                <Dropdown.Menu className={styles['nav-selector-items']}>
+                  {it.children.map((m) => {
+                    return (
+                      <Dropdown.Item
+                        key={m.path}
+                        className={classNames(styles['nav-selector-item'])}
+                        onClick={() => {
+                          window.location.href = m.path;
+                        }}
+                      >
+                        <span className="semi-select-option-text">
+                          {m.label(t)}
+                          {m.newIcon && (
+                            <span
                               className={classNames(
-                                styles['nav-selector-item'],
-                                selected
-                                  ? 'semi-select-option-selected'
-                                  : undefined,
+                                styles['new-icon'],
+                                'new-icon',
                               )}
-                              onClick={() => {
-                                window.location.href = m.path;
-                              }}
-                            >
-                              <span className="semi-select-option-text">
-                                {m.label(t)}
-                                {m.newIcon ? (
-                                  <span
-                                    className={classNames(
-                                      styles['new-icon'],
-                                      'new-icon',
-                                    )}
-                                  />
-                                ) : undefined}
-                              </span>
-                            </Dropdown.Item>
-                          );
-                        })}
-                      </Dropdown.Menu>
-                    }
-                  >
-                    <a
-                      key={it.label(t)}
-                      className={classNames(
-                        styles['link'],
-                        it.active ? styles['active'] : undefined,
-                      )}
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      {it.label(t)}
-                      {it.newIcon ? (
-                        <span
-                          className={classNames(styles['new-icon'], 'new-icon')}
-                        />
-                      ) : undefined}
-                    </a>
-                  </Dropdown>
-                ) : (
-                  <a
-                    key={it.label(t)}
-                    href={it.path}
-                    className={classNames(
-                      styles['link'],
-                      it.active ? styles['active'] : undefined,
-                    )}
-                    target={
-                      Env.isMetaMaskAndroid ||
-                      (Env.isTelegram &&
-                        it.path.includes('sofa.org') &&
-                        !it.path.includes('docs.sofa.org'))
-                        ? undefined
-                        : it.target
-                    }
-                    rel="noopener noreferrer"
-                  >
-                    {it.label(t)}
-                    {it.newIcon ? (
-                      <span
-                        className={classNames(styles['new-icon'], 'new-icon')}
-                      />
-                    ) : undefined}
-                  </a>
-                )
-              ) : (
-                <NavLink
-                  key={it.label(t)}
-                  to={joinUrl(it.path, location.search)}
-                  className={classNames(styles['link'], {
-                    [styles['active']]:
-                      it.path === '/'
-                        ? it.path === location.pathname
-                        : location.pathname.startsWith(it.path),
+                            />
+                          )}
+                        </span>
+                      </Dropdown.Item>
+                    );
                   })}
-                >
-                  {it.label(t)}
-                  {it.newIcon ? (
-                    <span className={styles['new-icon']} />
-                  ) : undefined}
-                </NavLink>
-              ),
-            )}
-          </>
-        )}
+                </Dropdown.Menu>
+              }
+            >
+              <a
+                key={it.label(t)}
+                className={classNames(styles['link'])}
+                href={it.path}
+                onClick={(e) => !it.path && e.preventDefault()}
+              >
+                {it.label(t)}
+                {it.newIcon && (
+                  <span
+                    className={classNames(styles['new-icon'], 'new-icon')}
+                  />
+                )}
+              </a>
+            </Dropdown>
+          );
+        })}
       </nav>
       <aside className={styles['right']}>
         <LangSelector className={styles['lang-selector']} />
         {more && (
           <div className={styles['wallet']}>
             <NetworkSelector />
-            <WalletConnector
-              enableServerAuth={campaign.isBtcAdventure || campaign.isCelebrity}
-            />
+            <WalletConnector />
           </div>
         )}
         {more && <TimezoneSelector />}
-        {more && !campaign.isCampaign && <IndexPrices />}
-        {type === 1 && !campaign.isBtcAdventure && !campaign.isCelebrity && (
-          <LaunchApp />
-        )}
+        {more && <IndexPrices />}
+        {type === 1 && <LaunchApp />}
         {more && type === 2 && (
           <div className={styles['other-links']}>
             <a
               className={classNames(styles['btn-link'], 'btn-gradient', {
                 [styles['active']]: location.pathname.startsWith('/rch'),
               })}
-              href={import.meta.env.VITE_RCH_LINK}
+              href={EnvLinks.config.VITE_RCH_LINK}
               target={
                 Env.isMetaMaskAndroid || Env.isTelegram ? undefined : 'rch'
               }

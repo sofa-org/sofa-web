@@ -304,7 +304,7 @@ export class WalletConnect {
     checkChainId(chainId);
     const modal = await WalletConnect.getModal();
 
-    if (Env.isMobile) {
+    if (Env.isMobile && !Env.isTelegram) {
       const validConnectors = await WalletConnect.getValidConnectors();
       if (validConnectors.length === 1) {
         const originProvider = validConnectors[0].originProvider;

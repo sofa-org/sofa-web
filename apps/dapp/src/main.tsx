@@ -28,6 +28,7 @@ import NotFound from '@/pages/not-found';
 
 import './global-var';
 
+import { EnvLinks } from './env-links';
 import { RouteGuard } from './route-guard';
 import { routes } from './routes';
 import { useGlobalState } from './store';
@@ -104,7 +105,7 @@ window.$router = createBrowserRouter([
         /fest-competition|rch-game-center|rch-celebrity/.test(location.pathname)
       ) {
         window.location.href = joinUrl(
-          import.meta.env.VITE_CAMPAIGN_LINK,
+          EnvLinks.config.VITE_CAMPAIGN_LINK,
           location.pathname,
         );
         return <></>;

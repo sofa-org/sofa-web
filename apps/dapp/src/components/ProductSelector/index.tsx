@@ -8,6 +8,7 @@ import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import { Comp as Logo } from '@/assets/logo';
+import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
 
 import { CSelect } from '../CSelect';
@@ -96,7 +97,7 @@ export const ProjectSelector = (props: ProductSelectorProps) => {
             className={styles['logo']}
             onClick={(e) => {
               e.stopPropagation();
-              window.location.href = import.meta.env.VITE_SOFA_LINK;
+              window.location.href = EnvLinks.config.VITE_SOFA_LINK;
             }}
           />
           {v.label}

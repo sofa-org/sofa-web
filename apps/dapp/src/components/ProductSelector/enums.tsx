@@ -1,6 +1,7 @@
 import { TFunction } from '@sofa/services/i18n';
 import { ProductType, RiskType } from '@sofa/services/products';
 
+import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
 
 import iconDntProtected from './assets/dnt-protected.png';
@@ -31,7 +32,7 @@ export const RiskTypeRefs = {
       ),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.PROTECTED,
-    link: import.meta.env.VITE_EARN_LINK as string,
+    link: EnvLinks.config.VITE_EARN_LINK,
   },
   [RiskType.LEVERAGE]: {
     label: (t: TFunction) => t('Leverage'),
@@ -43,7 +44,7 @@ export const RiskTypeRefs = {
       ),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.LEVERAGE,
-    link: import.meta.env.VITE_EARN_LINK as string,
+    link: EnvLinks.config.VITE_EARN_LINK,
   },
   [RiskType.RISKY]: {
     label: (t: TFunction) => t('Surge'),
@@ -55,7 +56,7 @@ export const RiskTypeRefs = {
       ),
     icon: <img src={IconHighYield} width="24px" />,
     value: RiskType.RISKY,
-    link: import.meta.env.VITE_SURGE_LINK as string,
+    link: EnvLinks.config.VITE_SURGE_LINK,
   },
 };
 
