@@ -123,6 +123,7 @@ const CustomTicket = (props: CustomTicketProps) => {
           {props.active ? (
             <div className={styles['value']}>
               <DatePicker
+                key={vault?.vault}
                 className={styles['date-picker']}
                 dropdownClassName={styles['date-picker-dropdown']}
                 type="date"
@@ -138,7 +139,7 @@ const CustomTicket = (props: CustomTicketProps) => {
                   return curr8h <= min || curr8h > max;
                 }}
                 presetPosition="top"
-                value={
+                defaultValue={
                   props.product?.expiry
                     ? props.product.expiry * 1000
                     : undefined

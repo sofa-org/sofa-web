@@ -14,7 +14,7 @@ import {
   RiskType,
 } from '@sofa/services/products';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
-import { day8h, displayExpiry, next8h } from '@sofa/utils/expiry';
+import { day8h, displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
 import { calcVal } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useLazyCallback } from '@sofa/utils/hooks';
@@ -265,8 +265,11 @@ const ProductCustomize = () => {
                   onChange={(v) => updateProduct({ expiry: +v })}
                 />
                 <DatePicker
+                  key={vault?.vault}
                   type="date"
-                  value={product?.expiry ? product.expiry * 1000 : undefined}
+                  defaultValue={
+                    product?.expiry ? product.expiry * 1000 : undefined
+                  }
                   onChange={(v) =>
                     updateProduct({ expiry: day8h(Number(v)) / 1000 })
                   }

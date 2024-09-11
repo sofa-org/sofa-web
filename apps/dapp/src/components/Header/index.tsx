@@ -228,12 +228,10 @@ const Header = () => {
                   onClick={() => navigate('/')}
                 />
               )}
-              {
-                <IconMenu
-                  className={styles['icon-menu']}
-                  onClick={() => setExpanded((pre) => !pre)}
-                />
-              }
+              <IconMenu
+                className={styles['icon-menu']}
+                onClick={() => setExpanded((pre) => !pre)}
+              />
             </div>
 
             {menusForRender.map((it) =>
