@@ -208,47 +208,6 @@ export class MarketService {
     });
   }
 
-  private static async aaveHistory(
-    ccy: 'WETH' | 'WBTC' | 'USDT',
-    chainId: number,
-    timestampGte: number,
-    timestampLt?: number,
-  ) {
-    const url = ChainMap[chainId].aaveGraphUrl;
-    const query = `
-        {
-          reserves(where: { symbol: "${ccy}" }) {
-            id
-            name
-            liquidityRate
-            symbol
-            paramsHistory(
-              first: 1000
-              where: { timestamp_gte: ${timestampGte}${
-                timestampLt ? ', timestamp_lt: ' + timestampLt : ''
-              } }
-              orderBy: timestamp
-              orderDirection: desc
-            ) {
-              id
-              liquidityRate
-              timestamp
-            }
-          }
-        }
-      `;
-    return http
-      .post<
-        unknown,
-        HttpResponse<{
-          data: {
-            reserves: [{ liquidityRate: number; paramsHistory: AAVERecord[] }];
-          };
-        }>
-      >(url, { query })
-      .then((res) => res.value.data.reserves[0]);
-  }
-
   private static async $interestRate(
     ccy: 'WETH' | 'WBTC' | 'USDT' | 'USDC' | 'stETH' | 'RCH',
     chainId: number,

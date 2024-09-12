@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService, VaultInfo } from '@sofa/services/contracts';
@@ -42,20 +42,32 @@ const Index = () => {
   const [productType, setProductType] = useProductSelect();
   const tabs = useMemo(
     () =>
-      Object.values(ProductTypeRefs).map((it) => ({
-        label: (
-          <div className={styles['product-type']}>
-            {it.img}
-            <span>{it.label(t)}</span>
-            <span className={styles['tag']} style={it.tagStyle}>
-              {it.tag}
-            </span>
-          </div>
+      Object.values(ProductTypeRefs)
+        .map((it) => ({
+          label: (
+            <div className={styles['product-type']}>
+              {it.img}
+              <span>{it.label(t)}</span>
+              <span className={styles['tag']} style={it.tagStyle}>
+                {it.tag}
+              </span>
+            </div>
+          ),
+          value: it.value,
+        }))
+        .filter((it) =>
+          ProductsService.findVault(ContractsService.vaults, {
+            chainId,
+            productType: it.value,
+          }),
         ),
-        value: it.value,
-      })),
-    [t],
+    [chainId, t],
   );
+  useEffect(() => {
+    if (tabs.every((it) => it.value !== productType)) {
+      setProductType(tabs[0].value);
+    }
+  }, [productType, setProductType, tabs]);
 
   const depositCcyList = useMemo(() => {
     const vaults = ProductsService.filterVaults(ContractsService.vaults, {

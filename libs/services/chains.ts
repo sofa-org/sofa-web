@@ -2,7 +2,22 @@ import { Env } from '@sofa/utils/env';
 import { omitBy } from 'lodash-es';
 
 import IconArb from './assets/icon-arb.svg?url';
+import IconBNB from './assets/icon-bnb.webp';
 import IconETH from './assets/icon-eth.svg?url';
+
+/*
+ * 上新链的 TODO:
+ * 前端：
+ *  1. ChainMap 配置，一些关键的东西：the graph 服务的 url；oracle 预言机的地址
+ *  2. vaults 配置
+ * 服务端：
+ *  1. 头寸记录，交易记录同步
+ *  2. 结算价格同步
+ *  3. vaults 配置
+ *  4. 获取保本产品底层利率（aave, stETH...）
+ * 做市商：
+ *  1. 报价支持
+ **/
 
 export const ChainMap: Record<
   string | number,
@@ -30,7 +45,6 @@ export const ChainMap: Record<
     feeContractAddress: string;
     hlPriceOracle: Record<'BTC' | 'ETH', string>;
     spotPriceOracle: Record<'BTC' | 'ETH', string>;
-    aaveGraphUrl: string;
     stRCHAddress: string;
   }
 > = omitBy(
@@ -66,7 +80,6 @@ export const ChainMap: Record<
         BTC: '0xFFf0d064B1cbf5D4C97D0af56a73a4C7e31DFb0D',
         ETH: '0x6417084B8Df644e1d7E32BE39B54F3a5BbEA645B',
       },
-      aaveGraphUrl: 'https://api.thegraph.com/subgraphs/name/aave/protocol-v3',
       stRCHAddress: '0x2B9aeA129B85F51A468274e7271434A83c3BB6b4',
     },
     42161: {
@@ -100,9 +113,41 @@ export const ChainMap: Record<
         BTC: '0xD0fb7977df47d7Fe946A21679DAbCe877f7A3a05',
         ETH: '0xab08fF5dd91636fE556f692825Cadd7bA04A4c97',
       },
-      aaveGraphUrl:
-        'https://api.thegraph.com/subgraphs/name/aave/protocol-v3-arbitrum',
-      stRCHAddress: '',
+      stRCHAddress: '', // 只有 defaultChain 有
+    },
+    56: {
+      chainId: 56,
+      isTest: false,
+      name: 'BNB Smart Chain',
+      currency: 'BNB',
+      icon: IconBNB,
+      explorerUrl: 'https://bscscan.com',
+      rpcUrl: 'https://binance.llamarpc.com',
+      nativeCurrency: {
+        name: 'BNB',
+        symbol: 'BNB', // 2-6 characters long
+        decimals: 18,
+      },
+      vaultGraphUrl:
+        'https://api.studio.thegraph.com/query/77961/sofa-bsc/version/latest',
+      usdtAddress: '', // 只有 defaultChain 有
+      rchAddress: '', // 只有 defaultChain 有
+      rchAirdropAddress: '', // 只有 defaultChain 有
+      rchUniswapAddress: '', // 只有 defaultChain 有
+      rchUniswapVersion: 'v3',
+      bonusAirdropAddress: '', // 只有 defaultChain 有
+      feeContractAddress: '0xEC722a53Efee08ebFF8d2C61622991a33705fA79',
+      uniswapUrl: 'https://app.uniswap.org/explore/tokens/bnb/{address}',
+      // TODO
+      hlPriceOracle: {
+        BTC: '',
+        ETH: '',
+      },
+      spotPriceOracle: {
+        BTC: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
+        ETH: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
+      },
+      stRCHAddress: '', // 只有 defaultChain 有
     },
     11155111: {
       chainId: 11155111,
@@ -136,7 +181,6 @@ export const ChainMap: Record<
         BTC: '0x9ca3FF3117204D1B6f6a81A6E9BDfe9BF4E79Fd5',
         ETH: '0x8Daeb7DcB6a1103b7a601017a479B0e5D10402af',
       },
-      aaveGraphUrl: 'https://api.thegraph.com/subgraphs/name/aave/protocol-v3',
       stRCHAddress: '0x2845aD1636F2273687850108581E8Cf321AAbD6d',
     },
   },

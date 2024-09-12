@@ -30,6 +30,7 @@ import STVaultAbis from './abis/SmartTrendVault.json';
 import STVaultAbis1 from './abis/SmartTrendVault-No-Permit2.json';
 import SpotOracleAbis from './abis/SpotOracle.json';
 import vaults_1 from './vaults/1';
+import vaults_56 from './vaults/56';
 import vaults_42161 from './vaults/42161';
 import vaults_11155111 from './vaults/11155111';
 import {
@@ -79,98 +80,96 @@ export class ContractsService {
 
   static vaults: VaultInfo[] = [
     ...vaults_1,
+    ...vaults_56,
     ...vaults_42161,
     ...vaults_11155111,
   ]
     .filter((it) => ChainMap[it.chainId])
-    .map(
-      (it) =>
-        ({
-          ...it,
-          trackingSource: 'COINBASE',
-          depositMinAmount: (() => {
-            if (Env.isPre) {
-              // 大约 0.05U
-              return {
-                RCH: 0.05,
-                USDT: 0.05,
-                USDC: 0.05,
-                WETH: 0.000015,
-                stETH: 0.000015,
-                WBTC: 0.000001,
-              }[it.depositCcy];
-            }
-            return it.riskType === RiskType.RISKY
-              ? {
-                  RCH: 20,
-                  USDT: 20,
-                  USDC: 20,
-                  WETH: 0.01,
-                  stETH: 0.01,
-                  WBTC: 0.0005,
-                }[it.depositCcy]
-              : {
-                  RCH: 100,
-                  USDT: 100,
-                  USDC: 100,
-                  WETH: 0.05,
-                  stETH: 0.05,
-                  WBTC: 0.002,
-                }[it.depositCcy];
-          })(),
-          depositTickAmount: (() => {
-            if (Env.isPre) {
-              // 大约 0.05U
-              return {
-                RCH: 0.05,
-                USDT: 0.05,
-                USDC: 0.05,
-                WETH: 0.000001,
-                stETH: 0.000001,
-                WBTC: 0.000001,
-              }[it.depositCcy];
-            }
-            return it.riskType === RiskType.RISKY
-              ? {
-                  RCH: 20,
-                  USDT: 20,
-                  USDC: 20,
-                  WETH: 0.01,
-                  stETH: 0.01,
-                  WBTC: 0.0005,
-                }[it.depositCcy]
-              : {
-                  RCH: 1,
-                  USDT: 1,
-                  USDC: 1,
-                  WETH: 0.0001,
-                  stETH: 0.0001,
-                  WBTC: 0.0001,
-                }[it.depositCcy];
-          })(),
-          anchorPricesDecimal: 1e8,
-          collateralDecimal: {
-            RCH: 1e18,
-            USDT: 1e6,
-            USDC: 1e6,
-            WETH: 1e18,
-            stETH: 1e18,
-            WBTC: 1e18,
-          }[it.depositCcy],
-          balanceDecimal:
-            {
-              RCH: 1e18,
-              USDT: 1e6,
-              USDC: 1e6,
-              WETH: 1e18,
-              stETH: 1e18,
-              WBTC: 1e18,
-            }[it.depositCcy]! * (it.riskType === RiskType.PROTECTED ? 1e18 : 1),
-          abis: ContractsService.RFQVaultAbis[
-            `${it.productType}-${it.riskType}-${it.usePermit2}`
-          ],
-        }) as VaultInfo,
-    );
+    .map((it) => {
+      const collateralDecimal = {
+        RCH: 1e18,
+        USDT: it.chainId == 56 ? 1e18 : 1e6,
+        USDC: it.chainId == 56 ? 1e18 : 1e6,
+        WETH: 1e18,
+        stETH: 1e18,
+        WBTC: 1e18,
+      }[it.depositCcy];
+      if (!collateralDecimal)
+        throw new Error(`Cannot configure the ${it.depositCcy} vault`);
+      const depositMinAmount = (() => {
+        if (Env.isPre) {
+          // 大约 0.05U
+          return {
+            RCH: 0.05,
+            USDT: 0.05,
+            USDC: 0.05,
+            WETH: 0.000015,
+            stETH: 0.000015,
+            WBTC: 0.000001,
+          }[it.depositCcy];
+        }
+        return it.riskType === RiskType.RISKY
+          ? {
+              RCH: 20,
+              USDT: 20,
+              USDC: 20,
+              WETH: 0.01,
+              stETH: 0.01,
+              WBTC: 0.0005,
+            }[it.depositCcy]
+          : {
+              RCH: 100,
+              USDT: 100,
+              USDC: 100,
+              WETH: 0.05,
+              stETH: 0.05,
+              WBTC: 0.002,
+            }[it.depositCcy];
+      })();
+      const depositTickAmount = (() => {
+        if (Env.isPre) {
+          // 大约 0.05U
+          return {
+            RCH: 0.05,
+            USDT: 0.05,
+            USDC: 0.05,
+            WETH: 0.000001,
+            stETH: 0.000001,
+            WBTC: 0.000001,
+          }[it.depositCcy];
+        }
+        return it.riskType === RiskType.RISKY
+          ? {
+              RCH: 20,
+              USDT: 20,
+              USDC: 20,
+              WETH: 0.01,
+              stETH: 0.01,
+              WBTC: 0.0005,
+            }[it.depositCcy]
+          : {
+              RCH: 1,
+              USDT: 1,
+              USDC: 1,
+              WETH: 0.0001,
+              stETH: 0.0001,
+              WBTC: 0.0001,
+            }[it.depositCcy];
+      })();
+      return {
+        ...it,
+        trackingSource: 'COINBASE',
+        depositMinAmount,
+        depositTickAmount,
+        anchorPricesDecimal: 1e8,
+        collateralDecimal,
+        balanceDecimal:
+          collateralDecimal * (it.riskType === RiskType.PROTECTED ? 1e18 : 1),
+        abis: ContractsService.RFQVaultAbis[
+          `${it.productType}-${it.riskType}-${it.usePermit2}`
+        ],
+      } as VaultInfo;
+    });
 
   static rchAddress() {
     return ChainMap[defaultChain.chainId].rchAddress;

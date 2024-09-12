@@ -85,7 +85,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
     if (vault && loading) {
       timerRef.current = setInterval(
         () => useProductsState.updateRecommendedList(vault),
-        3000,
+        4000,
       );
       return () => clearInterval(timerRef.current);
     }
