@@ -338,7 +338,7 @@ const PositionCard = (props: PositionCardProps) => {
               <span className={styles['range']}>
                 {(() => {
                   if (product.vault.productType === ProductType.DNT)
-                    return position.takerAllocationRate === 1 &&
+                    return Number(position.takerAllocationRate) === 1 &&
                       !position.claimParams.maker
                       ? t('In Range')
                       : t('Out of Range');
@@ -347,10 +347,6 @@ const PositionCard = (props: PositionCardProps) => {
                     ? t('Profits')
                     : t('Payout');
                 })()}
-                {/* {product.vault.riskType !== RiskType.RISKY &&
-                position.takerAllocationRate === 0 && (
-                  <span>({t('protected')})</span>
-                )} */}
               </span>
               {product.vault.riskType !== RiskType.RISKY ? (
                 <>

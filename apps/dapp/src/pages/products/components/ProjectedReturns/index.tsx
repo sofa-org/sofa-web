@@ -176,12 +176,13 @@ export const ProjectedReturns = (
   const isRangebound = [ProductType.DNT].includes(product.vault.productType);
   const hasExpired = Number(product.expiry) * 1000 <= Date.now();
   const showScenario = {
-    max: !hasExpired || !isTrend || position.takerAllocationRate! === 1,
+    max: !hasExpired || !isTrend || Number(position.takerAllocationRate) === 1,
     middle:
       !hasExpired ||
       !isTrend ||
-      (position.takerAllocationRate! > 0 && position.takerAllocationRate! < 1),
-    min: !hasExpired || !isTrend || position.takerAllocationRate! === 0,
+      (Number(position.takerAllocationRate) > 0 &&
+        Number(position.takerAllocationRate) < 1),
+    min: !hasExpired || !isTrend || Number(position.takerAllocationRate) === 0,
   };
   return (
     <section className={styles['section']}>
@@ -193,7 +194,7 @@ export const ProjectedReturns = (
         className={classNames(styles['profit-scenarios'], props.className, {
           [styles['highlight']]: hasExpired && isTrend,
           [styles['highlight-red']]:
-            hasExpired && isTrend && position.takerAllocationRate! <= 0,
+            hasExpired && isTrend && Number(position.takerAllocationRate) <= 0,
           [styles['is-trend']]: isTrend,
           [styles['expired']]: hasExpired,
         })}
@@ -213,7 +214,7 @@ export const ProjectedReturns = (
                 [styles['highlight']]:
                   hasExpired &&
                   isRangebound &&
-                  position.takerAllocationRate! > 0,
+                  Number(position.takerAllocationRate) > 0,
               })}
               title={returnSituationsDesc.max}
               img={isRangebound && <RangeboundImg data={position} type="win" />}
@@ -316,7 +317,7 @@ export const ProjectedReturns = (
                 [styles['highlight-red']]:
                   hasExpired &&
                   isRangebound &&
-                  position.takerAllocationRate! <= 0,
+                  Number(position.takerAllocationRate) <= 0,
               })}
               title={returnSituationsDesc.min}
               img={
