@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown } from '@douyinfe/semi-ui';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
@@ -34,6 +34,7 @@ interface MenuItem {
   target?: string;
   newIcon?: boolean;
   children?: MenuItem[];
+  hide?(): boolean;
 }
 
 const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
@@ -60,46 +61,43 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
       target: '_top',
       newIcon: true,
       type: 2,
-      ...(Env.isTelegram
-        ? { path: EnvLinks.config.VITE_CAMPAIGN_LINK }
-        : {
-            path: '',
-            children: [
-              {
-                label: (t: TFunction) => t('Competition & Claim Prize'),
-                path: joinUrl(
-                  EnvLinks.config.VITE_CAMPAIGN_LINK,
-                  '/fest-competition',
-                ).replace(window.location.origin, ''),
-                target: '_top',
-              },
-              {
-                label: (t: TFunction) =>
-                  t({
-                    enUS: 'RCH Celebrity',
-                    zhCN: 'RCH 名人堂',
-                  }),
-                path: joinUrl(
-                  EnvLinks.config.VITE_CAMPAIGN_LINK,
-                  '/rch-celebrity',
-                ).replace(window.location.origin, ''),
-                target: '_top',
-                newIcon: true,
-              },
-              {
-                label: (t: TFunction) =>
-                  t({
-                    enUS: 'RCH Game Center',
-                    zhCN: 'RCH 游戏中心',
-                  }),
-                path: joinUrl(
-                  EnvLinks.config.VITE_CAMPAIGN_LINK,
-                  '/rch-game-center/btc-adventure',
-                ).replace(window.location.origin, ''),
-                target: '_top',
-              },
-            ],
-          }),
+      path: '',
+      hide: () => Env.isTelegram,
+      children: [
+        {
+          label: (t: TFunction) => t('Competition & Claim Prize'),
+          path: joinUrl(
+            EnvLinks.config.VITE_CAMPAIGN_LINK,
+            '/fest-competition',
+          ).replace(window.location.origin, ''),
+          target: '_top',
+        },
+        {
+          label: (t: TFunction) =>
+            t({
+              enUS: 'RCH Celebrity',
+              zhCN: 'RCH 名人堂',
+            }),
+          path: joinUrl(
+            EnvLinks.config.VITE_CAMPAIGN_LINK,
+            '/rch-celebrity',
+          ).replace(window.location.origin, ''),
+          target: '_top',
+          newIcon: true,
+        },
+        {
+          label: (t: TFunction) =>
+            t({
+              enUS: 'RCH Game Center',
+              zhCN: 'RCH 游戏中心',
+            }),
+          path: joinUrl(
+            EnvLinks.config.VITE_CAMPAIGN_LINK,
+            '/rch-game-center/btc-adventure',
+          ).replace(window.location.origin, ''),
+          target: '_top',
+        },
+      ],
     },
   ];
 };
@@ -180,6 +178,7 @@ const Header = () => {
         </div>
 
         {menusForRender.map((it) => {
+          if (it.hide?.()) return <Fragment key={it.label(t)} />;
           if (it.path && !it.path.startsWith('http')) {
             return (
               <NavLink
@@ -235,6 +234,7 @@ const Header = () => {
               render={
                 <Dropdown.Menu className={styles['nav-selector-items']}>
                   {it.children.map((m) => {
+                    if (it.hide?.()) return <Fragment key={it.path} />;
                     return (
                       <Dropdown.Item
                         key={m.path}
