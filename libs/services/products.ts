@@ -163,7 +163,7 @@ export class ProductsService {
               product.protectedApy ??
               product.protectedReturnApy ??
               product.apyInfo?.min;
-            return (!v ? 0 : Number(v)).toFixed(3);
+            return +(!v ? 0 : Number(v)).toFixed(3);
           })();
     const depositAmount = product.depositAmount || product.amounts?.own;
     return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;

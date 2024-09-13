@@ -71,11 +71,12 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
             '/fest-competition',
           ).replace(window.location.origin, ''),
           target: '_top',
+          newIcon: true,
         },
         {
           label: (t: TFunction) =>
             t({
-              enUS: 'RCH Celebrity',
+              enUS: 'RCH Hall of Fame',
               zhCN: 'RCH 名人堂',
             }),
           path: joinUrl(
@@ -83,7 +84,6 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
             '/rch-celebrity',
           ).replace(window.location.origin, ''),
           target: '_top',
-          newIcon: true,
         },
         {
           label: (t: TFunction) =>

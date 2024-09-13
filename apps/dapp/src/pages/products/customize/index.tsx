@@ -219,10 +219,10 @@ const ProductCustomize = () => {
   const { min, max } = useMemo(() => {
     if (!expiries) return { min: next8h(), max: pre8h() };
     return {
-      min: expiries[0].value * 1000,
+      min: customDev ? next8h(undefined, 1) : expiries[0].value * 1000,
       max: expiries[expiries.length - 1].value * 1000,
     };
-  }, [expiries]);
+  }, [customDev, expiries]);
 
   return (
     <>
@@ -273,7 +273,7 @@ const ProductCustomize = () => {
                   disabledDate={(d) => {
                     if (!d) return true;
                     const curr8h = next8h(d.getTime());
-                    return curr8h <= min || curr8h > max;
+                    return curr8h < min || curr8h > max;
                   }}
                 />
               </div>

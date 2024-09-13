@@ -9,6 +9,7 @@ import {
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
 import { day8h, next8h, pre8h } from '@sofa/utils/expiry';
+import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
@@ -39,6 +40,8 @@ export interface CustomTicketProps {
 const CustomTicket = (props: CustomTicketProps) => {
   const [t] = useTranslation('CustomTicket');
 
+  const customDev = useMemo(() => currQuery()['custom-dev'] === '1', []);
+
   const vault = useGlobalState((state) =>
     ProductsService.findVault(state.vaults, {
       chainId: props.product.vault.chainId,
@@ -65,8 +68,11 @@ const CustomTicket = (props: CustomTicketProps) => {
   );
   const { min, max } = useMemo(() => {
     if (!expiries) return { min: next8h(), max: pre8h() };
-    return { min: expiries[0], max: expiries[expiries.length - 1] };
-  }, [expiries]);
+    return {
+      min: customDev ? next8h(undefined, 1) : expiries[0],
+      max: expiries[expiries.length - 1],
+    };
+  }, [customDev, expiries]);
 
   if (!vault || !ticketMeta) return <></>;
 
@@ -128,7 +134,7 @@ const CustomTicket = (props: CustomTicketProps) => {
                 disabledDate={(d) => {
                   if (!d) return true;
                   const curr8h = next8h(d.getTime());
-                  return curr8h <= min || curr8h > max;
+                  return curr8h < min || curr8h > max;
                 }}
                 presetPosition="top"
                 defaultValue={
