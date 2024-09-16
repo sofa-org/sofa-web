@@ -12,6 +12,7 @@ import { joinUrl } from '@sofa/utils/url';
 import classNames from 'classnames';
 import { color } from 'echarts/core';
 
+import CEmpty from '@/components/Empty';
 import {
   useProductSelect,
   useProjectChange,
@@ -58,14 +59,15 @@ const Index = () => {
         .filter((it) =>
           ProductsService.findVault(ContractsService.vaults, {
             chainId,
+            riskType: project,
             productType: it.value,
           }),
         ),
-    [chainId, t],
+    [chainId, project, t],
   );
   useEffect(() => {
     if (tabs.every((it) => it.value !== productType)) {
-      setProductType(tabs[0].value);
+      setProductType(tabs[0]?.value);
     }
   }, [productType, setProductType, tabs]);
 
@@ -94,14 +96,25 @@ const Index = () => {
       onChange={(v) => setProductType(v as ProductType)}
       prefix={t('Product')}
       extraTopContent={
-        <div className={styles['title']}>
-          {RiskTypeRefs[project].icon}
-          {t('Choose Your Product')}
-        </div>
+        depositCcyList.length > 0 && (
+          <div className={styles['title']}>
+            {RiskTypeRefs[project].icon}
+            {t('Choose Your Product')}
+          </div>
+        )
       }
       sticky
     >
       <ProductsFixedNav depositCcyList={depositCcyList} />
+      {depositCcyList.length < 1 && (
+        <CEmpty
+          className="semi-always-dark"
+          description={t({
+            enUS: 'Supported vaults are coming soon',
+            zhCN: '没有支持的合约，敬请期待！',
+          })}
+        />
+      )}
       {depositCcyList.map((ccy) => {
         const config = CCYService.ccyConfigs[ccy];
         const ticketMeta = ProductsService.TicketTypeOptions.find(
