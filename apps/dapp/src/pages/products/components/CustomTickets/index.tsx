@@ -121,7 +121,7 @@ const CustomTicket = (props: CustomTicketProps) => {
           {props.active ? (
             <div className={styles['value']}>
               <DatePicker
-                key={vault?.vault}
+                key={props.product?.expiry}
                 className={styles['date-picker']}
                 dropdownClassName={styles['date-picker-dropdown']}
                 type="date"
