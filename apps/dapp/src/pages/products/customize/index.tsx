@@ -260,7 +260,7 @@ const ProductCustomize = () => {
                   onChange={(v) => updateProduct({ expiry: +v })}
                 />
                 <DatePicker
-                  key={vault?.vault}
+                  key={product?.expiry}
                   type="date"
                   defaultValue={
                     product?.expiry ? product.expiry * 1000 : undefined
@@ -304,6 +304,9 @@ const ProductCustomize = () => {
                       : [t('B1'), t('B2')]
                   }
                   mustIncludeAtm={productType === ProductType.DNT}
+                  productType={productType}
+                  anchorPrices={product?.anchorPrices}
+                  winningProbability={quoteInfo?.winningProbability}
                 />
               </div>
             </div>

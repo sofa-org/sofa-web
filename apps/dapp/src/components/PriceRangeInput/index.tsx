@@ -7,8 +7,13 @@ import {
 } from 'react';
 import { Popover, Toast } from '@douyinfe/semi-ui';
 import { useTranslation } from '@sofa/services/i18n';
-import { ProductsService } from '@sofa/services/products';
+import {
+  CalculatedInfo,
+  ProductsService,
+  ProductType,
+} from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
+import { Env } from '@sofa/utils/env';
 import { calcVal, isNullLike } from '@sofa/utils/fns';
 import {
   useAsyncMemo,
@@ -25,6 +30,7 @@ import { addI18nResources } from '@/locales';
 import { CheckboxBtnGroup } from '../CheckboxBtnGroup';
 import { COverlay } from '../COverlay';
 import { useIndexPrices } from '../IndexPrices/store';
+import { ProductTypeRefs } from '../ProductSelector/enums';
 import { RadioBtnOption } from '../RadioBtnGroup';
 
 import { Comp as IconArrow } from './assets/icon-arrow.svg';
@@ -40,6 +46,9 @@ export interface PriceRangeInputProps
   // default: ['K1', 'K2']
   prefixes?: [string, string];
   mustIncludeAtm?: boolean;
+  productType?: ProductType;
+  anchorPrices?: (string | number)[];
+  winningProbability?: CalculatedInfo['winningProbability'];
 }
 
 const toNum = (it?: string | number) => (it ? Number(it) : it);
@@ -208,6 +217,22 @@ export const PriceRangeInputEl = (
           <input placeholder={t('Upper')} onBlur={(e) => onInputBlur(e, 1)} />
         </div>
       </div>
+      {Env.isPre &&
+        props.productType &&
+        props.winningProbability &&
+        props.anchorPrices && (
+          <div className={styles['probabilities']}>
+            {ProductTypeRefs[props.productType]
+              .probability(t, props.winningProbability, props.anchorPrices)
+              .map((it) => (
+                <div
+                  className={styles['probability']}
+                  key={it}
+                  dangerouslySetInnerHTML={{ __html: it }}
+                />
+              ))}
+          </div>
+        )}
       <div className={styles['quick-selects']}>
         <div>
           <CheckboxBtnGroup

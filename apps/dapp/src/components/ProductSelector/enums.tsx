@@ -1,8 +1,10 @@
 import { TFunction } from '@sofa/services/i18n';
-import { ProductType, RiskType } from '@sofa/services/products';
+import { CalculatedInfo, ProductType, RiskType } from '@sofa/services/products';
+import { displayPercentage } from '@sofa/utils/amount';
 
 import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
+import enUS from '@/locales/en-US';
 
 import iconDntProtected from './assets/dnt-protected.png';
 import iconDntProtectedInverse from './assets/dnt-protected-inverse.png';
@@ -138,6 +140,32 @@ export const ProductTypeRefs = {
       color: '#000',
     },
     disabled: false,
+    probability: (
+      t: TFunction,
+      probability: CalculatedInfo['winningProbability'],
+      strikes: (string | number)[],
+    ) => [
+      t(
+        {
+          enUS: 'Reference Probability ≥{{strike}}: <span class="bold">{{value}}</span>',
+          zhCN: '参考概率 ≥{{strike}}: <span class="bold">{{value}}</span>',
+        },
+        {
+          value: displayPercentage(probability.probBullTrendItmLowerStrike),
+          strike: strikes[0],
+        },
+      ),
+      t(
+        {
+          enUS: 'Reference Probability ≥{{strike}}: <span class="bold">{{value}}</span>',
+          zhCN: '参考概率 ≥{{strike}}: <span class="bold">{{value}}</span>',
+        },
+        {
+          value: displayPercentage(probability.probBullTrendItmUpperStrike),
+          strike: strikes[1],
+        },
+      ),
+    ],
   },
   [ProductType.DNT]: {
     label: (t: TFunction) => t('Rangebound'),
@@ -215,6 +243,22 @@ export const ProductTypeRefs = {
       color: '#000',
     },
     disabled: false,
+    probability: (
+      t: TFunction,
+      probability: CalculatedInfo['winningProbability'],
+      strikes: (string | number)[],
+    ) => [
+      t(
+        {
+          enUS: 'Reference Probability Always In Range: <span class="bold">{{value}}</span>',
+          zhCN: '始终在范围内的参考概率: <span class="bold">{{value}}</span>',
+        },
+        {
+          value: displayPercentage(probability.probDntStayInRange),
+          strike: strikes.join('-'),
+        },
+      ),
+    ],
   },
   [ProductType.BearSpread]: {
     label: (t: TFunction) => t('Bear Trend'),
@@ -293,5 +337,31 @@ export const ProductTypeRefs = {
       color: '#000',
     },
     disabled: false,
+    probability: (
+      t: TFunction,
+      probability: CalculatedInfo['winningProbability'],
+      strikes: (string | number)[],
+    ) => [
+      t(
+        {
+          enUS: 'Reference Probability ≤{{strike}}: <span class="bold">{{value}}</span>',
+          zhCN: '参考概率 ≤{{strike}}: <span class="bold">{{value}}</span>',
+        },
+        {
+          value: displayPercentage(probability.probBearTrendItmLowerStrike),
+          strike: strikes[0],
+        },
+      ),
+      t(
+        {
+          enUS: 'Reference Probability ≤{{strike}}: <span class="bold">{{value}}</span>',
+          zhCN: '参考概率 ≤{{strike}}: <span class="bold">{{value}}</span>',
+        },
+        {
+          value: displayPercentage(probability.probBearTrendItmUpperStrike),
+          strike: strikes[1],
+        },
+      ),
+    ],
   },
 };

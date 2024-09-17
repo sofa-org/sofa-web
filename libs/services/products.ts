@@ -93,6 +93,13 @@ export interface CalculatedInfo {
     max: string | number; // 对赌全赢的情况对应的赔率
   };
   relevantDollarPrices: { ccy: string; price: string | number }[]; // 计算 RCH 年化时的币种价格
+  winningProbability: {
+    probDntStayInRange?: number; // DNT预估始终在区间的概率 报价不适用时为空
+    probBullTrendItmLowerStrike?: number; // 到期比LowerStrike高的概率 报价不适用时为空
+    probBullTrendItmUpperStrike?: number; // 到期比UpperStrike高的概率 报价不适用时为空
+    probBearTrendItmLowerStrike?: number; // 到期比LowerStrike低的概率 报价不适用时为空
+    probBearTrendItmUpperStrike?: number; // 到期比UpperStrike低的概率 报价不适用时为空
+  };
 }
 
 export interface OriginProductQuoteResult extends CalculatedInfo {
