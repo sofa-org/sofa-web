@@ -53,25 +53,4 @@ export class Env {
     if (Env._ua === undefined) Env._ua = new UAParser();
     return Env._ua;
   }
-
-  static getAuth(): AuthValue | undefined {
-    const v = localStorage.getItem('auth') as string;
-    try {
-      const res = JSON.parse(v) as AuthValue;
-      if (res.token) {
-        return res;
-      }
-    } catch (e) {
-      // no-ops
-    }
-    return undefined;
-  }
-
-  static setAuth(value?: AuthValue) {
-    if (!value) {
-      localStorage.removeItem('auth');
-      return;
-    }
-    localStorage.setItem('auth', JSON.stringify(value));
-  }
 }

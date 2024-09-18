@@ -46,6 +46,11 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
     { label: (t: TFunction) => t('Capabilities'), path: '/strengths', type: 1 },
     { label: (t: TFunction) => t('RCH'), path: '/rch', type: 1 },
     {
+      label: (t: TFunction) => t({ enUS: 'Points', zhCN: '积分' }),
+      path: '/points',
+      type: 1,
+    },
+    {
       label: (t: TFunction) => t('Docs'),
       path: 'https://docs.sofa.org',
       type: 1,

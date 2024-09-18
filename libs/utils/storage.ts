@@ -9,22 +9,20 @@ export class UserStorage<T> {
     this.uidGetter = uidGetter;
   }
 
-  get() {
-    const uid = this.uidGetter();
+  get(uid = this.uidGetter()) {
     if (!uid) return undefined;
     const whole = storage.get(this.key) as Record<string, unknown> | null;
     return whole?.[uid] as T;
   }
 
-  set(val: T | null | undefined) {
-    const uid = this.uidGetter();
+  set(val: T | null | undefined, uid = this.uidGetter()) {
     if (!uid) return void 0;
     const whole = (storage.get(this.key) || {}) as Record<string, unknown>;
     whole[uid] = val;
     return storage.set(this.key, whole);
   }
 
-  remove() {
-    this.set(null);
+  remove(uid = this.uidGetter()) {
+    this.set(null, uid);
   }
 }

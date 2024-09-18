@@ -26,10 +26,7 @@ const WalletConnector = (
 ) => {
   const [t] = useTranslation('WalletConnector');
   const wallet = useWalletStore();
-  // const { serverAuthing } = useWalletStore();
-  const { connectVisible, bringUpConnect, dismissConnect } = useWalletUIState(
-    (s) => s,
-  );
+  const { connectVisible, bringUpConnect, dismissConnect } = useWalletUIState();
 
   useEffect(() => {
     const pro = useWalletStore.subscribeAccountChange();
@@ -67,14 +64,6 @@ const WalletConnector = (
         })()}
         {!props.hideArrow && <IconDropdown />}
       </div>
-      {/* Audrey Gray Shuyun 会商量一个更合适的 UI/文案，下面代码回头会启用 */}
-      {/* {serverAuthing ?
-        <div className={styles['server-authing-overlay']}>
-          {t({
-            enUS: 'Please approve the sign request in your wallet to login',
-            zhCN: '请在你的钱包里确认用于登入的签名请求',
-          })}
-        </div> : undefined} */}
       <Modal
         centered
         className={styles['wallet-connector-modal']}

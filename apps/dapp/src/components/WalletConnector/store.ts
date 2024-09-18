@@ -1,12 +1,12 @@
+import { useEffect } from 'react';
 import { Toast } from '@douyinfe/semi-ui';
-import { AuthApis } from '@sofa/services/auth';
+import { AuthService } from '@sofa/services/auth';
 import { ChainMap, defaultChain } from '@sofa/services/chains';
 import { t } from '@sofa/services/i18n';
 import { WalletService } from '@sofa/services/wallet';
 import { WalletConnect } from '@sofa/services/wallet-connect';
-import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
-import { addHttpErrorHandler } from '@sofa/utils/http';
+import { addHttpErrorHandler, AuthToken } from '@sofa/utils/http';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -20,20 +20,22 @@ export const useWalletUIState = createWithEqualityFn<WalletUIState>((set) => ({
   connectVisible: false,
   dismissConnect: () => set({ connectVisible: false }),
   bringUpConnect: (params) => {
-    if (useWalletStore.getState().address) {
-      if (!params?.enableServerAuth || useWalletStore.getState().serverAuth) {
-        set({ connectVisible: true });
-        return;
-      }
+    const { address } = useWalletStore.getState();
+    if (
+      address &&
+      (!params?.enableServerAuth || AuthToken.get(address?.toLowerCase()))
+    ) {
+      set({ connectVisible: true });
+      return;
     }
     (async () => {
       if (useWalletStore.getState().address) {
         await useWalletStore.disconnect();
       }
-      await useWalletStore.connect();
       if (params?.enableServerAuth) {
         await useWalletStore.serverAuth();
       }
+      await useWalletStore.connect();
     })()
       .then(() => {
         Toast.success(t('connect.succ', { ns: 'global' }));
@@ -63,8 +65,6 @@ export interface WalletStoreState {
   name?: string;
   icon: string;
   balance?: PartialRecord<string, number>;
-  serverAuthing?: boolean;
-  serverAuth?: { uid: number; token: string; wallet: string };
 }
 
 addHttpErrorHandler(async (err) => {
@@ -78,10 +78,7 @@ addHttpErrorHandler(async (err) => {
       if (!urlStr) return;
       const uri = new URL(urlStr);
       if (/(^|\.)sofa\.org$/i.test(uri.hostname)) {
-        // signout
-        const state = useWalletStore.getState();
-        if (!state.serverAuthing && state.serverAuth) {
-          Env.setAuth(undefined);
+        if (AuthToken.get(useWalletStore.getState().address?.toLowerCase())) {
           useWalletStore.disconnect()?.catch((e) => {
             console.error(
               'error while useWalletStore.disconnect after token invalid',
@@ -115,19 +112,13 @@ export const useWalletStore = Object.assign(
         WalletService.disconnect().then(() => {
           useWalletStore.setState((pre) => ({
             ...pre,
-            serverAuthing: false,
-            serverAuth: undefined,
             address: undefined,
             balance: undefined,
             name: undefined,
             icon: undefined,
           }));
         });
-      if (useWalletStore.getState().serverAuth && Env.getAuth()) {
-        return AuthApis.logout()
-          .catch((e) => console.log('error logout serverAuth', e))
-          .then(() => finalDisconnect());
-      }
+      if (AuthToken.get(address?.toLowerCase())) AuthService.logout();
       return finalDisconnect();
     },
     connect: (chainId?: number) => {
@@ -141,78 +132,31 @@ export const useWalletStore = Object.assign(
       });
     },
     serverAuth: async () => {
-      const { address, chainId } = useWalletStore.getState();
-      if (!address) {
-        throw new Error('address is empty');
+      const { chainId } = useWalletStore.getState();
+      const { signer } = await WalletService.connect(chainId);
+      const nonce = await AuthService.getLoginNonce({ wallet: signer.address });
+      if (!nonce || nonce.code || !nonce.value) {
+        console.error('AuthService.getLoginNonce', nonce);
+        throw new Error(nonce?.message || 'Cannot get nonce');
       }
-      useWalletStore.setState({ serverAuthing: true, serverAuth: undefined });
-      try {
-        const nonce = await AuthApis.getLoginNonce({ wallet: address });
-        if (!nonce || nonce.code || !nonce.value) {
-          console.error('AuthApis.getLoginNonce', nonce);
-          throw new Error(nonce?.message || 'Cannot get nonce');
-        }
+      if (!signer) throw new Error('cannot get signer');
+      const params = {
+        hostname: 'sofa.org',
+        uri: 'https://sofa.org',
+        version: 1,
+        chainId,
+        nonce: nonce.value,
+        account: signer.address,
+        issuedAt: new Date().toISOString(),
+        expiredAt: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+        statement: 'wallet_sign_statement',
+      };
+      const message = `${params.hostname} wants you to sign in with your Ethereum account:\n${params.account}\n\n${params.statement}\nURI: ${params.uri}\nVersion: ${params.version}\nChain ID: ${params.chainId}\nNonce: ${params.nonce}\nIssued At: ${params.issuedAt}\nExpiration Time: ${params.expiredAt}`;
 
-        const { signer } = await WalletService.connect(chainId);
-        if (!signer) {
-          throw new Error('cannot get signer');
-        }
-        const params = {
-          hostname: 'sofa.org',
-          uri: 'https://sofa.org',
-          version: 1,
-          chainId,
-          nonce: nonce.value,
-          account: address,
-          issuedAt: new Date().toISOString(),
-          expiratedAt: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-          statement: 'wallet_sign_statement',
-        };
-        const msg = `${params.hostname} wants you to sign in with your Ethereum account:\n${params.account}\n\n${params.statement}\nURI: ${params.uri}\nVersion: ${params.version}\nChain ID: ${params.chainId}\nNonce: ${params.nonce}\nIssued At: ${params.issuedAt}\nExpiration Time: ${params.expiratedAt}`;
+      const signature = await signer.signMessage(message);
+      console.info('Login for', signer.address, { message, signature });
 
-        const signed = await signer.signMessage(msg);
-        console.log({ msg, signed });
-
-        const res = await AuthApis.login({
-          message: msg,
-          signature: signed,
-        });
-        if (!res || res.code) {
-          console.error('AuthApis.login', res);
-          throw new Error(res?.message || 'Cannot login');
-        }
-        if (!res.value.wallet) {
-          console.error('AuthApis.login', res);
-          res.value.wallet = address;
-        }
-        Env.setAuth(res.value);
-        useWalletStore.setState({
-          serverAuth: res.value,
-        });
-      } finally {
-        useWalletStore.setState({ serverAuthing: false });
-      }
-    },
-    /**
-     * 检查是否有服务端登入，且和当前wallet地址一致
-     */
-    checkServerAuth: () => {
-      const { address, serverAuth } = useWalletStore.getState();
-      if (serverAuth) {
-        if (address?.toLowerCase() != serverAuth.wallet?.toLowerCase()) {
-          // mismatch, let's signout
-          useWalletStore.disconnect();
-          Toast.error(
-            t({
-              enUS: 'Please login again',
-              zhCN: '请重新登入',
-            }),
-          );
-          return false;
-        }
-        return true;
-      }
-      return false;
+      await AuthService.login({ wallet: signer.address, message, signature });
     },
     setChain: async (chainId: number) => {
       await WalletService.switchNetwork(chainId);
@@ -265,31 +209,23 @@ export const useWalletStore = Object.assign(
       return WalletConnect.subscribeAccountChange((address) => {
         const originState = useWalletStore.getState();
         if (originState.address) useWalletStore.setState({ address });
-        if (
-          originState.serverAuth &&
-          originState.serverAuth.wallet?.toLowerCase() != address?.toLowerCase()
-        ) {
-          // Audrey Gray Shuyun 会商量一个更合适的 UI/文案，下面代码回头会启用
-          // 目前暂时在有 serverAuth 时，切钱包就登出
-          setTimeout(() => {
-            useWalletStore.disconnect();
-          }, 200);
-          /*
-          // 之前有服务端验证，这里需要重新验证
-          useWalletStore.serverAuth().catch((e) => {
-            useWalletStore.disconnect();
-            console.error('error while switch wallet + serverAuth', e);
-            Toast.error(t({
-              enUS: 'Please sign the login request in your wallet',
-              zhCN: '请在你的钱包里确认登入签名请求',
-            }));
-          });
-          */
-        }
       });
     },
   },
 );
+
+/**
+ * 检查是否有服务端登入，且和当前wallet地址一致
+ */
+export function useCheckAuth() {
+  const address = useWalletStore((state) => state.address);
+  useEffect(() => {
+    if (!address || AuthToken.get(address?.toLowerCase())) return;
+    // mismatch, let's signout
+    useWalletStore.disconnect();
+    Toast.error(t({ enUS: 'Please login again', zhCN: '请重新登入' }));
+  }, [address]);
+}
 
 setTimeout(() => {
   // 判断是否钱包是否还保持连接

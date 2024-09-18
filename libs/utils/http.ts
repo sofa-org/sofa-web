@@ -8,9 +8,17 @@ import axios, {
 import axiosRetry from 'axios-retry';
 import { noop } from 'lodash-es';
 
-import { Env } from './env';
 import { getErrorMsg, isTwoStringSame, jsonSafeParse } from './fns';
 import { sentry } from './sentry';
+import { UserStorage } from './storage';
+
+export const AuthToken = new UserStorage<string>(
+  'auth',
+  () =>
+    jsonSafeParse(localStorage.getItem('wallet-info'), {
+      state: { address: '' },
+    }).state.address,
+);
 
 // const codeMessage = {
 //   200: '服务器成功返回请求的数据。',
@@ -83,7 +91,7 @@ function applyAxiosRetry(
   axiosRetry(http, {
     shouldResetTimeout: true,
     retries: 3,
-    retryDelay: () => 100,
+    retryDelay: () => 500,
     onRetry,
     retryCondition: async (err) => {
       const config = err.config || err.response?.config;
@@ -126,10 +134,10 @@ const http = axios.create({
 http.interceptors.request.use(async (options: AxiosRequestConfig) => {
   const headers = new AxiosHeaders(options.headers as AxiosHeaders);
   const finalUri = axios.getUri(options);
-  const auth = Env.getAuth();
+  const auth = AuthToken.get();
   if (auth && /(^|\.)sofa\.org$|localhost/i.test(new URL(finalUri).hostname)) {
     // only send Authorization header to subdomain of sofa.org
-    headers.set('Authorization', `Bearer ${auth.token}`);
+    headers.set('Authorization', `Bearer ${auth}`);
   }
   if (/(^|\.)sofa\.org$|localhost/i.test(new URL(finalUri).hostname)) {
     options.withCredentials = true;
@@ -141,6 +149,7 @@ http.interceptors.request.use(async (options: AxiosRequestConfig) => {
   // }
   return { ...options, headers };
 });
+
 type ErrorObj = {
   response?: {
     data: {
@@ -153,6 +162,7 @@ type ErrorObj = {
     url?: string;
   };
 } & Error;
+
 http.interceptors.response.use(async (res) => {
   const response = ('response' in res && (res.response as typeof res)) || res;
   const options = response.config;

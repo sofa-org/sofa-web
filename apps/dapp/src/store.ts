@@ -1,7 +1,7 @@
 import { ContractsService } from '@sofa/services/contracts';
 import { MarketService } from '@sofa/services/market';
 import { VaultInfo } from '@sofa/services/products';
-import { AuthValue, Env } from '@sofa/utils/env';
+import { AuthValue } from '@sofa/utils/env';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -48,12 +48,6 @@ export const useGlobalState = Object.assign(
           interestRate: { ...pre.interestRate, [chainId]: interestRate },
         })),
       );
-    },
-    login(auth?: AuthValue) {
-      Env.setAuth(auth);
-      useGlobalState.setState({
-        auth,
-      });
     },
   },
 );

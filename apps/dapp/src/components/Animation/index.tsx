@@ -272,7 +272,6 @@ export const CAnimation = (props: AnimationProps) => {
             ...to,
             // markers: true,
             // onUpdate: (c) => {
-            //   console.info(1111, c, c.progress);
             // },
             ...(scrollTrigger
               ? {
