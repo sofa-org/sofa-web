@@ -61,12 +61,6 @@ export const PointRecords = () => {
   const columns = useMemo(() => {
     const tradeColumns = [
       {
-        key: 'product',
-        title: t({ enUS: 'Type', zhCN: '类型' }),
-        render: (_, it) =>
-          `${it.tradeInfoDTO?.depositCcy} ${it.categoryText.toUpperCase()}`,
-      },
-      {
         key: 'symbol',
         title: t({ enUS: 'Symbol', zhCN: '产品' }),
         render: (_, it) => {
@@ -82,6 +76,12 @@ export const PointRecords = () => {
           )}_${it.tradeInfoDTO.anchorPrices.join('-')}`;
         },
       },
+      {
+        key: 'product',
+        title: t({ enUS: 'Type', zhCN: '类型' }),
+        render: (_, it) =>
+          `${it.tradeInfoDTO?.depositCcy} ${it.categoryText.toUpperCase()}`,
+      },
     ] as ColumnProps<PointItem>[];
 
     return [
@@ -91,7 +91,6 @@ export const PointRecords = () => {
         render: (_, it) =>
           dayjs(it.tradeTimeSeconds * 1000).format('MMM DD YYYY'),
       },
-      ...(type === PointType.TRADE ? tradeColumns : []),
       {
         key: 'points',
         title: t({ enUS: 'Points', zhCN: '积分' }),
@@ -99,6 +98,7 @@ export const PointRecords = () => {
           <span className={styles['td-points']}>{it.points}</span>
         ),
       },
+      ...(type === PointType.TRADE ? tradeColumns : []),
     ] as ColumnProps<PointItem>[];
   }, [t, type]);
 

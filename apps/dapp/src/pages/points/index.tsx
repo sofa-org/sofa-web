@@ -119,11 +119,7 @@ const Points = () => {
             })}
           </p>
           <WalletConnector
-            style={{
-              width: 'fit-content',
-              transform: 'scale(1.5)',
-              transformOrigin: 'left top',
-            }}
+            className={styles['wallet-connector']}
             enableServerAuth
           />
         </div>

@@ -1,11 +1,11 @@
 .point-records {
   position: relative;
   z-index: 1;
-  width: 1240px;
-  margin: 64px 0 0;
-  padding: 24px;
+  width: min(1240px, 90vw);
+  margin: min(64px, 12vw) 0 0;
+  padding: min(24px, 4.4vw);
   color: #fff;
-  border-radius: 20px;
+  border-radius: min(20px, 4vw);
   background: #141414;
 }
 
@@ -14,30 +14,30 @@
 
   justify-content: flex-start;
   margin: 0;
-  font-size: 18px;
+  font-size: min(18px, 4vw);
 
   &::before {
     content: "";
     display: inline-block;
     width: 2px;
-    height: 16px;
+    height: min(16px, 3.5vw);
     background: $color-main-gradient;
   }
 }
 
 .tips {
-  font-size: 18px;
+  font-size: min(16px, 3.8vw);
   color: rgba(#fff, 0.65);
 }
 
 .btns {
-  gap: 12px;
-  margin: 12px 0;
+  gap: min(12px, 2.4vw);
+  margin: min(12px, 2.4vw) 0;
 
   :global {
     .radio-btn {
-      width: 85px;
-      height: 26px;
+      width: min(85px, 17vw);
+      height: min(26px, 7vw);
       color: rgba(#fff, 0.65);
       border-radius: 13px;
       background: #303030;
@@ -57,7 +57,7 @@
 }
 
 .table {
-  border-radius: 10px;
+  border-radius: min(10px, 2vw);
   overflow: hidden;
 
   th,
@@ -65,7 +65,9 @@
     @include regular;
 
     height: 46px;
+    font-size: min(14px, 3vw);
     background: #000 !important;
+    white-space: nowrap;
   }
 
   td {

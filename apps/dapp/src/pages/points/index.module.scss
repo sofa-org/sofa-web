@@ -8,22 +8,24 @@
   @include flex-center;
 
   justify-content: space-between;
+  flex-wrap: wrap;
   position: relative;
-  width: 1240px;
+  width: min(1240px, 90vw);
   margin: 0 auto;
-  padding: 80px 0;
+  padding: min(80px, 12vw) 0;
   color: #fff;
 
   &.section-column {
     flex-direction: column;
+    justify-content: center;
 
     &::before {
       content: "";
       position: absolute;
       left: 50%;
       top: 0;
-      width: 1440px;
-      height: 1064px;
+      width: min(1440px, 100vw);
+      height: min(1064px, 80vw);
       background: url("./assets/bg-light.png") no-repeat top center / 1440px
         auto;
       transform: translate(-50%, 0);
@@ -33,43 +35,57 @@
 }
 
 .content {
+  flex: 1;
   position: relative;
   z-index: 1;
+  min-width: 300px;
 }
 
 .title {
   @include bold;
   @include gradient;
 
-  font-size: 80px;
-  margin: 0 0 12px;
+  font-size: min(80px, 9vw);
+  margin: 0 0 min(12px, 2vw);
 }
 
 .desc {
-  font-size: 32px;
-  line-height: 40px;
-  margin: 0 0 16px;
+  font-size: min(32px, 5vw);
+  line-height: 1.5;
+  margin: 0 0 min(16px, 3vw);
   color: rgba(#fff, 0.65);
 }
 
+.wallet-connector {
+  width: fit-content;
+  min-width: 120px;
+  transform: scale(1.5);
+  transform-origin: left top;
+}
+
 .img-wrapper {
+  flex: 1;
   position: relative;
-  top: -80px;
-  width: 570px;
+  top: max(-80px, -12.6vw);
+  width: min(570px, 90vw);
+  min-width: min(570px, 90vw);
+  height: min(438px, 69.2vw);
 
   .bg-gif {
     position: absolute;
-    left: -30px;
-    bottom: -207px;
+    right: min(200px, 31.6vw);
+    bottom: max(-207px, -32.7vw);
+    width: min(400px, 63.2vw);
+    height: min(400px, 63.2vw);
   }
 
   .img-1 {
-    position: relative;
-    left: 60px;
-    top: 60px;
+    position: absolute;
+    right: max(-30px, -4.7vw);
+    top: min(60px, 9.5vw);
     z-index: 1;
-    width: 558px;
-    height: 438px;
+    width: min(558px, 88.1vw);
+    height: min(438px, 69.2vw);
   }
 }
 
@@ -77,27 +93,28 @@
   @include bold;
   @include gradient;
 
-  font-size: 42px;
-  margin: -70px 0 26px;
+  font-size: min(42px, 5vw);
+  margin: 60px 0 26px;
 }
 
 .desc-1 {
-  font-size: 20px;
-  line-height: 30px;
+  margin: 0 0 130px;
+  font-size: min(20px, 3vw);
+  line-height: min(30px, 4.5vw);
 
   .desc-item {
     display: block;
     position: relative;
-    margin: 0 0 12px;
-    padding: 0 0 0 20px;
+    margin: 0 0 min(12px, 1.5vw);
+    padding: 0 0 0 min(20px, 3.2vw);
 
     &::before {
       content: "";
       position: absolute;
       left: 0;
-      top: 15px;
-      width: 6px;
-      height: 6px;
+      top: min(15px, 2.25vw);
+      width: min(6px, 1vw);
+      height: min(6px, 1vw);
       border-radius: 50%;
       background: #fff;
       transform: translate(0, -50%);
@@ -107,21 +124,22 @@
 
 .img-wrapper-1 {
   position: relative;
-  width: 450px;
+  width: min(450px, 90vw);
+  margin: 0 min(60px, 10vw) 0 max(-50px, -8vw);
 
   .bg-cloud {
     position: absolute;
     top: 0;
     left: 0;
-    width: 1440px;
-    height: 570px;
+    width: min(1440px, 227.4vw);
+    height: min(570px, 90vw);
     filter: blur(20px);
   }
 
   .img-2 {
     position: relative;
-    width: 450px;
-    height: 450px;
+    width: min(450px, 71vw);
+    height: min(450px, 71vw);
   }
 }
 
@@ -130,10 +148,10 @@
   @include pointer;
   @include bold;
 
-  height: 38px;
-  padding: 0 32px;
+  height: min(38px, 6vw);
+  padding: 0 min(32px, 4vw);
   margin: 0;
-  border-radius: 19px;
+  border-radius: min(19px, 3vw);
   color: #000;
   background: $color-main-gradient;
 }
@@ -144,27 +162,24 @@
 
   position: relative;
   z-index: 2;
-  font-size: 36px;
-  margin: 0 0 70px;
+  font-size: min(36px, 5vw);
+  margin: 0 0 min(70px, 12vw);
 }
 
 .my-points {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  border-radius: 20px;
+  width: 100% !important;
+  margin: -100px 0 0;
+  border-radius: min(20px, 4vw);
   background: $color-main-gradient;
 
   h3 {
     @include flex-center;
 
     justify-content: flex-start;
-    height: 52px;
+    height: min(52px, 8vw);
     margin: 0;
-    padding: 0 32px;
-    font-size: 20px;
+    padding: 0 min(32px, 6vw);
+    font-size: min(20px, 4vw);
   }
 }
 
@@ -172,20 +187,20 @@
   @include flex-center;
 
   justify-content: space-between;
-  border-radius: 19px;
-  padding: 30px;
+  border-radius: min(19px, 4vw);
+  padding: min(30px, 6vw);
   background: #141414;
   border: 1px solid rgba(#fff, 0.2);
 
   > div {
     @include bold;
 
-    font-size: 60px;
+    font-size: min(60px, 9vw);
 
     img {
-      width: 52px;
-      height: 52px;
-      margin: 0 18px 0 0;
+      width: min(52px, 8vw);
+      height: min(52px, 8vw);
+      margin: 0 min(18px, 3vw) 0 0;
     }
   }
 
@@ -199,14 +214,17 @@
 
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 40px;
+  gap: min(40px, 8vw);
 
   .card {
+    align-self: stretch;
     position: relative;
-    width: 600px;
+    flex: 1;
+    width: min(600px, 90vw);
+    min-width: calc((100% - min(40px, 8vw)) / 2);
     margin: 0;
-    padding: 42px 24px;
-    border-radius: 40px;
+    padding: min(24px, 4.4vw);
+    border-radius: min(30px, 6vw);
     border: 1px solid rgba(#fff, 0.2);
     background: #171717;
 
@@ -229,9 +247,9 @@
     margin: 0;
 
     img {
-      width: 80px;
-      padding: 14px;
-      border-radius: 10px 10px 0 0;
+      width: min(80px, 16vw);
+      padding: min(14px, 3vw);
+      border-radius: min(10px, 2vw) min(10px, 2vw) 0 0;
       background: #232323;
     }
   }
@@ -239,20 +257,20 @@
   .card-header-right {
     @include flex-center;
 
-    gap: 12px;
+    gap: min(12px, 2vw);
     margin: 0;
   }
 
   .card-link {
     @include flex-center;
 
-    border-radius: 8px;
+    border-radius: min(8px, 1.5vw);
     overflow: hidden;
     background-color: #232323;
 
     img {
-      width: 60px;
-      height: 60px;
+      width: min(60px, 12vw);
+      height: min(60px, 12vw);
       padding: 0;
       background-color: transparent;
       filter: grayscale(1);
@@ -272,9 +290,10 @@
   }
 
   .card-content {
+    height: calc(100% - min(80px, 16vw));
     margin: 0;
-    padding: 32px 24px;
-    border-radius: 0 10px 10px;
+    padding: min(32px, 6vw) min(24px, 4vw);
+    border-radius: 0 min(10px, 2vw) min(10px, 2vw);
     background: #232323;
   }
 
@@ -282,10 +301,10 @@
     @include flex-center;
 
     width: fit-content;
-    height: 26px;
-    margin: 0 0 12px;
+    height: min(26px, 4.8vw);
+    margin: 0 0 min(12px, 2vw);
     padding: 0 6px;
-    font-size: 16px;
+    font-size: min(16px, 3vw);
     border-radius: 2px;
     background: #393939;
   }
@@ -296,12 +315,40 @@
 
     width: fit-content;
     margin: 0 0 8px;
-    font-size: 20px;
+    font-size: min(20px, 4vw);
   }
 
   .card-desc {
     margin: 0;
-    font-size: 14px;
+    font-size: min(14px, 3.2vw);
     color: rgba(#fff, 0.65);
+  }
+}
+
+@media (orientation: portrait) {
+  .wallet-connector {
+    transform: scale(1.1);
+  }
+
+  .img-wrapper {
+    right: -5vw;
+    transform: scale(0.8);
+    transform-origin: center right;
+  }
+
+  .img-wrapper-1 {
+    left: -10vw;
+    margin-top: -30vw;
+    margin-left: 0;
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+
+  .title-1 {
+    margin: -10vw 0 3vw;
+  }
+
+  .card {
+    min-width: min(360px, 90vw) !important;
   }
 }
