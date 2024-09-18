@@ -52,8 +52,8 @@ const cards = [
       }),
     desc: (t: TFunction) =>
       t({
-        enUS: 'Distributed according to the final snapshot data.',
-        zhCN: '根据最终快照数据进行分发。',
+        enUS: 'Including but not limited to trading, gaming, and burning.',
+        zhCN: '包括但不限于交易、游戏和销毁。',
       }),
     btns: [
       {

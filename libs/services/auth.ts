@@ -14,21 +14,18 @@ export class AuthService {
   private static async $login(params: { message: string; signature: string }) {
     return http.post<
       unknown,
-      HttpResponse<{ uid: number; token: string; wallet: string }>
+      HttpResponse<{ uid: number; token: string; lastLoginTimestamp: number }>
     >(`${prefix}/login`, params);
   }
 
   static async login(params: {
-    wallet?: string;
+    wallet: string;
     message: string;
     signature: string;
   }) {
     return AuthService.$login(params).then((res) => {
-      if (!res.value.wallet) throw new Error('Login failed');
-      AuthToken.set(
-        res.value.token,
-        (params.wallet ?? res.value.wallet).toLowerCase(),
-      );
+      if (!res.value.token) throw new Error('Login failed');
+      AuthToken.set(res.value.token, params.wallet.toLowerCase());
       return res;
     });
   }
