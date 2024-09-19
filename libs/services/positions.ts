@@ -266,19 +266,22 @@ export class PositionsService {
       : ProductsService.filterVaults(ContractsService.vaults, params, true).map(
           (it) => it.vault.toLowerCase(),
         );
-    const res = await http.post<unknown, HttpResponse<TransactionInfo[]>>('', {
-      chainId: params.chainId,
-      taker: params.minter,
-      vaults: vault_in,
-      endDateTime: extra?.cursor ?? params.expiry,
-      claimParams: {
-        term: params.term,
-        expiry: params.expiry,
-        anchorPrices: params.anchorPrices,
-        collateralAtRiskPercentage: params.collateralAtRiskPercentage,
-        maker: 1,
-      },
-    } as TransactionParams);
+    const res = await http.post<unknown, HttpResponse<TransactionInfo[]>>(
+      '/rfq/transaction-list',
+      {
+        chainId: params.chainId,
+        taker: params.minter,
+        vaults: vault_in,
+        endDateTime: extra?.cursor ?? params.expiry,
+        claimParams: {
+          term: params.term,
+          expiry: params.expiry,
+          anchorPrices: params.anchorPrices,
+          collateralAtRiskPercentage: params.collateralAtRiskPercentage,
+          maker: 0,
+        },
+      } as TransactionParams,
+    );
 
     return {
       cursor: res.value[res.value.length - 1]?.createdAt,
