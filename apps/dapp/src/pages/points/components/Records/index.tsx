@@ -21,8 +21,14 @@ export const PointTypeRefs = objectValCvt(
     [PointType.GAME]: {
       label: (t: TFunction) => t({ enUS: 'Game', zhCN: '游戏' }),
     },
+    [PointType.TG]: {
+      label: (t: TFunction) => t({ enUS: 'Telegram', zhCN: 'Telegram' }),
+    },
     [PointType.BURN]: {
       label: (t: TFunction) => t({ enUS: 'Trade', zhCN: '销毁' }),
+    },
+    [PointType.HOLDER]: {
+      label: (t: TFunction) => t({ enUS: 'Holder', zhCN: '持有' }),
     },
     [PointType.OTHER]: {
       label: (t: TFunction) => t({ enUS: 'Other', zhCN: '其它' }),
@@ -83,6 +89,13 @@ export const PointRecords = () => {
           `${it.tradeInfoDTO?.depositCcy} ${it.categoryText.toUpperCase()}`,
       },
     ] as ColumnProps<PointItem>[];
+    const tgColumns = [
+      {
+        key: 'tg',
+        title: 'TG账号',
+        render: (_, it) => it.tgConvertInfoDTO?.tgId || '-',
+      },
+    ] as ColumnProps<PointItem>[];
 
     return [
       {
@@ -99,6 +112,7 @@ export const PointRecords = () => {
         ),
       },
       ...(type === PointType.TRADE ? tradeColumns : []),
+      ...(type === PointType.TG ? tgColumns : []),
     ] as ColumnProps<PointItem>[];
   }, [t, type]);
 

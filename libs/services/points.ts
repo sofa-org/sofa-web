@@ -2,10 +2,12 @@ import { applyMock } from '@sofa/utils/decorators';
 import { http } from '@sofa/utils/http';
 
 export enum PointType {
-  TRADE = 'trade',
-  GAME = 'game',
-  BURN = 'burn',
-  OTHER = 'other',
+  TRADE = 'TRADE',
+  GAME = 'GAME',
+  TG = 'TELEGRAM',
+  BURN = 'BURN',
+  HOLDER = 'HOLDER',
+  OTHER = 'OTHER',
 }
 
 export interface PointItem {
@@ -21,6 +23,15 @@ export interface PointItem {
     anchorPrices: (string | number)[]; // 价格列表
     expiry: number; // 到期时间
     rfqType: 'DNT' | 'BULL_TREND' | 'BEAR_TREND';
+  };
+  tgConvertInfoDTO?: {
+    // TG 交易
+    tgId: string; // telegram id
+    type: 'Convert';
+  };
+  otherConvertInfoDTO?: {
+    // 其他交易
+    type: string;
   };
 }
 
