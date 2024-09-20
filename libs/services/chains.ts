@@ -118,7 +118,7 @@ export const ChainMap: Record<
     56: {
       chainId: 56,
       isTest: false,
-      name: 'BNB Smart Chain',
+      name: 'BNB Chain',
       currency: 'BNB',
       icon: IconBNB,
       explorerUrl: 'https://bscscan.com',
