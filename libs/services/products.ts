@@ -4,7 +4,7 @@ import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import Big from 'big.js';
-import { pick, uniq } from 'lodash-es';
+import { omit, pick, uniq } from 'lodash-es';
 
 import {
   ContractsService,
@@ -54,6 +54,26 @@ export interface QuoteInfo {
   signature?: string; // 签名（可空）
 }
 
+export interface WinningProbabilitiesParams {
+  forCcy: string;
+  expiry: number;
+  anchorPrices: (string | number)[];
+}
+
+export interface WinningProbabilities {
+  probDntStayInRange?: number; // DNT预估始终在区间的概率 报价不适用时为空
+  probBullTrendItmLowerStrike?: number; // 到期比LowerStrike高的概率 报价不适用时为空
+  probBullTrendItmUpperStrike?: number; // 到期比UpperStrike高的概率 报价不适用时为空
+  probBearTrendItmLowerStrike?: number; // 到期比LowerStrike低的概率 报价不适用时为空
+  probBearTrendItmUpperStrike?: number; // 到期比UpperStrike低的概率 报价不适用时为空
+}
+
+export interface WinningProbabilitiesResult {
+  spotPrice: string | number;
+  timestamp: number;
+  probabilities: WinningProbabilities;
+}
+
 export interface CalculatedInfo {
   amounts: {
     counterparty: string | number; // 对手方出的钱
@@ -93,13 +113,6 @@ export interface CalculatedInfo {
     max: string | number; // 对赌全赢的情况对应的赔率
   };
   relevantDollarPrices: { ccy: string; price: string | number }[]; // 计算 RCH 年化时的币种价格
-  winningProbability: {
-    probDntStayInRange?: number; // DNT预估始终在区间的概率 报价不适用时为空
-    probBullTrendItmLowerStrike?: number; // 到期比LowerStrike高的概率 报价不适用时为空
-    probBullTrendItmUpperStrike?: number; // 到期比UpperStrike高的概率 报价不适用时为空
-    probBearTrendItmLowerStrike?: number; // 到期比LowerStrike低的概率 报价不适用时为空
-    probBearTrendItmUpperStrike?: number; // 到期比UpperStrike低的概率 报价不适用时为空
-  };
 }
 
 export interface OriginProductQuoteResult extends CalculatedInfo {
@@ -365,6 +378,37 @@ export class ProductsService {
       lowerStrike: data.anchorPrices[0],
       upperStrike: data.anchorPrices[1],
     }).then((res) => ProductsService.dealOriginQuote(res.value));
+  }
+
+  @asyncCache({
+    until: (_, createdAt) => !createdAt || Date.now() - createdAt >= 30000,
+    id: (name, [type, params]) => {
+      const { forCcy, expiry, anchorPrices } =
+        params as WinningProbabilitiesParams;
+      return `${name}-${type}-${forCcy}-${expiry}-${anchorPrices.join(',')}`;
+    },
+  })
+  static async winningProbabilities(
+    type: ProductType,
+    params: WinningProbabilitiesParams,
+  ) {
+    const urls: PartialRecord<ProductType, string> = {
+      [ProductType.DNT]: '/rfq/dnt/winning-probabilities',
+      [ProductType.BullSpread]: '/rfq/smart-trend/winning-probabilities',
+      [ProductType.BearSpread]: '/rfq/smart-trend/winning-probabilities',
+    };
+    if (!urls[type]) return Promise.reject();
+    return http
+      .get<unknown, HttpResponse<WinningProbabilitiesResult>>(urls[type]!, {
+        params: {
+          ...omit(params, 'anchorPrices'),
+          lowerBarrier: params.anchorPrices[0],
+          upperBarrier: params.anchorPrices[1],
+          lowerStrike: params.anchorPrices[0],
+          upperStrike: params.anchorPrices[1],
+        },
+      })
+      .then((res) => res.value);
   }
 
   static genProtectedApyList(apy: number | undefined, dev = false) {

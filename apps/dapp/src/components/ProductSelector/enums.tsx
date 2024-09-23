@@ -1,10 +1,13 @@
 import { TFunction } from '@sofa/services/i18n';
-import { CalculatedInfo, ProductType, RiskType } from '@sofa/services/products';
+import {
+  ProductType,
+  RiskType,
+  WinningProbabilities,
+} from '@sofa/services/products';
 import { displayPercentage } from '@sofa/utils/amount';
 
 import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
-import enUS from '@/locales/en-US';
 
 import iconDntProtected from './assets/dnt-protected.png';
 import iconDntProtectedInverse from './assets/dnt-protected-inverse.png';
@@ -142,7 +145,7 @@ export const ProductTypeRefs = {
     disabled: false,
     probability: (
       t: TFunction,
-      probability: CalculatedInfo['winningProbability'],
+      probability: WinningProbabilities,
       strikes: (string | number)[],
     ) => [
       t(
@@ -245,7 +248,7 @@ export const ProductTypeRefs = {
     disabled: false,
     probability: (
       t: TFunction,
-      probability: CalculatedInfo['winningProbability'],
+      probability: WinningProbabilities,
       strikes: (string | number)[],
     ) => [
       t(
@@ -339,7 +342,7 @@ export const ProductTypeRefs = {
     disabled: false,
     probability: (
       t: TFunction,
-      probability: CalculatedInfo['winningProbability'],
+      probability: WinningProbabilities,
       strikes: (string | number)[],
     ) => [
       t(

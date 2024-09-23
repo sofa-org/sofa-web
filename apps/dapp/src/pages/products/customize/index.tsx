@@ -224,6 +224,22 @@ const ProductCustomize = () => {
     };
   }, [customDev, expiries]);
 
+  const winningProbability = useAsyncMemo(async () => {
+    if (
+      !product?.vault.forCcy ||
+      !product?.expiry ||
+      !product?.anchorPrices?.[0] ||
+      !product?.anchorPrices?.[1]
+    ) {
+      return undefined;
+    }
+    return ProductsService.winningProbabilities(product.vault.productType, {
+      forCcy: product.vault.forCcy,
+      expiry: product.expiry,
+      anchorPrices: product.anchorPrices,
+    });
+  }, [product]);
+
   return (
     <>
       <ProductBanner title={<></>} />
@@ -306,7 +322,7 @@ const ProductCustomize = () => {
                   mustIncludeAtm={productType === ProductType.DNT}
                   productType={productType}
                   anchorPrices={product?.anchorPrices}
-                  winningProbability={quoteInfo?.winningProbability}
+                  winningProbability={winningProbability?.probabilities}
                 />
               </div>
             </div>

@@ -8,9 +8,9 @@ import {
 import { Popover, Toast } from '@douyinfe/semi-ui';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  CalculatedInfo,
   ProductsService,
   ProductType,
+  WinningProbabilities,
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
@@ -48,7 +48,7 @@ export interface PriceRangeInputProps
   mustIncludeAtm?: boolean;
   productType?: ProductType;
   anchorPrices?: (string | number)[];
-  winningProbability?: CalculatedInfo['winningProbability'];
+  winningProbability?: WinningProbabilities;
 }
 
 const toNum = (it?: string | number) => (it ? Number(it) : it);
@@ -217,7 +217,7 @@ export const PriceRangeInputEl = (
           <input placeholder={t('Upper')} onBlur={(e) => onInputBlur(e, 1)} />
         </div>
       </div>
-      {Env.isPre &&
+      {!Env.isProd &&
         props.productType &&
         props.winningProbability &&
         props.anchorPrices && (
