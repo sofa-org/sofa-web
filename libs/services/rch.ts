@@ -190,7 +190,7 @@ export class RCHService {
       'burn',
       (gasLimit?: number) => [
         ethers.parseUnits(amount, 18),
-        ...(gasLimit ? [{ gasLimit }] : []),
+        ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
       ],
     );
   }
@@ -209,7 +209,7 @@ export class RCHService {
       indexes,
       amounts,
       proofs,
-      ...(gasLimit ? [{ gasLimit }] : []),
+      ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
     ];
     const hash = await ContractsService.dirtyCall(
       airdropContract,

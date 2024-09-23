@@ -153,7 +153,7 @@ export class WalletService {
       (gasLimit?: number) => [
         approveTo,
         allowAmount ? String(allowAmount) : ethers.MaxUint256,
-        ...(gasLimit ? [{ gasLimit }] : []),
+        ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
       ],
     );
     const network = await signer.provider._detectNetwork();
@@ -234,7 +234,9 @@ export class WalletService {
       const args = (gasLimit?: number) => [
         params,
         '0x837f487ec9e1C65bf960e7c3652b409EAD9fAb24',
-        ...(gasLimit ? [{ value: amount, gasLimit }] : [{ value: amount }]),
+        ...(gasLimit
+          ? [{ value: amount, gasLimit }]
+          : [{ value: amount, blockTag: 'pending' }]),
       ];
       const method =
         'mint((uint256,uint256[2],uint256,uint256,uint256,address,bytes),address)';
@@ -257,7 +259,7 @@ export class WalletService {
         data.quote.totalCollateral,
         params,
         '0x837f487ec9e1C65bf960e7c3652b409EAD9fAb24',
-        ...(gasLimit ? [{ gasLimit }] : []),
+        ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
       ];
       const method =
         data.vault.riskType === RiskType.RISKY
@@ -279,7 +281,7 @@ export class WalletService {
       sign,
       nonce,
       '0x837f487ec9e1C65bf960e7c3652b409EAD9fAb24',
-      ...(gasLimit ? [{ gasLimit }] : []),
+      ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
     ];
     return ContractsService.dirtyCall(contract, 'mint', args);
   }
@@ -319,7 +321,9 @@ export class WalletService {
         totalCollaterals,
         params,
         '0x837f487ec9e1C65bf960e7c3652b409EAD9fAb24',
-        ...(gasLimit ? [{ value, gasLimit }] : [{ value }]),
+        ...(gasLimit
+          ? [{ value, gasLimit }]
+          : [{ value, blockTag: 'pending' }]),
       ];
       return ContractsService.dirtyCall(contract, 'mintBatch', args);
     }
@@ -340,7 +344,7 @@ export class WalletService {
         totalCollaterals,
         params,
         '0x837f487ec9e1C65bf960e7c3652b409EAD9fAb24',
-        ...(gasLimit ? [{ gasLimit }] : []),
+        ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
       ];
       return ContractsService.dirtyCall(contract, 'mintBatch', args);
     }
@@ -360,7 +364,7 @@ export class WalletService {
       nonce,
       deadline,
       '0x837f487ec9e1C65bf960e7c3652b409EAD9fAb24',
-      ...(gasLimit ? [{ gasLimit }] : []),
+      ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
     ];
     return ContractsService.dirtyCall(contract, 'mintBatch', args);
   }
@@ -470,7 +474,7 @@ export class WalletService {
         ? [data.collateralAtRiskPercentage]
         : []),
       data.isMaker,
-      ...(gasLimit ? [{ gasLimit }] : []),
+      ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
     ];
     return ContractsService.dirtyCall(
       contract,
@@ -513,7 +517,10 @@ export class WalletService {
       return ContractsService.dirtyCall(
         contract,
         claimCcy === 'ETH' ? 'ethBurnBatch' : 'burnBatch',
-        (gasLimit?: number) => [params, ...(gasLimit ? [{ gasLimit }] : [])],
+        (gasLimit?: number) => [
+          params,
+          ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
+        ],
       );
     };
     return Promise.all(
