@@ -102,7 +102,7 @@ export const PointRecords = () => {
         key: 'time',
         title: t({ enUS: 'Time', zhCN: '时间' }),
         render: (_, it) =>
-          dayjs(it.tradeTimeSeconds * 1000).format('MMM DD YYYY'),
+          dayjs(it.generateTimeSeconds * 1000).format('MMM DD YYYY'),
       },
       {
         key: 'points',

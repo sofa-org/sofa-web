@@ -15,7 +15,7 @@ window.mockData.pointPage = () => ({
     values: [...Array(19)].map(() => {
       const forCcy = ['BTC', 'ETH'][Math.floor(Math.random() * 2)];
       return {
-        tradeTimeSeconds: Date.now() / 1000,
+        generateTimeSeconds: Date.now() / 1000,
         points: Math.round(Math.random() * 100),
         categoryText: ['earn', 'surge', 'leverage'][
           Math.floor(Math.random() * 3)
