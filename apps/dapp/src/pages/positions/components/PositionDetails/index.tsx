@@ -35,6 +35,7 @@ import {
   PositionClaimProgress,
   PositionClaimProgressRef,
 } from '../ClaimProgress';
+import { judgeSettled } from '../PositionCard';
 
 import locale from './locale';
 
@@ -55,7 +56,11 @@ const PositionDetails = (props: PositionDetailsProps) => {
     () => product.expiry * 1000 - Date.now(),
     [product.expiry],
   );
-  const hasExpired = leftTime < -10 * MsIntervals.min;
+  const hasExpired = leftTime < 0;
+  const hasSettled = useMemo(
+    () => judgeSettled(product.expiry),
+    [product.expiry],
+  );
 
   const isWin = useMemo(() => {
     if (position.product.vault.riskType === RiskType.RISKY)
@@ -301,7 +306,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
             className={styles['calculation']}
           />
         </div>
-        {product.vault.riskType === RiskType.RISKY && hasExpired && (
+        {product.vault.riskType === RiskType.RISKY && hasSettled && (
           <div
             className={styles['result-badge']}
             style={{
@@ -315,7 +320,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
           <span className={styles['status']}>{t('CLAIMED')}</span>
         ) : hasExpired ? (
           !!Number(position.amounts.redeemable) &&
-          hasExpired && (
+          hasSettled && (
             <AsyncButton
               type="primary"
               theme="solid"
