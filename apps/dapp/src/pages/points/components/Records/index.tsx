@@ -89,6 +89,18 @@ export const PointRecords = () => {
           `${it.tradeInfoDTO?.depositCcy} ${it.categoryText.toUpperCase()}`,
       },
     ] as ColumnProps<PointItem>[];
+    const gameColumns = [
+      {
+        key: 'type',
+        title: t({ enUS: 'Type', zhCN: '类型' }),
+        render: (_, it) => it.categoryText,
+      },
+      {
+        key: 'type-detail',
+        title: t({ enUS: 'Type Detail', zhCN: '类型补充' }),
+        render: (_, it) => it.otherConvertInfoDTO?.type,
+      },
+    ] as ColumnProps<PointItem>[];
     const tgColumns = [
       {
         key: 'tg',
@@ -112,6 +124,7 @@ export const PointRecords = () => {
         ),
       },
       ...(type === PointType.TRADE ? tradeColumns : []),
+      ...(type === PointType.GAME ? gameColumns : []),
       ...(type === PointType.TG ? tgColumns : []),
     ] as ColumnProps<PointItem>[];
   }, [t, type]);

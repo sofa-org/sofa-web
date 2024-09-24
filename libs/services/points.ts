@@ -13,7 +13,7 @@ export enum PointType {
 export interface PointItem {
   generateTimeSeconds: number; // 时间戳，精确到秒
   points: string; // 积分数量
-  categoryText: 'earn' | 'surge' | 'leverage'; // earn surge leverage
+  categoryText: string; // earn surge leverage GAME-RANK GAME-DRAW
   wallet: string; // 钱包地址
   categoryId: number; //
   tradeInfoDTO?: {
