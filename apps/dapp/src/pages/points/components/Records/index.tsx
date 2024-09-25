@@ -90,16 +90,16 @@ export const PointRecords = () => {
       },
     ] as ColumnProps<PointItem>[];
     const gameColumns = [
-      {
-        key: 'type',
-        title: t({ enUS: 'Type', zhCN: '类型' }),
-        render: (_, it) => it.categoryText,
-      },
-      {
-        key: 'type-detail',
-        title: t({ enUS: 'Type Detail', zhCN: '类型补充' }),
-        render: (_, it) => it.otherConvertInfoDTO?.type,
-      },
+      // {
+      //   key: 'type',
+      //   title: t({ enUS: 'Type', zhCN: '类型' }),
+      //   render: (_, it) => it.categoryText,
+      // },
+      // {
+      //   key: 'type-detail',
+      //   title: t({ enUS: 'Type Detail', zhCN: '类型补充' }),
+      //   render: (_, it) => it.otherConvertInfoDTO?.type,
+      // },
     ] as ColumnProps<PointItem>[];
     const tgColumns = [
       {
