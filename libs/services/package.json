@@ -22,6 +22,7 @@
     "@types/crypto-js": "^4.2.2",
     "@types/lodash-es": "^4.17.11",
     "@types/papaparse": "^5.3.14",
+    "@types/react": "^18.2.15",
     "@uniswap/permit2-sdk": "^1.2.0",
     "@uxuycom/web3-tg-sdk": "^0.0.5",
     "@web3modal/ethers": "^4.2.3",
@@ -32,6 +33,7 @@
     "i18next": "^23.6.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^5.0.3",
-    "papaparse": "^5.4.1"
+    "papaparse": "^5.4.1",
+    "react": "^18.2.0"
   }
 }

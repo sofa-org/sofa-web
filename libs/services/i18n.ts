@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-useless-escape */
-import { useLazyCallback } from '@sofa/utils/hooks';
+import { useCallback } from 'react';
 import MD5 from 'crypto-js/md5';
 import i18next, { i18n, TFunction as _TFunction } from 'i18next';
 
@@ -80,17 +80,20 @@ export function useTranslation(
     throw new Error(`${configReactI18next.name} must be called during init`);
   }
   const [_t, _i18next, ready] = useTranslation_(defaultNS, options);
-  const $$t = useLazyCallback((index: AI18nStringIndex, params?: object) => {
-    return _t(getKey(index), {
-      ns:
-        typeof index === 'string' || !index.package
-          ? defaultNS || undefined
-          : index.package,
-      returnObjects: true,
-      defaultValue: getDefaultValue(index, _i18next),
-      ...params,
-    }) as any;
-  });
+  const $$t = useCallback(
+    (index: AI18nStringIndex, params?: object) => {
+      return _t(getKey(index), {
+        ns:
+          typeof index === 'string' || !index.package
+            ? defaultNS || undefined
+            : index.package,
+        returnObjects: true,
+        defaultValue: getDefaultValue(index, _i18next),
+        ...params,
+      }) as any;
+    },
+    [_t, defaultNS, _i18next],
+  );
   return [$$t, _i18next, ready];
 }
 const packageValidationRegex = /^[\w\-]+$/;
