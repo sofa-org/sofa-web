@@ -25,7 +25,7 @@ export const PointTypeRefs = objectValCvt(
       label: (t: TFunction) => t({ enUS: 'Telegram', zhCN: 'Telegram' }),
     },
     [PointType.BURN]: {
-      label: (t: TFunction) => t({ enUS: 'Trade', zhCN: '销毁' }),
+      label: (t: TFunction) => t({ enUS: 'Burn', zhCN: '销毁' }),
     },
     [PointType.HOLDER]: {
       label: (t: TFunction) => t({ enUS: 'Holder', zhCN: '持有' }),
