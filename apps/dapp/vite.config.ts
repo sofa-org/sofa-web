@@ -99,8 +99,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks: (id: string) => {
           const name = id.match(/[^/]+(?=@)/)?.[0].replace(/[+]/g, '/');
           if (!name) return undefined;
-          if (/dayjs|date-fns/.test(name)) return 'time';
-          if (/big.js|bignumber/i.test(name)) return 'number';
+          if (/dayjs|date-fns|moment/.test(name)) return 'time';
           if (/axios/.test(name)) return 'axios';
           if (/lodash/.test(name)) return 'lodash';
           if (/^react$|^react-dom|^react-router/.test(name)) return 'react';
