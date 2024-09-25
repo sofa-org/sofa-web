@@ -1,7 +1,6 @@
-import { RefObject, useRef, useState } from 'react';
+import { RefObject, useRef } from 'react';
 import { MouseRotate3D } from '@sofa/effects/MouseRotate3D';
 import { Env } from '@sofa/utils/env';
-import Spline from '@splinetool/react-spline';
 import classNames from 'classnames';
 
 import videoAtom from './assets/atom.webm';
@@ -139,9 +138,9 @@ const SplineModel = (
   const ref = useRef<HTMLDivElement>(null);
   const model = models[props.id];
 
-  const [loading, setLoading] = useState(() =>
-    model.resource.endsWith('splinecode'),
-  );
+  // const [loading, setLoading] = useState(() =>
+  //   model.resource.endsWith('splinecode'),
+  // );
 
   const img = (isLoading?: boolean) => (
     <img
@@ -165,22 +164,23 @@ const SplineModel = (
       return <MouseRotate3D perspective={300}>{img()}</MouseRotate3D>;
     }
     if (model.resource.endsWith('splinecode')) {
-      return (
-        <>
-          <Spline
-            ref={props.elRef as never}
-            scene={model.resource}
-            style={{
-              width: '111%',
-              height: '111%',
-              opacity: loading ? 0 : 1,
-            }}
-            renderOnDemand
-            onLoad={(e) => setLoading(false)}
-          />
-          {loading && img(true)}
-        </>
-      );
+      return <>Spline model is not supported</>;
+      // return (
+      //   <>
+      //     <Spline
+      //       ref={props.elRef as never}
+      //       scene={model.resource}
+      //       style={{
+      //         width: '111%',
+      //         height: '111%',
+      //         opacity: loading ? 0 : 1,
+      //       }}
+      //       renderOnDemand
+      //       onLoad={(e) => setLoading(false)}
+      //     />
+      //     {loading && img(true)}
+      //   </>
+      // );
     }
     return <video src={model.resource} autoPlay loop muted />;
   })();

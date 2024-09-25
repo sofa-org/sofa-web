@@ -96,11 +96,19 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'lodash-es': ['lodash-es'],
-          react: ['react', 'react-dom'],
-          ui: ['@douyinfe/semi-ui'],
-          sentry: ['@sentry/integrations', '@sentry/react', '@sentry/tracing'],
+        manualChunks: (id: string) => {
+          const name = id.match(/[^/]+(?=@)/)?.[0].replace(/[+]/g, '/');
+          if (!name) return undefined;
+          if (/dayjs|date-fns/.test(name)) return 'time';
+          if (/big.js|bignumber/i.test(name)) return 'number';
+          if (/axios/.test(name)) return 'axios';
+          if (/lodash/.test(name)) return 'lodash';
+          if (/^react$|^react-dom|^react-router/.test(name)) return 'react';
+          if (/semi-|swiper/.test(name)) return 'ui';
+          if (/web3modal|walletconnect|uxuycom|uniswap|ethers/.test(name))
+            return 'wallet';
+          if (/chart/.test(name)) return 'chart';
+          if (/sentry/.test(name)) return 'sentry';
         },
       },
     },
