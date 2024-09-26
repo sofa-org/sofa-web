@@ -8,6 +8,7 @@ import { useInfiniteScroll } from 'ahooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
+import CEmpty from '@/components/Empty';
 import RadioBtnGroup from '@/components/RadioBtnGroup';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
@@ -15,11 +16,11 @@ import styles from './index.module.scss';
 
 export const PointTypeRefs = objectValCvt(
   {
-    [PointType.TRADE]: {
-      label: (t: TFunction) => t({ enUS: 'Trade', zhCN: '交易' }),
-    },
     [PointType.GAME]: {
       label: (t: TFunction) => t({ enUS: 'Game', zhCN: '游戏' }),
+    },
+    [PointType.TRADE]: {
+      label: (t: TFunction) => t({ enUS: 'Trade', zhCN: '交易' }),
     },
     [PointType.TG]: {
       label: (t: TFunction) => t({ enUS: 'Telegram', zhCN: 'Telegram' }),
@@ -146,13 +147,23 @@ export const PointRecords = () => {
         value={type}
         onChange={(v) => setType(v as PointType)}
       />
-      <Table
-        className={classNames(styles['table'], 'semi-always-dark')}
-        columns={columns}
-        dataSource={data?.list}
-        pagination={false}
-        loading={loading && data?.type != type}
-      />
+      {!loading && !data?.list.length ? (
+        <CEmpty
+          className={'semi-always-dark'}
+          description={t({
+            enUS: 'Data is currently being processed.',
+            zhCN: '数据准备中。',
+          })}
+        />
+      ) : (
+        <Table
+          className={classNames(styles['table'], 'semi-always-dark')}
+          columns={columns}
+          dataSource={data?.list}
+          pagination={false}
+          loading={loading && data?.type != type}
+        />
+      )}
     </div>
   );
 };

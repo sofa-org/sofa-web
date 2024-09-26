@@ -1,5 +1,6 @@
 import { Spin } from '@douyinfe/semi-ui';
 import { scrollToElement } from '@livelybone/scroll-get';
+import { ChainMap, defaultChain } from '@sofa/services/chains';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { PointService } from '@sofa/services/points';
 import { amountFormatter } from '@sofa/utils/amount';
@@ -7,6 +8,7 @@ import { isNullLike } from '@sofa/utils/fns';
 import { useRequest } from 'ahooks';
 import classNames from 'classnames';
 
+import logoUniswap from '@/assets/logo-uniswap.svg?url';
 import WalletConnector from '@/components/WalletConnector';
 import {
   useCheckAuth,
@@ -41,6 +43,19 @@ const cards = [
         enUS: 'Distributed according to the final snapshot data.',
         zhCN: '根据最终快照数据进行分发。',
       }),
+    btns: [
+      {
+        icon: logoUniswap,
+        txt: (t: TFunction) => t({ enUS: 'Purchase Now', zhCN: '去购买' }),
+        onClick: () =>
+          (window.location.href = ChainMap[
+            defaultChain.chainId
+          ].uniswapUrl.replace(
+            '{address}',
+            ChainMap[defaultChain.chainId].rchAddress,
+          )),
+      },
+    ],
   },
   {
     icon: icon2,
@@ -57,6 +72,7 @@ const cards = [
       }),
     btns: [
       {
+        icon: undefined,
         txt: (t: TFunction) => t({ enUS: 'Trade', zhCN: '交易' }),
         onClick: () => (window.location.href = EnvLinks.config.VITE_EARN_LINK),
       },
@@ -142,7 +158,7 @@ const Points = () => {
           </h2>
           <p className={styles['desc-1']}>
             {t({
-              enUS: 'SOFA Points will later serve as the basis for our govern token <span style="color:yellow;font-weight:bold">SOFA Airdrop</span>.\nThere will also be some other points-related activities to participate in, place stay tuned.',
+              enUS: 'SOFA Points will later serve as the basis for our govern token <span style="color:yellow;font-weight:bold">SOFA Airdrop</span>.\nThere will also be some other points-related activities to participate in, please stay tuned.',
               zhCN: 'SOFA 积分将作为我们治理代币<span style="color:yellow;font-weight:bold"> SOFA 空投</span>的基础。\n之后还会有一些与积分相关的活动，敬请关注。',
             })
               .split(/\n/)
@@ -198,6 +214,7 @@ const Points = () => {
                       key={btn.txt(t)}
                       onClick={btn.onClick}
                     >
+                      {btn.icon && <img src={btn.icon} alt="" />}
                       {btn.txt(t)}
                     </span>
                   ))}

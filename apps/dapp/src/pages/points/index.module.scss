@@ -148,12 +148,21 @@
   @include pointer;
   @include bold;
 
-  height: min(38px, 6vw);
-  padding: 0 min(32px, 4vw);
+  min-width: min(100px, 20vw);
+  height: min(38px, 9vw);
+  padding: 0 min(18px, 4vw);
   margin: 0;
-  border-radius: min(19px, 3vw);
+  border-radius: min(19px, 4.5vw);
+  font-size: min(14px, 3vw);
   color: #000;
   background: $color-main-gradient;
+
+  img {
+    width: min(30px, 5vw) !important;
+    height: min(30px, 5vw) !important;
+    padding: 0 !important;
+    background: none !important;
+  }
 }
 
 .title-2 {
