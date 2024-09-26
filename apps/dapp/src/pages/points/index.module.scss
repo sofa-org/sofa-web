@@ -166,13 +166,38 @@
 }
 
 .title-2 {
-  @include bold;
-  @include gradient;
+  @include flex-center;
 
+  flex-direction: column;
   position: relative;
   z-index: 2;
-  font-size: min(36px, 5vw);
   margin: 0 0 min(70px, 12vw);
+
+  span {
+    @include bold;
+    @include gradient;
+
+    font-size: min(36px, 5vw);
+  }
+
+  .btn-link {
+    @include flex-center;
+    @include regular;
+
+    height: min(30px, 6vw);
+    padding: 1em;
+    margin: 8px 0 0;
+    font-size: min(14px, 3vw);
+    color: #fff;
+    white-space: nowrap;
+    background: #232323;
+    border-radius: min(15px, 3vw);
+
+    svg {
+      width: 1em;
+      height: 1em;
+    }
+  }
 }
 
 .my-points {

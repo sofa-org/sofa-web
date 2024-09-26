@@ -43,7 +43,7 @@ export const PointRecords = () => {
 
   const wallet = useWalletStore();
 
-  const [type, setType] = useState(PointType.TRADE);
+  const [type, setType] = useState(PointType.GAME);
   const options = useMemo(
     () =>
       Object.values(PointTypeRefs).map((it) => ({ ...it, label: it.label(t) })),

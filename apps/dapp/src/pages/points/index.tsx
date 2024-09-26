@@ -23,6 +23,7 @@ import icon2 from './assets/icon-2.png';
 import icon3 from './assets/icon-3.png';
 import icon4 from './assets/icon-4.png';
 import iconDiscord from './assets/icon-discord.png';
+import { Comp as IconMore } from './assets/icon-more.svg';
 import iconPoints from './assets/icon-points.png';
 import iconTelegram from './assets/icon-telegram.png';
 import iconX from './assets/icon-x.png';
@@ -200,7 +201,16 @@ const Points = () => {
         className={classNames(styles['section'], styles['section-column'])}
       >
         <h2 className={styles['title-2']}>
-          {t({ enUS: 'Ways to earn points', zhCN: '如何获得积分' })}
+          <span>
+            {t({ enUS: 'Ways to earn points', zhCN: '如何获得积分' })}
+          </span>
+          <a
+            className={styles['btn-link']}
+            href="https://docs.sofa.org/sofa-point/"
+          >
+            {t({ enUS: 'View the specific rules', zhCN: '查看规则' })}
+            <IconMore />
+          </a>
         </h2>
         <div className={styles['cards']}>
           {cards.map((it) => (
