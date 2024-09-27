@@ -30,19 +30,33 @@
 .new-icon {
   width: 41px;
   height: 16px;
-  background: url(./assets/icon-new.svg) no-repeat center;
+  background: url("./assets/icon-new.svg") no-repeat center;
   background-size: contain;
   position: absolute;
   margin-top: 14px;
   margin-left: 5px;
   user-select: none;
 }
+
+.battle-tower-icon {
+  width: 75px;
+  height: 16px;
+  background: url("./assets/icon-battle-tower.png") no-repeat center;
+  background-size: contain;
+  position: absolute;
+  margin-top: 14px;
+  margin-left: 5px;
+  user-select: none;
+}
+
 :global {
   .main-content.main-content {
     margin-top: $header-height;
   }
+
   .semi-select-option-text {
-    > .new-icon {
+    > .new-icon,
+    > .battle-tower-icon {
       position: static;
       margin-left: 5px;
       margin-top: 0;

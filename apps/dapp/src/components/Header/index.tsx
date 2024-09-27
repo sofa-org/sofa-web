@@ -32,7 +32,7 @@ interface MenuItem {
   path: string;
   type?: 1 | 2;
   target?: string;
-  newIcon?: boolean;
+  icon?: string;
   children?: MenuItem[];
   hide?(): boolean;
 }
@@ -64,11 +64,24 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
           zhCN: '活动中心',
         }),
       target: '_top',
-      newIcon: true,
+      icon: 'new',
       type: 2,
       path: '',
       hide: () => Env.isTelegram,
       children: [
+        {
+          label: (t: TFunction) =>
+            t({
+              enUS: 'RCH Game Center',
+              zhCN: 'RCH 游戏中心',
+            }),
+          path: joinUrl(
+            EnvLinks.config.VITE_CAMPAIGN_LINK,
+            '/rch-game-center/new-world',
+          ).replace(window.location.origin, ''),
+          target: '_top',
+          icon: 'battle-tower',
+        },
         {
           label: (t: TFunction) => t('Competition & Claim Prize'),
           path: joinUrl(
@@ -76,7 +89,6 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
             '/fest-competition',
           ).replace(window.location.origin, ''),
           target: '_top',
-          newIcon: true,
         },
         {
           label: (t: TFunction) =>
@@ -87,18 +99,6 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
           path: joinUrl(
             EnvLinks.config.VITE_CAMPAIGN_LINK,
             '/rch-celebrity',
-          ).replace(window.location.origin, ''),
-          target: '_top',
-        },
-        {
-          label: (t: TFunction) =>
-            t({
-              enUS: 'RCH Game Center',
-              zhCN: 'RCH 游戏中心',
-            }),
-          path: joinUrl(
-            EnvLinks.config.VITE_CAMPAIGN_LINK,
-            '/rch-game-center/btc-adventure',
           ).replace(window.location.origin, ''),
           target: '_top',
         },
@@ -199,8 +199,8 @@ const Header = () => {
                 })}
               >
                 {it.label(t)}
-                {it.newIcon ? (
-                  <span className={styles['new-icon']} />
+                {it.icon ? (
+                  <span className={styles[`${it.icon}-icon`]} />
                 ) : undefined}
               </NavLink>
             );
@@ -222,9 +222,12 @@ const Header = () => {
                 rel="noopener noreferrer"
               >
                 {it.label(t)}
-                {it.newIcon ? (
+                {it.icon ? (
                   <span
-                    className={classNames(styles['new-icon'], 'new-icon')}
+                    className={classNames(
+                      styles[`${it.icon}-icon`],
+                      `${it.icon}-icon`,
+                    )}
                   />
                 ) : undefined}
               </a>
@@ -250,11 +253,11 @@ const Header = () => {
                       >
                         <span className="semi-select-option-text">
                           {m.label(t)}
-                          {m.newIcon && (
+                          {m.icon && (
                             <span
                               className={classNames(
-                                styles['new-icon'],
-                                'new-icon',
+                                styles[`${m.icon}-icon`],
+                                `${m.icon}-icon`,
                               )}
                             />
                           )}
@@ -272,9 +275,12 @@ const Header = () => {
                 onClick={(e) => !it.path && e.preventDefault()}
               >
                 {it.label(t)}
-                {it.newIcon && (
+                {it.icon && (
                   <span
-                    className={classNames(styles['new-icon'], 'new-icon')}
+                    className={classNames(
+                      styles[`${it.icon}-icon`],
+                      `${it.icon}-icon`,
+                    )}
                   />
                 )}
               </a>
