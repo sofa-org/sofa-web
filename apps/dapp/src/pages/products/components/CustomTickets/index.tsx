@@ -12,6 +12,7 @@ import { day8h, next8h, pre8h } from '@sofa/utils/expiry';
 import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 
 import { Comp as IconDel } from '@/assets/icon-del.svg';
@@ -119,7 +120,12 @@ const CustomTicket = (props: CustomTicketProps) => {
         </div>
         <div className={styles['form-item']}>
           {props.active ? (
-            <div className={styles['value']}>
+            <div
+              className={classNames(
+                styles['value'],
+                styles['date-picker-wrapper'],
+              )}
+            >
               <DatePicker
                 key={props.product?.expiry}
                 className={styles['date-picker']}
@@ -144,14 +150,26 @@ const CustomTicket = (props: CustomTicketProps) => {
                 }
                 onChange={(v) => onChange({ expiry: day8h(Number(v)) / 1000 })}
               />
+              {!!props.product?.expiry && (
+                <span className={styles['term']}>
+                  {Math.abs(dayjs().diff(props.product.expiry * 1000, 'day'))}d
+                </span>
+              )}
             </div>
           ) : (
             <div className={styles['value']}>
               {props.product.expiry ? (
-                <Time
-                  time={props.product.expiry * 1000}
-                  format="YYYY-MM-DD HH:mm"
-                />
+                <>
+                  <Time
+                    time={props.product.expiry * 1000}
+                    format="YYYY-MM-DD HH:mm"
+                  />
+
+                  <span className={styles['term']}>
+                    {Math.abs(dayjs().diff(props.product.expiry * 1000, 'day'))}
+                    d
+                  </span>
+                </>
               ) : (
                 '-'
               )}

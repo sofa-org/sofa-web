@@ -243,6 +243,25 @@
   }
 }
 
+.term {
+  padding: 0 0 0 8px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.date-picker-wrapper {
+  @include flex-center;
+
+  position: relative;
+
+  .term {
+    position: absolute;
+    right: 34px;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+}
+
 @media (orientation: portrait) {
   .right {
     padding: 12px 12px 12px 10px;

@@ -13,6 +13,38 @@
   margin: 24px auto 40px;
 }
 
+.term {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.date-picker {
+  @include flex-center;
+
+  position: relative;
+  width: fit-content;
+  margin: 8px 0 0;
+
+  :global {
+    .semi-datepicker {
+      > div {
+        margin: 0;
+      }
+
+      input {
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .term {
+    position: absolute;
+    right: 34px;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+}
+
 .product-name {
   @include bold;
   @include flex-center;

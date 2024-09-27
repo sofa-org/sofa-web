@@ -20,6 +20,7 @@ import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { uniqBy } from 'lodash-es';
 import { nanoid } from 'nanoid';
 
@@ -197,7 +198,14 @@ const ProductCustomize = () => {
       vault &&
       ProductsService.genExpiries(vault).then((res) =>
         res.map((value) => ({
-          label: displayExpiry(value),
+          label: (
+            <>
+              {displayExpiry(value)}
+              <span className={styles['term']}>
+                {Math.abs(dayjs().diff(value, 'day'))}d
+              </span>
+            </>
+          ),
           value: value / 1000,
         })),
       ),
@@ -270,28 +278,39 @@ const ProductCustomize = () => {
               <div className={styles['label']}>{t('Expiry Date')}</div>
               <div className={styles['input-wrapper']}>
                 <RadioBtnGroup
-                  radioStyle={{ width: 76 / window.winScale }}
+                  radioStyle={{
+                    width: 110 / window.winScale,
+                    justifyContent: 'flex-start',
+                  }}
                   options={expiries}
                   value={product?.expiry}
                   onChange={(v) => updateProduct({ expiry: +v })}
                 />
-                <DatePicker
-                  key={product?.expiry}
-                  type="date"
-                  defaultValue={
-                    product?.expiry ? product.expiry * 1000 : undefined
-                  }
-                  onChange={(v) =>
-                    updateProduct({ expiry: day8h(Number(v)) / 1000 })
-                  }
-                  inputReadOnly
-                  showClear={false}
-                  disabledDate={(d) => {
-                    if (!d) return true;
-                    const curr8h = next8h(d.getTime());
-                    return curr8h < min || curr8h > max;
-                  }}
-                />
+                <div className={styles['date-picker']}>
+                  <DatePicker
+                    key={product?.expiry}
+                    type="date"
+                    defaultValue={
+                      product?.expiry ? product.expiry * 1000 : undefined
+                    }
+                    onChange={(v) =>
+                      updateProduct({ expiry: day8h(Number(v)) / 1000 })
+                    }
+                    format="ddMMMyy"
+                    inputReadOnly
+                    showClear={false}
+                    disabledDate={(d) => {
+                      if (!d) return true;
+                      const curr8h = next8h(d.getTime());
+                      return curr8h < min || curr8h > max;
+                    }}
+                  />
+                  {!!product?.expiry && (
+                    <span className={styles['term']}>
+                      {Math.abs(dayjs().diff(product.expiry * 1000, 'day'))}d
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className={styles['form-item']}>
