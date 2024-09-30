@@ -64,7 +64,7 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
           zhCN: '活动中心',
         }),
       target: '_top',
-      icon: 'new',
+      icon: 'battle-tower',
       type: 2,
       path: '',
       hide: () => Env.isTelegram,
@@ -72,8 +72,8 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
         {
           label: (t: TFunction) =>
             t({
-              enUS: 'RCH Game Center',
-              zhCN: 'RCH 游戏中心',
+              enUS: 'Game Center',
+              zhCN: '游戏中心',
             }),
           path: joinUrl(
             EnvLinks.config.VITE_CAMPAIGN_LINK,

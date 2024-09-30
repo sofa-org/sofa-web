@@ -296,7 +296,6 @@ const ProductCustomize = () => {
                     onChange={(v) =>
                       updateProduct({ expiry: day8h(Number(v)) / 1000 })
                     }
-                    format="ddMMMyy"
                     inputReadOnly
                     showClear={false}
                     disabledDate={(d) => {
