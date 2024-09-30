@@ -159,7 +159,7 @@ const Points = () => {
           </h2>
           <p className={styles['desc-1']}>
             {t({
-              enUS: 'SOFA Points will later serve as the basis for our govern token <span style="color:yellow;font-weight:bold">SOFA Airdrop</span>.\nThere will also be some other points-related activities to participate in, please stay tuned.',
+              enUS: 'SOFA Points will later serve as the basis for our governance token <span style="color:yellow;font-weight:bold">SOFA Airdrop</span>.\nThere will also be some other points-related activities to participate in, please stay tuned.',
               zhCN: 'SOFA 积分将作为我们治理代币<span style="color:yellow;font-weight:bold"> SOFA 空投</span>的基础。\n之后还会有一些与积分相关的活动，敬请关注。',
             })
               .split(/\n/)
