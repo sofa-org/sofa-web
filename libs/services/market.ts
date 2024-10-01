@@ -155,9 +155,21 @@ export class MarketService {
       ETH: ['ETH'],
       '': ['BTC', 'ETH'],
     } as const;
+    const fallbackUrls = {
+      BTC: 'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=bitcoin&days=0',
+      ETH: 'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=ethereum&days=0',
+    };
     return Promise.all(
-      map[ccy || ''].map((ccy) =>
-        MarketService.$$fetchIndexPx(ccy).then((price) => [ccy, price]),
+      map[ccy || ''].map(($ccy) =>
+        MarketService.$$fetchIndexPx($ccy)
+          .then((price) => [$ccy, price])
+          .catch(() =>
+            http
+              .get<unknown, HttpResponse<{ prices: [number, number][] }>>(
+                fallbackUrls[$ccy],
+              )
+              .then((res) => [$ccy, res.value.prices[0][1]]),
+          ),
       ),
     ).then((res) => {
       return { ...Object.fromEntries(res), USD: 1, USDT: 1, USDC: 1 };
