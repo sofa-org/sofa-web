@@ -212,8 +212,10 @@ const ProductCustomize = () => {
     [vault],
   );
   useLayoutEffect(() => {
-    if (!product?.expiry && expiries)
-      updateProduct({ expiry: expiries[3].value });
+    if (!product?.expiry && expiries?.length)
+      updateProduct({
+        expiry: expiries[Math.min(3, expiries.length - 1)].value,
+      });
   }, [product?.expiry, expiries, updateProduct]);
 
   const quoteInfo = useProductsState(
@@ -225,10 +227,12 @@ const ProductCustomize = () => {
   );
 
   const { min, max } = useMemo(() => {
-    if (!expiries) return { min: next8h(), max: pre8h() };
+    if (!expiries?.length) return { min: next8h(), max: pre8h() };
     return {
       min: customDev ? next8h(undefined, 1) : expiries[0].value * 1000,
-      max: expiries[expiries.length - 1].value * 1000,
+      max: customDev
+        ? next8h(undefined, 180)
+        : expiries[expiries.length - 1].value * 1000,
     };
   }, [customDev, expiries]);
 

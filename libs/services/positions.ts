@@ -20,7 +20,9 @@ export interface PositionParams {
   vaults?: string[]; // 合约地址集合，没传表示查询全部合约
   claimed?: boolean; // 是否已被赎回，没传表示查询所有状态的头寸
   expired?: boolean; // 是否到期，没传表示查询所有状态的头寸
-  exceededPrincipalReturn?: boolean; // 是否获得了超过本金的回报，没传表示查询所有头寸
+  concealed?: boolean; // 是否被隐藏，没传表示查询所有状态的头寸
+  positiveReturn?: boolean; //赎回金额是否大于 0，没传表示查询所有头寸
+  positiveProfit?: boolean; // 是否获得了超过本金的回报，没传表示查询所有头寸
   limit?: number; // 查询数量，默认为 100，最大为 300
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   endDateTime?: number; // 对应的秒级时间戳，例如 1672387200
@@ -58,6 +60,7 @@ export interface SettlementInfo {
 
 export interface OriginPositionInfo extends CalculatedInfo, SettlementInfo {
   id: PositionInfoInGraph['productId'];
+  positionId: PositionInfoInGraph['id'];
   wallet: string; // 所有人的地址
   product: ProductInfo;
   claimed: boolean;
@@ -196,7 +199,9 @@ export class PositionsService {
       expiry_lte?: number;
       claimed?: boolean;
       expired?: boolean;
-      exceededPrincipalReturn?: boolean;
+      concealed?: boolean;
+      positiveReturn?: boolean;
+      positiveProfit?: boolean;
     },
     extra?: PageParams<'cursor', 'updatedAt' | 'return'>,
   ): Promise<PageResult<PositionInfo, { hasMore: boolean }, 'cursor'>> {
@@ -214,7 +219,9 @@ export class PositionsService {
         endDateTime: extra?.cursor ?? params.expiry_lte,
         claimed: params.claimed,
         expired: params.expired,
-        exceededPrincipalReturn: params.exceededPrincipalReturn,
+        concealed: params.concealed,
+        positiveReturn: params.positiveReturn,
+        positiveProfit: params.positiveProfit,
         vaults: vault_in,
         limit,
         orderBy: extra?.orderBy,
@@ -310,8 +317,9 @@ export class PositionsService {
       {
         ...params,
         claimed: true,
-        exceededPrincipalReturn:
-          params.riskType === RiskType.RISKY ? undefined : true, // 彩票只要有奖金就认为是 wonderful time
+        ...(params.riskType === RiskType.RISKY
+          ? { positiveReturn: true } // 彩票只要有奖金就认为是 wonderful time
+          : { positiveProfit: true }),
       },
       { limit: 200 },
     );
@@ -637,9 +645,22 @@ export class PositionsService {
         ...params,
         riskType: RiskType.RISKY,
         chainId: params.chainId,
-        exceededPrincipalReturn: true,
+        positiveReturn: true,
       },
       { ...pageParams, orderBy: 'return' },
     ).then((res) => res.list.filter((it) => !it.claimParams.maker));
+  }
+
+  static async conceal(data: { chainId: number; positionIds: string[] }) {
+    const call = (count: number) =>
+      http.post<unknown, HttpResponse>('/rfq/position/conceal', {
+        ...data,
+        positionIds: data.positionIds.slice(20 * (count - 1), 20 * count),
+      });
+    return pollingUntil(
+      call,
+      (_, count) => 20 * count >= data.positionIds.length,
+      1000,
+    );
   }
 }

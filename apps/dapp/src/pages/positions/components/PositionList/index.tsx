@@ -1,5 +1,5 @@
 import { Fragment, useMemo, useRef, useState } from 'react';
-import { Button, Spin, Toast } from '@douyinfe/semi-ui';
+import { Button, Modal, Spin, Toast } from '@douyinfe/semi-ui';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import {
@@ -8,12 +8,12 @@ import {
   RiskType,
 } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
-import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useInfiniteScroll } from 'ahooks';
 import { uniqBy } from 'lodash-es';
 
+import AsyncButton from '@/components/AsyncButton';
 import CEmpty from '@/components/Empty';
 import { useProjectChange } from '@/components/ProductSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
@@ -40,6 +40,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     data: $data,
     loading,
     mutate,
+    reload: refresh,
   } = useInfiniteScroll(
     async (d) => {
       if (!wallet.address) return { list: [], hasMore: false, limit: 300 };
@@ -48,6 +49,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           chainId: wallet.chainId,
           owner: wallet.address,
           claimed: false,
+          concealed: false,
           riskType: props.riskType,
           productType: props.productType,
         },
@@ -87,6 +89,15 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
         if (it.claimParams.maker && it.triggerPrice) return true;
         return false;
       }) || [],
+    [data],
+  );
+
+  const loseList = useMemo(
+    () =>
+      data?.filter(
+        (it) =>
+          judgeSettled(it.product.expiry) && !Number(it.amounts.redeemable),
+      ) || [],
     [data],
   );
 
@@ -180,8 +191,8 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           onStatusChange={handleStatusChange}
         />
       </Spin>
-      {!!unClaimedList.length && (
-        <div className={styles['btn-bottom-wrapper']}>
+      <div className={styles['btn-bottom-wrapper']}>
+        {!!unClaimedList.length && (
           <Button
             size="large"
             theme="solid"
@@ -191,8 +202,63 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           >
             {t('CLAIM ALL')} ({unClaimedList.length})
           </Button>
-        </div>
-      )}
+        )}
+        {!!loseList.length && (
+          <AsyncButton
+            size="large"
+            theme="solid"
+            type="primary"
+            className={styles['btn-bottom']}
+            onClick={() =>
+              new Promise((res, rej) =>
+                Modal.confirm({
+                  icon: null,
+                  centered: true,
+                  title: t({
+                    enUS: 'Hide Lose Positions',
+                    zhCN: '隐藏输了的头寸',
+                  }),
+                  content: t({
+                    enUS: 'To hide such positions, please click confirm. You can still view them in the history.',
+                    zhCN: '隐藏此类头寸，请点击确定。您仍可以从历史记录查看',
+                  }),
+                  okText: t({ enUS: 'Confirm', zhCN: '确定' }),
+                  cancelText: t({ enUS: 'Cancel', zhCN: '取消' }),
+                  onOk: res,
+                  onCancel: rej,
+                }),
+              )
+                .then(() =>
+                  PositionsService.conceal({
+                    chainId: wallet.chainId,
+                    positionIds: loseList.map((it) => it.positionId),
+                  }),
+                )
+                .then(() => {
+                  refresh();
+                  Toast.info(
+                    t({ enUS: 'Hidden successfully', zhCN: '隐藏成功' }),
+                  );
+                })
+            }
+          >
+            {t({ enUS: 'Hide Lose', zhCN: '隐藏输了的头寸' })} (
+            {loseList?.length})
+          </AsyncButton>
+        )}
+        <Button
+          size="large"
+          theme="solid"
+          type="primary"
+          className={styles['btn-bottom']}
+          onClick={() => {
+            const link = `/positions/orders${window.location.search}`;
+            window.location.href = link;
+          }}
+        >
+          {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}
+        </Button>
+      </div>
       <PositionClaimProgress
         ref={claimProgressRef}
         chainId={wallet.chainId}

@@ -68,10 +68,10 @@ const CustomTicket = (props: CustomTicketProps) => {
     [vault],
   );
   const { min, max } = useMemo(() => {
-    if (!expiries) return { min: next8h(), max: pre8h() };
+    if (!expiries?.length) return { min: next8h(), max: pre8h() };
     return {
       min: customDev ? next8h(undefined, 1) : expiries[0],
-      max: expiries[expiries.length - 1],
+      max: customDev ? next8h(undefined, 180) : expiries[expiries.length - 1],
     };
   }, [customDev, expiries]);
 

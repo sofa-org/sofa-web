@@ -59,7 +59,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           size="large"
           theme="solid"
           type="primary"
-          className={classNames(styles['btn-bottom'], styles['ghost'])}
+          className={styles['btn-bottom']}
           onClick={() => {
             const link = `/positions/orders${window.location.search}`;
             window.location.href = link;
