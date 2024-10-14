@@ -45,7 +45,7 @@ export const RCHHistory = forwardRef<RCHHistoryRef>((_, ref) => {
         {
           title: t('Time'),
           key: 'time',
-          render: (_, it) => <Time time={it.timestamp} format="MMM DD YYYY" />,
+          render: (_, it) => <Time time={it.timestamp} format="MMM DD, YYYY" />,
         },
         // {
         //   title: t('Deposit Volume(U)'),
