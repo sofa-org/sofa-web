@@ -84,7 +84,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   const unClaimedList = useMemo(
     () =>
       data?.filter((it) => {
-        if (!Number(it.amounts.redeemable)) return false;
+        if (!Number(it.amounts.redeemable) || it.claimed) return false;
         if (judgeSettled(it.product.expiry)) return true;
         if (it.claimParams.maker && it.triggerPrice) return true;
         return false;
