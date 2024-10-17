@@ -28,12 +28,14 @@ addI18nResources(locale, 'Header');
 declare const winScale: Global['winScale'];
 
 interface MenuItem {
-  label(t: TFunction): string;
   path: string;
   type?: 1 | 2;
   target?: string;
   icon?: string;
   children?: MenuItem[];
+
+  label(t: TFunction): string;
+
   hide?(): boolean;
 }
 
@@ -83,7 +85,7 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
           icon: 'battle-tower',
         },
         {
-          label: (t: TFunction) => t('Competition & Claim Prize'),
+          label: (t: TFunction) => t('Poker Museum & Claim Prize'),
           path: joinUrl(
             EnvLinks.config.VITE_CAMPAIGN_LINK,
             '/fest-competition',

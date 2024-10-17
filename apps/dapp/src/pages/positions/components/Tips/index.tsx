@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { RiskType } from '@sofa/services/base-type';
 import { useLocalStorageState } from 'ahooks';
 
-import { Comp as IconDel } from '@/assets/icon-del.svg';
 import { addI18nResources } from '@/locales';
 
 import chest from '../../assets/chest.png';
@@ -26,7 +25,7 @@ export const PositionTips = (props: { project: RiskType }) => {
         <span
           dangerouslySetInnerHTML={{
             __html: t(
-              `For unclaimed positions, user's deposits will remain within the Aave/Lido/Sofa protocol, continuing to accrue interest without any loss due to delayed claims.<br/>Note the yield displayed for unclaimed positions is indicative only.<br/>The actual yield of trade will be determined by the Aave/Lido/Sofa interest accumulated from the time of deposit until the claim is made.`,
+              `Unclaimed positions can also yield returns. Your deposits will remain within the Aave/Lido/Sofa protocol, continuing to accrue interest without any loss due to delayed claims.<br/>Note the yield displayed for unclaimed positions is indicative only.<br/>The actual yield of trade will be determined by the Aave/Lido/Sofa interest accumulated from the time of deposit until the claim is made.`,
             ),
           }}
         />
