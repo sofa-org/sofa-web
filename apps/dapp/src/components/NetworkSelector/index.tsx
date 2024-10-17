@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Modal } from '@douyinfe/semi-ui';
 import { ChainMap, defaultChain } from '@sofa/services/chains';
@@ -22,6 +22,8 @@ export const NetworkTypes = Object.values(ChainMap).map((it) => ({
   chainId: it.chainId,
   icon: it.icon,
 }));
+
+const onlyMainnetPaths = ['/rch'];
 
 const NetworkSelector = () => {
   const [t] = useTranslation('NetworkSelector');
@@ -51,6 +53,14 @@ const NetworkSelector = () => {
       pro.then((un) => un?.());
     };
   }, [address]);
+
+  const networkOptions = useMemo(
+    () =>
+      !onlyMainnetPaths.includes(location.pathname)
+        ? NetworkTypes
+        : NetworkTypes.filter((it) => it.chainId === defaultChain.chainId),
+    [location.pathname],
+  );
 
   return (
     <>
@@ -83,7 +93,7 @@ const NetworkSelector = () => {
               )
             : t('tips')}
         </div>
-        {NetworkTypes.map((it) => (
+        {networkOptions.map((it) => (
           <AsyncButton
             className={classNames('btn-ghost', {
               [styles['active']]: it.chainId === chainId,
