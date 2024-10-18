@@ -42,6 +42,7 @@ export function useDepositCcySelect() {
     () =>
       ContractsService.vaults.find(
         (it) =>
+          !it.tradeDisable &&
           it.chainId === chainId &&
           it.riskType === project &&
           it.productType === productType &&

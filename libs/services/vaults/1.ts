@@ -311,6 +311,7 @@ const RCHVaults = [
     depositCcy: 'RCH',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // RCHDNTVault(WBTC/RCH)
   {
@@ -323,6 +324,7 @@ const RCHVaults = [
     depositCcy: 'RCH',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // RCHBearTrendVault(ETH/RCH)
   {
@@ -383,6 +385,7 @@ const RCHVaults = [
     depositCcy: 'RCH',
     rchMultiplier: 2,
     usePermit2: false,
+    tradeDisable: true,
   },
   // DNTVault(WBTC/RCH)
   {
@@ -395,6 +398,7 @@ const RCHVaults = [
     depositCcy: 'RCH',
     rchMultiplier: 2,
     usePermit2: false,
+    tradeDisable: true,
   },
   // SmartBullVault(ETH/RCH)
   {
