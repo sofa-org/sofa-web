@@ -1,13 +1,16 @@
-import { ReactNode, SetStateAction, useMemo } from 'react';
+import { ReactNode, SetStateAction, useEffect, useMemo } from 'react';
 import { ProductType, RiskType } from '@sofa/services/base-type';
+import { ContractsService } from '@sofa/services/contracts.ts';
 import { useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { calcVal } from '@sofa/utils/fns';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
+import { uniq } from 'lodash-es';
 
 import { Comp as Logo } from '@/assets/logo';
+import { useWalletStore } from '@/components/WalletConnector/store.ts';
 import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
 
@@ -21,12 +24,13 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'ProjectProductSelector');
 
 export interface ProductSelectorProps extends BaseProps {
+  dropdownClassName?: string;
+
   renderValue?(
     value: { riskType: RiskType; productType: ProductType },
     riskRef: (typeof RiskTypeRefs)[RiskType],
     productRef: (typeof ProductTypeRefs)[ProductType],
   ): ReactNode;
-  dropdownClassName?: string;
 }
 
 export function useProjectChange() {
@@ -113,18 +117,32 @@ export const ProductTypeSelector = (
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
+  const chainId = useWalletStore((state) => state.chainId);
   const [product, setProduct] = useProductSelect();
   const options = useMemo(() => {
-    return Object.values(ProductTypeRefs).map((it) => ({
-      label: (
-        <span className={classNames(styles['product-item'], 'product-item')}>
-          {it.img}
-          {it.label(t)}
-        </span>
-      ),
-      value: it.value,
-    }));
-  }, [t]);
+    const vaults = ContractsService.vaults.filter(
+      (it) => it.chainId === chainId && !it.tradeDisable,
+    );
+    const productTypes = uniq(vaults.map((it) => it.productType));
+    return Object.values(ProductTypeRefs)
+      .filter((it) => productTypes.includes(it.value))
+      .map((it) => ({
+        label: (
+          <span className={classNames(styles['product-item'], 'product-item')}>
+            {it.img}
+            {it.label(t)}
+          </span>
+        ),
+        value: it.value,
+      }));
+  }, [chainId, t]);
+
+  useEffect(() => {
+    if (options.length && !options.some((it) => it.value === product)) {
+      setProduct(options[0].value);
+    }
+  }, [options, product, setProduct]);
+
   return (
     <CSelect
       prefix={t('Product')}

@@ -108,6 +108,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 1,
     usePermit2: true,
+    tradeDisable: true,
   },
   // DNTVault(WBTC/USDT)
   {
@@ -120,6 +121,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 1,
     usePermit2: true,
+    tradeDisable: true,
   },
   // PrincipalDNTVault(USDT) deprecated
   {
@@ -160,6 +162,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // PrincipalDNTVault(WBTC/USDT)
   {
@@ -172,6 +175,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // LeverageDNTVault(ETH/USDT)
   {
@@ -184,6 +188,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // LeverageDNTVault(WBTC/USDT)
   {
@@ -196,6 +201,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // LeverageBullSpreadVault(ETH/USDT)
   {
@@ -462,6 +468,7 @@ const stETHVaults = [
     depositCcy: 'stETH',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // StETHDNTPrincipalVault(WBTC/STETH)
   {
@@ -474,6 +481,7 @@ const stETHVaults = [
     depositCcy: 'stETH',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // StETHSmartBullPrincipalVault(ETH/STETH)
   {
@@ -534,6 +542,7 @@ const stETHVaults = [
     depositCcy: 'stETH',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // StETHLeverageDNTVault(WBTC/STETH)
   {
@@ -546,6 +555,7 @@ const stETHVaults = [
     depositCcy: 'stETH',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // StETHLeverageBullSpreadVault(ETH/STETH)
   {
