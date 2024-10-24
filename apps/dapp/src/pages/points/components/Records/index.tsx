@@ -3,6 +3,7 @@ import Table, { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { PointItem, PointService, PointType } from '@sofa/services/points';
 import { displayExpiry } from '@sofa/utils/expiry';
+import { isNullLike } from '@sofa/utils/fns.ts';
 import { objectValCvt } from '@sofa/utils/object';
 import { useInfiniteScroll } from 'ahooks';
 import classNames from 'classnames';
@@ -54,7 +55,7 @@ export const PointRecords = () => {
   >(
     async (pre) => {
       const limit = 20;
-      const offset = pre?.offset ? pre.offset + limit : 0;
+      const offset = !isNullLike(pre?.offset) ? pre.offset + limit : 0;
       if (!wallet.address) return { type, limit, offset, list: [] };
       return PointService.page({ type, offset, limit });
     },

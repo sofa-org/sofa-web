@@ -70,7 +70,7 @@ export class PointService {
           limit: pageSize,
           offset: params.offset || (pageNum - 1) * pageSize,
           list: res.value.values,
-          hasMore: res.value.totalCount > (pageNum + 1) * pageSize,
+          hasMore: res.value.totalCount > pageNum * pageSize,
         }) as PageResult<PointItem> & { type: PointType },
     );
   }
