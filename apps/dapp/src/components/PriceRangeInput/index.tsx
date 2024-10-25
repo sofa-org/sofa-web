@@ -13,7 +13,6 @@ import {
   WinningProbabilities,
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
-import { Env } from '@sofa/utils/env';
 import { calcVal, isNullLike } from '@sofa/utils/fns';
 import {
   useAsyncMemo,
@@ -217,22 +216,19 @@ export const PriceRangeInputEl = (
           <input placeholder={t('Upper')} onBlur={(e) => onInputBlur(e, 1)} />
         </div>
       </div>
-      {!Env.isProd &&
-        props.productType &&
-        props.winningProbability &&
-        props.anchorPrices && (
-          <div className={styles['probabilities']}>
-            {ProductTypeRefs[props.productType]
-              .probability(t, props.winningProbability, props.anchorPrices)
-              .map((it) => (
-                <div
-                  className={styles['probability']}
-                  key={it}
-                  dangerouslySetInnerHTML={{ __html: it }}
-                />
-              ))}
-          </div>
-        )}
+      {props.productType && props.winningProbability && props.anchorPrices && (
+        <div className={styles['probabilities']}>
+          {ProductTypeRefs[props.productType]
+            .probability(t, props.winningProbability, props.anchorPrices)
+            .map((it) => (
+              <div
+                className={styles['probability']}
+                key={it}
+                dangerouslySetInnerHTML={{ __html: it }}
+              />
+            ))}
+        </div>
+      )}
       <div className={styles['quick-selects']}>
         <div>
           <CheckboxBtnGroup
