@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown } from '@douyinfe/semi-ui';
+import { RiskType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { joinUrl } from '@sofa/utils/url';
@@ -14,7 +15,7 @@ import { addI18nResources, LangSelector } from '@/locales';
 import IndexPrices from '../IndexPrices';
 import LaunchApp from '../LaunchApp';
 import NetworkSelector from '../NetworkSelector';
-import { ProjectSelector } from '../ProductSelector';
+import { ProjectSelector, useProjectChange } from '../ProductSelector';
 import TimezoneSelector from '../TimezoneSelector';
 import WalletConnector from '../WalletConnector';
 
@@ -42,11 +43,24 @@ interface MenuItem {
 const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
   // 下面这行被注释掉的code 告诉 ai18n 下面的 t 都是在 Header 包下
   // const [t] = useTranslation('Header');
+  const campaign = {
+    label: (t: TFunction) =>
+      t({
+        enUS: 'Campaign',
+        zhCN: '活动中心',
+      }),
+    target: '_top',
+    // icon: 'battle-tower',
+    type: 2 as const,
+    path: EnvLinks.config.VITE_CAMPAIGN_LINK,
+    hide: () => Env.isTelegram,
+  };
   return [
     { label: (t: TFunction) => t('home'), path: '/', type: 1 },
     { label: (t: TFunction) => t('Project'), path: '/mechanism', type: 1 },
     { label: (t: TFunction) => t('Capabilities'), path: '/strengths', type: 1 },
     { label: (t: TFunction) => t('RCH'), path: '/rch', type: 1 },
+    { ...campaign, type: 1 },
     {
       label: (t: TFunction) => t({ enUS: 'Points', zhCN: '积分' }),
       path: '/points',
@@ -59,53 +73,7 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
     },
     { label: (t: TFunction) => t('Trade'), path: '/products', type: 2 },
     { label: (t: TFunction) => t('Position'), path: '/positions', type: 2 },
-    {
-      label: (t: TFunction) =>
-        t({
-          enUS: 'Campaign',
-          zhCN: '活动中心',
-        }),
-      target: '_top',
-      icon: 'battle-tower',
-      type: 2,
-      path: '',
-      hide: () => Env.isTelegram,
-      children: [
-        {
-          label: (t: TFunction) =>
-            t({
-              enUS: 'Game Center',
-              zhCN: '游戏中心',
-            }),
-          path: joinUrl(
-            EnvLinks.config.VITE_CAMPAIGN_LINK,
-            '/rch-game-center/new-world',
-          ).replace(window.location.origin, ''),
-          target: '_top',
-          icon: 'battle-tower',
-        },
-        {
-          label: (t: TFunction) => t('Poker Museum & Claim Prize'),
-          path: joinUrl(
-            EnvLinks.config.VITE_CAMPAIGN_LINK,
-            '/fest-competition',
-          ).replace(window.location.origin, ''),
-          target: '_top',
-        },
-        {
-          label: (t: TFunction) =>
-            t({
-              enUS: 'RCH Hall of Fame',
-              zhCN: 'RCH 名人堂',
-            }),
-          path: joinUrl(
-            EnvLinks.config.VITE_CAMPAIGN_LINK,
-            '/rch-celebrity',
-          ).replace(window.location.origin, ''),
-          target: '_top',
-        },
-      ],
-    },
+    campaign,
   ];
 };
 
@@ -136,6 +104,7 @@ const Header = () => {
   const [t] = useTranslation('Header');
   const navigate = useNavigate();
   const location = useLocation();
+  const [project] = useProjectChange(RiskType.RISKY);
 
   const opacity = useOpacity();
 
@@ -211,7 +180,7 @@ const Header = () => {
             return (
               <a
                 key={it.label(t)}
-                href={it.path}
+                href={joinUrl(it.path, `?project=${project}`)}
                 className={classNames(styles['link'])}
                 target={
                   Env.isMetaMaskAndroid ||

@@ -33,7 +33,7 @@ export interface ProductSelectorProps extends BaseProps {
   ): ReactNode;
 }
 
-export function useProjectChange() {
+export function useProjectChange(defaultVal = RiskType.PROTECTED) {
   const query = useQuery();
   const project = useMemo(() => {
     const project = Object.values(RiskTypeRefs).find((it) => {
@@ -43,11 +43,11 @@ export function useProjectChange() {
       );
     });
     if (project) return project.value;
-    return (query.project as RiskType) || RiskType.PROTECTED;
+    return (query.project as RiskType) || defaultVal;
   }, [query.project]);
   const setProject = useLazyCallback(
     (action: SetStateAction<RiskType | undefined>) => {
-      const nextProject = calcVal(action, project) || RiskType.PROTECTED;
+      const nextProject = calcVal(action, project) || defaultVal;
       const link = RiskTypeRefs[nextProject].link;
       window.location.href = link;
     },
