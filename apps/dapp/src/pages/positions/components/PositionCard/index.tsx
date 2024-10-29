@@ -30,6 +30,7 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'PositionCard');
 
 export interface PositionCardProps {
+  syncing?: boolean;
   position: PositionInfo;
   onStatusChange?(status: PositionStatus): void;
   onClick?(): void;
@@ -106,7 +107,7 @@ const ProtectedAmounts = (
           <span className={styles['badge-est']}>| {t('Est.')}</span>
         )}
       </div>
-      {claimable && (
+      {!props.syncing && claimable && (
         <div className={styles['btns']}>
           <AsyncButton
             type="primary"
@@ -301,8 +302,9 @@ const PositionCard = (props: PositionCardProps) => {
       <div
         className={classNames(styles['card'], {
           [styles['has-rch-amount']]: !position.claimParams.maker,
+          [styles['syncing']]: props.syncing,
         })}
-        onClick={() => props.onClick?.()}
+        onClick={() => !props.syncing && props.onClick?.()}
       >
         <div
           className={classNames(styles['product'], {
@@ -314,7 +316,11 @@ const PositionCard = (props: PositionCardProps) => {
             <img src={icon.icon} alt="" />
             <img src={icon.icon} alt="" />
           </div>
-          {!hasExpired ? (
+          {props.syncing ? (
+            <span className={styles['syncing-decoration']}>
+              {t({ enUS: 'Syncing', zhCN: '同步中' })}
+            </span>
+          ) : !hasExpired ? (
             <span className={styles['count-down']}>
               {formatDuration(leftTime).replace(/\d+s/, '') || '0m'}
             </span>

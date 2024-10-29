@@ -50,7 +50,7 @@
   @extend %product;
 }
 
-.pending-decoration {
+.syncing-decoration {
   @include flex-center;
   @include bold;
 
@@ -293,7 +293,7 @@
   border-radius: min(25px, 2.5vw);
   overflow: hidden;
 
-  &.pending {
+  &.syncing {
     .product {
       .img {
         filter: none;

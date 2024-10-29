@@ -77,7 +77,7 @@ export interface PositionInfo extends OriginPositionInfo {
 export interface OriginTransactionInfo
   extends Omit<
     OriginPositionInfo,
-    'id' | 'wallet' | 'claimParams' | 'updatedAt' | 'claimed'
+    'id' | 'positionId' | 'wallet' | 'claimParams' | 'updatedAt' | 'claimed'
   > {
   hash: string;
   takerWallet: string;
@@ -347,18 +347,21 @@ export class PositionsService {
       1000,
     ).then(async (res) => {
       const s = res[res.length - 1];
-      const status = await (async () => {
-        if (s === TransactionStatus.FAILED) return PositionStatus.FAILED;
-        await pollingUntil(
-          () =>
-            TheGraphService.transactions({ chainId, hash }).catch(console.warn),
-          (r) => !!r?.list?.length,
-          1000,
-        );
-        return PositionStatus.MINTED;
-      })();
-      PositionUpdateTime.set({ timeMs: Date.now() });
-      return status;
+      if (s === TransactionStatus.FAILED) return PositionStatus.FAILED;
+      return PositionStatus.MINTED;
+      // const s = res[res.length - 1];
+      // const status = await (async () => {
+      //   if (s === TransactionStatus.FAILED) return PositionStatus.FAILED;
+      //   await pollingUntil(
+      //     () =>
+      //       TheGraphService.transactions({ chainId, hash }).catch(console.warn),
+      //     (r) => !!r?.list?.length,
+      //     1000,
+      //   );
+      //   return PositionStatus.MINTED;
+      // })();
+      // PositionUpdateTime.set({ timeMs: Date.now() });
+      // return status;
     });
   }
 
@@ -372,9 +375,6 @@ export class PositionsService {
     }`;
     return WalletService.mint(params)
       .then(async (hash) => {
-        ReferralService.bind([
-          { rfqId: params.rfqId, quoteId: params.quote.quoteId, txId: hash },
-        ]);
         safeRun(cb, {
           status: 'QueryResult',
           details: [
@@ -392,6 +392,11 @@ export class PositionsService {
           hash,
           params.vault.chainId,
         );
+        if (status === PositionStatus.MINTED) {
+          ReferralService.bind([
+            { rfqId: params.rfqId, quoteId: params.quote.quoteId, txId: hash },
+          ]);
+        }
         safeRun(cb, {
           status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
           details: [[key, { status, hash, quoteIds: [params.quote.quoteId] }]],
@@ -426,27 +431,6 @@ export class PositionsService {
         1: 'All Failed',
         2: 'Partial Failed',
       } as const;
-      if (map[hashes.code] !== 'All Failed') {
-        const detailsMap = Object.fromEntries(hashes.value);
-        ReferralService.bind(
-          params.reduce((pre, it) => {
-            const result =
-              detailsMap[
-                `${it.vault.vault.toLowerCase()}-${it.vault.chainId}-${
-                  it.depositCcy
-                }`
-              ];
-            if (result.hash) {
-              pre.push({
-                rfqId: it.rfqId,
-                quoteId: it.quote.quoteId,
-                txId: result.hash,
-              });
-            }
-            return pre;
-          }, [] as BindTradeInfo[]),
-        );
-      }
       safeRun(cb, {
         status: 'QueryResult',
         details: hashes.value.map(
@@ -486,6 +470,27 @@ export class PositionsService {
           ] as const;
         }),
       );
+      if (map[hashes.code] !== 'All Failed') {
+        const detailsMap = Object.fromEntries(hashes.value);
+        ReferralService.bind(
+          params.reduce((pre, it) => {
+            const result =
+              detailsMap[
+                `${it.vault.vault.toLowerCase()}-${it.vault.chainId}-${
+                  it.depositCcy
+                }`
+              ];
+            if (result.hash) {
+              pre.push({
+                rfqId: it.rfqId,
+                quoteId: it.quote.quoteId,
+                txId: result.hash,
+              });
+            }
+            return pre;
+          }, [] as BindTradeInfo[]),
+        );
+      }
       safeRun(cb, { status: map[hashes.code], details });
     });
   }
@@ -662,5 +667,62 @@ export class PositionsService {
       (_, count) => 20 * count >= data.positionIds.length,
       1000,
     );
+  }
+
+  static async pendingPositions(params: {
+    chainId: number;
+    owner?: string;
+    riskType?: RiskType;
+    productType?: ProductType;
+  }) {
+    const vault_in = ProductsService.filterVaults(
+      ContractsService.vaults,
+      params,
+      true,
+    ).map((it) => it.vault.toLowerCase());
+    return http
+      .post<unknown, HttpResponse<TransactionInfo[]>>(
+        '/rfq/transactions/pending',
+        {
+          chainId: params.chainId,
+          taker: params.owner,
+          vaults: vault_in,
+        },
+      )
+      .then((res) =>
+        Promise.all(
+          res.value.map(async (it) => ({
+            ...it,
+            txStatus: await WalletService.transactionResult(
+              it.hash,
+              it.product.vault.chainId,
+            ),
+            vault: ContractsService.getVaultInfo(
+              it.product.vault.vault,
+              it.product.vault.chainId,
+            ),
+            pricesForCalculation: it.relevantDollarPrices.reduce(
+              (pre, it) => ({ ...pre, [it.ccy]: it.price }),
+              {},
+            ),
+          })),
+        ),
+      )
+      .then((res) =>
+        res
+          .filter((it) => it.txStatus === TransactionStatus.SUCCESS)
+          .map(
+            (it) =>
+              ({
+                ...it,
+                id: it.hash,
+                positionId: it.hash,
+                wallet: it.makerWallet,
+                claimed: false,
+                updatedAt: it.createdAt,
+                claimParams: undefined as never,
+              }) as PositionInfo,
+          ),
+      );
   }
 }

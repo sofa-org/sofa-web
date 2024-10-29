@@ -10,7 +10,7 @@ import {
 import { PositionStatus } from '@sofa/services/the-graph';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
-import { useInfiniteScroll } from 'ahooks';
+import { useInfiniteScroll, useRequest } from 'ahooks';
 import { uniqBy } from 'lodash-es';
 
 import AsyncButton from '@/components/AsyncButton';
@@ -35,6 +35,25 @@ addI18nResources(locale, 'PositionList');
 const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   const [t] = useTranslation('PositionList');
   const wallet = useWalletStore();
+
+  const { data: pendingPositions } = useRequest(
+    () =>
+      PositionsService.pendingPositions({
+        chainId: wallet.chainId,
+        owner: wallet.address,
+        riskType: props.riskType,
+        productType: props.productType,
+      }),
+    {
+      refreshDeps: [
+        wallet.chainId,
+        wallet.address,
+        props.riskType,
+        props.productType,
+      ],
+      onError: (err) => console.error(getErrorMsg(err)),
+    },
+  );
 
   const {
     data: $data,
@@ -166,6 +185,15 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   return (
     <>
       <Spin wrapperClassName={styles['list']} spinning={loading}>
+        {pendingPositions?.map((it) => (
+          <PositionCard
+            syncing={true}
+            position={it}
+            onStatusChange={(status) => handleStatusChange(status, it)}
+            onClick={() => setSelectedPosition(it)}
+            key={`${it.id}-${ProductsService.productKey(it.product)}`}
+          />
+        ))}
         {data.map((it) =>
           it.claimed ? (
             <Fragment key={it.id} />
@@ -178,7 +206,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
             />
           ),
         )}
-        {!data?.length && !loading && (
+        {!pendingPositions?.length && !data?.length && !loading && (
           <CEmpty
             className={styles['empty']}
             style={{ margin: '100px auto 0' }}
