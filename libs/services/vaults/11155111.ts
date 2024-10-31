@@ -186,6 +186,61 @@ const USDTVaults = [
   },
 ];
 
+const USDTVaultsForAutomator = [
+  // LeverageBearSpreadVault(ETH/USDT)
+  {
+    chainId: 11155111,
+    vault: '0x86BadD9C434F06B420c1c6807e80061bd44fB7BC',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.LEVERAGE,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+  // LeverageBullSpreadVault(ETH/USDT)
+  {
+    chainId: 11155111,
+    vault: '0x15C13a4fEFB3D24Ceffe0f70A99EC3E40dC1F644',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.LEVERAGE,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+  // AAVESmartBullVault(ETH/USDT)
+  {
+    chainId: 11155111,
+    vault: '0x35c50461B3E3f56E62bCF11C25FF37F31A766F8B',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+  // AAVESmartBearVault(ETH/USDT)
+  {
+    chainId: 11155111,
+    vault: '0xf3d532f1D36BD63F9aA44822A8de85F6399ca141',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+];
+
 const RCHVaults = [
   // RCHDNTVault(ETH/USDT)
   {
@@ -225,6 +280,25 @@ const RCHVaults = [
   },
 ];
 
-const Vaults = [...USDTVaults, ...RCHVaults];
+const AutomatorVaults = [
+  {
+    chainId: 11155111,
+    vault: '0x8d922b143933FD6D4f6f82ae2Acea6D78b6a23a9',
+    productType: ProductType.Automator,
+    riskType: RiskType.Null,
+    forCcy: '',
+    domCcy: '',
+    depositCcy: 'USDT',
+    rchMultiplier: 0,
+    usePermit2: true,
+  },
+];
+
+const Vaults = [
+  ...USDTVaults,
+  ...RCHVaults,
+  ...AutomatorVaults,
+  ...USDTVaultsForAutomator,
+];
 
 export default Vaults;

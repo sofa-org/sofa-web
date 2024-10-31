@@ -6,10 +6,9 @@ import { http } from '@sofa/utils/http';
 import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
 
-import { ChainMap, defaultChain } from './chains';
+import { defaultChain } from './chains';
 import { ContractsService, VaultInfo } from './contracts';
 import { ApyDefinition } from './products';
-import { WalletService } from './wallet';
 
 export interface AAVERecord {
   id: string;

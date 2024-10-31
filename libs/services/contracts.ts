@@ -9,6 +9,7 @@ import {
 import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 
+import AutomatorAbis from './abis/Automator.json';
 import {
   CommonAbis,
   IUniswapV2PairABI,
@@ -32,6 +33,7 @@ import SpotOracleAbis from './abis/SpotOracle.json';
 import vaults_1 from './vaults/1';
 import vaults_56 from './vaults/56';
 import vaults_42161 from './vaults/42161';
+import vaults_421614 from './vaults/421614';
 import vaults_11155111 from './vaults/11155111';
 import {
   ProductType,
@@ -76,6 +78,8 @@ export class ContractsService {
       LeverageSTVaultAbis, // 其实是不支持 permit2
     [`${ProductType.BearSpread}-${RiskType.LEVERAGE}-false`]:
       LeverageSTVaultAbis,
+    [`${ProductType.Automator}-${RiskType.Null}-false`]: AutomatorAbis,
+    [`${ProductType.Automator}-${RiskType.Null}-true`]: AutomatorAbis,
   };
 
   static vaults: VaultInfo[] = [
@@ -83,6 +87,7 @@ export class ContractsService {
     ...vaults_56,
     ...vaults_42161,
     ...vaults_11155111,
+    ...vaults_421614,
   ]
     .filter((it) => ChainMap[it.chainId])
     .map((it) => {
@@ -172,9 +177,10 @@ export class ContractsService {
         collateralDecimal,
         balanceDecimal:
           collateralDecimal * (it.riskType === RiskType.PROTECTED ? 1e18 : 1),
-        abis: ContractsService.RFQVaultAbis[
-          `${it.productType}-${it.riskType}-${it.usePermit2}`
-        ],
+        abis:
+          ContractsService.RFQVaultAbis[
+            `${it.productType}-${it.riskType}-${it.usePermit2}`
+          ] || [],
       } as VaultInfo;
     });
 
@@ -192,6 +198,10 @@ export class ContractsService {
 
   static feeContractAddress(chainId: number) {
     return ChainMap[chainId].feeContractAddress;
+  }
+
+  static automatorFeeContractAddress(chainId: number) {
+    return ChainMap[chainId].automatorFeeContractAddress;
   }
 
   static getVaultInfo(vault: string, chainId: number) {
@@ -369,6 +379,13 @@ export class ContractsService {
     const chainId = Number(network.chainId);
     const info = ContractsService.getVaultInfo(vault, chainId);
     return new ethers.Contract(vault, info.abis, signerOrProvider);
+  }
+
+  static async automatorContract(
+    vault: string,
+    signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider, // 提供 provider 时无法调用 vault 的 mint, burn 和 burnBatch 方法
+  ) {
+    return ContractsService.rfqContract(vault, signerOrProvider);
   }
 
   static rchContract(

@@ -5,12 +5,14 @@ export enum ProductType {
   // DOT = 'DOT',
   BullSpread = 'BullSpread',
   BearSpread = 'BearSpread',
+  Automator = 'Automator',
 }
 
 export enum RiskType {
   PROTECTED = 'PROTECTED',
   LEVERAGE = 'LEVERAGE',
   RISKY = 'RISKY',
+  Null = 'Null', // Automator 产品没有风险类型
 }
 
 export enum TransactionStatus {
@@ -22,6 +24,13 @@ export enum TransactionStatus {
 export enum InterestType {
   AAVE = 'AAVE',
   LIDO = 'LIDO',
+}
+
+export enum AutomatorTransactionStatus {
+  PENDING = 'PENDING',
+  CLAIMABLE = 'CLAIMABLE',
+  COMPLETED = 'COMPLETED',
+  EXPIRED = 'EXPIRED',
 }
 
 export interface VaultInfo {
@@ -45,4 +54,9 @@ export interface VaultInfo {
   interestType?: InterestType; // 生息方式，只有 PROTECTED 产品有
   abis: ethers.InterfaceAbi;
   earlyClaimable?: boolean;
+  useSimpleFeeRate?: boolean; // 是否使用简单的手续费率
+}
+
+export interface AutomatorVaultInfo extends VaultInfo {
+  productType: ProductType.Automator;
 }
