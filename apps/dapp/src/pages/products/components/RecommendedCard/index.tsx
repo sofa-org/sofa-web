@@ -132,7 +132,14 @@ const RecommendedCard = (props: RecommendedCardProps) => {
       productType: vault.productType,
       riskType: RiskType.LEVERAGE,
     });
-    if (!leverageVault) return undefined;
+    if (
+      !leverageVault ||
+      !(['forCcy', 'depositCcy', 'productType', 'riskType'] as const).some(
+        (k) => vault[k] != leverageVault[k],
+      )
+    ) {
+      return undefined;
+    }
     return useProductsState.quote({
       vault: leverageVault,
       expiry: data?.[0].expiry,
