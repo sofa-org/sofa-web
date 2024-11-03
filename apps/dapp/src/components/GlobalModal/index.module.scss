@@ -1,0 +1,17 @@
+.global-modal {
+  p {
+    margin: 0 0 16px;
+  }
+}
+
+.footer {
+  @include flex-center;
+
+  margin: 24px 0 0;
+}
+
+.btn-confirm {
+  flex: 1;
+  height: min(48px, 10vw);
+  border-radius: calc(min(48px, 10vw) / 2);
+}

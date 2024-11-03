@@ -10,7 +10,13 @@ import {
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ejectPromise } from '@livelybone/promise-wait';
-import { useDebounce, useSafeState, useSize, useThrottleFn } from 'ahooks';
+import {
+  useDebounce,
+  useMount,
+  useSafeState,
+  useSize,
+  useThrottleFn,
+} from 'ahooks';
 import useEffectWithTarget from 'ahooks/es/utils/useEffectWithTarget';
 import { isEqual } from 'lodash-es';
 import { parse } from 'qs';
@@ -244,6 +250,9 @@ export function useDomSizeChange(
 
 export function useTime(options?: { interval?: number }) {
   const [time, setTime] = useState(() => Date.now());
+  useMount(() => {
+    setTime(Date.now());
+  });
   useEffect(() => {
     const timer = setInterval(
       () => setTime(Date.now()),

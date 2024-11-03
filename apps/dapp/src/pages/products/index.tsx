@@ -96,12 +96,18 @@ const Index = () => {
       onChange={(v) => setProductType(v as ProductType)}
       prefix={t('Product')}
       extraTopContent={
-        depositCcyList.length > 0 && (
-          <div className={styles['title']}>
-            {RiskTypeRefs[project].icon}
-            {t('Choose Your Product')}
-          </div>
-        )
+        <>
+          <div
+            id="global-tips-container"
+            className={styles['global-tips-container']}
+          />
+          {depositCcyList.length > 0 && (
+            <div className={styles['title']}>
+              {RiskTypeRefs[project].icon}
+              {t('Choose Your Product')}
+            </div>
+          )}
+        </>
       }
       sticky
     >
