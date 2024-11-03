@@ -60,6 +60,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: true,
+    tradeDisable: true,
   },
   // SmartBullPrincipalVault(WBTC/USDT)
   {
@@ -72,6 +73,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: true,
+    tradeDisable: true,
   },
   // SmartBearPrincipalVault(USDT)
   {
@@ -84,6 +86,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: true,
+    tradeDisable: true,
   },
   // SmartBearPrincipalVault(WBTC/USDT)
   {
@@ -96,6 +99,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: true,
+    tradeDisable: true,
   },
   // DNTVault(USDT)
   {
@@ -607,6 +611,62 @@ const stETHVaults = [
   },
 ];
 
-const vaults = [...USDTVaults, ...RCHVaults, ...stETHVaults];
+const USDTVaultsForOKXWeb3 = [
+  // AAVESmartBullVault(ETH/USDT)
+  {
+    chainId: 1,
+    vault: '0xe483d580664cd72B0A8cae0D65EFfA6587bd2263',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 0,
+    usePermit2: false,
+  },
+  // AAVESmartBullVault(WBTC/USDT)
+  {
+    chainId: 1,
+    vault: '0x21f759Bcb31739032A00b37e3560a216AE52eFDC',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 0,
+    usePermit2: false,
+  },
+  // AAVESmartBearVault(ETH/USDT)
+  {
+    chainId: 1,
+    vault: '0x3191a0008415dEB5c5161C4B394Ec46C8C703f8c',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 0,
+    usePermit2: false,
+  },
+  // AAVESmartBearVault(WBTC/USDT)
+  {
+    chainId: 1,
+    vault: '0xC9Aa266e2E50EC2474cD881566845480F8daE931',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 0,
+    usePermit2: false,
+  },
+];
+
+const vaults = [
+  ...USDTVaults,
+  ...RCHVaults,
+  ...stETHVaults,
+  ...USDTVaultsForOKXWeb3,
+];
 
 export default vaults;
