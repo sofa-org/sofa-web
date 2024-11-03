@@ -1,0 +1,60 @@
+.tips-close {
+  @include pointer;
+
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.tips-text {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.tips-actions {
+  @include flex-center;
+
+  flex: none;
+  width: fit-content;
+}
+
+.tips-content {
+  flex: 1;
+  width: 1px;
+}
+
+.global-tips {
+  @include flex-center;
+
+  width: $width-content;
+  min-height: 48px;
+  padding: 16px 0;
+  gap: 24px;
+  color: rgba(#fff, 0.85);
+}
+
+.global-tips-wrapper {
+  @include flex-center;
+
+  width: 100vw;
+  background: #1a1b20;
+  pointer-events: initial;
+}
+
+@media (orientation: portrait) {
+  .tips-close {
+    top: 12px;
+  }
+
+  .tips-text {
+    font-size: 12px;
+  }
+
+  // .global-tips {
+  //   @include flex-column-center;
+
+  //   gap: 6px;
+  //   position: relative;
+  //   padding: 12px 0;
+  // }
+}

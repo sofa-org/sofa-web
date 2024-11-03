@@ -2,6 +2,10 @@
   margin: 0;
 }
 
+.global-tips-container {
+  margin: -48px 0 48px;
+}
+
 .title {
   @include flex-center;
 
@@ -125,6 +129,10 @@
 }
 
 @media (orientation: portrait) {
+  .global-tips-container {
+    margin: -12px 0 12px;
+  }
+
   .title {
     @include flex-center;
 
