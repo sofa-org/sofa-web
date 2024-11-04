@@ -28,6 +28,7 @@ import NotFound from '@/pages/not-found';
 
 import './global-var';
 
+import { GlobalModal } from './components/GlobalModal';
 import { EnvLinks } from './env-links';
 import { RouteGuard } from './route-guard';
 import { routes } from './routes';
@@ -75,8 +76,8 @@ const Root = WasmSuspenseHoc(
           </main>
           <Footer />
           {/* <CursorTail /> */}
-          {/* <GlobalModal />
-          <GlobalTips /> */}
+          <GlobalModal />
+          {/* <GlobalTips /> */}
         </ErrorBoundary>
       </ConfigProvider>
     );

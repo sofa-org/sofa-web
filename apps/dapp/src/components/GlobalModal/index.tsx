@@ -10,7 +10,7 @@ import styles from './index.module.scss';
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
-  const [data, setData] = useLocalStorageState('global-modal', {
+  const [data, setData] = useLocalStorageState('global-modal-postpone', {
     defaultValue: { closedAt: 0 },
   });
   const visible = useMemo(() => {
@@ -24,7 +24,7 @@ export const GlobalModal = () => {
   return (
     <Modal
       className={styles['global-modal']}
-      title={t({ enUS: 'Notification', zhCN: '通知' })}
+      title={t({ enUS: 'Postponement Notification', zhCN: '延期通知' })}
       footer={null}
       visible={visible}
       centered
@@ -33,7 +33,7 @@ export const GlobalModal = () => {
       maskClosable={false}
       width={720}
     >
-      <p
+      {/* <p
         dangerouslySetInnerHTML={{
           __html: t({
             enUS: 'Get ready for the OKX Web3 x SOFA.org joint event! Starting November 4 at 8am UTC and running until December 4 at 8am, visit the OKX Web3 x SOFA.org event area and purchase Earn to receive even more $RCH airdrops.',
@@ -56,6 +56,30 @@ export const GlobalModal = () => {
             zhCN: '12 月 4 日 16:00 起，空投将恢复至现有规则。',
           }),
         }}
+      /> */}
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: 'We regret to inform you that the OKX Web3 joint event has been postponed. Until the event launches, the $RCH airdrop distribution will remain unchanged.',
+            zhCN: '很抱歉，OKX Web3 联合活动将延期上线。活动上线前，$RCH 空投与之前保持不变。',
+          }),
+        }}
+      />
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: 'In the meantime, you can secure your $RCH airdrop in advance by purchasing long-term Earn products, with yields of up to 20% on a 60-day expiry.',
+            zhCN: '目前购买较长期限的Earn产品，能提前锁定 $RCH 空投。60 天到期日，收益率高达 20%。',
+          }),
+        }}
+      />
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: 'The new start date for the joint event will be announced separately. Please stay tuned for updates.',
+            zhCN: '联合活动的开始日期将另行通知，敬请留意。',
+          }),
+        }}
       />
       <div className={styles['footer']}>
         <Button
@@ -64,7 +88,7 @@ export const GlobalModal = () => {
           theme="solid"
           onClick={() => setData({ closedAt: Date.now() })}
         >
-          {t({ enUS: 'Confirm', zhCN: '确定' })}
+          {t({ enUS: 'Okay', zhCN: '好的' })}
           {/* {t({ enUS: 'Go to OKX Web3', zhCN: '立即参与' })} */}
         </Button>
       </div>
