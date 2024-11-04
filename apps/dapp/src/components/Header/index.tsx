@@ -71,6 +71,17 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
       path: 'https://docs.sofa.org',
       type: 1,
     },
+    {
+      label: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
+      path: 'https://blog.sofa.org/',
+      type: 1,
+    },
+    {
+      label: (t: TFunction) =>
+        t({ enUS: 'Ambassador Program', zhCN: '宣传大使项目' }),
+      path: 'https://blog.sofa.org/ambassador/',
+      type: 1,
+    },
     { label: (t: TFunction) => t('Trade'), path: '/products', type: 2 },
     { label: (t: TFunction) => t('Position'), path: '/positions', type: 2 },
     campaign,
