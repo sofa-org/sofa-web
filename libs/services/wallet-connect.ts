@@ -291,6 +291,7 @@ export class WalletConnect {
     Connector,
     'originProvider' | 'provider' | 'signer'
   > & {
+    chainId: number;
     disconnect(): void;
   };
   static async connect(
@@ -301,7 +302,9 @@ export class WalletConnect {
       disconnect(): void;
     }
   > {
-    if (WalletConnect._wallet) return WalletConnect._wallet;
+    if (WalletConnect._wallet && WalletConnect._wallet.chainId === chainId) {
+      return WalletConnect._wallet;
+    }
     checkChainId(chainId);
     const modal = await WalletConnect.getModal();
 
@@ -317,6 +320,7 @@ export class WalletConnect {
           ...validConnectors[0],
           provider: new BrowserProvider(originProvider),
           signer,
+          chainId,
           disconnect: () => modal.disconnect(),
         };
         return WalletConnect._wallet;
@@ -367,6 +371,7 @@ export class WalletConnect {
       ...connector,
       imageUrl: connector?.imageUrl || iconWalletConnect,
       originProvider: originProvider,
+      chainId,
       provider: new BrowserProvider(originProvider),
       signer,
       disconnect: () => modal.disconnect(),
