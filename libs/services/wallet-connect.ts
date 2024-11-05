@@ -213,7 +213,7 @@ export class WalletConnect {
   @asyncCache({
     until: async (pre, t, _, __, [chainId]) => {
       if (!pre || !t) return true;
-      const network = await (pre as JsonRpcProvider)._detectNetwork();
+      const network = await (pre as JsonRpcProvider)._network;
       return Number(network.chainId) !== chainId;
     },
   })
@@ -252,7 +252,9 @@ export class WalletConnect {
       modal,
     });
     if (provider) return provider;
-    return new JsonRpcProvider(ChainMap[chainId].rpcUrl, chainId);
+    const p = new JsonRpcProvider(ChainMap[chainId].rpcUrl, chainId);
+    await p._detectNetwork();
+    return p;
   }
 
   @asyncShare()
@@ -312,13 +314,18 @@ export class WalletConnect {
       const validConnectors = await WalletConnect.getValidConnectors();
       if (validConnectors.length === 1) {
         const originProvider = validConnectors[0].originProvider;
-        const provider = new BrowserProvider(originProvider);
-        if (switchNetwork) await WalletConnect.switchNetwork(provider, chainId);
+        const provider = await (async () => {
+          let p = new BrowserProvider(originProvider);
+          if (switchNetwork) await WalletConnect.switchNetwork(p, chainId);
+          p = new BrowserProvider(originProvider);
+          await p._detectNetwork();
+          return p;
+        })();
         const signer = await provider.getSigner();
         modal.close();
         WalletConnect._wallet = {
           ...validConnectors[0],
-          provider: new BrowserProvider(originProvider),
+          provider,
           signer,
           chainId,
           disconnect: () => modal.disconnect(),
@@ -363,8 +370,13 @@ export class WalletConnect {
     // @ts-ignore
     const connectors = modal.getConnectors();
     const connector = connectors.find((it) => it.provider === originProvider)!;
-    const provider = new BrowserProvider(originProvider);
-    if (switchNetwork) await WalletConnect.switchNetwork(provider, chainId);
+    const provider = await (async () => {
+      let p = new BrowserProvider(originProvider);
+      if (switchNetwork) await WalletConnect.switchNetwork(p, chainId);
+      p = new BrowserProvider(originProvider);
+      await p._detectNetwork();
+      return p;
+    })();
     const signer = await provider.getSigner();
     modal.close();
     WalletConnect._wallet = {
@@ -372,7 +384,7 @@ export class WalletConnect {
       imageUrl: connector?.imageUrl || iconWalletConnect,
       originProvider: originProvider,
       chainId,
-      provider: new BrowserProvider(originProvider),
+      provider,
       signer,
       disconnect: () => modal.disconnect(),
     };
@@ -388,8 +400,7 @@ export class WalletConnect {
   static async subscribeNetworkChange(cb: (chainId: number) => void) {
     const provider = await WalletConnect.$getModalProvider();
     if (!provider) return () => {};
-    const p = new BrowserProvider(provider);
-    let preNetwork = await p._detectNetwork();
+    let preNetwork = await new BrowserProvider(provider)._detectNetwork();
     cb(Number(preNetwork.chainId));
     const handler = (chain: string) => {
       cb(Number(chain));
@@ -399,7 +410,7 @@ export class WalletConnect {
       provider.on('chainChanged', handler);
     }
     const timer = setInterval(async () => {
-      const n = await p._detectNetwork();
+      const n = await new BrowserProvider(provider)._detectNetwork();
       if (n.chainId !== preNetwork.chainId) cb(Number(n.chainId));
       preNetwork = n;
     }, 3000);

@@ -156,7 +156,7 @@ export class WalletService {
         ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
       ],
     );
-    const network = await signer.provider._detectNetwork();
+    const network = await signer.provider._network;
     const succ = await pollingUntil(
       () => WalletService.transactionResult(hash, Number(network.chainId)),
       (res) => res !== TransactionStatus.PENDING,
