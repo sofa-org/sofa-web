@@ -54,7 +54,11 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           productType: props.productType,
         },
         { limit: 300, cursor: d?.cursor },
-      );
+      ).then((res) => ({
+        ...res,
+        chainId: wallet.chainId,
+        owner: wallet.address,
+      }));
     },
     {
       target: () => document.querySelector('#root'),
@@ -70,6 +74,9 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   );
 
   const data = useMemo(() => {
+    if (!$data) return undefined;
+    if ($data?.chainId !== wallet.chainId) return undefined;
+    if ($data?.owner !== wallet.address) return undefined;
     const list = uniqBy(
       $data?.list,
       (it: PositionInfo) =>
@@ -77,7 +84,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     );
     console.info('Positions', list);
     return list as PositionInfo[];
-  }, [$data]);
+  }, [$data, wallet.chainId, wallet.address]);
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
 
@@ -165,8 +172,8 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
 
   return (
     <>
-      <Spin wrapperClassName={styles['list']} spinning={loading}>
-        {data.map((it) =>
+      <Spin wrapperClassName={styles['list']} spinning={loading || !data}>
+        {data?.map((it) =>
           it.claimed ? (
             <Fragment key={it.id} />
           ) : (
