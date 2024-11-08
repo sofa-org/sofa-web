@@ -24,7 +24,8 @@ export const GlobalTips = () => {
   }, [location, time]);
 
   const visible = useMemo(() => {
-    if (Date.now() < dayjs('2024-11-04T08:00Z').valueOf()) return false;
+    if (Date.now() < dayjs('2024-11-08T10:00Z').valueOf()) return false;
+    if (Date.now() >= dayjs('2024-12-08T08:00Z').valueOf()) return false;
     // 如果 closedAt 对应的下一个 UTC8:00 小于当前时间对应下一个的 UTC8:00，则显示
     return !data?.closedAt || next8h(data?.closedAt) < next8h();
   }, [data]);
@@ -37,8 +38,8 @@ export const GlobalTips = () => {
         <div className={styles['tips-content']} style={{ textAlign: 'center' }}>
           <p className={styles['tips-text']}>
             {t({
-              enUS: 'From now until December 4th 8:00 UTC, visit the OKX Web3 x SOFA.org event area and purchase Earn to qualify for more $RCH airdrops!',
-              zhCN: '现在至12月4日 16:00 (UTC+8)，前往 OKX Web3 x SOFA 活动专区 购买 Earn 将获得更多 $RCH 空投！',
+              enUS: 'From now until December 8th 8:00 UTC, visit the OKX Web3 x SOFA.org event area and purchase Earn to qualify for more $RCH airdrops!',
+              zhCN: '现在至12月8日 16:00 (UTC+8)，前往 OKX Web3 x SOFA 活动专区 购买 Earn 将获得更多 $RCH 空投！',
             })}
           </p>
           {/* <Link to={OKX_WEB3_URL}>{t({ enUS: 'Go to OKX Web3', zhCN: '立即参与' })}</Link> */}
