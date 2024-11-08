@@ -31,6 +31,12 @@ export const Medium = {
   link: 'https://medium.com/sofaorg',
 };
 
+export const Blog = {
+  name: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
+  icon: <img src={LogoMedium} alt="" />,
+  link: 'https://blog.sofa.org',
+};
+
 export const Sofa = {
   name: (t: TFunction) => 'SOFA.org',
   icon: <LogoSofa />,
@@ -43,4 +49,4 @@ export const LinkedIn = {
   link: 'https://www.linkedin.com/company/sofa-org/',
 };
 
-export const LinkItems = [Twitter, Discord, Telegram, Medium];
+export const LinkItems = [Twitter, Discord, Telegram, Blog];
