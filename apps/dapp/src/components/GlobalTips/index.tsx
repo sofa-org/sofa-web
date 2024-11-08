@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '@sofa/services/i18n';
 import { next8h } from '@sofa/utils/expiry';
 import { useTime } from '@sofa/utils/hooks';
@@ -16,12 +16,11 @@ export const GlobalTips = () => {
     defaultValue: { closedAt: 0 },
   });
 
-  const location = useLocation();
-  const time = useTime({ interval: 10000 });
+  const time = useTime({ interval: 1000 });
   const container = useMemo(() => {
-    if (!location || !time) return null;
+    if (!time) return null;
     return document.querySelector('#global-tips-container');
-  }, [location, time]);
+  }, [time]);
 
   const visible = useMemo(() => {
     if (Date.now() < dayjs('2024-11-08T10:00Z').valueOf()) return false;
@@ -41,8 +40,13 @@ export const GlobalTips = () => {
               enUS: 'From now until December 8th 8:00 UTC, visit the OKX Web3 x SOFA.org event area and purchase Earn to qualify for more $RCH airdrops!',
               zhCN: '现在至12月8日 16:00 (UTC+8)，前往 OKX Web3 x SOFA 活动专区 购买 Earn 将获得更多 $RCH 空投！',
             })}
+            <Link
+              to={'https://www.okx.com/web3/defi/activity/33'}
+              className={styles['tips-link']}
+            >
+              {t({ enUS: 'Get started now', zhCN: '立即前往' })} &gt;
+            </Link>
           </p>
-          {/* <Link to={OKX_WEB3_URL}>{t({ enUS: 'Go to OKX Web3', zhCN: '立即参与' })}</Link> */}
         </div>
         {/* <div className={styles['tips-actions']}>
           <svg

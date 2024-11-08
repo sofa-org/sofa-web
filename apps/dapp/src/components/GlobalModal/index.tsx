@@ -4,13 +4,14 @@ import { Button, Modal } from '@douyinfe/semi-ui';
 import { useTranslation } from '@sofa/services/i18n';
 import { MsIntervals, next8h } from '@sofa/utils/expiry';
 import { useLocalStorageState } from 'ahooks';
+import classNames from 'classnames';
 
 import styles from './index.module.scss';
 
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
-  const [data, setData] = useLocalStorageState('global-modal', {
+  const [data, setData] = useLocalStorageState('global-modal-1', {
     defaultValue: { closedAt: 0 },
   });
   const visible = useMemo(() => {
@@ -61,13 +62,15 @@ export const GlobalModal = () => {
       />
       <div className={styles['footer']}>
         <Button
-          className={styles['btn-confirm']}
+          className={classNames(styles['btn-confirm'], 'btn-gradient')}
           type="primary"
           theme="solid"
-          onClick={() => setData({ closedAt: Date.now() })}
+          onClick={() => {
+            setData({ closedAt: Date.now() });
+            window.open('https://www.okx.com/web3/defi/activity/33', '_blank');
+          }}
         >
-          {t({ enUS: 'Okay', zhCN: '好的' })}
-          {/* {t({ enUS: 'Go to OKX Web3', zhCN: '立即参与' })} */}
+          {t({ enUS: 'Join now', zhCN: '立即参与' })}
         </Button>
       </div>
     </Modal>

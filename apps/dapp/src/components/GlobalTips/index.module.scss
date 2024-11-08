@@ -19,8 +19,17 @@
 }
 
 .tips-content {
+  gap: 12px;
   flex: 1;
   width: 1px;
+
+  .tips-link {
+    @include pointer;
+    @include gradient-txt;
+
+    display: inline-block;
+    padding: 0 0 0 12px;
+  }
 }
 
 .global-tips {
@@ -48,6 +57,7 @@
 
   .tips-text {
     font-size: 12px;
+    text-align: left;
   }
 
   // .global-tips {
