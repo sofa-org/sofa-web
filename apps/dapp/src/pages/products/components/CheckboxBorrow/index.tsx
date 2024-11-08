@@ -49,7 +49,7 @@ export const CheckboxBorrow = (props: CheckboxBorrowProps) => {
     [leverageVault],
   );
 
-  if (!leverageVault || !leverageInfo) return <></>;
+  if (!leverageVault) return <></>;
 
   return (
     <>
@@ -72,7 +72,7 @@ export const CheckboxBorrow = (props: CheckboxBorrowProps) => {
           className={styles['tip']}
           title={t(
             'Pay the borrowing fee and use {{leverage}}x leverage to subscribe for this product',
-            { leverage: leverageInfo.leverage },
+            { leverage: leverageInfo?.leverage },
           )}
         >
           Leverage
@@ -87,14 +87,17 @@ export const CheckboxBorrow = (props: CheckboxBorrowProps) => {
           <div className={styles['item']}>
             <div className={styles['label']}>{t('Borrow Amount')}</div>
             <div className={classNames(styles['value'], styles['highlight'])}>
-              {amountFormatter(principal * (leverageInfo.leverage - 1), 2)}
+              {amountFormatter(
+                principal * (Number(leverageInfo?.leverage) - 1),
+                2,
+              )}
               <span className={styles['unit']}>{props.vault.depositCcy}</span>
             </div>
           </div>
           <div className={styles['item']}>
             <div className={styles['label']}>{t('Total Notional Value')}</div>
             <div className={styles['value']}>
-              {amountFormatter(principal * leverageInfo.leverage, 2)}
+              {amountFormatter(principal * Number(leverageInfo?.leverage), 2)}
               <span className={styles['unit']}>{props.vault.depositCcy}</span>
             </div>
           </div>

@@ -205,7 +205,7 @@ export class ContractsService {
   static async $feeRate(
     provider: ethers.JsonRpcApiProvider,
   ): Promise<{ trading: number; settlement: number }> {
-    const network = await provider._network;
+    const network = await provider._detectNetwork();
     console.info('Fee Rate Params: ', {
       network,
       feeContract: ContractsService.feeContractAddress(Number(network.chainId)),
@@ -231,7 +231,7 @@ export class ContractsService {
     vault: string,
     timeMs: number,
   ): Promise<{ trading: number; settlement: number }> {
-    const network = await provider._network;
+    const network = await provider._detectNetwork();
     const vaultInfo = ContractsService.getVaultInfo(
       vault,
       Number(network.chainId),
@@ -277,7 +277,7 @@ export class ContractsService {
     vault: string,
     timeMs: number,
   ) {
-    const network = await provider._network;
+    const network = await provider._detectNetwork();
     const vaultInfo = ContractsService.getVaultInfo(
       vault,
       Number(network.chainId),
@@ -341,7 +341,7 @@ export class ContractsService {
     const { domain, types, values } = SignatureTransfer.getPermitData(
       minterPermit,
       PERMIT2_ADDRESS,
-      Number((await signer.provider._network).chainId),
+      Number((await signer.provider._detectNetwork()).chainId),
     );
     const sign = await signer.signTypedData(
       domain as ethers.TypedDataDomain,
@@ -357,8 +357,8 @@ export class ContractsService {
   ) {
     const network =
       'address' in signerOrProvider
-        ? await signerOrProvider.provider._network
-        : await signerOrProvider._network;
+        ? await signerOrProvider.provider._detectNetwork()
+        : await signerOrProvider._detectNetwork();
     const chainId = Number(network.chainId);
     const info = ContractsService.getVaultInfo(vault, chainId);
     return new ethers.Contract(vault, info.abis, signerOrProvider);
@@ -531,7 +531,7 @@ export class ContractsService {
     ccy: 'BTC' | 'ETH',
     ms: number,
   ) {
-    const network = await provider._network;
+    const network = await provider._detectNetwork();
     const chainInfo = ChainMap[Number(network.chainId)];
     const contract = new ethers.Contract(
       chainInfo.spotPriceOracle[ccy],
@@ -558,7 +558,7 @@ export class ContractsService {
     startMs: number,
     endMs: number,
   ) {
-    const network = await provider._network;
+    const network = await provider._detectNetwork();
     const chainInfo = ChainMap[Number(network.chainId)];
     const contract = new ethers.Contract(
       chainInfo.hlPriceOracle[ccy],

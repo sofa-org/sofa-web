@@ -213,7 +213,7 @@ export class WalletConnect {
   @asyncCache({
     until: async (pre, t, _, __, [chainId]) => {
       if (!pre || !t) return true;
-      const network = await (pre as JsonRpcProvider)._network;
+      const network = await (pre as JsonRpcProvider)._detectNetwork();
       return Number(network.chainId) !== chainId;
     },
   })
