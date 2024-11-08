@@ -31,10 +31,12 @@ export const GlobalModal = () => {
       footer={null}
       visible={visible}
       centered
-      closable={false}
       closeOnEsc={false}
       maskClosable={false}
       width={720}
+      onCancel={() => {
+        setData({ closedAt: Date.now() });
+      }}
     >
       <p
         dangerouslySetInnerHTML={{
