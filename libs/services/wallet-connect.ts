@@ -2,6 +2,7 @@
 import { ejectPromise, wait, waitUntil } from '@livelybone/promise-wait';
 import { asyncCache, asyncShare } from '@sofa/utils/decorators';
 import { Env } from '@sofa/utils/env';
+import { getErrorMsg } from '@sofa/utils/fns';
 import { reMsgError } from '@sofa/utils/object';
 import {
   EIP6963ProviderDetail,
@@ -159,7 +160,7 @@ export class WalletConnect {
     const networkData = {
       chainId: `0x${ChainMap[chainId].chainId.toString(16)}`,
       chainName: ChainMap[chainId].name,
-      rpcUrls: [ChainMap[chainId].rpcUrl],
+      rpcUrls: [...ChainMap[chainId].rpcUrlsForAddNetwork],
       nativeCurrency: ChainMap[chainId].nativeCurrency,
       blockExplorerUrls: [ChainMap[chainId].explorerUrl],
     };
@@ -170,27 +171,24 @@ export class WalletConnect {
       ]);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (switchError: any) {
-      // if (
-      //   !Env.isProd &&
-      //   (switchError.code === 4902 || /4902/.test(getErrorMsg(switchError)))
-      // ) {
-      //   try {
-      //     await provider.send('wallet_addEthereumChain', [networkData]);
-      //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //   } catch (addError: any) {
-      //     throw reMsgError(
-      //       addError.error || addError,
-      //       (m) =>
-      //         `Failed to add network - ${ChainMap[chainId].name}(${chainId}): ${m}`,
-      //     );
-      //   }
-      // } else {
-      throw reMsgError(
-        switchError.error || switchError,
-        (m) =>
-          `Failed to switch to network - ${ChainMap[chainId].name}(${chainId}): ${m}`,
-      );
-      // }
+      if (switchError.code === 4902 || /4902/.test(getErrorMsg(switchError))) {
+        try {
+          await provider.send('wallet_addEthereumChain', [networkData]);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (addError: any) {
+          throw reMsgError(
+            addError.error || addError,
+            (m) =>
+              `Failed to add network - ${ChainMap[chainId].name}(${chainId}): ${m}`,
+          );
+        }
+      } else {
+        throw reMsgError(
+          switchError.error || switchError,
+          (m) =>
+            `Failed to switch to network - ${ChainMap[chainId].name}(${chainId}): ${m}`,
+        );
+      }
     }
   }
 

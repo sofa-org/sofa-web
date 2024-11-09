@@ -27,6 +27,7 @@ export const ChainMap: Record<
     currency: string;
     explorerUrl: string;
     rpcUrl: string;
+    rpcUrlsForAddNetwork: string[];
     icon: string;
     isTest: boolean;
     nativeCurrency: {
@@ -57,6 +58,13 @@ export const ChainMap: Record<
       icon: IconETH,
       explorerUrl: 'https://etherscan.io',
       rpcUrl: import.meta.env.VITE_RPC_URL_OF_1,
+      rpcUrlsForAddNetwork: [
+        'https://eth.llamarpc.com',
+        'https://rpc.ankr.com/eth',
+        'https://eth.meowrpc.com',
+        'https://eth.drpc.org',
+        'https://1rpc.io/eth',
+      ],
       nativeCurrency: {
         name: 'ETH',
         symbol: 'ETH', // 2-6 characters long
@@ -90,6 +98,12 @@ export const ChainMap: Record<
       icon: IconArb,
       explorerUrl: 'https://arbiscan.io/',
       rpcUrl: import.meta.env.VITE_RPC_URL_OF_42161,
+      rpcUrlsForAddNetwork: [
+        'https://arbitrum.llamarpc.com',
+        'https://arbitrum.meowrpc.com',
+        'https://arbitrum.drpc.org',
+        'https://1rpc.io/arb',
+      ],
       nativeCurrency: {
         name: 'ETH',
         symbol: 'ETH', // 2-6 characters long
@@ -123,6 +137,12 @@ export const ChainMap: Record<
       icon: IconBNB,
       explorerUrl: 'https://bscscan.com',
       rpcUrl: 'https://binance.llamarpc.com',
+      rpcUrlsForAddNetwork: [
+        'https://binance.llamarpc.com',
+        'https://rpc.ankr.com/bsc',
+        'https://bsc.meowrpc.com',
+        'https://bsc.drpc.org',
+      ],
       nativeCurrency: {
         name: 'BNB',
         symbol: 'BNB', // 2-6 characters long
@@ -157,6 +177,13 @@ export const ChainMap: Record<
       icon: IconETH,
       explorerUrl: 'https://sepolia.etherscan.io',
       rpcUrl: 'https://rpc2.sepolia.org',
+      rpcUrlsForAddNetwork: [
+        'https://rpc2.sepolia.org',
+        'https://rpc.sepolia.org',
+        'https://1rpc.io/sepolia',
+        'https://sepolia.drpc.org',
+        'https://endpoints.omniatech.io/v1/eth/sepolia/public',
+      ],
       nativeCurrency: {
         name: 'ETH',
         symbol: 'ETH', // 2-6 characters long
