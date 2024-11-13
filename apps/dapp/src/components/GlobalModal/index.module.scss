@@ -2,6 +2,11 @@
   p {
     margin: 0 0 16px;
   }
+
+  .head {
+    @include bold;
+    margin: 0 0 8px;
+  }
 }
 
 .footer {

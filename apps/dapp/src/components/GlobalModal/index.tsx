@@ -11,7 +11,7 @@ import styles from './index.module.scss';
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
-  const [data, setData] = useLocalStorageState('global-modal-1', {
+  const [data, setData] = useLocalStorageState('global-modal-2', {
     defaultValue: { closedAt: 0 },
   });
   const visible = useMemo(() => {
@@ -27,7 +27,7 @@ export const GlobalModal = () => {
   return (
     <Modal
       className={styles['global-modal']}
-      title={t({ enUS: 'Notification', zhCN: '通知' })}
+      title={t({ enUS: 'Event Update Reminder', zhCN: '活动更新提醒' })}
       footer={null}
       visible={visible}
       centered
@@ -39,26 +39,36 @@ export const GlobalModal = () => {
       }}
     >
       <p
+        className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: 'The OKX Web3 x SOFA.org joint event kicks off on November 8 at 10:00 UTC!',
-            zhCN: 'OKX Web3 x SOFA.org 联合活动于 11月8日 18:00（UTC+8）正式上线！',
+            enUS: '1. OKX Web3 x SOFA.org Joint Event Now Live',
+            zhCN: '1. OKX Web3 x SOFA.org 联合活动已上线！',
           }),
         }}
       />
       <p
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: 'From November 8 at 8:00 UTC to December 8 at 8:00 UTC, the $RCH airdrop allocation will be temporarily adjusted. Of the daily 12,500 $RCH airdrop, 8,000 $RCH will be dedicated to the OKX Web3 x SOFA.org event. Head to OKX Web3, purchase Earn products, and enjoy high returns!',
-            zhCN: '11月8日 16:00（UTC+8） - 12月8日 16:00（UTC+8） 期间，$RCH 空投规则将临时调整：每天的 12,500 $RCH 空投中，将有 8,000 $RCH 分配至 OKX Web3 x SOFA.org 活动中。欢迎大家前往 OKX Web3 购买Earn 产品，享受高收益回报！',
+            enUS: 'From November 8 at 8:00 UTC to December 8 at 8:00 UTC, we’re excited to announce an adjustment to the $RCH airdrop allocation. During this period, 8,000 $RCH out of the daily 12,500 $RCH airdrop will be exclusively dedicated to the OKX Web3 x SOFA.org event. Head over to OKX Web3, purchase SOFA Earn products, and enjoy high returns.',
+            zhCN: '11月8日 16:00 - 12月8日 16:00 (UTC+8) 期间，$RCH 空投规则将临时调整：每天的 12,500 $RCH 空投中，将有 8,000 $RCH 分配至 OKX Web3 x SOFA.org 活动中。欢迎大家前往 OKX Web3 购买Earn 产品，享受高收益回报！',
+          }),
+        }}
+      />
+      <p
+        className={styles['head']}
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: '2. Surge Poker Museum Update',
+            zhCN: '2. Surge 扑克博物馆',
           }),
         }}
       />
       <p
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: 'After December 8 at 8:00 UTC, the airdrop will revert to its usual rules.',
-            zhCN: '12月8日 16:00（UTC+8） 起，空投将恢复至现有规则。',
+            enUS: 'Rule Update: Earn products are not included in this event. <br/>Event Rules: Buy a Surge to participate in the poker game.Each poker can be redeemed for up to 100 $RCH.',
+            zhCN: '规则调整：Earn 产品暂不参与本期活动<br/>具体规则：购买一笔 Surge 即可参与赢扑克，每张扑克最高可兑换 100 $RCH！',
           }),
         }}
       />
@@ -72,7 +82,7 @@ export const GlobalModal = () => {
             window.open('https://www.okx.com/web3/defi/activity/33', '_blank');
           }}
         >
-          {t({ enUS: 'Join now', zhCN: '立即参与' })}
+          {t({ enUS: 'Go to OKX Web3', zhCN: '前往 OKX Web3' })}
         </Button>
       </div>
     </Modal>

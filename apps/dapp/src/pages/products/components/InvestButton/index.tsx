@@ -230,7 +230,7 @@ const InvestButton = (props: InvestButtonProps) => {
                 delRfq(it[0]);
               }
             });
-            pokerRightsReminder();
+            if (vault.riskType === RiskType.RISKY) pokerRightsReminder();
           }
           if (/Success/i.test(progress.status)) {
             if (vault.riskType === RiskType.RISKY)
