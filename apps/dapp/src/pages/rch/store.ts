@@ -9,6 +9,7 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 
 const initialState = {
   myAirdropList: undefined as undefined | AirdropRecord[],
+  selectedAirdropKeys: [] as number[],
 };
 
 export const useRCHState = Object.assign(
@@ -53,6 +54,9 @@ export const useRCHState = Object.assign(
         useRCHState.setState(() => ({ myAirdropList: res }));
         return res;
       });
+    },
+    updateSelectedAirdropKeys: (keys: number[]) => {
+      useRCHState.setState((pre) => ({ ...pre, selectedAirdropKeys: keys }));
     },
     claimBatch: async () => {
       const claimableList = useRCHState.getState().claimableList();

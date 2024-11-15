@@ -42,6 +42,13 @@ const Account = () => {
   const claimableAmount = useRCHState((state) => state.claimableAmount());
   const totalAmount = useRCHState((state) => state.totalAmount());
 
+  const selectedClaimableList = useRCHState(
+    (state) =>
+      state
+        .claimableList()
+        ?.filter((it) => state.selectedAirdropKeys.includes(it.timestamp)),
+  );
+
   return (
     <div className={styles['account']}>
       <div className={styles['left']}>
@@ -143,24 +150,45 @@ const Account = () => {
           >
             {t('How to get RCH airdrop?')}
           </a>
-          {!!claimableList?.length && (
-            <AsyncButton
-              theme="solid"
-              type="primary"
-              onClick={() =>
-                useRCHState.claimBatch().then(() => {
-                  Toast.info(t('Claim successful'));
-                  useWalletStore.updateBalanceByTokenContract(
-                    ContractsService.rchAddress(),
-                    defaultChain.chainId,
-                  );
-                  ref.current?.refresh();
-                })
-              }
-            >
-              {t('Claim')}
-            </AsyncButton>
-          )}
+          <div className={styles['btns']}>
+            {!!claimableList?.length && (
+              <AsyncButton
+                theme="solid"
+                type="primary"
+                onClick={() =>
+                  useRCHState.claimBatch().then(() => {
+                    Toast.info(t('Claim successful'));
+                    useWalletStore.updateBalanceByTokenContract(
+                      ContractsService.rchAddress(),
+                      defaultChain.chainId,
+                    );
+                    ref.current?.refresh();
+                  })
+                }
+              >
+                {t({ enUS: 'Claim All', zhCN: '领取全部' })}
+              </AsyncButton>
+            )}
+            {!!claimableList?.length && (
+              <AsyncButton
+                theme="solid"
+                type="primary"
+                onClick={() =>
+                  useRCHState.claimBatch().then(() => {
+                    Toast.info(t('Claim successful'));
+                    useWalletStore.updateBalanceByTokenContract(
+                      ContractsService.rchAddress(),
+                      defaultChain.chainId,
+                    );
+                    ref.current?.refresh();
+                  })
+                }
+              >
+                {t({ enUS: 'Claim Selected', zhCN: '领取选中的' })}(
+                {selectedClaimableList?.length || 0})
+              </AsyncButton>
+            )}
+          </div>
         </div>
         <div className={styles['history']}>
           <div className={styles['total']}>

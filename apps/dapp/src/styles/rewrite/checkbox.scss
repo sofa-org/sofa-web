@@ -5,3 +5,9 @@
 .semi-checkbox-inner-display {
   @include flex-center;
 }
+
+.semi-checkbox-indeterminate .semi-checkbox-inner-display,
+.semi-checkbox-checked .semi-checkbox-inner-display {
+  background: $color-rch !important;
+  box-shadow: none !important;
+}
