@@ -10,7 +10,6 @@ import { BindTradeInfo, ReferralService } from './referral';
 import {
   PositionInfoInGraph,
   PositionStatus,
-  TheGraphService,
   TransactionInfoInGraph,
 } from './the-graph';
 import { WalletService } from './wallet';
@@ -349,12 +348,12 @@ export class PositionsService {
       const s = res[res.length - 1];
       const status = await (async () => {
         if (s === TransactionStatus.FAILED) return PositionStatus.FAILED;
-        await pollingUntil(
-          () =>
-            TheGraphService.transactions({ chainId, hash }).catch(console.warn),
-          (r) => !!r?.list?.length,
-          1000,
-        );
+        // await pollingUntil(
+        //   () =>
+        //     TheGraphService.transactions({ chainId, hash }).catch(console.warn),
+        //   (r) => !!r?.list?.length,
+        //   1000,
+        // );
         return PositionStatus.MINTED;
       })();
       PositionUpdateTime.set({ timeMs: Date.now() });
