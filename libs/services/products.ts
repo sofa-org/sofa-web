@@ -191,6 +191,7 @@ export class ProductsService {
 
   private static dealOriginQuote(
     it: OriginProductQuoteResult,
+    fixProtectedApy?: string | number,
   ): ProductQuoteResult {
     const vault = ContractsService.getVaultInfo(it.vault, it.chainId);
     return {
@@ -200,6 +201,10 @@ export class ProductsService {
       anchorPrices: it.quote.anchorPrices.map(
         (it) => +Big(it).div(vault.anchorPricesDecimal),
       ),
+      apyInfo: it.apyInfo && {
+        ...it.apyInfo,
+        min: fixProtectedApy ?? it.apyInfo.min,
+      },
       observationStart: it.observationStart || next8h() / 1000,
       pricesForCalculation: it.relevantDollarPrices.reduce(
         (pre, it) => ({ ...pre, [it.ccy]: it.price }),
@@ -302,7 +307,9 @@ export class ProductsService {
       .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(urls[type]!, {
         params: pick(params, ['chainId', 'vault']),
       })
-      .then((res) => res.value.map(ProductsService.dealOriginQuote));
+      .then((res) =>
+        res.value.map((it) => ProductsService.dealOriginQuote(it)),
+      );
   }
 
   static TicketTypeOptions = [
@@ -377,7 +384,9 @@ export class ProductsService {
       upperBarrier: data.anchorPrices[1],
       lowerStrike: data.anchorPrices[0],
       upperStrike: data.anchorPrices[1],
-    }).then((res) => ProductsService.dealOriginQuote(res.value));
+    }).then((res) =>
+      ProductsService.dealOriginQuote(res.value, data.protectedApy),
+    );
   }
 
   @asyncCache({
