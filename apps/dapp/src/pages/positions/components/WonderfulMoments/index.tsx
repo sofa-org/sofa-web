@@ -43,7 +43,10 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   );
   return (
     <>
-      <Spin wrapperClassName={styles['list']} spinning={loading}>
+      <Spin
+        wrapperClassName={styles['list']}
+        spinning={loading || (!positions && !!wallet.address)}
+      >
         {positions?.map((it) => (
           <WonderfulMomentCard position={it} key={it.id} />
         ))}

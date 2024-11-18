@@ -172,7 +172,10 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
 
   return (
     <>
-      <Spin wrapperClassName={styles['list']} spinning={loading || !data}>
+      <Spin
+        wrapperClassName={styles['list']}
+        spinning={loading || (!data && !!wallet.address)}
+      >
         {data?.map((it) =>
           it.claimed ? (
             <Fragment key={it.id} />

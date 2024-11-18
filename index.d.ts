@@ -10,7 +10,7 @@ declare interface HttpResponse<T = unknown> {
 }
 
 declare type CCY = 'BTC' | 'ETH' | 'RCH' | 'WBTC' | 'WETH' | 'stETH';
-declare type USDS = 'USD' | 'USDC' | 'USDT';
+declare type USDS = 'USD' | 'USDC' | 'USDT' | 'crvUSD' | string;
 
 declare type PRecord<K, V> = Partial<Record<K, V>>;
 

@@ -658,6 +658,6 @@ const crvUSDVaults = [
   },
 ];
 
-const vaults = [...USDTVaults, ...RCHVaults, ...stETHVaults, ...crvUSDVaults];
+const vaults = [...crvUSDVaults, ...USDTVaults, ...RCHVaults, ...stETHVaults];
 
 export default vaults;

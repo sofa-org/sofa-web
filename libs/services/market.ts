@@ -7,7 +7,7 @@ import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
 
 import { ChainMap, defaultChain } from './chains';
-import { ContractsService } from './contracts';
+import { ContractsService, VaultInfo } from './contracts';
 import { ApyDefinition } from './products';
 import { WalletService } from './wallet';
 
@@ -221,7 +221,7 @@ export class MarketService {
   }
 
   private static async $interestRate(
-    ccy: 'WETH' | 'WBTC' | 'USDT' | 'USDC' | 'stETH' | 'RCH',
+    ccy: 'WETH' | 'WBTC' | VaultInfo['depositCcy'],
     chainId: number,
   ) {
     return http
@@ -271,7 +271,7 @@ export class MarketService {
 
   @asyncCache({
     persist: true,
-    id: (_, [chainId]) => `interest-rate-1-${chainId}`,
+    id: (_, [chainId]) => `interest-rate-${chainId}`,
     until: (cache, createdAt) =>
       !cache || !createdAt || Date.now() - createdAt > MsIntervals.min * 2,
   })
@@ -297,14 +297,12 @@ export class MarketService {
       apyDefinition: ApyDefinition.AaveLendingAPY,
     };
     const interestRates = await Promise.all(
-      (['WBTC', 'WETH', 'USDT', 'USDC', 'stETH', 'RCH'] as const).map(
-        async (ccy) => [
-          ccy,
-          !ccyList.includes(ccy)
-            ? defaultApy
-            : await MarketService.$interestRate(ccy, chainId),
-        ],
-      ),
+      (['WBTC', 'WETH', ...ccyList] as const).map(async (ccy) => [
+        ccy,
+        !ccyList.includes(ccy)
+          ? defaultApy
+          : await MarketService.$interestRate(ccy, chainId),
+      ]),
     ).then(Object.fromEntries);
     return Promise.resolve().then(() => ({
       ...interestRates,
