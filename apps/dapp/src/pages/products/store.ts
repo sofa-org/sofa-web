@@ -110,7 +110,7 @@ export const useProductsState = Object.assign(
       if (!vault) return new Error('Please switch deposit currency');
       if (vault.riskType === RiskType.PROTECTED && !params.fundingApy)
         return new Error(
-          'Please wait for the yield from Aave/Lido/Sofa to be successfully retrieved',
+          'Please wait for the yield from Aave/Lido/Sofa/Curve to be successfully retrieved',
         );
       return null;
     },
