@@ -607,6 +607,57 @@ const stETHVaults = [
   },
 ];
 
-const vaults = [...USDTVaults, ...RCHVaults, ...stETHVaults];
+const crvUSDVaults = [
+  // CrvUSDBullTrendVault(ETH/crvUSD)
+  {
+    chainId: 1,
+    vault: '0xF5BF8aa4b571FF2Be9905289bfcEbC1D46408D9F',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'crvUSD',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // CrvUSDBearTrendVault(ETH/crvUSD)
+  {
+    chainId: 1,
+    vault: '0x9832e7E40d5a1495cA7bdbCd6A5C0A90D28F6cFA',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'crvUSD',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // CrvUSDBullTrendVault(WBTC/crvUSD)
+  {
+    chainId: 1,
+    vault: '0x99595455Ba95b286F8e2614470b865e34f034Aa1',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'crvUSD',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+  // CrvUSDBearTrendVault(WBTC/crvUSD)
+  {
+    chainId: 1,
+    vault: '0xf421B050647CF6eB757dE873F212e04a5e324487',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'crvUSD',
+    rchMultiplier: 20,
+    usePermit2: false,
+  },
+];
+
+const vaults = [...USDTVaults, ...RCHVaults, ...stETHVaults, ...crvUSDVaults];
 
 export default vaults;
