@@ -134,7 +134,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
     });
     if (
       !leverageVault ||
-      !(['forCcy', 'depositCcy', 'productType', 'riskType'] as const).some(
+      (['forCcy', 'depositCcy', 'productType', 'riskType'] as const).some(
         (k) => vault[k] != leverageVault[k],
       )
     ) {
