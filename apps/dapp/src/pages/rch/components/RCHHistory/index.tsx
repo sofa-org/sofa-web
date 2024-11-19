@@ -133,7 +133,7 @@ export const RCHHistory = forwardRef<RCHHistoryRef>((_, ref) => {
       <div className={styles['operators']}>
         <Checkbox
           className={classNames('semi-always-dark', styles['btn-hide'])}
-          value={hideClaimedAirdrop}
+          checked={hideClaimedAirdrop}
           onChange={() => setHideClaimedAirdrop((pre) => !pre)}
         >
           {t({ enUS: 'Hide claimed records', zhCN: '隐藏已领取的空投记录' })}
