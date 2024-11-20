@@ -8,8 +8,10 @@ export const RouteGuard = (props: { Comp: ComponentType }) => {
   const isSubProject =
     /earn|surge/i.test(location.origin) ||
     (/localhost|front.sofa.org|(\d+\.){3}\d+/.test(location.origin) &&
-      /project=(PROTECTED|RISKY|LEVERAGE)/.test(location.search));
-  const isSubProjectPath = /products|positions/.test(location.pathname);
+      /project=\w+/.test(location.search));
+  const isSubProjectPath = /products|positions|transactions/.test(
+    location.pathname,
+  );
 
   if (isSubProject && !isSubProjectPath) {
     return <Navigate to={{ pathname: '/products', search: location.search }} />;

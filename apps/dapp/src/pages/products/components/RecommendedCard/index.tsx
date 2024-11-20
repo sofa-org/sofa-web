@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@douyinfe/semi-ui';
+import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -49,7 +50,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
   const wallet = useWalletStore();
   const [project] = useProjectChange();
   const riskType =
-    project === RiskType.RISKY ? RiskType.RISKY : RiskType.PROTECTED;
+    project === ProjectType.Surge ? RiskType.RISKY : RiskType.PROTECTED;
   const [productType] = useProductSelect();
   const vault = useGlobalState((state) =>
     ProductsService.findVault(state.vaults, {
@@ -265,7 +266,8 @@ const RecommendedCard = (props: RecommendedCardProps) => {
                         ...parse(window.location.search, {
                           ignoreQueryPrefix: true,
                         }),
-                        project: it.vault.riskType || '',
+                        project,
+                        'risk-type': it.vault.riskType || '',
                         'product-type': it.vault.productType || '',
                         'for-ccy': it.vault.forCcy,
                         'deposit-ccy': it.vault.depositCcy,

@@ -1,21 +1,17 @@
 import { useMemo } from 'react';
 import { Popover } from '@douyinfe/semi-ui';
-import { RiskType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { Env } from '@sofa/utils/env';
 import { useIsPortrait } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import { addI18nResources } from '@/locales';
 
 import { C_Select } from '../CSelect';
-import { RiskTypeRefs } from '../ProductSelector/enums';
+import { ProjectTypeRefs } from '../ProductSelector/enums';
 
 import locale from './locale';
 
 import styles from './index.module.scss';
-
-import { Comp as LogoSofa } from '@@/favicon.svg';
 
 addI18nResources(locale, 'LaunchApp');
 
@@ -24,18 +20,16 @@ const LaunchApp = (props: BaseProps) => {
   const isPortrait = useIsPortrait();
   const options = useMemo(
     () => [
-      ...Object.values(RiskTypeRefs)
-        .filter((it) => it.value !== RiskType.LEVERAGE)
-        .map((it) => ({
-          label: (
-            <>
-              {it.icon}
-              {it.label(t)}
-            </>
-          ),
-          name: it.value,
-          value: it.link,
-        })),
+      ...Object.values(ProjectTypeRefs).map((it) => ({
+        label: (
+          <>
+            {it.icon}
+            {it.label(t)}
+          </>
+        ),
+        name: it.value,
+        value: it.link,
+      })),
     ],
     // () => [
     //   {

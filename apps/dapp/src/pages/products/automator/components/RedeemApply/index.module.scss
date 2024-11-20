@@ -1,0 +1,241 @@
+.title {
+  @include regular;
+
+  margin: 0 0 min(16px, 2vw);
+  font-size: min(14px, 3.3vw);
+  text-align: center;
+  opacity: 0.65;
+}
+
+.duration {
+  padding: 0 0 0 8px;
+}
+
+.shares {
+  margin: 0;
+  text-align: center;
+
+  .value {
+    @include bold;
+
+    margin: 0;
+    font-size: min(28px, 6.6vw);
+  }
+
+  .decorative {
+    padding: 0 0 0 8px;
+    font-size: min(14px, 3.3vw);
+    opacity: 0.6;
+  }
+}
+
+.form-item {
+  &:last-child {
+    margin: 0;
+  }
+
+  .suffix {
+    font-size: 14px;
+  }
+}
+
+.label {
+  margin: 0 0 min(14px, 1.5vw);
+  font-size: min(16px, 3.6vw);
+  opacity: 0.65;
+}
+
+.equals {
+  padding: 0 0 0 4px;
+  font-size: 12px;
+}
+
+.input-wrapper {
+  margin: 0;
+
+  :global {
+    .semi-datepicker-input {
+      margin: 8px 0 0;
+      overflow: hidden;
+
+      .semi-input-wrapper {
+        margin: 0;
+        border-radius: 20px;
+      }
+
+      input {
+        @include bold;
+      }
+    }
+
+    .radio-btn-group {
+      display: flex;
+    }
+  }
+}
+
+.unit {
+  font-size: min(14px, 3.3vw);
+}
+
+.balance {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: min(16px, 4vw) 0 0;
+
+  .label {
+    margin: 0;
+    font-size: min(14px, 3.3vw);
+    opacity: 0.3;
+  }
+
+  .value {
+    font-size: min(14px, 3.3vw);
+    opacity: 0.6;
+  }
+}
+
+.redeem-info {
+  @include flex-center;
+
+  justify-content: flex-start;
+  gap: 12px;
+  margin: min(12px, 2.8vw) 0 0;
+  color: #d89614;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    flex: none;
+    width: min(16px, 4.8vw);
+    height: min(16px, 4.8vw);
+    background: url("../../assets/icon-wait.svg") no-repeat center center /
+      contain;
+  }
+}
+
+.tips {
+  .tip {
+    position: relative;
+    padding: 0 0 0 min(28px, 6.6vw);
+    margin: min(16px, 4vw) 0 0;
+    font-size: min(14px, 3.3vw);
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: min(20px, 4.8vw);
+      height: min(20px, 4.8vw);
+      background: url("../../assets/icon-wait.svg") no-repeat center center /
+        contain;
+    }
+
+    :global(.highlight) {
+      color: #d89614;
+    }
+  }
+}
+
+:global(.highlight) {
+  color: #d89614;
+}
+
+.button {
+  width: 100%;
+  height: min(48px, 12vw);
+  padding: 0;
+  margin: min(40px, 6vw) 0 0;
+  background: #000;
+  border-radius: min(24px, 6vw);
+
+  svg {
+    width: 1em;
+    height: 1em;
+    margin: 0 0 0 6px;
+  }
+
+  &.cancel-button {
+    background: transparent !important;
+    border: 1px solid #000 !important;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    &[disabled] {
+      opacity: 0.6;
+    }
+  }
+
+  &:not(.cancel-button) {
+    :global {
+      .semi-button-content {
+        @include gradient-txt;
+
+        svg[data-icon="spin"] {
+          color: #fff;
+        }
+      }
+    }
+
+    &:hover {
+      background: rgba(#000, 0.8) !important;
+    }
+
+    &[disabled] {
+      background: rgba(#000, 0.6) !important;
+    }
+  }
+
+  &.btn-claim {
+    :global {
+      .semi-button-content {
+        color: #fff;
+        background: transparent;
+        background-clip: text;
+        -webkit-text-fill-color: initial;
+
+        svg[data-icon="spin"] {
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+.buttons {
+  @include flex-center;
+
+  justify-content: space-between;
+  gap: min(20px, 5vw);
+}
+
+.modal {
+  :global {
+    .semi-modal-footer {
+      @include flex-center;
+
+      padding: 0;
+
+      button:first-child {
+        display: none !important;
+      }
+
+      button:last-child {
+        display: block;
+        width: min(280px, $width-content);
+        height: min(40px, 10vw);
+        margin-left: 0;
+        border-radius: min(20px, 5vw);
+
+        .semi-button-content {
+          @include flex-center;
+        }
+      }
+    }
+  }
+}

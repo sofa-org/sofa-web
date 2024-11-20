@@ -10,7 +10,7 @@ import {
 } from '@sofa/services/positions';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { amountFormatter } from '@sofa/utils/amount';
-import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
+import { displayExpiry, next8h } from '@sofa/utils/expiry';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
 import { useRequest } from 'ahooks';
 import classNames from 'classnames';

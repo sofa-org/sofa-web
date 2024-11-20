@@ -1,4 +1,4 @@
-import { ProductType, RiskType } from '../base-type';
+import { ProductType, RiskType } from '../../base-type';
 
 const USDTVaultsForAutomator = [
   // LeverageBearSpreadVault(ETH/USDT)
@@ -55,20 +55,6 @@ const USDTVaultsForAutomator = [
   },
 ];
 
-const AutomatorVaults = [
-  {
-    chainId: 421614,
-    vault: '0x8d922b143933FD6D4f6f82ae2Acea6D78b6a23a9',
-    productType: ProductType.Automator,
-    riskType: RiskType.Null,
-    forCcy: '',
-    domCcy: '',
-    depositCcy: 'USDC',
-    rchMultiplier: 0,
-    usePermit2: true,
-  },
-];
-
-const Vaults = [...USDTVaultsForAutomator, ...AutomatorVaults];
+const Vaults = [...USDTVaultsForAutomator];
 
 export default Vaults;

@@ -3,10 +3,9 @@ import { useTranslation } from '@sofa/services/i18n';
 import { PositionsService } from '@sofa/services/positions';
 import { ProductType, RiskType } from '@sofa/services/products';
 import { useRequest } from 'ahooks';
-import classNames from 'classnames';
 
 import CEmpty from '@/components/Empty';
-import { useProjectChange } from '@/components/ProductSelector';
+import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
@@ -77,7 +76,8 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
 };
 
 const WonderfulMoment = () => {
-  const [riskType] = useProjectChange();
+  const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   return (
     <div className={styles['list-wrapper']}>
       <List riskType={riskType} />

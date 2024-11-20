@@ -1,0 +1,103 @@
+@import "../RedeemApply/index.module";
+
+.content {
+  padding: min(30px, 6vw) 0 min(20px, 4vw);
+}
+
+.separator {
+  position: relative;
+  margin: min(24px, 6vw) 0;
+  border-top: 1px dashed #e8e8e8;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #000;
+  }
+
+  div {
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: min(123px, 20vw);
+    border-top: 1px dashed #d89614;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-right: 10px solid #d89614;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+
+    &::before {
+      right: 123px;
+      transform: translateY(-50%) rotate(180deg);
+    }
+  }
+}
+
+.items {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: 0 0 min(24px, 6vw);
+
+  .label {
+    @include flex-center;
+
+    justify-content: flex-start;
+    margin: 0 0 6px;
+    transform: scale(0.9);
+    transform-origin: left center;
+
+    .badge {
+      padding: 0 4px;
+      line-height: min(16px, 3.3vw);
+      font-size: min(12px, 2.8vw);
+      color: #d89614;
+      border: 1px solid #d89614;
+      border-radius: 4px;
+    }
+  }
+
+  .value {
+    margin: 0;
+  }
+
+  .item {
+    margin: 0;
+    font-size: min(14px, 3.3vw);
+    text-align: left;
+
+    &:last-child {
+      .label {
+        justify-content: flex-end;
+        transform-origin: right center;
+      }
+    }
+  }
+}
+
+.tooltip {
+  padding: 1px 20px 26px;
+}
+
+.change-redemption {
+  @include pointer;
+
+  width: fit-content;
+  margin: min(24px, 4vw) auto;
+  text-decoration: underline;
+}

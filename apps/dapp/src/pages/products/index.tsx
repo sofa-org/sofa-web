@@ -1,13 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService, VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
-import {
-  ProductsService,
-  ProductType,
-  RiskType,
-} from '@sofa/services/products';
+import { ProductsService, ProductType } from '@sofa/services/products';
 import { joinUrl } from '@sofa/utils/url';
 import classNames from 'classnames';
 import { color } from 'echarts/core';
@@ -16,10 +13,11 @@ import CEmpty from '@/components/Empty';
 import {
   useProductSelect,
   useProjectChange,
+  useRiskSelect,
 } from '@/components/ProductSelector';
 import {
   ProductTypeRefs,
-  RiskTypeRefs,
+  ProjectTypeRefs,
 } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
@@ -29,6 +27,7 @@ import { ProductsFixedNav } from './components/FixedNav';
 import { FlowEarn } from './components/FlowEarn';
 import { FlowSurge } from './components/FlowSurge';
 import RecommendedCard from './components/RecommendedCard';
+import { Automator } from './automator';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -40,6 +39,7 @@ const Index = () => {
 
   const chainId = useWalletStore((state) => state.chainId);
   const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   const [productType, setProductType] = useProductSelect();
   const tabs = useMemo(
     () =>
@@ -59,11 +59,11 @@ const Index = () => {
         .filter((it) =>
           ProductsService.findVault(ContractsService.vaults, {
             chainId,
-            riskType: project,
+            riskType,
             productType: it.value,
           }),
         ),
-    [chainId, project, t],
+    [chainId, riskType, t],
   );
   useEffect(() => {
     if (tabs.every((it) => it.value !== productType)) {
@@ -74,7 +74,7 @@ const Index = () => {
   const depositCcyList = useMemo(() => {
     const vaults = ProductsService.filterVaults(ContractsService.vaults, {
       chainId,
-      riskType: project,
+      riskType,
       productType: productType,
     });
     return vaults.reduce(
@@ -84,12 +84,12 @@ const Index = () => {
       },
       [] as VaultInfo['depositCcy'][],
     );
-  }, [chainId, project, productType]);
+  }, [chainId, riskType, productType]);
 
   return (
     <TopTabs
       type={'banner-expandable'}
-      banner={project !== RiskType.RISKY ? <FlowEarn /> : <FlowSurge />}
+      banner={project === ProjectType.Earn ? <FlowEarn /> : <FlowSurge />}
       options={tabs}
       value={productType}
       dark
@@ -103,7 +103,7 @@ const Index = () => {
           />
           {depositCcyList.length > 0 && (
             <div className={styles['title']}>
-              {RiskTypeRefs[project].icon}
+              {ProjectTypeRefs[project].icon}
               {t('Choose Your Product')}
             </div>
           )}
@@ -156,7 +156,7 @@ const Index = () => {
                     alt=""
                   />{' '}
                 </div>
-                {project === RiskType.RISKY && ticketMeta && (
+                {project === ProjectType.Surge && ticketMeta && (
                   <div className={styles['per-ticket']}>
                     <span
                       className={classNames('txt-gradient', styles['amount'])}
@@ -193,4 +193,8 @@ const Index = () => {
   );
 };
 
-export default Index;
+const Comp = () => {
+  const [project] = useProjectChange();
+  return project === ProjectType.Automator ? <Automator /> : <Index />;
+};
+export default Comp;

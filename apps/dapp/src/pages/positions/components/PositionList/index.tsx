@@ -15,7 +15,7 @@ import { uniqBy } from 'lodash-es';
 
 import AsyncButton from '@/components/AsyncButton';
 import CEmpty from '@/components/Empty';
-import { useProjectChange } from '@/components/ProductSelector';
+import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
@@ -117,7 +117,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
         claimProgressRef.current?.update(it);
         if (['Success', 'Partial Failed'].includes(it.status)) {
           const successIds = it.details?.flatMap((d) => {
-            if (d[1].status === PositionStatus.CLAIMED) return d[1].positionIds;
+            if (d[1].status === PositionStatus.CLAIMED) return d[1].ids;
             return [];
           });
           if (successIds) {
@@ -280,7 +280,8 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
 };
 
 const PositionList = () => {
-  const [riskType] = useProjectChange();
+  const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   return (
     <div className={styles['position-list']}>
       <List riskType={riskType} />

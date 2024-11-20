@@ -1,0 +1,71 @@
+.overview {
+  :global(.semi-spin-children) {
+    @include flex-center;
+
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: min(40px, 5vw);
+    border-radius: 8px;
+    border: 1px solid rgba(#000, 0.12);
+    background: linear-gradient(to right, #f4feed 0%, #fefdec 100%);
+  }
+}
+
+.footnote {
+  @include regular;
+
+  margin: 0;
+  padding: 0 0 0 min(8px, 1vw);
+  font-size: 14px;
+  color: #000;
+  opacity: 0.45;
+}
+
+.desc {
+  margin: min(12px, 2vw) 0 0;
+  font-size: min(12px, 3vw);
+}
+
+.aum {
+  width: 50%;
+  margin: 0;
+  padding: 0 0 0 40px;
+}
+
+.title {
+  margin: 0 0 min(8px, 1vw);
+  opacity: 0.45;
+}
+
+.value {
+  margin: 0;
+  font-size: min(20px, 5vw);
+}
+
+.unit {
+  padding: 0 0 0 4px;
+  font-size: 14px;
+}
+
+.nav {
+  width: 50%;
+  margin: 0;
+  padding: 0 0 0 40px;
+  border-left: 1px dashed rgba(#000, 0.12);
+}
+
+.yield {
+  @include flex-column-center;
+
+  gap: 0;
+  width: 100%;
+  margin: 0 0 min(32px, 4vw);
+
+  .value {
+    @include bold;
+
+    font-size: min(32px, 7vw);
+    color: #50d113;
+  }
+}

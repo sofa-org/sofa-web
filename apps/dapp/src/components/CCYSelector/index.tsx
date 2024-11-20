@@ -8,7 +8,11 @@ import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import { CSelect } from '../CSelect';
-import { useProductSelect, useProjectChange } from '../ProductSelector';
+import {
+  useProductSelect,
+  useProjectChange,
+  useRiskSelect,
+} from '../ProductSelector';
 import { useWalletStore } from '../WalletConnector/store';
 
 import styles from './index.module.scss';
@@ -32,6 +36,7 @@ export function useForCcySelect() {
 export function useDepositCcySelect() {
   const query = useQuery();
   const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const chainId = useWalletStore((state) => state.chainId);
   const setDepositCcy = useLazyCallback(
@@ -44,13 +49,13 @@ export function useDepositCcySelect() {
         (it) =>
           !it.tradeDisable &&
           it.chainId === chainId &&
-          it.riskType === project &&
+          it.riskType === riskType &&
           it.productType === productType &&
           it.depositCcy === $ccy,
       )
         ? $ccy
         : 'USDT',
-    [$ccy, chainId, productType, project],
+    [$ccy, chainId, productType, riskType],
   );
   return [ccy, setDepositCcy] as const;
 }

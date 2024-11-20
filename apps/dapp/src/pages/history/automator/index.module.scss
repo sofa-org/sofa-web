@@ -1,0 +1,22 @@
+@import "../index.module";
+
+.table {
+  width: min(1200px, $width-content);
+  margin: max(-60px, -15vw) auto min(60px, 15vw);
+}
+
+.unit {
+  padding: 0 0 0 min(8px, 1vw);
+  opacity: 0.6;
+  font-size: min(12px, 2.8vw);
+}
+
+@media (orientation: portrait) {
+  .table {
+    margin: 0 auto min(60px, 15vw);
+  }
+
+  .unit {
+    font-size: min(12px, 2.8vw);
+  }
+}

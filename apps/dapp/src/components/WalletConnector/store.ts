@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Toast } from '@douyinfe/semi-ui';
 import { AuthService } from '@sofa/services/auth';
+import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { ChainMap, defaultChain } from '@sofa/services/chains';
 import { t } from '@sofa/services/i18n';
 import { WalletService } from '@sofa/services/wallet';
@@ -175,6 +176,18 @@ export const useWalletStore = Object.assign(
         vault,
         address,
         chainId,
+      ).then((balance) => {
+        useWalletStore.setState((pre) => ({
+          balance: { ...pre.balance, ...balance },
+        }));
+      });
+    },
+    updateBalanceByAutomatorVault: (vault: AutomatorVaultInfo) => {
+      const { address } = useWalletStore.getState();
+      if (!address) return;
+      return WalletService.getBalanceFromAutomatorVaultCollateral(
+        vault,
+        address,
       ).then((balance) => {
         useWalletStore.setState((pre) => ({
           balance: { ...pre.balance, ...balance },

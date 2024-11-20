@@ -1,8 +1,17 @@
+import { safeRun } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
+import Big from 'big.js';
+import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 
-import { AutomatorTransactionStatus, AutomatorVaultInfo } from './base-type';
+import {
+  AutomatorTransactionStatus,
+  AutomatorVaultInfo,
+  TransactionStatus,
+} from './base-type';
 import { ContractsService } from './contracts';
+import { TransactionProgress } from './positions';
+import { PositionStatus } from './the-graph';
 import { WalletService } from './wallet';
 
 export interface AutomatorInfo {
@@ -33,6 +42,8 @@ export interface AutomatorPerformance {
   rch: number | string; // 空投的rch数量
   rchPrice: number | string; // rch相对Deposit ccy的币价
   dateTime: number; // 日期（秒级时间戳）
+  totalDepositCcyPnlForShare: number | string;
+  totalDepositCcyPnlForRch: number | string;
 }
 
 export interface AutomatorUserDetail {
@@ -47,7 +58,6 @@ export interface AutomatorUserDetail {
 
 export interface AutomatorTransactionsParams {
   wallet: string; // 用户钱包地址
-  limit?: number; // 查询数量，默认为 100，不超过200
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
 }
 
@@ -124,55 +134,160 @@ export class AutomatorService {
 
   static async getShares({ chainId, vault }: AutomatorVaultInfo) {
     const { signer } = await WalletService.connect(chainId);
-    const automator = await ContractsService.automatorContract(vault, signer);
-    const [decimals, shares, pricePerShare] = await Promise.all([
-      automator.decimals(),
-      automator.balanceOf(signer.address),
-      automator
-        .getPricePerShare(signer.address)
-        .then((res) => ethers.formatUnits(res, 18)),
-    ]);
-    return { decimals, shares: shares, pricePerShare };
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    const [shareDecimals, sharesWithDecimals, pricePerShare] =
+      await Promise.all([
+        Automator.decimals().then((res) => Number(res)),
+        Automator.balanceOf(signer.address).then((res) => Number(res)),
+        Automator.getPricePerShare().then(
+          (res) => +ethers.formatUnits(res, 18),
+        ),
+      ]);
+    const shares = sharesWithDecimals / 10 ** shareDecimals;
+    return {
+      shareDecimals,
+      sharesWithDecimals,
+      shares,
+      pricePerShare,
+      amount: shares * pricePerShare,
+    };
   }
 
-  static async deposit(
+  private static progressWrap<Args extends unknown[]>(
+    transactionCall: (
+      vault: AutomatorVaultInfo,
+      ...args: Args
+    ) => Promise<string>,
+    statusMap: Record<'before' | 'failed' | 'success', PositionStatus>,
+  ) {
+    return (
+      cb: (progress: TransactionProgress) => void,
+      vault: AutomatorVaultInfo,
+      ...args: Args
+    ) => {
+      safeRun(cb, { status: 'Submitting' });
+      const key = `${vault.vault.toLowerCase()}-${vault.chainId}-${
+        vault.depositCcy
+      }`;
+      return transactionCall(vault, ...args)
+        .then(async (hash) => {
+          safeRun(cb, {
+            status: 'QueryResult',
+            details: [
+              [
+                key,
+                {
+                  status: statusMap.before,
+                  hash,
+                  ids: [],
+                },
+              ],
+            ],
+          });
+          const status = await WalletService.transactionResult(
+            hash,
+            vault.chainId,
+          ).then((res) =>
+            res === TransactionStatus.FAILED
+              ? statusMap.failed
+              : statusMap.success,
+          );
+          safeRun(cb, {
+            status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
+            details: [[key, { status, hash, ids: [] }]],
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          safeRun(cb, {
+            status: 'SubmitFailed',
+            details: [
+              [
+                key,
+                {
+                  status: statusMap.failed,
+                  error,
+                  ids: [],
+                },
+              ],
+            ],
+          });
+        });
+    };
+  }
+
+  private static async $deposit(
     { chainId, vault }: AutomatorVaultInfo,
-    amountWithDecimals: number,
+    amount: string | number,
   ) {
     const { signer } = await WalletService.connect(chainId);
-    const automator = await ContractsService.automatorContract(vault, signer);
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    const [decimals, collateralAddress] = await Promise.all([
+      Automator.decimals(),
+      Automator.collateral(),
+    ]);
+    const amountWithDecimals = Big(amount)
+      .times(10 ** Number(decimals))
+      .toString();
+    await WalletService.$approve(
+      collateralAddress,
+      amountWithDecimals,
+      signer,
+      vault,
+    );
     const genArgs = (gasLimit?: number) => [
       String(amountWithDecimals),
       { gasLimit },
     ];
-    return ContractsService.dirtyCall(automator, 'deposit', genArgs);
+    return ContractsService.dirtyCall(Automator, 'deposit', genArgs);
   }
+
+  static deposit = AutomatorService.progressWrap(AutomatorService.$deposit, {
+    before: PositionStatus.PENDING,
+    failed: PositionStatus.FAILED,
+    success: PositionStatus.MINTED,
+  });
 
   static async getRedemptionInfo({ chainId, vault }: AutomatorVaultInfo) {
     const { signer } = await WalletService.connect(chainId);
-    const automator = await ContractsService.automatorContract(vault, signer);
-    return automator
-      .getRedemption()
-      .then((res) => ({ pendingShares: res[0], createTime: res[1] }));
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    return Automator.getRedemption().then((res) => {
+      return {
+        pendingSharesWithDecimals: Number(res[0]),
+        createTime: Number(res[1]),
+      };
+    });
   }
 
-  static async redeem(
+  private static async $redeem(
     { chainId, vault }: AutomatorVaultInfo,
-    sharesWithDecimals: number,
+    sharesWithDecimals: string | number,
   ) {
     const { signer } = await WalletService.connect(chainId);
-    const automator = await ContractsService.automatorContract(vault, signer);
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
     const genArgs = (gasLimit?: number) => [
       String(sharesWithDecimals),
       { gasLimit },
     ];
-    return ContractsService.dirtyCall(automator, 'withdraw', genArgs);
+    return ContractsService.dirtyCall(Automator, 'withdraw', genArgs);
   }
 
-  static async claim({ chainId, vault }: AutomatorVaultInfo) {
+  static redeem = AutomatorService.progressWrap(AutomatorService.$redeem, {
+    before: PositionStatus.REDEEMING,
+    failed: PositionStatus.MINTED,
+    success: PositionStatus.REDEEMED,
+  });
+
+  private static async $claim({ chainId, vault }: AutomatorVaultInfo) {
     const { signer } = await WalletService.connect(chainId);
-    const automator = await ContractsService.automatorContract(vault, signer);
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
     const genArgs = (gasLimit?: number) => [{ gasLimit }];
-    return ContractsService.dirtyCall(automator, 'claimRedemptions', genArgs);
+    return ContractsService.dirtyCall(Automator, 'claimRedemptions', genArgs);
   }
+
+  static claim = AutomatorService.progressWrap(AutomatorService.$claim, {
+    before: PositionStatus.CLAIMING,
+    failed: PositionStatus.REDEEMED,
+    success: PositionStatus.CLAIMED,
+  });
 }

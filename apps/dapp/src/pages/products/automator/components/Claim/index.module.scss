@@ -1,0 +1,19 @@
+@import "../RedeemApply/index.module";
+
+.remaining {
+  @include gradient-border(1px, #fff, 4px);
+
+  margin: 16px auto 24px;
+  width: fit-content;
+
+  span {
+    @include gradient-txt;
+
+    padding: 0 8px;
+    font-size: 14px;
+  }
+}
+
+.content {
+  padding: min(30px, 6vw) 0 min(20px, 4vw);
+}

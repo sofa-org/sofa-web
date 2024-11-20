@@ -12,6 +12,7 @@ import { CSelect } from '@/components/CSelect';
 import {
   useProductSelect,
   useProjectChange,
+  useRiskSelect,
 } from '@/components/ProductSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
@@ -34,7 +35,8 @@ export function useTicketType(forCcy: VaultInfo['forCcy']) {
   const query = useQuery();
   const depositCcy = query?.['deposit-ccy'];
   const chainId = useWalletStore((state) => state.chainId);
-  const [riskType] = useProjectChange();
+  const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const options = useMemo(
     () =>

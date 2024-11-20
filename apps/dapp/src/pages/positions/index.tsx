@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ProjectType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
 import { useQuery } from '@sofa/utils/hooks';
 
 import { useProjectChange } from '@/components/ProductSelector';
-import { RiskTypeRefs } from '@/components/ProductSelector/enums';
+import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { addI18nResources } from '@/locales';
 
@@ -14,11 +17,15 @@ import { PositionTips } from './components/Tips';
 import WonderfulMoments from './components/WonderfulMoments';
 import locale from './locale';
 
-addI18nResources(locale, 'Positions');
 import styles from './index.module.scss';
+
+addI18nResources(locale, 'Positions');
 
 const Positions = () => {
   const [t] = useTranslation('Positions');
+  const navigate = useNavigate();
+  const [project] = useProjectChange();
+
   const query = useQuery();
   const tab = (query.tab as string) || '1';
   const tabs = [
@@ -42,7 +49,14 @@ const Positions = () => {
     },
   ];
 
-  const [project] = useProjectChange();
+  useEffect(() => {
+    if (project === ProjectType.Automator) {
+      navigate(`/transactions${window.location.search}`, { replace: true });
+    }
+  }, [navigate, project]);
+  if (project === ProjectType.Automator) {
+    return <></>;
+  }
 
   return (
     <TopTabs
@@ -50,7 +64,7 @@ const Positions = () => {
         <div className={styles['banner']}>
           <span className={styles['banner-txt']}>
             {t("{{project}}'s Position", {
-              project: RiskTypeRefs[project].label(t),
+              project: ProjectTypeRefs[project].label(t),
             })}
           </span>
           <PositionTips project={project} />

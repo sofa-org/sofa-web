@@ -62,4 +62,8 @@ export const routes: {
     path: '/positions/orders',
     Component: OrderHistory,
   },
+  {
+    path: '/transactions',
+    Component: OrderHistory,
+  },
 ];

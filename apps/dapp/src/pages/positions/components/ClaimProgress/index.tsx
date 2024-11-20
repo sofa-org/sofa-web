@@ -13,14 +13,14 @@ import { RiskType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  PosClaimProgress,
   PositionInfo,
   PositionsService,
+  TransactionProgress,
 } from '@sofa/services/positions';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry } from '@sofa/utils/expiry';
 import { calcVal, getErrorMsg, isNullLike } from '@sofa/utils/fns';
-import { arrToDict, simplePlus } from '@sofa/utils/object';
+import { arrToDict, simplePlus, toArray } from '@sofa/utils/object';
 import { useRequest, useSize } from 'ahooks';
 import classNames from 'classnames';
 
@@ -45,7 +45,7 @@ addI18nResources(locale, 'PosClaimButton');
 
 export interface PositionClaimProgressRef {
   visible: boolean;
-  update(progress?: PosClaimProgress): void;
+  update(progress?: TransactionProgress): void;
 }
 
 interface PositionClaimProgressProps {
@@ -61,7 +61,7 @@ export const PositionClaimProgress = forwardRef<
   const [t] = useTranslation('PosClaimButton');
   const size = useSize(document.body);
   const windowWidth = size?.width || window.innerWidth;
-  const [progress, setProgress] = useState<PosClaimProgress>();
+  const [progress, setProgress] = useState<TransactionProgress>();
   useImperativeHandle(ref, () => ({
     update: setProgress,
     visible: !!progress,
@@ -152,7 +152,7 @@ export const PositionClaimProgress = forwardRef<
         title: t('Transaction Hash'),
         key: 'hash',
         render: (_, it) =>
-          it[1]?.hash?.map((hash) => (
+          toArray(it[1]?.hash).map((hash) => (
             <HashDisplay key={hash} chainId={props.chainId}>
               {hash}
             </HashDisplay>
@@ -187,7 +187,7 @@ export const PositionClaimProgress = forwardRef<
           return (
             <>
               <MsgDisplay style={{ maxWidth: 250 }}>
-                {t('PositionIds')}: {it[1].positionIds.join(', ')}
+                {t('PositionIds')}: {it[1].ids.join(', ')}
               </MsgDisplay>
               <MsgDisplay style={{ maxWidth: 250 }}>{msg}</MsgDisplay>
             </>
@@ -195,7 +195,7 @@ export const PositionClaimProgress = forwardRef<
         },
       },
     ] as XRequired<
-      ColumnProps<NonNullable<PosClaimProgress['details']>[0]>,
+      ColumnProps<NonNullable<TransactionProgress['details']>[0]>,
       'key' | 'render'
     >[];
     const renderTable = (

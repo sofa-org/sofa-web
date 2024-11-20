@@ -1,4 +1,4 @@
-import { ProductType, RiskType } from '../base-type';
+import { ProductType, RiskType } from '../../base-type';
 
 const vaults = [
   // AAVESmartBullVault(ETH/USDT)

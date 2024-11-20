@@ -213,12 +213,8 @@ export class RCHService {
       ];
       return ContractsService.dirtyCall(airdropContract, 'claimMultiple', args);
     })();
-    return pollingUntil(
-      () => WalletService.transactionResult(hash, chainId),
-      (res) => res !== TransactionStatus.PENDING,
-      1000,
-    ).then((res) => {
-      return res[res.length - 1] === TransactionStatus.FAILED
+    return WalletService.transactionResult(hash, chainId).then((res) => {
+      return res === TransactionStatus.FAILED
         ? Promise.reject(new Error('Claim failed on chain'))
         : Promise.resolve();
     });

@@ -33,7 +33,7 @@ const AmountDisplay = (props: AmountDisplayProps) => {
             .substring(0, Math.max(1, (props.precision ?? 4) - 1))}
         </>
       ) : (
-        amountFormatter(props.amount, props.precision).replace(/[-]/, '')
+        amountFormatter(props.amount, props.precision).replace(/[-]/, '') || '-'
       )}
     </span>
   );

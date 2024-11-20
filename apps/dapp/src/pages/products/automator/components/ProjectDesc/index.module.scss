@@ -1,0 +1,61 @@
+@import "../../../components/YieldTower/index.module";
+
+.address {
+  @include flex-center;
+  @include bold;
+
+  margin: 0 auto;
+}
+
+.content {
+  width: 100%;
+}
+
+.snapshot {
+  :global(.semi-spin-children) {
+    @include flex-center;
+
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: min(24px, 4vw) min(120px, 32vw);
+  }
+
+  .it-item {
+    @include flex-center;
+
+    justify-content: space-between;
+    flex: 1;
+    min-width: 34%;
+    font-size: min(16px, 3.4vw);
+
+    .left {
+      @include flex-center;
+
+      justify-content: flex-start;
+      gap: min(16px, 4vw);
+      flex: none;
+    }
+
+    .direction {
+      &:global(.buy) {
+        color: $color-rise;
+      }
+
+      &:global(.sell) {
+        color: $color-fall;
+      }
+    }
+  }
+}
+
+.performance {
+  :global(.semi-spin-children) {
+    width: 100%;
+  }
+
+  .chart {
+    width: calc(100% + 80px);
+    height: 360px;
+    margin: -40px;
+  }
+}

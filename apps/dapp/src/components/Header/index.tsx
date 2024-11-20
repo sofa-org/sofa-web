@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown } from '@douyinfe/semi-ui';
-import { RiskType } from '@sofa/services/base-type.ts';
+import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { joinUrl } from '@sofa/utils/url';
@@ -40,7 +40,7 @@ interface MenuItem {
   hide?(): boolean;
 }
 
-const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
+const allMenuItems = (project: ProjectType): MenuItem[] => {
   // 下面这行被注释掉的code 告诉 ai18n 下面的 t 都是在 Header 包下
   // const [t] = useTranslation('Header');
   const campaign = {
@@ -83,7 +83,18 @@ const allMenuItems = (location: ReturnType<typeof useLocation>): MenuItem[] => {
       type: 1,
     },
     { label: (t: TFunction) => t('Trade'), path: '/products', type: 2 },
-    { label: (t: TFunction) => t('Position'), path: '/positions', type: 2 },
+    {
+      label: (t: TFunction) => t('Position'),
+      path: '/positions',
+      type: 2,
+      hide: () => project === ProjectType.Automator,
+    },
+    {
+      label: (t: TFunction) => t({ enUS: 'Transaction', zhCN: '交易记录' }),
+      path: '/transactions',
+      type: 2,
+      hide: () => project !== ProjectType.Automator,
+    },
     campaign,
   ];
 };
@@ -115,22 +126,22 @@ const Header = () => {
   const [t] = useTranslation('Header');
   const navigate = useNavigate();
   const location = useLocation();
-  const [project] = useProjectChange(RiskType.RISKY);
+  const [project] = useProjectChange(ProjectType.Surge);
 
   const opacity = useOpacity();
 
   const type = useMemo<number>(() => {
     if (/^\/$|rch/.test(location.pathname)) return 1;
     return (
-      allMenuItems(location).find(
+      allMenuItems(project).find(
         (it) => it.path !== '/' && location.pathname.startsWith(it.path),
       )?.type ?? 2
     );
-  }, [location]);
+  }, [location.pathname, project]);
 
   const menusForRender = useMemo(
-    () => allMenuItems(location).filter((it) => it.type === type),
-    [type, location],
+    () => allMenuItems(project).filter((it) => it.type === type),
+    [type, project],
   );
 
   const more = useMemo(

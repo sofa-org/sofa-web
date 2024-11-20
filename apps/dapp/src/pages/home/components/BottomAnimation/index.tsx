@@ -1,12 +1,8 @@
 import { useMemo } from 'react';
-import { Toast } from '@douyinfe/semi-ui';
-import { RiskType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { Env } from '@sofa/utils/env';
 import { useSize } from 'ahooks';
 import classNames from 'classnames';
 
-import { RiskTypeRefs } from '@/components/ProductSelector/enums';
 import SplineModel from '@/components/SplineModel';
 import { addI18nResources } from '@/locales';
 

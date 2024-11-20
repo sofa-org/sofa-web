@@ -3,8 +3,12 @@ import { Modal, Spin, Table } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
-import { DepositProgress, PositionsService } from '@sofa/services/positions';
+import {
+  PositionsService,
+  TransactionProgress,
+} from '@sofa/services/positions';
 import { calcVal, getErrorMsg } from '@sofa/utils/fns';
+import { toArray } from '@sofa/utils/object';
 import { useSize } from 'ahooks';
 import classNames from 'classnames';
 
@@ -23,7 +27,7 @@ addI18nResources(locale, 'InvestProgress');
 
 export interface ProgressRef {
   visible: boolean;
-  update(progress?: DepositProgress): void;
+  update(progress?: TransactionProgress): void;
 }
 
 interface ProgressProps {
@@ -35,7 +39,7 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
     const [t] = useTranslation('InvestProgress');
     const size = useSize(document.body);
     const windowWidth = size?.width || window.innerWidth;
-    const [progress, setProgress] = useState<DepositProgress>();
+    const [progress, setProgress] = useState<TransactionProgress>();
     useImperativeHandle(ref, () => ({
       update: setProgress,
       visible: !!progress,
@@ -87,9 +91,12 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
         {
           title: t('Transaction Hash'),
           key: 'hash',
-          render: (_, it) => (
-            <HashDisplay chainId={props.chainId}>{it[1]?.hash}</HashDisplay>
-          ),
+          render: (_, it) =>
+            toArray(it[1]?.hash).map(($it) => (
+              <HashDisplay chainId={props.chainId} key={$it}>
+                {$it}
+              </HashDisplay>
+            )),
         },
         {
           title: t('Position Status'),
@@ -119,14 +126,14 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
             if (!msg) return '-';
             return (
               <>
-                {t('QuoteIds')}: {it[1].quoteIds.join(', ')}
+                {t('QuoteIds')}: {it[1].ids.join(', ')}
                 <MsgDisplay style={{ maxWidth: 250 }}>{msg}</MsgDisplay>
               </>
             );
           },
         },
       ] as XRequired<
-        ColumnProps<NonNullable<DepositProgress['details']>[0]>,
+        ColumnProps<NonNullable<TransactionProgress['details']>[0]>,
         'key' | 'render'
       >[];
       const renderTable = (width: number, $columns = columns) => {

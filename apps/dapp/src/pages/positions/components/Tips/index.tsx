@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { RiskType } from '@sofa/services/base-type';
+import { ProjectType } from '@sofa/services/base-type';
 import { useLocalStorageState } from 'ahooks';
 
 import { addI18nResources } from '@/locales';
@@ -11,13 +11,13 @@ import locale from './locale';
 import styles from './index.module.scss';
 
 addI18nResources(locale, 'PositionTips');
-export const PositionTips = (props: { project: RiskType }) => {
+export const PositionTips = (props: { project: ProjectType }) => {
   const [t] = useTranslation('PositionTips');
   const [visible, setVisible] = useLocalStorageState('position-tips', {
     defaultValue: true,
   });
 
-  if (props.project === RiskType.RISKY || !visible) return <></>;
+  if (props.project !== ProjectType.Earn || !visible) return <></>;
   return (
     <div className={styles['tips-wrapper']}>
       <div className={styles['tips']}>

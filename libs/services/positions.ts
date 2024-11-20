@@ -87,7 +87,7 @@ export interface TransactionInfo extends OriginTransactionInfo {
   pricesForCalculation: Record<string, number | undefined>;
 }
 
-export interface DepositProgress {
+export interface TransactionProgress {
   status:
     | 'Submitting'
     | 'SubmitFailed'
@@ -98,29 +98,10 @@ export interface DepositProgress {
   details?: (readonly [
     string /* `${vault.toLowerCase()}-${chainId}-${depositCcy}` */,
     {
-      quoteIds: (string | number)[];
+      ids: (string | number)[];
       status: PositionStatus;
-      hash?: string;
+      hash?: string | string[];
       error?: unknown;
-    },
-  ])[];
-}
-
-export interface PosClaimProgress {
-  status:
-    | 'Submitting'
-    | 'SubmitFailed'
-    | 'QueryResult'
-    | 'Success'
-    | 'Partial Failed'
-    | 'All Failed';
-  details?: (readonly [
-    string /* `${vault.toLowerCase()}-${chainId}-${depositCcy}` */,
-    {
-      status: PositionStatus;
-      hash?: string[];
-      error?: unknown;
-      positionIds: string[];
     },
   ])[];
 }
@@ -147,6 +128,14 @@ export class PositionsService {
     [PositionStatus.EXPIRED]: {
       label: (t: TFunction) => t('EXPIRED'),
       color: '#e05e2b',
+    },
+    [PositionStatus.REDEEMING]: {
+      label: (t: TFunction) => t('REDEEMING'),
+      color: '#999',
+    },
+    [PositionStatus.REDEEMED]: {
+      label: (t: TFunction) => t('REDEEMED'),
+      color: '#000',
     },
     [PositionStatus.CLAIMING]: {
       label: (t: TFunction) => t('CLAIMING'),
@@ -337,15 +326,7 @@ export class PositionsService {
     chainId: number,
   ): Promise<PositionStatus> {
     if (!hash) return PositionStatus.PENDING;
-    return pollingUntil(
-      () =>
-        WalletService.transactionResult(hash, chainId).catch(
-          () => TransactionStatus.PENDING,
-        ),
-      (s) => s !== TransactionStatus.PENDING,
-      1000,
-    ).then(async (res) => {
-      const s = res[res.length - 1];
+    return WalletService.transactionResult(hash, chainId).then(async (s) => {
       const status = await (async () => {
         if (s === TransactionStatus.FAILED) return PositionStatus.FAILED;
         // await pollingUntil(
@@ -362,7 +343,7 @@ export class PositionsService {
   }
 
   static async deposit(
-    cb: (progress: DepositProgress) => void,
+    cb: (progress: TransactionProgress) => void,
     ...[params]: Parameters<typeof WalletService.mint>
   ) {
     safeRun(cb, { status: 'Submitting' });
@@ -382,7 +363,7 @@ export class PositionsService {
               {
                 status: PositionStatus.PENDING,
                 hash,
-                quoteIds: [params.quote.quoteId],
+                ids: [params.quote.quoteId],
               },
             ],
           ],
@@ -393,7 +374,7 @@ export class PositionsService {
         );
         safeRun(cb, {
           status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
-          details: [[key, { status, hash, quoteIds: [params.quote.quoteId] }]],
+          details: [[key, { status, hash, ids: [params.quote.quoteId] }]],
         });
       })
       .catch((error) => {
@@ -406,7 +387,7 @@ export class PositionsService {
               {
                 status: PositionStatus.FAILED,
                 error,
-                quoteIds: [params.quote.quoteId],
+                ids: [params.quote.quoteId],
               },
             ],
           ],
@@ -415,7 +396,7 @@ export class PositionsService {
   }
 
   static async batchDeposit(
-    cb: (progress: DepositProgress) => void,
+    cb: (progress: TransactionProgress) => void,
     ...[params]: Parameters<typeof WalletService.mintBatch>
   ) {
     safeRun(cb, { status: 'Submitting' });
@@ -457,7 +438,7 @@ export class PositionsService {
                 status: it[1].error
                   ? PositionStatus.FAILED
                   : PositionStatus.PENDING,
-                quoteIds: it[1].quoteIds,
+                ids: it[1].quoteIds,
               },
             ] as const,
         ),
@@ -471,7 +452,7 @@ export class PositionsService {
               {
                 status: PositionStatus.FAILED,
                 error: info?.error,
-                quoteIds: info?.quoteIds,
+                ids: info?.quoteIds,
               },
             ] as const;
           const chainId = +key.split('-')[1];
@@ -481,7 +462,7 @@ export class PositionsService {
           );
           return [
             key,
-            { status, hash: info.hash, quoteIds: info.quoteIds },
+            { status, hash: info.hash, ids: info.quoteIds },
           ] as const;
         }),
       );
@@ -490,7 +471,7 @@ export class PositionsService {
   }
 
   static async claim(
-    cb: (progress: PosClaimProgress) => void,
+    cb: (progress: TransactionProgress) => void,
     params: Parameters<typeof WalletService.burn>[0] & {
       positionId: string;
     },
@@ -509,7 +490,7 @@ export class PositionsService {
               {
                 status: PositionStatus.PENDING,
                 hash: [hash],
-                positionIds: [params.positionId],
+                ids: [params.positionId],
               },
             ],
           ],
@@ -517,9 +498,7 @@ export class PositionsService {
         const status = await PositionsService.claimResult(hash, params.chainId);
         safeRun(cb, {
           status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
-          details: [
-            [key, { status, hash: [hash], positionIds: [params.positionId] }],
-          ],
+          details: [[key, { status, hash: [hash], ids: [params.positionId] }]],
         });
       })
       .catch((error) => {
@@ -532,7 +511,7 @@ export class PositionsService {
               {
                 status: PositionStatus.FAILED,
                 error,
-                positionIds: [params.positionId],
+                ids: [params.positionId],
               },
             ],
           ],
@@ -541,7 +520,7 @@ export class PositionsService {
   }
 
   static async claimBatch(
-    cb: (progress: PosClaimProgress) => void,
+    cb: (progress: TransactionProgress) => void,
     params: Parameters<typeof WalletService.burn>[0][],
   ) {
     safeRun(cb, { status: 'Submitting' });
@@ -559,6 +538,7 @@ export class PositionsService {
               it[0],
               {
                 ...it[1],
+                ids: it[1].positionIds,
                 status: it[1].error
                   ? PositionStatus.FAILED
                   : PositionStatus.PENDING,
@@ -575,7 +555,7 @@ export class PositionsService {
               {
                 status: PositionStatus.FAILED,
                 error: info?.error,
-                positionIds: info.positionIds,
+                ids: info.positionIds,
               },
             ] as const;
           const chainId = +key.split('-')[1];
@@ -585,7 +565,7 @@ export class PositionsService {
           );
           return [
             key,
-            { status, hash: info.hash, positionIds: info.positionIds },
+            { status, hash: info.hash, ids: info.positionIds },
           ] as const;
         }),
       );
@@ -598,12 +578,7 @@ export class PositionsService {
     chainId: number,
   ): Promise<PositionStatus> {
     if (!hash) return PositionStatus.EXPIRED;
-    return pollingUntil(
-      () => WalletService.transactionResult(hash, chainId),
-      (s) => s !== TransactionStatus.PENDING,
-      1000,
-    ).then(async (res) => {
-      const s = res[res.length - 1];
+    return WalletService.transactionResult(hash, chainId).then(async (s) => {
       const status = await (async () => {
         if (s === TransactionStatus.FAILED) return PositionStatus.EXPIRED;
         // await pollingUntil(

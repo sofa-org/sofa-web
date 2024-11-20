@@ -1,18 +1,22 @@
 import { ethers } from 'ethers';
 
+export enum ProjectType {
+  Earn = 'Earn',
+  Surge = 'Surge',
+  Automator = 'Automator',
+}
+
 export enum ProductType {
   DNT = 'DNT',
   // DOT = 'DOT',
   BullSpread = 'BullSpread',
   BearSpread = 'BearSpread',
-  Automator = 'Automator',
 }
 
 export enum RiskType {
   PROTECTED = 'PROTECTED',
   LEVERAGE = 'LEVERAGE',
   RISKY = 'RISKY',
-  Null = 'Null', // Automator 产品没有风险类型
 }
 
 export enum TransactionStatus {
@@ -31,6 +35,7 @@ export enum AutomatorTransactionStatus {
   CLAIMABLE = 'CLAIMABLE',
   COMPLETED = 'COMPLETED',
   EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
 }
 
 export interface VaultInfo {
@@ -54,9 +59,17 @@ export interface VaultInfo {
   interestType?: InterestType; // 生息方式，只有 PROTECTED 产品有
   abis: ethers.InterfaceAbi;
   earlyClaimable?: boolean;
-  useSimpleFeeRate?: boolean; // 是否使用简单的手续费率
 }
 
-export interface AutomatorVaultInfo extends VaultInfo {
-  productType: ProductType.Automator;
+export interface AutomatorVaultInfo {
+  vault: string; // 合约地址
+  chainId: number;
+  depositCcy: CCY | USDS; // 申购币种
+  depositMinAmount: number; // 申购币种数量的最小数量
+  depositTickAmount: number; // 申购币种数量的步增
+  collateralDecimal: number; // 转换为合约入参的倍数
+  balanceCcy: string; // 头寸余额的 ERC20 币种名称
+  redeemWaitPeriod: number; // 赎回等待期
+  claimPeriod: number; // 赎回有效期
+  abis: ethers.InterfaceAbi;
 }

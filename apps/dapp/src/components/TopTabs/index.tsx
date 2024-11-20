@@ -4,7 +4,7 @@ import { useIsPortrait } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import { C_Select } from '../CSelect';
-import { useProjectChange } from '../ProductSelector';
+import { useProjectChange, useRiskSelect } from '../ProductSelector';
 
 import styles from './index.module.scss';
 
@@ -22,6 +22,7 @@ export interface TopTabsProps extends BaseInputProps<string | number> {
 
 const TopTabs = (props: TopTabsProps) => {
   const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   const isPortrait = useIsPortrait();
 
   return (
@@ -33,8 +34,8 @@ const TopTabs = (props: TopTabsProps) => {
           props.bannerClassName,
           {
             [styles['dark']]: props.dark,
-            [styles['risky']]: project === RiskType.RISKY,
-            risky: project === RiskType.RISKY,
+            [styles['risky']]: riskType === RiskType.RISKY,
+            risky: riskType === RiskType.RISKY,
             'banner-expandable': props.type === 'banner-expandable',
             [styles['banner-expandable']]: props.type === 'banner-expandable',
           },

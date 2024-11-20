@@ -2,7 +2,10 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Button, Toast } from '@douyinfe/semi-ui';
 import { wait, waitUntil } from '@livelybone/promise-wait';
 import { useTranslation } from '@sofa/services/i18n';
-import { DepositProgress, PositionsService } from '@sofa/services/positions';
+import {
+  PositionsService,
+  TransactionProgress,
+} from '@sofa/services/positions';
 import {
   ProductQuoteParams,
   ProductQuoteResult,
@@ -31,6 +34,62 @@ import locale from './locale';
 import styles from './index.module.scss';
 
 addI18nResources(locale, 'InvestButton');
+
+export interface BaseInvestButtonProps extends BaseProps {
+  shouldPrepare?: boolean;
+  preparing?: boolean;
+  prepareText?: string;
+  prepare?(): Promise<void>;
+  insufficient?: boolean;
+  onSubmit?(): Promise<unknown>;
+}
+
+export const BaseInvestButton = (props: BaseInvestButtonProps) => {
+  const [t] = useTranslation('InvestButton');
+  const wallet = useWalletStore();
+  return props.shouldPrepare ? (
+    <AsyncButton
+      style={props.style}
+      className={classNames(styles['btn-deposit'], props.className)}
+      size="large"
+      onClick={() => props.prepare?.()}
+      loading={props.preparing}
+    >
+      {props.prepareText}
+    </AsyncButton>
+  ) : !wallet.address ? (
+    <WalletConnector style={{ padding: 0 }} hideArrow>
+      {(connecting) => (
+        <Button
+          style={props.style}
+          size="large"
+          className={classNames(styles['btn-deposit'], props.className)}
+          loading={connecting}
+        >
+          {t('Connect Wallet')}
+        </Button>
+      )}
+    </WalletConnector>
+  ) : props.insufficient ? (
+    <AsyncButton
+      style={props.style}
+      className={classNames(styles['btn-deposit'], props.className)}
+      size="large"
+      disabled
+    >
+      {t('Insufficient Balance')}
+    </AsyncButton>
+  ) : (
+    <AsyncButton
+      style={props.style}
+      size="large"
+      className={classNames(styles['btn-deposit'], props.className)}
+      onClick={() => props.onSubmit?.()}
+    >
+      {props.children}
+    </AsyncButton>
+  );
+};
 
 export interface InvestButtonProps extends BaseProps {
   vault: string;
@@ -152,118 +211,90 @@ const InvestButton = (props: InvestButtonProps) => {
     (state) => vault && state.interestRate[wallet.chainId]?.[vault.depositCcy],
   );
 
-  if (!vault) return <></>;
+  const handleSubmit = useLazyCallback(async () => {
+    if (!vault) return;
+    const amount = simplePlus(...quoteInfos.map((it) => it?.amounts.own)) || 0;
+    if (
+      wallet.balance?.[vault.depositCcy] &&
+      wallet.balance[vault.depositCcy]! < amount
+    ) {
+      return Toast.warning(t('Balance is no enough!'));
+    }
+    const delRfq = (key: NonNullable<TransactionProgress['details']>[0][0]) => {
+      quoteInfos.forEach((quote) => {
+        if (!quote) return;
+        const k = `${quote.vault.vault.toLowerCase()}-${quote.vault.chainId}-${
+          quote.vault.depositCcy
+        }`;
+        if (k === key) {
+          ProductsService.delRfq(quote.rfqId);
+          useProductsState.delQuote(quote);
+        }
+      });
+    };
+    const judgeConsumed = (progress: TransactionProgress) => {
+      if (/failed/i.test(progress.status)) {
+        progress.details?.forEach((it) => {
+          if (/signature consumed/i.test(getErrorMsg(it[1].error))) {
+            delRfq(it[0]);
+          }
+        });
+      }
+    };
+    const judgeSuccess = (progress: TransactionProgress) => {
+      if (/Success|Partial/i.test(progress.status)) {
+        progress.details?.forEach((it) => {
+          if (it[1].status === PositionStatus.MINTED) {
+            delRfq(it[0]);
+          }
+        });
+        if (vault.riskType === RiskType.RISKY) pokerRightsReminder();
+      }
+      if (/Success/i.test(progress.status)) {
+        if (vault.riskType === RiskType.RISKY)
+          useProductsState.clearCart(vault);
+        waitUntil(() => !progressRef.current?.visible, {
+          interval: 300,
+          timeout: 10000000,
+        }).then(() => props.afterInvest?.());
+      }
+    };
+    if (quoteInfos.length === 1) {
+      return PositionsService.deposit((it) => {
+        progressRef.current?.update(it);
+        judgeConsumed(it);
+        judgeSuccess(it);
+      }, quoteInfos[0]!);
+    }
+    return PositionsService.batchDeposit((it) => {
+      progressRef.current?.update(it);
+      judgeConsumed(it);
+      judgeSuccess(it);
+    }, quoteInfos as ProductQuoteResult[]);
+  });
 
-  const el = showQuote ? (
-    <AsyncButton
-      style={props.style}
-      className={classNames(styles['btn-deposit'], props.className)}
-      size="large"
-      onClick={() => quote()}
-      loading={vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed}
-    >
-      {vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
-        ? t('In Preparation...')
-        : t('Request For Quote')}
-    </AsyncButton>
-  ) : !wallet.address ? (
-    <WalletConnector style={{ padding: 0 }} hideArrow>
-      {(connecting) => (
-        <Button
-          style={props.style}
-          size="large"
-          className={classNames(styles['btn-deposit'], props.className)}
-          loading={connecting}
-        >
-          {t('Connect Wallet')}
-        </Button>
-      )}
-    </WalletConnector>
-  ) : insufficient ? (
-    <AsyncButton
-      style={props.style}
-      className={classNames(styles['btn-deposit'], props.className)}
-      size="large"
-      disabled
-    >
-      {t('Insufficient Balance')}
-    </AsyncButton>
-  ) : (
-    <AsyncButton
-      style={props.style}
-      size="large"
-      className={classNames(styles['btn-deposit'], props.className)}
-      onClick={() => {
-        const amount =
-          simplePlus(...quoteInfos.map((it) => it?.amounts.own)) || 0;
-        if (
-          wallet.balance?.[vault.depositCcy] &&
-          wallet.balance[vault.depositCcy]! < amount
-        ) {
-          return Toast.warning(t('Balance is no enough!'));
-        }
-        const delRfq = (key: NonNullable<DepositProgress['details']>[0][0]) => {
-          quoteInfos.forEach((quote) => {
-            if (!quote) return;
-            const k = `${quote.vault.vault.toLowerCase()}-${
-              quote.vault.chainId
-            }-${quote.vault.depositCcy}`;
-            if (k === key) {
-              ProductsService.delRfq(quote.rfqId);
-              useProductsState.delQuote(quote);
-            }
-          });
-        };
-        const judgeConsumed = (progress: DepositProgress) => {
-          if (/failed/i.test(progress.status)) {
-            progress.details?.forEach((it) => {
-              if (/signature consumed/i.test(getErrorMsg(it[1].error))) {
-                delRfq(it[0]);
-              }
-            });
-          }
-        };
-        const judgeSuccess = (progress: DepositProgress) => {
-          if (/Success|Partial/i.test(progress.status)) {
-            progress.details?.forEach((it) => {
-              if (it[1].status === PositionStatus.MINTED) {
-                delRfq(it[0]);
-              }
-            });
-            if (vault.riskType === RiskType.RISKY) pokerRightsReminder();
-          }
-          if (/Success/i.test(progress.status)) {
-            if (vault.riskType === RiskType.RISKY)
-              useProductsState.clearCart(vault);
-            waitUntil(() => !progressRef.current?.visible, {
-              interval: 300,
-              timeout: 10000000,
-            }).then(() => props.afterInvest?.());
-          }
-        };
-        if (quoteInfos.length === 1) {
-          return PositionsService.deposit((it) => {
-            progressRef.current?.update(it);
-            judgeConsumed(it);
-            judgeSuccess(it);
-          }, quoteInfos[0]!);
-        }
-        return PositionsService.batchDeposit((it) => {
-          progressRef.current?.update(it);
-          judgeConsumed(it);
-          judgeSuccess(it);
-        }, quoteInfos as ProductQuoteResult[]);
-      }}
-    >
-      {vault.riskType === RiskType.RISKY
-        ? t('Purchase All Tickets')
-        : t('Deposit')}
-    </AsyncButton>
-  );
+  if (!vault) return <></>;
 
   return (
     <>
-      {el}
+      <BaseInvestButton
+        shouldPrepare={shouldQuote}
+        preparing={
+          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+        }
+        prepare={quote}
+        prepareText={
+          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+            ? t('In Preparation...')
+            : t('Request For Quote')
+        }
+        insufficient={insufficient}
+        onSubmit={handleSubmit}
+      >
+        {vault.riskType === RiskType.RISKY
+          ? t('Purchase All Tickets')
+          : t('Deposit')}
+      </BaseInvestButton>
       <InvestProgress chainId={wallet.chainId} ref={progressRef} />
     </>
   );

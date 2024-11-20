@@ -1,3 +1,4 @@
+import { ProjectType } from '@sofa/services/base-type';
 import { TFunction } from '@sofa/services/i18n';
 import {
   ProductType,
@@ -26,42 +27,58 @@ import locale from './locale';
 
 addI18nResources(locale, 'ProjectProductSelector');
 
-export const RiskTypeRefs = {
-  [RiskType.PROTECTED]: {
+export const ProjectTypeRefs = {
+  [ProjectType.Earn]: {
     label: (t: TFunction) => t('Earn'),
-    label1: (t: TFunction) => t('Capital Secured Earnings'),
-    label2: (t: TFunction) => t('Secured'),
     desc: (t: TFunction) =>
       t(
         'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
       ),
     icon: <img src={IconLowRisk} width="24px" />,
-    value: RiskType.PROTECTED,
+    value: ProjectType.Earn,
     link: EnvLinks.config.VITE_EARN_LINK,
   },
-  [RiskType.LEVERAGE]: {
-    label: (t: TFunction) => t('Leverage'),
-    label1: (t: TFunction) => t('Leverage'),
-    label2: (t: TFunction) => t('Leverage'),
-    desc: (t: TFunction) =>
-      t(
-        'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
-      ),
-    icon: <img src={IconLowRisk} width="24px" />,
-    value: RiskType.LEVERAGE,
-    link: EnvLinks.config.VITE_EARN_LINK,
-  },
-  [RiskType.RISKY]: {
+  [ProjectType.Surge]: {
     label: (t: TFunction) => t('Surge'),
-    label1: (t: TFunction) => t('ApxWinnings Tickets'),
-    label2: (t: TFunction) => t('All-or-None'),
     desc: (t: TFunction) =>
       t(
         'Popular TradFi exotics investments can now be safely invested on-chain, allowing users to speculate on token price action through a diverse product suite including Rangebound, Trends, and Shark Fin products.  Higher returns will come at the risk of principal losses, though users will have full control over the product parameters under our flexible RFQ interface.',
       ),
     icon: <img src={IconHighYield} width="24px" />,
-    value: RiskType.RISKY,
+    value: ProjectType.Surge,
     link: EnvLinks.config.VITE_SURGE_LINK,
+  },
+  [ProjectType.Automator]: {
+    label: (t: TFunction) => t({ enUS: 'Automator', zhCN: 'Automator' }),
+    desc: (t: TFunction) =>
+      t({
+        enUS: 'By running automated Bull Trend-selling and Bear Trend-selling strategy at recommended expiration and strikes, with principal and profits automatically reinvested.',
+        zhCN: '通过运行自动化的 Bull Trend-selling 和 Bear Trend-selling 策略，在推荐到期和敲出价执行，并自动再投资本金和利润。',
+      }),
+    icon: <img src={IconLowRisk} width="24px" />,
+    value: ProjectType.Automator,
+    link: EnvLinks.config.VITE_Automator_LINK,
+  },
+};
+
+export const RiskTypeRefs = {
+  [RiskType.PROTECTED]: {
+    label: (t: TFunction) => t('Earn'),
+    label2: (t: TFunction) => t('Secured'),
+    icon: <img src={IconLowRisk} width="24px" />,
+    value: RiskType.PROTECTED,
+  },
+  [RiskType.LEVERAGE]: {
+    label: (t: TFunction) => t('Leverage'),
+    label2: (t: TFunction) => t('Leverage'),
+    icon: <img src={IconLowRisk} width="24px" />,
+    value: RiskType.LEVERAGE,
+  },
+  [RiskType.RISKY]: {
+    label: (t: TFunction) => t('Surge'),
+    label2: (t: TFunction) => t('All-or-None'),
+    icon: <img src={IconHighYield} width="24px" />,
+    value: RiskType.RISKY,
   },
 };
 

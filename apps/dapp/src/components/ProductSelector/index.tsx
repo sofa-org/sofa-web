@@ -1,5 +1,5 @@
-import { ReactNode, SetStateAction, useEffect, useMemo } from 'react';
-import { ProductType, RiskType } from '@sofa/services/base-type';
+import { SetStateAction, useEffect, useMemo } from 'react';
+import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts.ts';
 import { useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
@@ -16,7 +16,7 @@ import { addI18nResources } from '@/locales';
 
 import { CSelect } from '../CSelect';
 
-import { ProductTypeRefs, RiskTypeRefs } from './enums';
+import { ProductTypeRefs, ProjectTypeRefs } from './enums';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -25,30 +25,31 @@ addI18nResources(locale, 'ProjectProductSelector');
 
 export interface ProductSelectorProps extends BaseProps {
   dropdownClassName?: string;
-
-  renderValue?(
-    value: { riskType: RiskType; productType: ProductType },
-    riskRef: (typeof RiskTypeRefs)[RiskType],
-    productRef: (typeof ProductTypeRefs)[ProductType],
-  ): ReactNode;
 }
 
-export function useProjectChange(defaultVal = RiskType.PROTECTED) {
-  const query = useQuery();
+export function useProjectChange(defaultVal = ProjectType.Earn) {
+  const val = useQuery().project;
   const project = useMemo(() => {
-    const project = Object.values(RiskTypeRefs).find((it) => {
+    if (ProjectType[val as ProjectType]) return val as ProjectType;
+
+    // 兼容旧的 riskType 类型：PROTECTED -> Earn; LEVERAGE -> Earn
+    if (val === RiskType.PROTECTED) return ProjectType.Earn;
+    if (val === RiskType.LEVERAGE) return ProjectType.Earn;
+    // 兼容旧的 riskType 类型：RISKY -> Surge
+    if (val === RiskType.RISKY) return ProjectType.Surge;
+
+    const project = Object.values(ProjectTypeRefs).find((it) => {
       if (Env.isDev) return false;
       return (
         it.link.match(/(https?:\/\/[^/?#]*)/)?.[1] === window.location.origin
       );
     });
-    if (project) return project.value;
-    return (query.project as RiskType) || defaultVal;
-  }, [query.project]);
+    return project?.value || defaultVal;
+  }, [defaultVal, val]);
   const setProject = useLazyCallback(
-    (action: SetStateAction<RiskType | undefined>) => {
+    (action: SetStateAction<ProjectType | undefined>) => {
       const nextProject = calcVal(action, project) || defaultVal;
-      const link = RiskTypeRefs[nextProject].link;
+      const link = ProjectTypeRefs[nextProject].link;
       window.location.href = link;
     },
   );
@@ -56,9 +57,11 @@ export function useProjectChange(defaultVal = RiskType.PROTECTED) {
 }
 
 export function useProductSelect() {
-  const query = useQuery();
-  const productType =
-    (query['product-type'] as ProductType) || ProductType.BullSpread;
+  const val = useQuery()['product-type'];
+  const productType = useMemo(() => {
+    if (ProductType[val as ProductType]) return val as ProductType;
+    return ProductType.BullSpread;
+  }, [val]);
   const setProductType = useLazyCallback(
     (action: SetStateAction<ProductType>) => {
       const nextProductType = calcVal(action, productType);
@@ -68,21 +71,36 @@ export function useProductSelect() {
   return [productType, setProductType] as const;
 }
 
+export function useRiskSelect(project: ProjectType) {
+  const defaultVal = useMemo(
+    () => (project === ProjectType.Surge ? RiskType.RISKY : RiskType.PROTECTED),
+    [project],
+  );
+  const val = useQuery()['risk-type'];
+  const riskType = useMemo(() => {
+    if (RiskType[val as RiskType]) return val as RiskType;
+    return defaultVal;
+  }, [defaultVal, val]);
+  const setRiskType = useLazyCallback((action: SetStateAction<RiskType>) => {
+    const nextRiskType = calcVal(action, riskType);
+    updateQuery({ 'risk-type': nextRiskType });
+  });
+  return [riskType, setRiskType] as const;
+}
+
 export const ProjectSelector = (props: ProductSelectorProps) => {
   const [t] = useTranslation('ProjectProductSelector');
   const [project, setProject] = useProjectChange();
   const options = useMemo(() => {
-    return Object.values(RiskTypeRefs)
-      .filter((it) => it.value !== RiskType.LEVERAGE)
-      .map((it) => ({
-        label: (
-          <span className={styles['risk-item']} style={{ gap: 12 }}>
-            {it.icon}
-            {it.label(t)}
-          </span>
-        ),
-        value: it.value,
-      }));
+    return Object.values(ProjectTypeRefs).map((it) => ({
+      label: (
+        <span className={styles['risk-item']} style={{ gap: 12 }}>
+          {it.icon}
+          {it.label(t)}
+        </span>
+      ),
+      value: it.value,
+    }));
   }, [t]);
   return (
     <CSelect
@@ -93,8 +111,8 @@ export const ProjectSelector = (props: ProductSelectorProps) => {
         props.dropdownClassName,
       )}
       optionList={options}
-      value={project === RiskType.RISKY ? RiskType.RISKY : RiskType.PROTECTED}
-      onSelect={(v) => setProject(v as RiskType)}
+      value={project}
+      onSelect={(v) => setProject(v as ProjectType)}
       renderSelectedItem={(v: Record<string, unknown>) => (
         <>
           <Logo

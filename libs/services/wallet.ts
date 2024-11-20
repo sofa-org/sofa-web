@@ -9,6 +9,7 @@ import { AbstractProvider, ethers } from 'ethers';
 import { pick } from 'lodash-es';
 
 import { CommonAbis } from './abis/common-abis';
+import type { AutomatorVaultInfo } from './base-type';
 import { ContractsService, RiskType, TransactionStatus } from './contracts';
 import { ProductQuoteResult, ProductType } from './products';
 import { PositionInfoInGraph } from './the-graph';
@@ -141,6 +142,29 @@ export class WalletService {
     );
   }
 
+  @asyncRetry()
+  static async getBalanceFromAutomatorVaultCollateral(
+    vault: AutomatorVaultInfo,
+    walletAddress: string,
+  ) {
+    const provider = await WalletService.readonlyConnect(vault.chainId);
+    const collateral = await WalletService.getCollateralFromVault(
+      vault.vault,
+      provider,
+    );
+    if (!collateral.address)
+      return {
+        [collateral.symbol]: +ethers.formatEther(
+          await provider.getBalance(walletAddress),
+        ),
+      };
+    return WalletService.getBalanceByTokenContract(
+      collateral.address,
+      walletAddress,
+      vault.chainId,
+    );
+  }
+
   private static async $$approve(
     signer: ethers.JsonRpcSigner,
     collateralContract: ethers.Contract,
@@ -157,18 +181,17 @@ export class WalletService {
       ],
     );
     const network = await signer.provider._detectNetwork();
-    const succ = await pollingUntil(
-      () => WalletService.transactionResult(hash, Number(network.chainId)),
-      (res) => res !== TransactionStatus.PENDING,
-      1000,
-    ).then((res) => res[res.length - 1] === TransactionStatus.SUCCESS);
+    const succ = await WalletService.transactionResult(
+      hash,
+      Number(network.chainId),
+    ).then((res) => res === TransactionStatus.SUCCESS);
     if (!succ)
       throw new Error(
         `Please approve ${approveTo} to proceed with the transaction`,
       );
   }
 
-  private static async $approve(
+  static async $approve(
     collateralAddress: string,
     amount: string | number, // 交易金额，用于判断 allowance 是否够用（应该已经乘以了系数，比如实际为 1,000ETH，应该变成 1,000,000,000）
     signer: ethers.JsonRpcSigner,
@@ -487,14 +510,21 @@ export class WalletService {
   static async transactionResult(
     hash: string,
     chainId: number,
-  ): Promise<TransactionStatus> {
-    console.info('Get transaction result of hash', { hash, chainId });
-    const provider = await WalletService.readonlyConnect(+chainId);
-    const receipt = await provider.getTransactionReceipt(hash);
-    if (!receipt) return TransactionStatus.PENDING;
-    return Number(receipt?.status) === 1
-      ? TransactionStatus.SUCCESS
-      : TransactionStatus.FAILED;
+  ): Promise<TransactionStatus.SUCCESS | TransactionStatus.FAILED> {
+    const poll = async () => {
+      console.info('Get transaction result of hash', { hash, chainId });
+      const provider = await WalletService.readonlyConnect(+chainId);
+      const receipt = await provider.getTransactionReceipt(hash);
+      if (!receipt) return TransactionStatus.PENDING;
+      return Number(receipt?.status) === 1
+        ? TransactionStatus.SUCCESS
+        : TransactionStatus.FAILED;
+    };
+    return pollingUntil(
+      () => poll().catch(() => TransactionStatus.PENDING),
+      (s) => s !== TransactionStatus.PENDING,
+      1000,
+    ).then((res) => res[res.length - 1] as never);
   }
 
   private static async $burnBatch(

@@ -74,7 +74,7 @@ export function amountFormatter(
   const precision = forcePrecision
     ? $precision
     : Math.max($precision, exponent);
-  const [int, $decimal] = Number(amount).toFixed(18).split('.');
+  const [int, $decimal] = Big(amount).toFixed(18).split('.');
   const intStr = int.replace(/\B(?=(\d{3})+(\.|$))/g, ',');
   const decimal = $decimal?.replace(/0+$/, '');
   return decimal && precision

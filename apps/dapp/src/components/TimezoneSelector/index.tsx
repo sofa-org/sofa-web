@@ -21,7 +21,7 @@ const TimezoneSelector = () => {
 
 export default TimezoneSelector;
 
-export const Time = (props: { time: number; format?: string }) => {
+export const Time = (props: { time: number | undefined; format?: string }) => {
   const timezone = useTimezone((state) => state.timezone);
   return (
     <>

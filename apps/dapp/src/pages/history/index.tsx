@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
-import { ProductType, RiskType } from '@sofa/services/base-type';
+import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
@@ -13,7 +13,7 @@ import dayjs from 'dayjs';
 
 import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
-import { useProjectChange } from '@/components/ProductSelector';
+import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
 import {
   ProductTypeRefs,
   RiskTypeRefs,
@@ -31,6 +31,8 @@ import { uniqBy } from 'lodash-es';
 
 import { judgeSettled } from '../positions/components/PositionCard';
 
+import { AutomatorHistory } from './automator';
+
 import styles from './index.module.scss';
 
 const OrderHistory = () => {
@@ -38,6 +40,7 @@ const OrderHistory = () => {
   const prices = useIndexPrices((state) => state.prices);
   const [t] = useTranslation('History');
   const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
 
   const { data: $data, loading } = useInfiniteScroll(
     async (pre) => {
@@ -45,7 +48,7 @@ const OrderHistory = () => {
       const params = {
         chainId: wallet.chainId,
         owner: wallet.address,
-        riskType: project,
+        riskType,
       };
       const limit = 20;
       const page = {
@@ -196,65 +199,90 @@ const OrderHistory = () => {
   );
 
   return (
-    <TopTabs banner={<></>} options={[]} dark type={'tab'}>
-      <Table
-        className={styles['table']}
-        columns={columns}
-        dataSource={data?.list}
-        loading={loading}
-        pagination={false}
-        rowKey={(record) => String(record?.id)}
-        empty={<CEmpty />}
-        expandedRowKeys={expandedRowKeys}
-        expandedRowRender={(record) => {
-          if (!record) return null;
-          const returnInDepositCcy = cvtAmountsInCcy(
-            [
-              [record.product.vault.depositCcy, record.amounts.redeemable],
-              ['RCH', record.amounts.rchAirdrop],
-            ],
-            prices,
-            record.product.vault.depositCcy,
-          );
-          const hasSettled = judgeSettled(record.product.expiry);
-          return (
-            <div className={styles['extra']}>
-              <div className={styles['extra-item']}>
-                <span className={styles['label']}>{t('Return')}</span>
-                <span className={styles['value']}>
-                  {amountFormatter(returnInDepositCcy, 2)}{' '}
-                  {record.product.vault.depositCcy}
-                </span>
-              </div>
-              <div className={styles['extra-item']}>
-                <span className={styles['label']}>{t('Settlement Info')}</span>
-                <span className={styles['value']}>
-                  {record.triggerTime ? (
-                    <>
-                      {record.product.vault.productType === ProductType.DNT
-                        ? t('Out of Range')
-                        : t('Settled')}{' '}
-                      ({t('at')} ${amountFormatter(record.triggerPrice, 2)}{' '}
-                      <Time
-                        time={record.triggerTime * 1000}
-                        format="YYYY-MM-DD HH:mm"
-                      />
-                      )
-                    </>
-                  ) : record.product.vault.productType === ProductType.DNT &&
-                    hasSettled ? (
-                    t('In Range')
-                  ) : (
-                    '-'
-                  )}
-                </span>
-              </div>
+    <Table
+      className={styles['table']}
+      columns={columns}
+      dataSource={data?.list}
+      loading={loading}
+      pagination={false}
+      rowKey={(record) => String(record?.id)}
+      empty={<CEmpty />}
+      expandedRowKeys={expandedRowKeys}
+      expandedRowRender={(record) => {
+        if (!record) return null;
+        const returnInDepositCcy = cvtAmountsInCcy(
+          [
+            [record.product.vault.depositCcy, record.amounts.redeemable],
+            ['RCH', record.amounts.rchAirdrop],
+          ],
+          prices,
+          record.product.vault.depositCcy,
+        );
+        const hasSettled = judgeSettled(record.product.expiry);
+        return (
+          <div className={styles['extra']}>
+            <div className={styles['extra-item']}>
+              <span className={styles['label']}>{t('Return')}</span>
+              <span className={styles['value']}>
+                {amountFormatter(returnInDepositCcy, 2)}{' '}
+                {record.product.vault.depositCcy}
+              </span>
             </div>
-          );
-        }}
-      />
+            <div className={styles['extra-item']}>
+              <span className={styles['label']}>{t('Settlement Info')}</span>
+              <span className={styles['value']}>
+                {record.triggerTime ? (
+                  <>
+                    {record.product.vault.productType === ProductType.DNT
+                      ? t('Out of Range')
+                      : t('Settled')}{' '}
+                    ({t('at')} ${amountFormatter(record.triggerPrice, 2)}{' '}
+                    <Time
+                      time={record.triggerTime * 1000}
+                      format="YYYY-MM-DD HH:mm"
+                    />
+                    )
+                  </>
+                ) : record.product.vault.productType === ProductType.DNT &&
+                  hasSettled ? (
+                  t('In Range')
+                ) : (
+                  '-'
+                )}
+              </span>
+            </div>
+          </div>
+        );
+      }}
+    />
+  );
+};
+
+const Index = () => {
+  const [t] = useTranslation('History');
+  const [project] = useProjectChange();
+  return (
+    <TopTabs
+      banner={
+        <>
+          <h1 className={styles['head-title']}>
+            {project === ProjectType.Automator
+              ? t({ enUS: 'Transaction History', zhCN: '交易历史' })
+              : t({ enUS: 'Order History', zhCN: '订单历史' })}
+          </h1>
+        </>
+      }
+      options={[]}
+      dark
+      type={'banner-expandable'}
+    >
+      {project === ProjectType.Automator ? (
+        <AutomatorHistory />
+      ) : (
+        <OrderHistory />
+      )}
     </TopTabs>
   );
 };
 
-export default OrderHistory;
+export default Index;

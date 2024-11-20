@@ -4,10 +4,10 @@ import { useTranslation } from '@sofa/services/i18n';
 import { ProductType, RiskType } from '@sofa/services/products';
 import classNames from 'classnames';
 
-import { useProjectChange } from '@/components/ProductSelector';
+import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
 import {
   ProductTypeRefs,
-  RiskTypeRefs,
+  ProjectTypeRefs,
 } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
@@ -30,10 +30,11 @@ export interface ProductBriefProps {
 
 const ProductBanner = (props: { title: ReactNode }) => {
   const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   return (
     <div
       className={classNames(styles['product-banner-wrapper'], {
-        [styles['risky']]: project === RiskType.RISKY,
+        [styles['risky']]: riskType === RiskType.RISKY,
       })}
     >
       <div className={styles['content']}>{props.title}</div>
@@ -43,7 +44,7 @@ const ProductBanner = (props: { title: ReactNode }) => {
 
 export const ProductBrief = (props: ProductBriefProps) => {
   const [t] = useTranslation('ProductBanner');
-  const riskRef = RiskTypeRefs[props.riskType];
+  const [project] = useProjectChange();
   const ref = ProductTypeRefs[props.productType];
   return (
     <div className={styles['product-brief']}>
@@ -52,7 +53,7 @@ export const ProductBrief = (props: ProductBriefProps) => {
           className={styles['title']}
           dangerouslySetInnerHTML={{
             __html: t("WHAT IS<br/>{{project}}'s {{product}}", {
-              project: riskRef.label(t),
+              project: ProjectTypeRefs[project].label(t),
               product: ref.label(t),
             }),
           }}

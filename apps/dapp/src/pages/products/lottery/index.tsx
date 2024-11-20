@@ -14,6 +14,7 @@ import {
   ProductTypeSelector,
   useProductSelect,
   useProjectChange,
+  useRiskSelect,
 } from '@/components/ProductSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { Time } from '@/components/TimezoneSelector';
@@ -45,7 +46,8 @@ const ProductLottery = () => {
   const wallet = useWalletStore();
   const prices = useIndexPrices((state) => state.prices);
   const [forCcy] = useForCcySelect();
-  const [riskType] = useProjectChange();
+  const [project] = useProjectChange();
+  const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const [ticket] = useTicketType(forCcy);
   const depositCcy = ticket?.value as VaultInfo['depositCcy'];

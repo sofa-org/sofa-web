@@ -1,3 +1,13 @@
+.head-title {
+  @include flex-center;
+
+  margin: 0;
+  padding: 75px 0 32px;
+  font-size: 24px;
+  text-align: center;
+  color: #fff;
+}
+
 .product-type {
   @include flex-center;
 

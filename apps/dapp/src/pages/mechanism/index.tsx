@@ -1,12 +1,10 @@
 import { AutoBg } from '@sofa/effects/AutoBg';
 import { SFXText } from '@sofa/effects/SFXText';
-import { RiskType } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
-import { Env } from '@sofa/utils/env';
 import classNames from 'classnames';
 
 import { CAnimation } from '@/components/Animation';
-import { RiskTypeRefs } from '@/components/ProductSelector/enums';
+import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
 import { BottomAnimation } from '../home/components/BottomAnimation';
@@ -74,20 +72,13 @@ const Index = () => {
         <CAnimation animationType={8}>
           {(ref) => (
             <div className={styles['types']} ref={ref as never}>
-              {[RiskType.PROTECTED, RiskType.RISKY].map((it) => {
-                const ref = RiskTypeRefs[it];
+              {Object.values(ProjectTypeRefs).map((ref) => {
                 return (
-                  <div className={styles['type']} key={it}>
+                  <div className={styles['type']} key={ref.value}>
                     <h4>{ref.label(t)}</h4>
                     {ref.icon}
                     <p className={styles['desc']}>{ref.desc(t)}</p>
-                    <a
-                      href={ref.link}
-                      className={styles['link1']}
-                      target={
-                        Env.isMetaMaskAndroid || Env.isTelegram ? undefined : it
-                      }
-                    >
+                    <a href={ref.link} className={styles['link1']}>
                       {t('Go To Dapp')}
                     </a>
                   </div>

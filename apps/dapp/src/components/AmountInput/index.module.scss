@@ -46,7 +46,7 @@
   @include flex-center;
 
   justify-content: space-between;
-  margin: 16px 0 0;
+  margin: min(16px, 3vw) 0 0;
 }
 
 .progress {

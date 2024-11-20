@@ -9,32 +9,19 @@ import {
 import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 
-import AutomatorAbis from './abis/Automator.json';
 import {
   CommonAbis,
   IUniswapV2PairABI,
   IUniswapV3PairABI,
 } from './abis/common-abis';
-import DNTVaultAbis from './abis/DNTVault.json';
-import DNTVaultAbis1 from './abis/DNTVault-No-Permit2.json';
 import FeeAbis from './abis/FeeCollector.json';
 import HlOracleAbis from './abis/HlOracle.json';
-import LeverageDNTVaultAbis from './abis/LeverageDNTVault.json';
-import LeverageSTVaultAbis from './abis/LeverageSmartTrendVault.json';
 import MerkleAirdropAbis from './abis/MerkleAirdrop.json';
-import PrincipalDNTVaultAbis from './abis/PrincipalDNTVault.json';
-import PrincipalDNTVaultAbis1 from './abis/PrincipalDNTVault-No-Permit2.json';
-import PrincipalSTVaultAbis from './abis/PrincipalSmartTrendVault.json';
-import PrincipalSTVaultAbis1 from './abis/PrincipalSmartTrendVault-No-Permit2.json';
 import RCHAbis from './abis/RCH.json';
-import STVaultAbis from './abis/SmartTrendVault.json';
-import STVaultAbis1 from './abis/SmartTrendVault-No-Permit2.json';
 import SpotOracleAbis from './abis/SpotOracle.json';
-import vaults_1 from './vaults/1';
-import vaults_56 from './vaults/56';
-import vaults_42161 from './vaults/42161';
-import vaults_421614 from './vaults/421614';
-import vaults_11155111 from './vaults/11155111';
+import { AutomatorVaults } from './vaults/automator';
+import { earnVaults } from './vaults/earn';
+import { surgeVaults } from './vaults/surge';
 import {
   ProductType,
   RiskType,
@@ -48,141 +35,8 @@ export { ProductType, RiskType, TransactionStatus };
 export type { VaultInfo };
 
 export class ContractsService {
-  private static RFQVaultAbis: PartialRecord<
-    `${ProductType}-${RiskType}-${boolean /* usePermit2 */}`,
-    ethers.InterfaceAbi
-  > = {
-    [`${ProductType.DNT}-${RiskType.PROTECTED}-true`]: PrincipalDNTVaultAbis,
-    [`${ProductType.DNT}-${RiskType.PROTECTED}-false`]: PrincipalDNTVaultAbis1,
-    [`${ProductType.BullSpread}-${RiskType.PROTECTED}-true`]:
-      PrincipalSTVaultAbis,
-    [`${ProductType.BullSpread}-${RiskType.PROTECTED}-false`]:
-      PrincipalSTVaultAbis1,
-    [`${ProductType.BearSpread}-${RiskType.PROTECTED}-true`]:
-      PrincipalSTVaultAbis,
-    [`${ProductType.BearSpread}-${RiskType.PROTECTED}-false`]:
-      PrincipalSTVaultAbis1,
-    [`${ProductType.DNT}-${RiskType.RISKY}-true`]: DNTVaultAbis,
-    [`${ProductType.DNT}-${RiskType.RISKY}-false`]: DNTVaultAbis1,
-    [`${ProductType.BullSpread}-${RiskType.RISKY}-true`]: STVaultAbis,
-    [`${ProductType.BullSpread}-${RiskType.RISKY}-false`]: STVaultAbis1,
-    [`${ProductType.BearSpread}-${RiskType.RISKY}-true`]: STVaultAbis,
-    [`${ProductType.BearSpread}-${RiskType.RISKY}-false`]: STVaultAbis1,
-    [`${ProductType.DNT}-${RiskType.LEVERAGE}-true`]: LeverageDNTVaultAbis, // 其实是不支持 permit2
-    [`${ProductType.DNT}-${RiskType.LEVERAGE}-false`]: LeverageDNTVaultAbis,
-    [`${ProductType.BullSpread}-${RiskType.LEVERAGE}-true`]:
-      LeverageSTVaultAbis, // 其实是不支持 permit2
-    [`${ProductType.BullSpread}-${RiskType.LEVERAGE}-false`]:
-      LeverageSTVaultAbis,
-    [`${ProductType.BearSpread}-${RiskType.LEVERAGE}-true`]:
-      LeverageSTVaultAbis, // 其实是不支持 permit2
-    [`${ProductType.BearSpread}-${RiskType.LEVERAGE}-false`]:
-      LeverageSTVaultAbis,
-    [`${ProductType.Automator}-${RiskType.Null}-false`]: AutomatorAbis,
-    [`${ProductType.Automator}-${RiskType.Null}-true`]: AutomatorAbis,
-  };
-
-  static vaults: VaultInfo[] = [
-    ...vaults_1,
-    ...vaults_56,
-    ...vaults_42161,
-    ...vaults_11155111,
-    ...vaults_421614,
-  ]
-    .filter((it) => ChainMap[it.chainId])
-    .map((it) => {
-      const collateralDecimal = {
-        RCH: 1e18,
-        USDT: it.chainId == 56 ? 1e18 : 1e6,
-        USDC: it.chainId == 56 ? 1e18 : 1e6,
-        crvUSD: 1e18,
-        WETH: 1e18,
-        stETH: 1e18,
-        WBTC: 1e18,
-      }[it.depositCcy];
-      if (!collateralDecimal)
-        throw new Error(`Cannot configure the ${it.depositCcy} vault`);
-      const depositMinAmount = (() => {
-        if (Env.isPre) {
-          // 大约 0.05U
-          return {
-            RCH: 0.05,
-            USDT: 0.05,
-            USDC: 0.05,
-            crvUSD: 0.05,
-            WETH: 0.000015,
-            stETH: 0.000015,
-            WBTC: 0.000001,
-          }[it.depositCcy];
-        }
-        return it.riskType === RiskType.RISKY
-          ? {
-              RCH: 20,
-              USDT: 20,
-              USDC: 20,
-              crvUSD: 20,
-              WETH: 0.01,
-              stETH: 0.01,
-              WBTC: 0.0005,
-            }[it.depositCcy]
-          : {
-              RCH: 100,
-              USDT: 100,
-              USDC: 100,
-              crvUSD: 100,
-              WETH: 0.05,
-              stETH: 0.05,
-              WBTC: 0.002,
-            }[it.depositCcy];
-      })();
-      const depositTickAmount = (() => {
-        if (Env.isPre) {
-          // 大约 0.05U
-          return {
-            RCH: 0.05,
-            USDT: 0.05,
-            USDC: 0.05,
-            crvUSD: 0.05,
-            WETH: 0.000001,
-            stETH: 0.000001,
-            WBTC: 0.000001,
-          }[it.depositCcy];
-        }
-        return it.riskType === RiskType.RISKY
-          ? {
-              RCH: 20,
-              USDT: 20,
-              USDC: 20,
-              crvUSD: 20,
-              WETH: 0.01,
-              stETH: 0.01,
-              WBTC: 0.0005,
-            }[it.depositCcy]
-          : {
-              RCH: 1,
-              USDT: 1,
-              USDC: 1,
-              crvUSD: 1,
-              WETH: 0.0001,
-              stETH: 0.0001,
-              WBTC: 0.0001,
-            }[it.depositCcy];
-      })();
-      return {
-        ...it,
-        trackingSource: 'COINBASE',
-        depositMinAmount,
-        depositTickAmount,
-        anchorPricesDecimal: 1e8,
-        collateralDecimal,
-        balanceDecimal:
-          collateralDecimal * (it.riskType === RiskType.PROTECTED ? 1e18 : 1),
-        abis:
-          ContractsService.RFQVaultAbis[
-            `${it.productType}-${it.riskType}-${it.usePermit2}`
-          ] || [],
-      } as VaultInfo;
-    });
+  static vaults = [...earnVaults, ...surgeVaults];
+  static AutomatorVaults = AutomatorVaults;
 
   static rchAddress() {
     return ChainMap[defaultChain.chainId].rchAddress;
@@ -200,8 +54,8 @@ export class ContractsService {
     return ChainMap[chainId].feeContractAddress;
   }
 
-  static automatorFeeContractAddress(chainId: number) {
-    return ChainMap[chainId].automatorFeeContractAddress;
+  static AutomatorFeeContractAddress(chainId: number) {
+    return ChainMap[chainId].AutomatorFeeContractAddress;
   }
 
   static getVaultInfo(vault: string, chainId: number) {
@@ -381,11 +235,24 @@ export class ContractsService {
     return new ethers.Contract(vault, info.abis, signerOrProvider);
   }
 
-  static async automatorContract(
+  static async AutomatorContract(
     vault: string,
     signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider, // 提供 provider 时无法调用 vault 的 mint, burn 和 burnBatch 方法
   ) {
-    return ContractsService.rfqContract(vault, signerOrProvider);
+    const network =
+      'address' in signerOrProvider
+        ? await signerOrProvider.provider._detectNetwork()
+        : await signerOrProvider._detectNetwork();
+    const chainId = Number(network.chainId);
+    const info = AutomatorVaults.find(
+      (it) =>
+        it.vault.toLowerCase() === vault.toLowerCase() &&
+        it.chainId === chainId,
+    );
+    if (!info) {
+      throw new Error(`Automator vault ${vault} (${chainId}) not found`);
+    }
+    return new ethers.Contract(vault, info.abis, signerOrProvider);
   }
 
   static rchContract(

@@ -11,6 +11,8 @@ export enum PositionStatus {
   PENDING = 'PENDING',
   MINTED = 'MINTED',
   EXPIRED = 'EXPIRED',
+  REDEEMING = 'REDEEMING', // 赎回申请中，正在上链，Automator 合约的状态
+  REDEEMED = 'REDEEMED', // 赎回已申请中，已上链，Automator 合约的状态
   CLAIMING = 'CLAIMING', // 赎回中，burn 方法已调用，正在上链，前端在交互中设置
   CLAIMED = 'CLAIMED',
   FAILED = 'FAILED',

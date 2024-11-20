@@ -200,7 +200,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
                   pathname: '/products/customize',
                   search: stringify({
                     ...currQuery(),
-                    project: data.vault.riskType || '',
+                    'risk-type': data.vault.riskType || '',
                     'product-type': data.vault.productType || '',
                     'for-ccy': data.vault.forCcy || '',
                     'deposit-ccy': data.vault.depositCcy || '',

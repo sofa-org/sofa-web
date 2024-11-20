@@ -17,9 +17,10 @@ import styles from './index.module.scss';
 
 const ProductDesc = (
   props: BaseProps & {
-    product: PartialRequired<ProductQuoteResult, 'vault'>;
+    product?: PartialRequired<ProductQuoteResult, 'vault'>;
     prefixTabs?: { itemKey: string; tab: string; element: ReactNode }[];
     noReturnTab?: boolean;
+    noMoreInfo?: boolean;
   },
 ) => {
   return (
@@ -33,20 +34,22 @@ const ProductDesc = (
           {it.element}
         </Tabs.TabPane>
       ))}
-      <Tabs.TabPane itemKey="return" tab={t('More Info')}>
-        {props.product.vault.riskType === RiskType.RISKY ? (
-          <OptionTrading {...props.product} />
-        ) : (
-          <YieldTower {...props.product} />
-        )}
-        <SuitableMarketScenario {...props.product} />
-        {props.product.vault.riskType !== RiskType.RISKY && (
-          <ProductStrategy {...props.product} />
-        )}
-        <FeeStructure {...props.product} />
-        <VaultDesc {...props.product} />
-        <ClaimWithdrawDesc {...props.product} />
-      </Tabs.TabPane>
+      {props.product && !props.noMoreInfo && (
+        <Tabs.TabPane itemKey="return" tab={t('More Info')}>
+          {props.product.vault.riskType === RiskType.RISKY ? (
+            <OptionTrading {...props.product} />
+          ) : (
+            <YieldTower {...props.product} />
+          )}
+          <SuitableMarketScenario {...props.product} />
+          {props.product.vault.riskType !== RiskType.RISKY && (
+            <ProductStrategy {...props.product} />
+          )}
+          <FeeStructure {...props.product} />
+          <VaultDesc {...props.product} />
+          <ClaimWithdrawDesc {...props.product} />
+        </Tabs.TabPane>
+      )}
       <Tabs.TabPane itemKey="strategy" tab={t('Risk Disclosures')}>
         <RiskDisclosures />
       </Tabs.TabPane>

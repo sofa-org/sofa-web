@@ -6,6 +6,7 @@ import {
   useState,
 } from 'react';
 import { DatePicker } from '@douyinfe/semi-ui';
+import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -38,6 +39,7 @@ import {
   ProductTypeSelector,
   useProductSelect,
   useProjectChange,
+  useRiskSelect,
 } from '@/components/ProductSelector';
 import {
   ProductTypeRefs,
@@ -70,12 +72,7 @@ const ProductCustomize = () => {
   const wallet = useWalletStore();
   const prices = useIndexPrices((state) => state.prices);
   const [productType] = useProductSelect();
-  const riskType = useMemo(() => {
-    const val = currQuery().project as never;
-    return [RiskType.PROTECTED, RiskType.LEVERAGE].includes(val)
-      ? val
-      : RiskType.PROTECTED;
-  }, []);
+  const [riskType] = useRiskSelect(ProjectType.Earn);
   const [forCcy] = useForCcySelect();
   const [depositCcy, setDepositCcy] = useDepositCcySelect();
   const [leverageVault, $setLeverageVault] = useState<string>();
@@ -493,8 +490,8 @@ const ProductCustomize = () => {
 };
 
 const Comp = () => {
-  const [riskType] = useProjectChange();
-  return riskType !== RiskType.RISKY ? (
+  const [project] = useProjectChange();
+  return project === ProjectType.Earn ? (
     <ProductCustomize />
   ) : (
     <ProductLottery />

@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from 'react';
 import { Checkbox, Table } from '@douyinfe/semi-ui';
 import { ColumnProps, TableProps } from '@douyinfe/semi-ui/lib/es/table';
-import { RiskType } from '@sofa/services/base-type';
+import { ProjectType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   AirdropRecord,
@@ -9,12 +9,11 @@ import {
   AirdropStatusRefs,
 } from '@sofa/services/rch';
 import { amountFormatter } from '@sofa/utils/amount';
-import { Env } from '@sofa/utils/env';
 import { useLocalStorageState } from 'ahooks';
 import classNames from 'classnames';
 
 import CEmpty from '@/components/Empty';
-import { RiskTypeRefs } from '@/components/ProductSelector/enums';
+import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import { Time } from '@/components/TimezoneSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
@@ -150,12 +149,7 @@ export const RCHHistory = forwardRef<RCHHistoryRef>((_, ref) => {
               {t('No Rewards History')}
               <a
                 className={classNames('btn-gradient', styles['btn-link'])}
-                href={RiskTypeRefs[RiskType.PROTECTED].link}
-                target={
-                  Env.isMetaMaskAndroid || Env.isTelegram
-                    ? undefined
-                    : RiskType.PROTECTED
-                }
+                href={ProjectTypeRefs[ProjectType.Earn].link}
               >
                 {t('Deposit & GET REWARDS')}
               </a>

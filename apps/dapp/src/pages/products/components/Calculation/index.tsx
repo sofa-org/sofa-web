@@ -54,7 +54,7 @@ export const Calculation = (props: CalculationProps) => {
   const z = displayWithFlag(timezone);
   const { quote } = props;
   const productRef = ProductTypeRefs[quote.vault.productType];
-  const projectRef = RiskTypeRefs[quote.vault.riskType];
+  const riskTypeRef = RiskTypeRefs[quote.vault.riskType];
   const leverageInfo = useAsyncMemo(
     () =>
       ProductsService.vaultLeverageInfo(quote.vault, quote.timestamp * 1000),
@@ -77,7 +77,8 @@ export const Calculation = (props: CalculationProps) => {
               name: t('Product Type'),
               value: (
                 <>
-                  {productRef.label(t)} {projectRef.icon} {projectRef.label(t)}
+                  {productRef.label(t)} {riskTypeRef.icon}{' '}
+                  {riskTypeRef.label(t)}
                 </>
               ),
               desc: t('Product Name'),
@@ -280,8 +281,8 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Product Type'),
                 value: (
                   <>
-                    {productRef.label(t)} {projectRef.icon}{' '}
-                    {projectRef.label(t)}
+                    {productRef.label(t)} {riskTypeRef.icon}{' '}
+                    {riskTypeRef.label(t)}
                   </>
                 ),
                 desc: t('Product Name'),
@@ -576,8 +577,8 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Product Type'),
                 value: (
                   <>
-                    {productRef.label(t)} {projectRef.icon}{' '}
-                    {projectRef.label(t)}
+                    {productRef.label(t)} {riskTypeRef.icon}{' '}
+                    {riskTypeRef.label(t)}
                   </>
                 ),
                 desc: t('Product Name'),
@@ -863,7 +864,7 @@ export const Calculation = (props: CalculationProps) => {
                 className: styles['highlight-1'],
               },
             ],
-    [quote, t, productRef, projectRef, z, leverageInfo],
+    [quote, t, productRef, riskTypeRef, z, leverageInfo],
   );
 
   const [visible, setVisible] = useState(false);

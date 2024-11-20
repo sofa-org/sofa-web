@@ -1,0 +1,109 @@
+.user-info {
+  @include pointer;
+
+  position: relative;
+  margin: min(24px, 4vw) 0 0;
+  padding: min(24px, 4vw);
+  border-radius: 8px;
+  border: 1px solid rgba(#000, 0.12);
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: auto;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: url("@/pages/products/automator/assets/icon-arrow.svg")
+      no-repeat center center / contain;
+  }
+}
+
+.item {
+  margin: 0 0 min(24px, 4vw);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.title {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: 0;
+  font-size: min(14px, 3.3vw);
+  color: rgba(#000, 0.45);
+
+  a {
+    color: $color-rch;
+  }
+}
+
+.decorative {
+  margin: 0;
+  font-size: min(14px, 3.3vw);
+  opacity: 0.45;
+}
+
+.amount {
+  margin: 0;
+}
+
+.unit {
+  margin: 0;
+  font-size: min(14px, 3.3vw);
+  opacity: 0.6;
+}
+
+.separator {
+  margin: 0;
+  padding: 0 min(8px, 1vw);
+  font-size: min(14px, 3.3vw);
+}
+
+.rch {
+  margin: 0;
+  color: $color-rch;
+}
+
+.shares {
+  display: none;
+
+  &.decorative {
+    margin-left: min(8px, 1vw);
+    padding-left: min(8px, 1vw);
+    border-left: 1px dashed rgba(#000, 0.12);
+  }
+
+  .shares {
+    display: initial !important;
+  }
+}
+
+.value {
+  margin: 0;
+  font-size: min(18px, 4vw);
+
+  .shares {
+    display: initial;
+  }
+}
+
+.expand {
+  .item.shares {
+    display: block;
+  }
+
+  .value {
+    .shares {
+      display: none;
+    }
+  }
+
+  &::after {
+    transform: translateX(-50%) rotate(180deg);
+  }
+}
