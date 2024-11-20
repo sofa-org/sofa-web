@@ -594,7 +594,7 @@ export class ContractsService {
       ...genArgs(undefined),
     );
     const gasLimit =
-      +Number(gasEstimate) + Math.min(+Number(gasEstimate) * 1.1, 40000); // 防止失败
+      +Number(gasEstimate) + Math.min(+Number(gasEstimate) * 0.1, 40000); // 防止失败
     const args = genArgs(gasLimit);
     console.info(`Add gasLimit for ${method}`, {
       contract,
