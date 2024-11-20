@@ -174,7 +174,7 @@ const Account = () => {
                 theme="solid"
                 type="primary"
                 onClick={() =>
-                  useRCHState.claimBatch().then(() => {
+                  useRCHState.claimBatch(true).then(() => {
                     Toast.info(t('Claim successful'));
                     useWalletStore.updateBalanceByTokenContract(
                       ContractsService.rchAddress(),

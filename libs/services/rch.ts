@@ -1,10 +1,8 @@
 import { asyncCache, asyncRetry } from '@sofa/utils/decorators';
 import { MsIntervals, next8h } from '@sofa/utils/expiry';
 import { http, pollingUntil } from '@sofa/utils/http';
-import { UserStorage } from '@sofa/utils/storage';
 import dayjs from 'dayjs';
 import { ethers } from 'ethers';
-import { omit } from 'lodash-es';
 
 import { defaultChain } from './chains';
 import { ContractsService, TransactionStatus } from './contracts';
@@ -61,10 +59,6 @@ export interface DailyBonusItem {
   uid: number;
   wallet: string;
 }
-
-const AirdropStatusStorage = new UserStorage<
-  Record<string /* {chainId}-{address}-{timestampMs} */, boolean>
->('airdrop-status', () => 'curr');
 
 /**
  * RCH 只会在 ETH mainnet 和 Sepolia testnet 上部署
@@ -166,11 +160,6 @@ export class RCHService {
                 signer,
               );
               if (claimed) return AirdropStatus.Claimed;
-              const claiming =
-                AirdropStatusStorage.get()?.[
-                  `${signer.address}-${(it.dateTime ?? it.daytime)! * 1000}`
-                ];
-              if (claiming) return AirdropStatus.Claiming;
               return AirdropStatus.Unclaimed;
             })(),
             timestamp: (it.dateTime ?? it.daytime)! * 1000,
@@ -196,43 +185,39 @@ export class RCHService {
   }
 
   static async claimAirdrop(list: AirdropRecord[]) {
+    if (list.length < 1) return;
     const chainId = defaultChain.chainId;
     const { signer } = await WalletService.connect(chainId);
     const airdropContract = ContractsService.rchAirdropContract(signer);
-    const indexes = list.map((it) => (it.timestamp - MsIntervals.day) / 1000); // 使用这个到期日的开始时间
-    const amounts = list.map((it) => it.amountInt && BigInt(it.amountInt));
-    const proofs = list.map((it) => {
-      if (!it.proof) return [];
-      return it.proof.split(',').map((it) => `0x${it}`);
-    });
-    const args = (gasLimit?: number) => [
-      indexes,
-      amounts,
-      proofs,
-      ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
-    ];
-    const hash = await ContractsService.dirtyCall(
-      airdropContract,
-      'claimMultiple',
-      args,
-    );
-    AirdropStatusStorage.set({
-      ...AirdropStatusStorage.get(),
-      ...Object.fromEntries(
-        list.map((it) => [`${signer.address}-${it.timestamp}`, true]),
-      ),
-    });
+    const hash = await (() => {
+      const indexes = list.map((it) => (it.timestamp - MsIntervals.day) / 1000); // 使用这个到期日的开始时间
+      const amounts = list.map((it) => it.amountInt && BigInt(it.amountInt));
+      const proofs = list.map((it) => {
+        if (!it.proof) return [];
+        return it.proof.split(',').map((it) => `0x${it}`);
+      });
+      if (list.length === 1) {
+        const args = (gasLimit?: number) => [
+          indexes[0],
+          amounts[0],
+          proofs[0],
+          ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
+        ];
+        return ContractsService.dirtyCall(airdropContract, 'claim', args);
+      }
+      const args = (gasLimit?: number) => [
+        indexes,
+        amounts,
+        proofs,
+        ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
+      ];
+      return ContractsService.dirtyCall(airdropContract, 'claimMultiple', args);
+    })();
     return pollingUntil(
       () => WalletService.transactionResult(hash, chainId),
       (res) => res !== TransactionStatus.PENDING,
       1000,
     ).then((res) => {
-      AirdropStatusStorage.set(
-        omit(
-          AirdropStatusStorage.get() || {},
-          list.map((it) => `${chainId}-${signer.address}-${it.timestamp}`),
-        ),
-      );
       return res[res.length - 1] === TransactionStatus.FAILED
         ? Promise.reject(new Error('Claim failed on chain'))
         : Promise.resolve();

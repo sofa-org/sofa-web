@@ -9,7 +9,7 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 
 const initialState = {
   myAirdropList: undefined as undefined | AirdropRecord[],
-  selectedAirdropKeys: [] as number[],
+  selectedAirdropKeys: [] as AirdropRecord['timestamp'][],
 };
 
 export const useRCHState = Object.assign(
@@ -58,8 +58,14 @@ export const useRCHState = Object.assign(
     updateSelectedAirdropKeys: (keys: number[]) => {
       useRCHState.setState((pre) => ({ ...pre, selectedAirdropKeys: keys }));
     },
-    claimBatch: async () => {
-      const claimableList = useRCHState.getState().claimableList();
+    claimBatch: async (partial?: boolean) => {
+      const state = useRCHState.getState();
+      const $claimableList = state.claimableList();
+      const claimableList = !partial
+        ? $claimableList
+        : $claimableList?.filter((it) =>
+            state.selectedAirdropKeys.includes(it.timestamp),
+          );
       if (!claimableList?.length) throw new Error('No RCH for claiming');
       await WalletService.connect(defaultChain.chainId);
       useWalletStore.connect(defaultChain.chainId);
