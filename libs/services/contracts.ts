@@ -54,8 +54,8 @@ export class ContractsService {
     return ChainMap[chainId].feeContractAddress;
   }
 
-  static AutomatorFeeContractAddress(chainId: number) {
-    return ChainMap[chainId].AutomatorFeeContractAddress;
+  static automatorFeeContractAddress(chainId: number) {
+    return ChainMap[chainId].automatorFeeContractAddress;
   }
 
   static getVaultInfo(vault: string, chainId: number) {

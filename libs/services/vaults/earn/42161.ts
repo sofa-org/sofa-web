@@ -374,6 +374,61 @@ const USDCVaults = [
   },
 ];
 
-const vaults = [...USDTVaults, ...USDCVaults];
+const USDTVaultsForAutomator = [
+  // AAVESmartBullVault(ETH/USDT)
+  {
+    chainId: 42161,
+    vault: '0x986Fa0383C39dBdA1B3A29Ac536fe5Df354Ed160',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+  // AAVESmartBullVault(WBTC/USDT)
+  {
+    chainId: 42161,
+    vault: '0x770f7fcEce69C68B208B80bBc4e3d1Bf8f9c0672',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+  // AAVESmartBearVault(ETH/USDT)
+  {
+    chainId: 42161,
+    vault: '0x1e5A684d263F42BaC1f2bAd6fB379277D4D6c28C',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+  // AAVESmartBearVault(WBTC/USDT)
+  {
+    chainId: 42161,
+    vault: '0xBF898C0C2E7d415dE8FCcc78d1200D029a060560',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDT',
+    depositCcy: 'USDT',
+    rchMultiplier: 20,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+];
+
+const vaults = [...USDTVaults, ...USDCVaults, ...USDTVaultsForAutomator];
 
 export default vaults;
