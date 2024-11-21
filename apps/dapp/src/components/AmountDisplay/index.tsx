@@ -7,7 +7,7 @@ export interface AmountDisplayProps {
   amount: string | number | undefined;
   thresholdCount?: number; // default: 5
   precision?: number;
-  signed?: boolean; // 是否显示 + - 符号
+  signed?: boolean; // 是否显示 + 符号
 }
 
 const AmountDisplay = (props: AmountDisplayProps) => {
@@ -17,8 +17,8 @@ const AmountDisplay = (props: AmountDisplayProps) => {
   }, [props.amount]);
 
   const sign = useMemo(() => {
-    if (!props.signed || !Number(props.amount)) return '';
-    if (Number(props.amount) > 0) return '+';
+    if (!Number(props.amount)) return '';
+    if (Number(props.amount) > 0) return !props.signed ? '' : '+';
     return '-';
   }, [props.amount, props.signed]);
 
