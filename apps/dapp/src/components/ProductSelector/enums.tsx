@@ -57,7 +57,7 @@ export const ProjectTypeRefs = {
       }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: ProjectType.Automator,
-    link: EnvLinks.config.VITE_Automator_LINK,
+    link: EnvLinks.config.VITE_AUTOMATOR_LINK,
   },
 };
 
