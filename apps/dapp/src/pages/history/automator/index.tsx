@@ -143,7 +143,9 @@ export const AutomatorHistory = () => {
                     className={styles['completed']}
                     style={{ color: '#49AA19' }}
                   >
-                    {t({ enUS: 'Claimed', zhCN: '已完成' })}
+                    {record.action === 'REDEEM'
+                      ? t({ enUS: 'Claimed', zhCN: '已赎回' })
+                      : t({ enUS: 'Completed', zhCN: '已完成' })}
                   </span>
                 );
               }
