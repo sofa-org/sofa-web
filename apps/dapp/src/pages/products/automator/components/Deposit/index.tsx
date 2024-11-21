@@ -17,6 +17,7 @@ import styles from './index.module.scss';
 
 export interface AutomatorDepositProps {
   vault?: AutomatorVaultInfo;
+  onSuccess?(): void;
 }
 
 export const AutomatorDeposit = (props: AutomatorDepositProps) => {
@@ -86,7 +87,12 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
           await wait(100);
           if (!depositData?.amount) throw new Error('Please input amount');
           return AutomatorService.deposit(
-            (it) => progressRef.current?.update(it),
+            (it) => {
+              progressRef.current?.update(it);
+              if (it.status === 'Success') {
+                props.onSuccess?.();
+              }
+            },
             vault,
             depositData.amount,
           );

@@ -4,7 +4,7 @@ import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
-import { useQuery } from '@sofa/utils/hooks';
+import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import CEmpty from '@/components/Empty';
@@ -21,18 +21,26 @@ import { AutomatorOverview } from './components/Overview';
 import { AutomatorProjectDesc } from './components/ProjectDesc';
 import { AutomatorUserInfo } from './components/UserInfo';
 import { AutomatorWithdraw } from './components/Withdraw';
+import { useAutomatorStore } from './store';
 
 import styles from './index.module.scss';
 
 export const Automator = () => {
   const [t] = useTranslation('Automator');
   const { tab } = useQuery();
-  const chainId = useWalletStore((state) => state.chainId);
+  const { chainId, address } = useWalletStore((state) => state);
 
   const vault = useMemo(
     () => ContractsService.AutomatorVaults.find((it) => it.chainId === chainId),
     [chainId],
   );
+
+  const handleSuccess = useLazyCallback(() => {
+    if (vault && address) {
+      useAutomatorStore.updateUserInfo(vault, address);
+      useWalletStore.updateBalanceByAutomatorVault(vault);
+    }
+  });
 
   return (
     <TopTabs
@@ -87,7 +95,7 @@ export const Automator = () => {
                     </span>
                   }
                 >
-                  <AutomatorDeposit vault={vault} />
+                  <AutomatorDeposit vault={vault} onSuccess={handleSuccess} />
                 </Tabs.TabPane>
                 <Tabs.TabPane
                   itemKey="redeem"
@@ -98,7 +106,7 @@ export const Automator = () => {
                     </span>
                   }
                 >
-                  <AutomatorWithdraw vault={vault} />
+                  <AutomatorWithdraw vault={vault} onSuccess={handleSuccess} />
                 </Tabs.TabPane>
               </Tabs>
             </div>

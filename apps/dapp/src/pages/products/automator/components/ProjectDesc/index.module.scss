@@ -11,6 +11,26 @@
   width: 100%;
 }
 
+.legend {
+  @include flex-center;
+
+  gap: 20px;
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  .legend-item {
+    @include flex-center;
+
+    .color {
+      width: 20px;
+      height: 10px;
+      border-radius: 2px;
+    }
+  }
+}
+
 .snapshot {
   :global(.semi-spin-children) {
     @include flex-center;

@@ -16,6 +16,7 @@ import styles from './index.module.scss';
 
 export interface AutomatorWithdrawProps {
   vault?: AutomatorVaultInfo;
+  onSuccess?: () => void;
 }
 
 export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
@@ -68,9 +69,7 @@ export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
           progressRef={progressRef}
           claimableStartAt={redeemInfo.claimableStartAt}
           claimableEndAt={redeemInfo.claimableEndAt}
-          onSuccess={() =>
-            vault && useWalletStore.updateBalanceByAutomatorVault(vault)
-          }
+          onSuccess={props.onSuccess}
         />
       ) : redeemInfo.cancelable && step !== 'redeem-apply' ? (
         <AutomatorRedeemAwait
@@ -78,11 +77,7 @@ export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
           progressRef={progressRef}
           claimableStartAt={redeemInfo.claimableStartAt}
           claimableEndAt={redeemInfo.claimableEndAt}
-          onSuccess={() =>
-            vault &&
-            wallet.address &&
-            useAutomatorStore.updateUserInfo(vault, wallet.address)
-          }
+          onSuccess={props.onSuccess}
         />
       ) : (
         <AutomatorRedeemApply
@@ -90,11 +85,7 @@ export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
           progressRef={progressRef}
           claimableStartAt={redeemInfo.claimableStartAt}
           pendingSharesWithDecimals={redemptionInfo?.pendingSharesWithDecimals}
-          onSuccess={() =>
-            vault &&
-            wallet.address &&
-            useAutomatorStore.updateUserInfo(vault, wallet.address)
-          }
+          onSuccess={props.onSuccess}
         />
       )}
       <AutomatorProgress

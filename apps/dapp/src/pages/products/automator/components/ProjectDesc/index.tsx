@@ -161,9 +161,7 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
           return result; // 返回最终的内容字符串
         },
       },
-      legend: {
-        top: 40,
-      },
+      legend: false,
       xAxis: {
         type: 'category',
         data: data.map((it) => it.timestamp),
@@ -227,7 +225,7 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
     myChart.current.setOption(option);
   }, [data, props.vault?.depositCcy, precision]);
 
-  if (!list?.length) return <></>;
+  if (!list?.length || list.length < 2) return <></>;
 
   return (
     <div className={classNames(styles['performance'], styles['section'])}>
@@ -236,6 +234,26 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
         {t({ enUS: 'Vault Performance', zhCN: '历史表现' })}
       </h2>
       <Spin spinning={!list} wrapperClassName={styles['content']}>
+        <div className={styles['legend']}>
+          <div className={styles['legend-item']}>
+            <div
+              className={styles['color']}
+              style={{ background: '#50D113' }}
+            />
+            <div
+              className={styles['color']}
+              style={{ background: '#EC5E88' }}
+            />
+            {t({ enUS: 'PnL Of Share' })}
+          </div>
+          <div className={styles['legend-item']}>
+            <div
+              className={styles['color']}
+              style={{ background: '#51acf1' }}
+            />
+            {t({ enUS: 'PnL Of RCH' })}
+          </div>
+        </div>
         <div className={styles['chart']} ref={chartRef} />
       </Spin>
     </div>
