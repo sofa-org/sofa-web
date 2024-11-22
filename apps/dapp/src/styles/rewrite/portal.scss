@@ -1,7 +1,7 @@
 @mixin rewrite {
   .semi-portal {
     position: fixed;
-    inset: 0 !important;
+    inset: 0 0 auto !important;
     background: rgba(#000, 0.7);
   }
 
@@ -24,7 +24,7 @@
   }
 }
 
-@media screen and (width <= 500px) {
+@media screen and (width <=500px) {
   .is-pc {
     @include rewrite;
   }
