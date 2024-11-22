@@ -116,8 +116,8 @@ const Index = () => {
         <CEmpty
           className="semi-always-dark"
           description={t({
-            enUS: 'Supported vaults are coming soon',
-            zhCN: '没有支持的合约，敬请期待！',
+            enUS: 'There are no supported vaults on this chain. Please switch to another chain.',
+            zhCN: '这条链上没有支持的合约，请切换到其它的链',
           })}
         />
       )}

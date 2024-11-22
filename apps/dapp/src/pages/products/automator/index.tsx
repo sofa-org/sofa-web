@@ -67,8 +67,8 @@ export const Automator = () => {
         <CEmpty
           className="semi-always-dark"
           description={t({
-            enUS: 'Supported Automator vaults are coming soon',
-            zhCN: '没有支持的 Automator 合约，敬请期待！',
+            enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain.',
+            zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链',
           })}
         />
       ) : (

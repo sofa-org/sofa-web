@@ -216,7 +216,7 @@ export const AutomatorRedeemApply = (props: {
         <span className={styles['redeem-info']}>
           {t(
             {
-              enUS: 'Redeem now, expected claimable on {{time}}',
+              enUS: 'Redemptions can be claimed on {{time}}',
               zhCN: '现在提交预计在 {{time}} 可赎回',
             },
             {

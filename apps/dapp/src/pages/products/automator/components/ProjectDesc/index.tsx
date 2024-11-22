@@ -288,13 +288,16 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
             dangerouslySetInnerHTML={{
               __html: t(
                 {
-                  enUS: '	•	When subscribing, users mint atUSDT by converting USDT at the current atUSDT price. Minting allocates shares proportionally to the size of the current pool.<br/> •	To redeem, users return atUSDT.  Redemption requests require a 7-day waiting period before becoming claimable.<br />	•	Once claimable, you have 3 days to complete the claim. If not claimed within this time, the request will expire, and you’ll need to submit a new redemption request.',
-                  zhCN: '	•	订阅时，用户通过当前 atUSDT 价格将 USDT 转换为 atUSDT，从而铸造 atUSDT 份额。铸造的份额将按当前资金池的规模比例分配。<br/>•	要赎回，用户需返还 atUSDT。赎回请求需经过 7 天的等待期后方可领取。<br/>•	在可领取状态下，您有 3 天的时间完成领取。如果未在规定时间内领取，赎回请求将过期，您需要重新提交新的赎回请求。',
+                  enUS: '· Users can mint atUSDT by converting USDT at the current atUSDT price. Minting allocates shares proportionally based on the size of the current pool. <br/>· To redeem, users will burn atUSDT to receive USDT, with a {{waitDuration}} waiting period. <br/>· Redemptions must be claimed within {{claimDuration}} following the waiting period, otherwise the request will expire and a new redemption process must be re-submitted.',
+                  zhCN: '	•	用户可以通过当前的 atUSDT 价格将 USDT 转换为 atUSDT，从而进行铸造。铸造的份额将根据当前资金池的规模按比例分配。<br/>•	赎回时，用户需销毁 atUSDT 以换取 USDT，并需经历 7 天的等待期。<br/>•	在等待期结束后的 3 天内必须完成领取，否则请求将过期，需重新提交新的赎回流程。',
                 },
                 {
-                  duration:
+                  waitDuration:
                     props.vault?.redeemWaitPeriod &&
                     formatDuration(props.vault?.redeemWaitPeriod, 1),
+                  claimDuration:
+                    props.vault?.claimPeriod &&
+                    formatDuration(props.vault?.claimPeriod, 1),
                 },
               ),
             }}
@@ -310,7 +313,7 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
           <div
             dangerouslySetInnerHTML={{
               __html: t({
-                enUS: `Automator strategies do not charge any fees on execution, while a performance fee of 15% will only be booked against actual & realized profits.`,
+                enUS: `Automator strategies do not charge any fees on execution, while a performance fee of 15% will only be booked against actual & realized profits. Protocol fees will be recycled into $RCH token burns to maintain our commitment towards sustainable tokenomics.`,
                 zhCN: '全程 0 手续费，仅收取利润部分的 15%。此费用将被用于 $RCH 的销毁，为 SOFA.org 的可持续发展贡献力量。',
               }),
             }}
