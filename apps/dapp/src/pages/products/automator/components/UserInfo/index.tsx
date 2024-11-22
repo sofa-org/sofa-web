@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Spin } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { amountFormatter } from '@sofa/utils/amount';
 import { useTime } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 

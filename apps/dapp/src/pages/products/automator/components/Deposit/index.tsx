@@ -77,29 +77,31 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
           </span>
         </div>
       </div>
-      <BaseInvestButton
-        className={styles['button']}
-        preparing={!vault}
-        prepareText={t({ enUS: 'No vault', zhCN: '未找到产品' })}
-        insufficient={!!balance && balance < Number(depositData?.amount)}
-        onSubmit={async () => {
-          if (!vault) return;
-          await wait(100);
-          if (!depositData?.amount) throw new Error('Please input amount');
-          return AutomatorService.deposit(
-            (it) => {
-              progressRef.current?.update(it);
-              if (it.status === 'Success') {
-                props.onSuccess?.();
-              }
-            },
-            vault,
-            depositData.amount,
-          );
-        }}
-      >
-        {t({ enUS: 'Deposit', zhCN: '存入' })}
-      </BaseInvestButton>
+      <div className={styles['buttons']}>
+        <BaseInvestButton
+          className={styles['button']}
+          preparing={!vault}
+          prepareText={t({ enUS: 'No vault', zhCN: '未找到产品' })}
+          insufficient={!!balance && balance < Number(depositData?.amount)}
+          onSubmit={async () => {
+            if (!vault) return;
+            await wait(100);
+            if (!depositData?.amount) throw new Error('Please input amount');
+            return AutomatorService.deposit(
+              (it) => {
+                progressRef.current?.update(it);
+                if (it.status === 'Success') {
+                  props.onSuccess?.();
+                }
+              },
+              vault,
+              depositData.amount,
+            );
+          }}
+        >
+          {t({ enUS: 'Deposit', zhCN: '存入' })}
+        </BaseInvestButton>
+      </div>
       <AutomatorProgress
         chainId={wallet.chainId}
         vault={vault?.vault || ''}

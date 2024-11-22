@@ -27,7 +27,7 @@ export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
   const wallet = useWalletStore();
   useEffect(() => {
     if (vault && wallet.address) {
-      useAutomatorStore.subscribeUserInfo(vault, wallet.address);
+      return useAutomatorStore.subscribeUserInfo(vault, wallet.address);
     }
   }, [vault, wallet.address]);
 

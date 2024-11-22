@@ -212,6 +212,10 @@
 
   justify-content: space-between;
   gap: min(20px, 5vw);
+
+  :global(.wallet-connector) {
+    flex: 1;
+  }
 }
 
 .modal {
