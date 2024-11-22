@@ -56,8 +56,15 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           </Tooltip>
         </div>
         <div className={styles['value']}>
-          <AmountDisplay amount={data?.amount} />
-          <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+          <AmountDisplay
+            amount={Number(data?.amount) / Number(data?.nav)}
+            precision={0}
+          />
+          <span className={styles['unit']}>{props.vault?.balanceCcy}</span>
+          <div className={styles['decorative']}>
+            ≈ <AmountDisplay amount={data?.amount} />
+            <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+          </div>
         </div>
       </div>
       <div className={styles['nav']}>

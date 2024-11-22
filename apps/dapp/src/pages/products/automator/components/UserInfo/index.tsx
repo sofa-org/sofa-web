@@ -57,7 +57,7 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
       >
         <div className={classNames(styles['item'], styles['position'])}>
           <div className={styles['title']}>
-            {t({ enUS: 'My Holding', zhCN: '我的持仓' })}
+            {t({ enUS: 'My Position', zhCN: '我的持仓' })}
             <Link
               to={`/positions?project=${ProjectType.Automator}&vault=${
                 props.vault?.vault || ''
@@ -74,14 +74,16 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
               ≈ <AmountDisplay amount={data?.shareInfo?.amount} />{' '}
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
             </span>
-            {/* {!!+pendingSharesWithDecimals && ( */}
-            <div className={classNames(styles['decorative'], styles['shares'])}>
-              <span className={styles['amount']}>
-                <AmountDisplay amount={pendingSharesWithDecimals} />{' '}
-                {t({ enUS: 'In Redemption', zhCN: '赎回中' })}
-              </span>
-            </div>
-            {/* )} */}
+            {!!+pendingSharesWithDecimals && (
+              <div
+                className={classNames(styles['decorative'], styles['shares'])}
+              >
+                <span className={styles['amount']}>
+                  <AmountDisplay amount={pendingSharesWithDecimals} />{' '}
+                  {t({ enUS: 'In Redemption', zhCN: '赎回中' })}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className={classNames(styles['item'], styles['total-pnl'])}>

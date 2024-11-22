@@ -29,6 +29,7 @@
 
 .aum {
   width: 50%;
+  height: 90px;
   margin: 0;
   padding: 0 0 0 40px;
 }
@@ -41,15 +42,22 @@
 .value {
   margin: 0;
   font-size: min(20px, 5vw);
+
+  .decorative {
+    font-size: 14px;
+    opacity: 0.6;
+  }
 }
 
 .unit {
+  height: 90px;
   padding: 0 0 0 4px;
   font-size: 14px;
 }
 
 .nav {
   width: 50%;
+  height: 100px;
   margin: 0;
   padding: 0 0 0 40px;
   border-left: 1px dashed rgba(#000, 0.12);

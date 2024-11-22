@@ -41,8 +41,7 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
   );
   const overview = useAutomatorStore(
     (state) =>
-      vault &&
-      state.vaultOverviews[`${vault.chainId}-${vault.vault}-${wallet.address}`],
+      vault && state.vaultOverviews[`${vault.chainId}-${vault.vault}-`],
   );
 
   const convertedShare = Number(depositData?.amount) / Number(overview?.nav);
@@ -109,9 +108,8 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
           {t({ enUS: 'Mint', zhCN: '铸造' })} {props.vault?.balanceCcy}
           {!!convertedShare && (
             <span className={styles['converted-share']}>
-              {' '}
-              ≈ {amountFormatter(convertedShare, 2)}{' '}
-              <span className={styles['unit']}>{props.vault?.balanceCcy}</span>{' '}
+              (≈ {amountFormatter(convertedShare, 2)}{' '}
+              <span className={styles['unit']}>{props.vault?.balanceCcy}</span>)
             </span>
           )}
         </BaseInvestButton>
