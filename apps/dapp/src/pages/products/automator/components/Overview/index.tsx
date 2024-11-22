@@ -70,7 +70,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           >
             {t({ enUS: 'MOIC', zhCN: '净值' })}
           </Tooltip>
-          (<Time time={data?.dateTime} format="MMM. DD" />)
+          (<Time time={Number(data?.dateTime) * 1000} format="MMM. DD" />)
         </div>
         <div className={styles['value']}>{amountFormatter(data?.nav, 4)}x</div>
       </div>
