@@ -246,7 +246,7 @@ export const AutomatorRedeemAwait = (props: {
         className={styles['change-redemption']}
         onClick={() => updateQuery({ step: 'redeem-apply' })}
       >
-        {t({ enUS: 'Change Redemption Shares', zhCN: '修改申请' })}
+        {t({ enUS: 'Change Redemption Amount', zhCN: '修改申请' })}
       </div>
     </>
   );

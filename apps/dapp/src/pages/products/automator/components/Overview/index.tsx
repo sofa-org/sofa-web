@@ -29,7 +29,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
     <Spin wrapperClassName={styles['overview']} spinning={!data}>
       <div className={styles['yield']}>
         <div className={styles['title']}>
-          {t({ enUS: '7D Yield', zhCN: '7日年化收益率' })}
+          {t({ enUS: '7D Target Yield', zhCN: '7日年化收益率' })}
         </div>
         <div className={styles['value']}>
           {displayPercentage(Number(data?.yieldPercentage) / 100)}
@@ -39,8 +39,8 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
         <div className={styles['desc']}>
           {t({
-            enUS: 'USDT Return + RCH Reward',
-            zhCN: 'USDT 收益 + RCH 奖励',
+            enUS: 'Airdrop Inclusive',
+            zhCN: '包含空投奖励',
           })}
         </div>
       </div>
@@ -52,7 +52,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
               zhCN: '资产管理规模',
             })}
           >
-            {t({ enUS: 'AUM', zhCN: '总资产' })}
+            {t({ enUS: 'Pool Size', zhCN: '总资产' })}
           </Tooltip>
         </div>
         <div className={styles['value']}>
@@ -62,17 +62,13 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
       </div>
       <div className={styles['nav']}>
         <div className={styles['title']}>
-          <Tooltip
-            content={t({
-              enUS: 'Multiple on Invested Capital',
-              zhCN: '投资资本倍数',
-            })}
-          >
-            {t({ enUS: 'MOIC', zhCN: '净值' })}
-          </Tooltip>
-          (<Time time={Number(data?.dateTime) * 1000} format="MMM. DD" />)
+          1 {props.vault?.balanceCcy} (
+          <Time time={Number(data?.dateTime) * 1000} format="MMM. DD" />)
         </div>
-        <div className={styles['value']}>{amountFormatter(data?.nav, 4)}x</div>
+        <div className={styles['value']}>
+          ≈ {amountFormatter(data?.nav, 4)}
+          <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+        </div>
       </div>
     </Spin>
   );

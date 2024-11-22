@@ -91,7 +91,7 @@ export const Automator = () => {
                   tab={
                     <span className={styles['tab-title']}>
                       <DepositIcon />
-                      {t({ enUS: 'Deposit', zhCN: '申购' })}
+                      {t({ enUS: 'Mint', zhCN: '铸造' })}
                     </span>
                   }
                 >

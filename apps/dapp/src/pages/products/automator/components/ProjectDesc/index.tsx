@@ -267,12 +267,12 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
       <section className={styles['section']}>
         <h2 className={styles['title']}>
           {/* <span className={styles['icon']}>︎︎✹︎</span> */}
-          {t({ enUS: 'Suitable Scenario', zhCN: '适用场景' })}
+          {t({ enUS: 'Suitability', zhCN: '适用场景' })}
         </h2>
         <div className={styles['content']}>
           {t({
-            enUS: 'Our strategy involves automated execution of Bull Trend-selling and Bear Trend-selling at carefully selected expiration dates and strike prices.This approach is designed to take advantage of market trends while reducing the need for constant monitoring.By using data- driven insights, we optimize each trade to enhance performance.Additionally, all principal and profits are automatically reinvested, fostering continuous growth and compounding returns.This seamless process allows users to benefit from our expertise without the complexity of individual trade management.',
-            zhCN: '我们的策略涉及自动执行牛市卖出和熊市卖出，在精心挑选的到期日和执行价格。这种方法旨在利用市场趋势，同时减少持续监控的需求。通过使用数据驱动的见解，我们优化每一笔交易以提高表现。此外，所有本金和利润都自动再投资，促进持续增长和复利回报。这一无缝过程使用户能够受益于我们的专业知识，而无需管理个人交易。',
+            enUS: 'Our Automator strategies will perform automated execution of our SOFA platform products (eg. Bull Trend & Bear Trend) at model expiration dates and strikes to target an optimized risk-adjusted yield. The strategies are designed to operate systematically via data-driven algorithms, with our data learning models continuously being refined to enhance long term performance. Capital will be continuously deployed to maximize yield compounding benefits, allowing users to deploy volatility monetization strategies with zero hassle. Strategies could include both controlled buying or selling of option exposure to generate returns.',
+            zhCN: '我们的 AutoMator 策略将自动执行 SOFA 平台产品（如牛市趋势和熊市趋势），在模型指定的到期日和行权价下，旨在实现优化的风险调整收益。这些策略通过数据驱动的算法系统化运行，并通过数据学习模型的持续优化提升长期表现。资金将持续部署以最大化收益复利效应，让用户轻松实现波动率套利策略。策略可能包括受控买入或卖出期权敞口，以生成收益。',
           })}
         </div>
       </section>
@@ -281,15 +281,15 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
       <section className={styles['section']}>
         <h2 className={styles['title']}>
           {/* <span className={styles['icon']}>︎︎✹︎</span> */}
-          {t({ enUS: 'Deposit & Redeem', zhCN: '申购与赎回' })}
+          {t({ enUS: 'Mint & Redemption Procedures', zhCN: '铸造与赎回' })}
         </h2>
         <div className={styles['content']}>
           <div
             dangerouslySetInnerHTML={{
               __html: t(
                 {
-                  enUS: '	•	When you subscribe to an Automator, your deposit amount will be converted into atUSDT shares based on its current value.<br/>	•	To withdraw your deposit, you’ll redeem atUSDT shares.<br/>	•	Upon initiating a redemption request, there is a 7-day waiting period before your shares become claimable.<br/>	•	Once claimable, you must claim within 3 days. If not claimed within this period, the redemption will expire, and you will need to submit a new request.',
-                  zhCN: '	•	当您订阅 Automator 时，您的存款金额将根据当前价值转换为 atUSDT 份额。<br/>•	要提取存款，您需要赎回 atUSDT 份额。<br/>•	发起赎回请求后，有 7 天的等待期，之后您的份额才可领取。<br/>•	在份额可领取后，您必须在 3 天内领取。如果未在此期间领取，赎回将过期，您需要重新提交请求。',
+                  enUS: '	•	When subscribing, users mint atUSDT by converting USDT at the current atUSDT price. Minting allocates shares proportionally to the size of the current pool.<br/> •	To redeem, users return atUSDT.  Redemption requests require a 7-day waiting period before becoming claimable.<br />	•	Once claimable, you have 3 days to complete the claim. If not claimed within this time, the request will expire, and you’ll need to submit a new redemption request.',
+                  zhCN: '	•	订阅时，用户通过当前 atUSDT 价格将 USDT 转换为 atUSDT，从而铸造 atUSDT 份额。铸造的份额将按当前资金池的规模比例分配。<br/>•	要赎回，用户需返还 atUSDT。赎回请求需经过 7 天的等待期后方可领取。<br/>•	在可领取状态下，您有 3 天的时间完成领取。如果未在规定时间内领取，赎回请求将过期，您需要重新提交新的赎回请求。',
                 },
                 {
                   duration:
@@ -304,14 +304,14 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
       <section className={styles['section']}>
         <h2 className={styles['title']}>
           {/* <span className={styles['icon']}>︎︎✹︎</span> */}
-          {t({ enUS: 'Fee Structure', zhCN: '费用结构' })}
+          {t({ enUS: 'Fees', zhCN: '费用' })}
         </h2>
         <div className={styles['content']}>
           <div
             dangerouslySetInnerHTML={{
               __html: t({
-                enUS: `The Automator charges a 15% performance fee, applied only to the profits generated. This fee supports platform operations and incentivizes high-performing Automator traders.`,
-                zhCN: 'Automator 收取 15% 的绩效费用，仅针对所产生的利润收取。此费用用于支持平台运营并激励高绩效的 Automator 交易者。',
+                enUS: `Automator strategies do not charge any fees on execution, while a performance fee of 15% will only be booked against actual & realized profits.`,
+                zhCN: '全程 0 手续费，仅收取利润部分的 15%。此费用将被用于 $RCH 的销毁，为 SOFA.org 的可持续发展贡献力量。',
               }),
             }}
           />

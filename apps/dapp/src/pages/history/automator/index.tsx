@@ -86,7 +86,7 @@ export const AutomatorHistory = () => {
               if (record.action === 'TRANSFER_OUT') {
                 return t({ enUS: 'Transfer Out', zhCN: '转出' });
               }
-              return t({ enUS: 'Deposit', zhCN: '申购' });
+              return t({ enUS: 'Mint', zhCN: '铸造' });
             },
           },
           {

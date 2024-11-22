@@ -39,6 +39,13 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
       vault &&
       state.depositData[`${vault.chainId}-${vault.vault}-${wallet.address}`],
   );
+  const overview = useAutomatorStore(
+    (state) =>
+      vault &&
+      state.vaultOverviews[`${vault.chainId}-${vault.vault}-${wallet.address}`],
+  );
+
+  const convertedShare = Number(depositData?.amount) / Number(overview?.nav);
 
   const progressRef = useRef<ProgressRef>(null);
 
@@ -46,7 +53,7 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
     <div className={styles['deposit']}>
       <div className={styles['form-item']}>
         <div className={styles['label']}>
-          {t({ enUS: 'Deposit Amount', zhCN: '申购金额' })}
+          {t({ enUS: 'Mint Amount', zhCN: '铸造金额' })}
         </div>
         <div className={styles['input-wrapper']}>
           <AmountInput
@@ -99,7 +106,14 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
             );
           }}
         >
-          {t({ enUS: 'Deposit', zhCN: '存入' })}
+          {t({ enUS: 'Mint', zhCN: '铸造' })} {props.vault?.balanceCcy}
+          {!!convertedShare && (
+            <span className={styles['converted-share']}>
+              {' '}
+              ≈ {amountFormatter(convertedShare, 2)}{' '}
+              <span className={styles['unit']}>{props.vault?.balanceCcy}</span>{' '}
+            </span>
+          )}
         </BaseInvestButton>
       </div>
       <AutomatorProgress

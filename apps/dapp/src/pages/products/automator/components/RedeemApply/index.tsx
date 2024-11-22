@@ -78,7 +78,7 @@ export const AutomatorRedeemApply = (props: {
     <>
       <div className={styles['form-item']}>
         <div className={styles['label']}>
-          {t({ enUS: 'Redemption Shares', zhCN: '赎回份额' })}
+          {t({ enUS: 'Redemption Amount', zhCN: '赎回份额' })}
         </div>
         <div className={styles['input-wrapper']}>
           <AmountInput
@@ -169,8 +169,8 @@ export const AutomatorRedeemApply = (props: {
                     vault={vault}
                     tip={t(
                       {
-                        enUS: `After the redemption is submitted, it will take <span class="highlight">{{waitDuration}}</span> to become claimable. Once claimable, please claim <span class="highlight">within {{claimDuration}}</span>. If not claimed in time, you'll need to re-initiate the redemption.`,
-                        zhCN: '提交赎回后，需要等待 <span class="highlight">{{waitDuration}}</span> 成为可赎回状态。可赎回后，请在 <span class="highlight">{{claimDuration}}</span> 内领取。如未及时领取，您将需要重新申请赎回。',
+                        enUS: `User assets will be claimable in <span class="highlight">{{waitDuration}}</span> following a redemption request, and will remain available for <span class="highlight">{{claimDuration}}</span> thereafter.  Unclaimed assets will be reinvested into the pool until further instructions.`,
+                        zhCN: '用户资产将在赎回请求后的 <span class="highlight">{{waitDuration}}</span> 时间内可领取，并在此后保持可领取状态 <span class="highlight">{{claimDuration}}</span> 时间。未领取的资产将重新投资到资金池中，直至收到进一步指示。',
                       },
                       {
                         waitDuration:

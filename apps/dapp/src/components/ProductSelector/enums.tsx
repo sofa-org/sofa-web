@@ -52,8 +52,8 @@ export const ProjectTypeRefs = {
     label: (t: TFunction) => t({ enUS: 'Automator', zhCN: 'Automator' }),
     desc: (t: TFunction) =>
       t({
-        enUS: 'By running automated Bull Trend-selling and Bear Trend-selling strategy at recommended expiration and strikes, with principal and profits automatically reinvested.',
-        zhCN: '通过运行自动化的 Bull Trend-selling 和 Bear Trend-selling 策略，在推荐到期和敲出价执行，并自动再投资本金和利润。',
+        enUS: 'Delegate your funds to high-performing Automator traders & strategies. Funds will be utilized and continuously re-invested in low-risk return strategies until user redemption.',
+        zhCN: '将您的资金委托给高绩效的 AutoMator 交易者和策略。资金将被用于并持续再投资于低风险回报策略，直到用户赎回为止。',
       }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: ProjectType.Automator,
