@@ -14,6 +14,7 @@ import iconDntProtected from './assets/dnt-protected.png';
 import iconDntProtectedInverse from './assets/dnt-protected-inverse.png';
 import iconDntRisky from './assets/dnt-risky.png';
 import iconDntRiskyInverse from './assets/dnt-risky-inverse.png';
+import IconAutomator from './assets/icon-automator.png';
 import IconHighYield from './assets/icon-high-yield.png';
 import IconLowRisk from './assets/icon-low-risk.png';
 import { Comp as ImgBearSpread } from './assets/product-bear-spread.svg';
@@ -55,7 +56,7 @@ export const ProjectTypeRefs = {
         enUS: 'Delegate your funds to high-performing Automator traders & strategies. Funds will be utilized and continuously re-invested in optimized return strategies until user redemption.',
         zhCN: '将资金托管给高绩效的 Automator 交易者及策略。资金将被充分利用，持续再投资以实现最佳回报，直至用户赎回。',
       }),
-    icon: <img src={IconLowRisk} width="24px" />,
+    icon: <img src={IconAutomator} width="24px" />,
     value: ProjectType.Automator,
     link: EnvLinks.config.VITE_AUTOMATOR_LINK,
   },
