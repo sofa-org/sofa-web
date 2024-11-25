@@ -53,7 +53,7 @@ export const ProjectTypeRefs = {
     desc: (t: TFunction) =>
       t({
         enUS: 'Delegate your funds to high-performing Automator traders & strategies. Funds will be utilized and continuously re-invested in optimized return strategies until user redemption.',
-        zhCN: '将您的资金委托给高绩效的 AutoMator 交易者和策略。资金将被用于并持续再投资于优化的回报策略，直至用户赎回。',
+        zhCN: '将资金托管给高绩效的 Automator 交易者及策略。资金将被充分利用，持续再投资以实现最佳回报，直至用户赎回。',
       }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: ProjectType.Automator,

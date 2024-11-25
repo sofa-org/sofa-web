@@ -35,7 +35,7 @@ export const RiskDisclosures = () => {
             <p className={styles['p']}>
               {t({
                 enUS: '· Automator strategies could involve both buying and selling of option exposures, with a potential for limited capital losses.',
-                zhCN: '· AutoMator 策略可能涉及期权敞口的买入和卖出，存在有限的资本损失风险。',
+                zhCN: '· Automator 策略可能涉及期权敞口的买入和卖出，存在有限的资本损失风险。',
               })}
             </p>
             <p className={styles['p']}>
