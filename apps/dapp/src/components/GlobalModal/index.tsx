@@ -6,12 +6,14 @@ import { MsIntervals, next8h } from '@sofa/utils/expiry';
 import { useLocalStorageState } from 'ahooks';
 import classNames from 'classnames';
 
+import { EnvLinks } from '@/env-links';
+
 import styles from './index.module.scss';
 
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
-  const [data, setData] = useLocalStorageState('global-modal-2', {
+  const [data, setData] = useLocalStorageState('global-modal-3', {
     defaultValue: { closedAt: 0 },
   });
   const visible = useMemo(() => {
@@ -42,16 +44,16 @@ export const GlobalModal = () => {
         className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: '1. OKX Web3 x SOFA.org Joint Event Now Live',
-            zhCN: '1. OKX Web3 x SOFA.org 联合活动已上线！',
+            enUS: '1. SOFA.org Automator is officially live!',
+            zhCN: '1. SOFA.org 全新产品 Automator 正式上线！',
           }),
         }}
       />
       <p
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: 'From November 8 at 8:00 UTC to December 8 at 8:00 UTC, we’re excited to announce an adjustment to the $RCH airdrop allocation. During this period, 8,000 $RCH out of the daily 12,500 $RCH airdrop will be exclusively dedicated to the OKX Web3 x SOFA.org event. Head over to OKX Web3, purchase SOFA Earn products, and enjoy high returns.',
-            zhCN: '11月8日 16:00 - 12月8日 16:00 (UTC+8) 期间，$RCH 空投规则将临时调整：每天的 12,500 $RCH 空投中，将有 8,000 $RCH 分配至 OKX Web3 x SOFA.org 活动中。欢迎大家前往 OKX Web3 购买Earn 产品，享受高收益回报！',
+            enUS: 'Delegate your funds to high-performing Automator traders & strategies. Funds will be utilized and continuously re-invested in optimized return strategies until user redemption. (Switch to the Arbitrum One network to access Automator.)',
+            zhCN: '将资金托管给高绩效的 Automator 交易者及策略。资金将被充分利用，持续再投资以实现最佳回报，直至用户赎回。（切换至 Arbitrum One 链，即可进入 Automator）',
           }),
         }}
       />
@@ -59,8 +61,25 @@ export const GlobalModal = () => {
         className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: '2. Surge Poker Museum Update',
-            zhCN: '2. Surge 扑克博物馆',
+            enUS: '2. OKX Web3 x SOFA.org Joint Event Now Live',
+            zhCN: '2. OKX Web3 x SOFA.org 联合活动已上线！',
+          }),
+        }}
+      />
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: 'From November 8 at 8:00 UTC to December 8 at 8:00 UTC, we’re excited to announce an adjustment to the $RCH airdrop allocation. During this period, 8,000 $RCH out of the daily 12,500 $RCH airdrop will be exclusively dedicated to the OKX Web3 x SOFA.org event. Head over to <a href="https://www.okx.com/web3/defi/activity/33" target="_blank">OKX Web3</a>, purchase SOFA Earn products, and enjoy high returns.',
+            zhCN: '11月8日 16:00 - 12月8日 16:00 (UTC+8) 期间，$RCH 空投规则将临时调整：每天的 12,500 $RCH 空投中，将有 8,000 $RCH 分配至 OKX Web3 x SOFA.org 活动中。欢迎大家前往 <a href="https://www.okx.com/web3/defi/activity/33" target="_blank">OKX Web3</a> 购买Earn 产品，享受高收益回报！',
+          }),
+        }}
+      />
+      <p
+        className={styles['head']}
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: '3. Surge Poker Museum Update',
+            zhCN: '3. Surge 扑克博物馆',
           }),
         }}
       />
@@ -79,10 +98,10 @@ export const GlobalModal = () => {
           theme="solid"
           onClick={() => {
             setData({ closedAt: Date.now() });
-            window.open('https://www.okx.com/web3/defi/activity/33', '_blank');
+            window.location.href = EnvLinks.config.VITE_AUTOMATOR_LINK;
           }}
         >
-          {t({ enUS: 'Go to OKX Web3', zhCN: '前往 OKX Web3' })}
+          {t({ enUS: 'Go to Automator', zhCN: '前往 Automator' })}
         </Button>
       </div>
     </Modal>

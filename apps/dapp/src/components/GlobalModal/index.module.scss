@@ -1,6 +1,11 @@
 .global-modal {
   p {
     margin: 0 0 16px;
+
+    a {
+      color: #000;
+      text-decoration: underline;
+    }
   }
 
   .head {
