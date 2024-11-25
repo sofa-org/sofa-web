@@ -1,0 +1,58 @@
+.campaign-entry {
+  @include flex-center;
+
+  flex-direction: column;
+  gap: 12px;
+  position: fixed;
+  right: min(24px, 3.5vw);
+  bottom: min(24px, 3.5vw);
+  z-index: 10;
+  margin: 0;
+}
+
+.treasure {
+  @include flex-center;
+
+  position: relative;
+  width: 170px;
+  height: 96px;
+  margin-right: -37px;
+
+  span {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    margin: 0;
+    background: url("./assets/icon-treasure.gif") no-repeat center center /
+      contain;
+    filter: brightness(1.2) sepia(1) hue-rotate(60deg);
+  }
+
+  &::before {
+    content: "";
+    position: static;
+    z-index: 1;
+    width: 66px;
+    height: 66px;
+    background: url("./assets/icon-treasure.png") no-repeat center center /
+      contain;
+  }
+
+  &.active {
+    &::after {
+      @include bold;
+
+      content: "New";
+      position: absolute;
+      right: 51px;
+      bottom: 14px;
+      z-index: 1;
+      padding: 4px;
+      line-height: 1em;
+      font-size: 12px;
+      color: #000;
+      background: $color-main-gradient;
+      border-radius: 4px 4px 4px 0;
+    }
+  }
+}

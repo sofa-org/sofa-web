@@ -49,7 +49,7 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
         enUS: 'Campaign',
         zhCN: '活动中心',
       }),
-    target: '_top',
+    target: '_blank',
     // icon: 'battle-tower',
     type: 2 as const,
     path: EnvLinks.config.VITE_CAMPAIGN_LINK,

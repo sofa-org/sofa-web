@@ -28,6 +28,7 @@ import NotFound from '@/pages/not-found';
 
 import './global-var';
 
+import { CampaignEntry } from './components/CampaignEntry';
 import { GlobalModal } from './components/GlobalModal';
 import { GlobalTips } from './components/GlobalTips';
 import { EnvLinks } from './env-links';
@@ -79,6 +80,7 @@ const Root = WasmSuspenseHoc(
           {/* <CursorTail /> */}
           <GlobalModal />
           <GlobalTips />
+          <CampaignEntry />
         </ErrorBoundary>
       </ConfigProvider>
     );
