@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Tabs } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
+import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
@@ -35,6 +36,15 @@ export const Automator = () => {
     [chainId],
   );
 
+  const chains = useMemo(
+    () =>
+      [...new Set(ContractsService.AutomatorVaults.map((it) => it.chainId))]
+        .map((it) => ChainMap[it]?.name)
+        .filter(Boolean)
+        .join(', '),
+    [],
+  );
+
   const handleSuccess = useLazyCallback(() => {
     if (vault && address) {
       useAutomatorStore.updateUserInfo(vault, address);
@@ -66,10 +76,13 @@ export const Automator = () => {
       {!vault ? (
         <CEmpty
           className="semi-always-dark"
-          description={t({
-            enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain.',
-            zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链',
-          })}
+          description={t(
+            {
+              enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
+              zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如{{chains}}',
+            },
+            { chains },
+          )}
         />
       ) : (
         <>
