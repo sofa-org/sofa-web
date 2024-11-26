@@ -149,7 +149,7 @@ export class AutomatorService {
       sharesWithDecimals,
       shares,
       pricePerShare,
-      amount: shares * pricePerShare,
+      amount: +(shares * pricePerShare).toFixed(6),
     };
   }
 
