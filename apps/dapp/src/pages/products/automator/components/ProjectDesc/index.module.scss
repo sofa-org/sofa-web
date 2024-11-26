@@ -44,9 +44,8 @@
     @include flex-center;
 
     justify-content: space-between;
-    flex: 1;
-    min-width: 34%;
-    font-size: min(16px, 3.4vw);
+    width: calc((100% - min(120px, 32vw)) / 2);
+    font-size: min(14px, 3.4vw);
 
     .left {
       @include flex-center;
@@ -77,5 +76,13 @@
     width: calc(100% + 80px);
     height: 360px;
     margin: -40px;
+  }
+}
+
+@media (orientation: portrait) {
+  .snapshot {
+    .it-item {
+      width: 100%;
+    }
   }
 }

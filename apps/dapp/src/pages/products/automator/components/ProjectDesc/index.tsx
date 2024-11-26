@@ -143,7 +143,6 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
             '</div>'; // 开始构建自定义的内容字符串
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           params.forEach((item: any) => {
-            console.log(1111, item);
             // 对每个系列数据进行循环，构建数据显示
             result +=
               '<div style="display: flex;justify-content: space-between; gap: 20px;font-size: 12px; color: #fff">';
