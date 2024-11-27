@@ -13,14 +13,14 @@ export enum PointType {
 export interface PointItem {
   generateTimeSeconds: number; // 时间戳，精确到秒
   points: string; // 积分数量
-  categoryText: string; // earn surge leverage GAME-RANK GAME-DRAW
+  categoryText: string; // earn surge leverage GAME-RANK GAME-DRAW AUTOMATOR
   wallet: string; // 钱包地址
   categoryId: number; //
   tradeInfoDTO?: {
     //	交易类型的才不为空
     depositCcy: string; // 币种 RCH USDT
-    forCcy: string; // 标的币种 BTC/ETH
-    anchorPrices: (string | number)[]; // 价格列表
+    forCcy?: string; // 标的币种 BTC/ETH
+    anchorPrices?: (string | number)[]; // 价格列表
     expiry: number; // 到期时间
     rfqType: 'DNT' | 'BULL_TREND' | 'BEAR_TREND';
   };

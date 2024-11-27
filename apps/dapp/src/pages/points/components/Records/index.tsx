@@ -73,15 +73,18 @@ export const PointRecords = () => {
         title: t({ enUS: 'Symbol', zhCN: '产品' }),
         render: (_, it) => {
           if (!it.tradeInfoDTO) return;
+          if (/automator/i.test(it.categoryText))
+            return `${it.tradeInfoDTO.depositCcy}_Automator`;
           return `${
             {
               DNT: 'Rangebound',
               BULL_TREND: 'Bull Trend',
               BEAR_TREND: 'Bear Trend',
+              AUTOMATOR: 'Automator',
             }[it.tradeInfoDTO.rfqType]
           }_${displayExpiry(
             it.tradeInfoDTO.expiry * 1000,
-          )}_${it.tradeInfoDTO.anchorPrices.join('-')}`;
+          )}_${it.tradeInfoDTO.anchorPrices?.join('-')}`;
         },
       },
       {
