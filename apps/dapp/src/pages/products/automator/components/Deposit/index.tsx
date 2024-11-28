@@ -22,6 +22,7 @@ export interface AutomatorDepositProps {
 
 export const AutomatorDeposit = (props: AutomatorDepositProps) => {
   const [t] = useTranslation('Automator');
+  const address = useWalletStore((state) => state.address);
   const vault = props.vault;
   const depositCcy = vault?.depositCcy || 'USDT';
 
@@ -30,7 +31,7 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
     if (vault) {
       useWalletStore.updateBalanceByAutomatorVault(vault);
     }
-  }, [vault]);
+  }, [vault, address]);
 
   const balance = wallet.balance?.[depositCcy];
 

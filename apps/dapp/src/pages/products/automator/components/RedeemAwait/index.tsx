@@ -86,7 +86,7 @@ const useAutomatorRedeemAwaitEl = (props: {
           </div>
           <div className={styles['value']}>
             {dayjs(Number(redemptionInfo?.createTime) * 1000).format(
-              'MMM DD,YYYY HH:mm',
+              'MMM DD, YYYY HH:mm',
             )}
           </div>
         </div>
@@ -100,8 +100,8 @@ const useAutomatorRedeemAwaitEl = (props: {
             )} */}
           </div>
           <div className={styles['value']}>
-            {dayjs(Number(claimableStartAt)).format('MMM DD,YYYY HH:mm')} -{' '}
-            {dayjs(Number(claimableEndAt)).format('MMM DD,YYYY HH:mm')}
+            {dayjs(Number(claimableStartAt)).format('MMM DD, YYYY HH:mm')} -{' '}
+            {dayjs(Number(claimableEndAt)).format('MMM DD, YYYY HH:mm')}
           </div>
         </div>
       </div>

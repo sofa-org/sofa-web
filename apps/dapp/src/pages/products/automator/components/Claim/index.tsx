@@ -94,7 +94,7 @@ export const AutomatorClaim = (props: {
               },
               {
                 endTime: dayjs(props.claimableEndAt).format(
-                  'MMM DD,YYYY HH:mm',
+                  'MMM DD, YYYY HH:mm',
                 ),
               },
             ),

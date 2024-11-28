@@ -221,7 +221,7 @@ export const AutomatorRedeemApply = (props: {
             },
             {
               time: dayjs(Date.now() + Number(vault?.redeemWaitPeriod)).format(
-                'MMM DD,YYYY HH:mm',
+                'MMM DD, YYYY HH:mm',
               ),
             },
           )}
@@ -235,7 +235,7 @@ export const AutomatorRedeemApply = (props: {
             },
             {
               time: dayjs(Date.now() + Number(vault?.redeemWaitPeriod)).format(
-                'MMM DD,YYYY HH:mm',
+                'MMM DD, YYYY HH:mm',
               ),
             },
           )}
