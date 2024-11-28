@@ -109,7 +109,6 @@ const Index = () => {
           )}
         </>
       }
-      sticky
     >
       <ProductsFixedNav depositCcyList={depositCcyList} />
       {depositCcyList.length < 1 && (

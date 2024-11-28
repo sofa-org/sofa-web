@@ -1,14 +1,19 @@
 @mixin rewrite {
   .semi-portal {
     position: fixed;
-    inset: 0 0 auto !important;
+    inset: 0 !important;
     background: rgba(#000, 0.7);
+
+    &:empty {
+      inset: 0 0 auto !important;
+    }
   }
 
   .semi-portal-inner {
     position: absolute;
     inset: auto 0 0 !important;
     transform: none !important;
+    pointer-events: initial;
   }
 
   .semi-popover-wrapper {

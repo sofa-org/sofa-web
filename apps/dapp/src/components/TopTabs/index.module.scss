@@ -132,6 +132,7 @@
 
   .tabs {
     @include flex-center;
+    pointer-events: initial;
   }
 
   .top-tabs-tab {
