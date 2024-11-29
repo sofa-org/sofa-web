@@ -1,4 +1,5 @@
 import IconBTC from './assets/icon-btc.svg?url';
+import IconCrvUSD from './assets/icon-crvusd.png';
 import IconETH from './assets/icon-eth.svg?url';
 import IconRCH from './assets/icon-rch.png';
 import IconSTETH from './assets/icon-steth.svg?url';
@@ -31,6 +32,12 @@ export class CCYService {
       name: 'USD',
       icon: IconUSD,
       color: '#FFD639',
+      precision: 2,
+    },
+    crvUSD: {
+      name: 'crvUSD',
+      icon: IconCrvUSD,
+      color: '#366f49',
       precision: 2,
     },
     USDC: {

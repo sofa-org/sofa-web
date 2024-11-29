@@ -89,8 +89,8 @@ export const AutomatorClaim = (props: {
           dangerouslySetInnerHTML={{
             __html: t(
               {
-                enUS: 'Please claim before <span class="highlight">{{endTime}}</span>. If not claimed in time, you\'ll need to re-initiate the redemption.',
-                zhCN: '请在 <span class="highlight">{{endTime}}</span> 前领取。如未及时领取，您将需要重新发起赎回。',
+                enUS: 'Please claim your redemption by <span class="highlight">{{endTime}}</span>. Otherwise, you will need to re-initiate the redemption request afterwards.',
+                zhCN: '请在 <span class="highlight">{{endTime}}</span> 前完成赎回。否则，您之后需要重新发起赎回请求。',
               },
               {
                 endTime: dayjs(props.claimableEndAt).format(

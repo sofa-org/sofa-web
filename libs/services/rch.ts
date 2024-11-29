@@ -1,6 +1,6 @@
 import { asyncCache, asyncRetry } from '@sofa/utils/decorators';
 import { MsIntervals, next8h } from '@sofa/utils/expiry';
-import { http, pollingUntil } from '@sofa/utils/http';
+import { http } from '@sofa/utils/http';
 import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 
