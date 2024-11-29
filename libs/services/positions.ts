@@ -25,7 +25,7 @@ export interface PositionParams {
   limit?: number; // 查询数量，默认为 100，最大为 300
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
   endDateTime?: number; // 对应的秒级时间戳，例如 1672387200
-  orderBy?: 'updatedAt' | 'return'; // 排序方式，updatedAt（更新时间，默认），return（回报）
+  orderBy?: 'createdAt' | 'return'; // 排序方式，createdAt（更新时间，默认），return（回报）
   orderDirection?: 'desc' | 'asc'; // "desc" | "asc", 默认为 desc（按时间戳降序）
   wallet?: string; // 钱包address (默认为空时查询所有钱包地址）
 }
@@ -191,7 +191,7 @@ export class PositionsService {
       positiveReturn?: boolean;
       positiveProfit?: boolean;
     },
-    extra?: PageParams<'cursor', 'updatedAt' | 'return'>,
+    extra?: PageParams<'cursor', 'createdAt' | 'return'>,
   ): Promise<PageResult<PositionInfo, { hasMore: boolean }, 'cursor'>> {
     const vault_in = ProductsService.filterVaults(
       ContractsService.vaults,

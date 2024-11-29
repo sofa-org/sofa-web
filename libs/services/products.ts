@@ -189,7 +189,7 @@ export class ProductsService {
     return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
   }
 
-  private static dealOriginQuote(
+  static dealOriginQuote(
     it: OriginProductQuoteResult,
     fixProtectedApy?: string | number,
   ): ProductQuoteResult {
