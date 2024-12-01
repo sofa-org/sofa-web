@@ -29,6 +29,8 @@ import locale from './locale';
 addI18nResources(locale, 'History');
 import { uniqBy } from 'lodash-es';
 
+import { formatTime } from '@/components/TimezoneSelector/store';
+
 import { judgeSettled } from '../positions/components/PositionCard';
 
 import { AutomatorHistory } from './automator';
@@ -49,6 +51,7 @@ const OrderHistory = () => {
         chainId: wallet.chainId,
         owner: wallet.address,
         riskType,
+        productType: ProductType.DNT,
       };
       const limit = 20;
       const page = {
@@ -236,11 +239,20 @@ const OrderHistory = () => {
                     {record.product.vault.productType === ProductType.DNT
                       ? t('Out of Range')
                       : t('Settled')}{' '}
-                    ({t('at')} ${amountFormatter(record.triggerPrice, 2)}{' '}
-                    <Time
-                      time={record.triggerTime * 1000}
-                      format="YYYY-MM-DD HH:mm"
-                    />
+                    (
+                    {t(
+                      {
+                        enUS: 'reached ${{price}} before {{time}}',
+                        zhCN: '在 {{time}} 之前到达 ${{price}}',
+                      },
+                      {
+                        price: amountFormatter(record.triggerPrice, 2),
+                        time: formatTime(
+                          record.triggerTime * 1000,
+                          'YYYY-MM-DD HH:mm',
+                        ),
+                      },
+                    )}
                     )
                   </>
                 ) : record.product.vault.productType === ProductType.DNT &&
