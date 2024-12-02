@@ -51,7 +51,6 @@ const OrderHistory = () => {
         chainId: wallet.chainId,
         owner: wallet.address,
         riskType,
-        productType: ProductType.DNT,
       };
       const limit = 20;
       const page = {
