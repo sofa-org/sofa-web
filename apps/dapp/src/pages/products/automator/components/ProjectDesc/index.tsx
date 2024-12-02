@@ -201,7 +201,7 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
       },
       series: [
         {
-          name: 'PnL Of Share',
+          name: `PnL Of ${props.vault?.balanceCcy ?? 'Share'}`,
           type: 'bar',
           stack: 'bar',
           data: data.map((it) => ({
@@ -243,7 +243,7 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
               className={styles['color']}
               style={{ background: '#EC5E88' }}
             />
-            {t({ enUS: 'PnL Of Share' })}
+            {t({ enUS: `PnL Of ${props.vault?.balanceCcy ?? 'Share'}` })}
           </div>
           <div className={styles['legend-item']}>
             <div
