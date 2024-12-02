@@ -392,9 +392,11 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {leverageInfo &&
+                      leverageInfo.leverage !== 1 &&
+                      !!quote.amounts.borrow &&
                       amountFormatter(
-                        (+quote.amounts.borrow * leverageInfo.leverage!) /
-                          (leverageInfo.leverage! - 1),
+                        (+quote.amounts.borrow * leverageInfo.leverage) /
+                          (leverageInfo.leverage - 1),
                       )}{' '}
                     {quote.vault.depositCcy}
                   </>
