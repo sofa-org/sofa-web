@@ -278,7 +278,7 @@ const InvestButton = (props: InvestButtonProps) => {
   return (
     <>
       <BaseInvestButton
-        shouldPrepare={shouldQuote}
+        shouldPrepare={shouldQuote || !products.length}
         preparing={
           vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
         }
