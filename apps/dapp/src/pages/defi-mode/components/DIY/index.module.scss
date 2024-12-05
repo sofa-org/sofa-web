@@ -1,0 +1,95 @@
+.progress {
+  margin: 0;
+}
+
+.badge {
+  margin: 0;
+}
+
+.label {
+  margin: 0 0 16px;
+  line-height: 1.2em;
+  font-size: 16px;
+}
+
+.input-wrapper {
+  @include flex-center;
+
+  justify-content: flex-start;
+  margin: 0;
+
+  :global {
+    .radio-btn-group {
+      gap: 16px;
+    }
+
+    .radio-btn {
+      width: fit-content;
+      height: 32px;
+      padding: 0 12px;
+      font-size: 16px;
+      white-space: nowrap;
+
+      img,
+      svg {
+        width: 1em;
+        height: 1em;
+      }
+    }
+
+    .progress-wrapper {
+      flex: none;
+      width: 312px;
+    }
+  }
+}
+
+.form-item {
+  position: relative;
+  padding: 0 0 20px 34px;
+  margin: 0;
+  counter-increment: step-counter;
+
+  &::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    line-height: 1.2em;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1.6em;
+    bottom: 0.2em;
+    font-size: 14px;
+    border-right: 1px dashed rgba(#000, 0.2);
+  }
+
+  &:last-child {
+    &::after {
+      content: none;
+    }
+  }
+}
+
+.left {
+  margin: 0;
+  counter-reset: step-counter;
+}
+
+.right {
+  margin: 0;
+}
+
+.defi-mode-wrapper {
+  @include flex-center;
+
+  justify-content: space-between;
+  align-items: stretch;
+  margin: 0;
+}

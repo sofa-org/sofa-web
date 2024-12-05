@@ -1,5 +1,6 @@
-import { CSSProperties, memo, ReactNode, useState } from 'react';
+import { CSSProperties, memo, ReactNode, useMemo, useState } from 'react';
 import { useLazyCallback } from '@sofa/utils/hooks';
+import { arrToDict } from '@sofa/utils/object';
 import classNames from 'classnames';
 
 import styles from './index.module.scss';
@@ -10,6 +11,8 @@ export interface CheckboxBtnOption {
   disabled?: boolean;
   className?: string;
   style?: CSSProperties;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 export interface CheckboxBtnGroupProps {
@@ -19,22 +22,28 @@ export interface CheckboxBtnGroupProps {
   options?: CheckboxBtnOption[];
   defaultValue?: (string | number)[];
   value?: (string | number)[];
-  onChange?: (value: (string | number)[]) => void;
+  onChange?: (
+    value: (string | number)[],
+    checkedItems: CheckboxBtnOption[],
+  ) => void;
   renderLabel?(props: CheckboxBtnOption): ReactNode;
   children?: ReactNode;
 }
 
 export const CheckboxBtnGroup = memo<CheckboxBtnGroupProps>((props) => {
   const { options, defaultValue, onChange } = props;
+
   const [$value, setValue] = useState(defaultValue);
   const value = 'value' in props ? props.value : $value;
+
+  const optionsMap = useMemo(() => arrToDict(options, 'value'), [options]);
   const handleClick = useLazyCallback((__value: string | number) => {
     const _value = value?.includes(__value)
       ? value?.filter((it) => it !== __value)
       : (value || []).concat(__value);
     setValue(_value);
     if (onChange) {
-      onChange(_value || []);
+      onChange(_value || [], _value?.map((it) => optionsMap[it]) || []);
     }
   });
   return (

@@ -196,8 +196,8 @@
 }
 
 .product {
-  &.active:not(.risky),
-  &:not(.risky):hover {
+  &.active:not(.risky, .no-hover),
+  &:not(.risky, .no-hover):hover {
     @include gradient-border(1px, #fff, 12px);
 
     opacity: 1;
@@ -221,7 +221,7 @@
     background: #52d216;
   }
 
-  &:hover:not(.skeleton-card) {
+  &:hover:not(.skeleton-card, .no-hover) {
     @include gradient-border(2px, #52d216, 12px);
   }
 }

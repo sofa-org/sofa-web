@@ -20,6 +20,7 @@ import styles from './index.module.scss';
 export interface CCYSelectorProps
   extends Omit<SelectProps, 'value' | 'onChange' | 'children'> {
   afterChange?(v: VaultInfo['forCcy']): void;
+  dark?: boolean;
 }
 
 export function useForCcySelect() {
@@ -81,7 +82,9 @@ export const CCYSelector = (props: CCYSelectorProps) => {
   return (
     <CSelect
       {...props}
-      className={classNames(props.className, styles['ccy-selector'])}
+      className={classNames(props.className, styles['ccy-selector'], {
+        [styles['dark']]: props.dark,
+      })}
       dropdownClassName={classNames(
         props.dropdownClassName,
         styles['ccy-dropdown'],

@@ -5,13 +5,13 @@ const Test = React.lazy(() => import('@/pages/test'));
 const Home = React.lazy(() => import('@/pages/home'));
 const Policy = React.lazy(() => import('@/pages/policy'));
 const Positions = React.lazy(() => import('@/pages/positions'));
-const Products = React.lazy(() => import('@/pages/products'));
 const ProductCustomize = React.lazy(() => import('@/pages/products/customize'));
 const RCH = React.lazy(() => import('@/pages/rch'));
 const Points = React.lazy(() => import('@/pages/points'));
 const Mechanism = React.lazy(() => import('@/pages/mechanism'));
 const Advantages = React.lazy(() => import('@/pages/advantages'));
 const OrderHistory = React.lazy(() => import('@/pages/history'));
+const DefiMode = React.lazy(() => import('@/pages/defi-mode'));
 
 export const routes: {
   path: string;
@@ -52,7 +52,7 @@ export const routes: {
   },
   {
     path: '/products',
-    Component: Products,
+    Component: DefiMode,
   },
   {
     path: '/products/customize',

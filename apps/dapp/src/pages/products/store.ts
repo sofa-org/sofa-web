@@ -6,8 +6,7 @@ import {
   VaultInfo,
 } from '@sofa/services/products';
 import { useLazyCallback } from '@sofa/utils/hooks';
-import { dirtyArrayOmit } from '@sofa/utils/object';
-import { omit } from 'lodash-es';
+import { dirtyArrayOmit, toArray } from '@sofa/utils/object';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -114,6 +113,21 @@ export const useProductsState = Object.assign(
         );
       return null;
     },
+    updateQuotes: (quote: ProductQuoteResult | ProductQuoteResult[]) => {
+      useProductsState.setState((pre) => ({
+        quoteInfos: {
+          ...Object.fromEntries(
+            dirtyArrayOmit(
+              Object.entries(pre.quoteInfos),
+              (it) => !it[1] || it[1].quote.deadline * 1000 <= Date.now(),
+            ),
+          ),
+          ...Object.fromEntries(
+            toArray(quote).map((it) => [ProductsService.productKey(it), it]),
+          ),
+        },
+      }));
+    },
     quote: async (params: PartialRequired<ProductQuoteParams, 'vault'>) => {
       const error = useProductsState.productValidator(params);
       if (error) throw error;
@@ -122,18 +136,7 @@ export const useProductsState = Object.assign(
         ...params,
         takerWallet: useWalletStore.getState().address,
       } as ProductQuoteParams).then((res) => {
-        const key = ProductsService.productKey(params as ProductQuoteParams);
-        useProductsState.setState((pre) => ({
-          quoteInfos: {
-            ...Object.fromEntries(
-              dirtyArrayOmit(
-                Object.entries(pre.quoteInfos),
-                (it) => !it[1] || it[1].quote.deadline * 1000 <= Date.now(),
-              ),
-            ),
-            [key]: res,
-          },
-        }));
+        useProductsState.updateQuotes(res);
         return res;
       });
     },

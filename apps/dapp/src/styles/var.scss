@@ -111,7 +111,13 @@ $header-height: 48px;
 }
 
 @mixin gradient-txt-1() {
-  background: linear-gradient(to right, #fffa00, #ffa82e);
+  background: $color-gradient-1;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@mixin gradient-txt-2() {
+  background: $color-gradient-2;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }

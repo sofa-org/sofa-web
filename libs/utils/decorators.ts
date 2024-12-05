@@ -334,26 +334,25 @@ export function shareSubscribe(
 
 declare global {
   interface Window {
-    mockData: Record<string, (params?: unknown) => unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockData: Record<string, (params?: any) => any>;
   }
 }
 
 /*
  * 应用 mock 数据，mock 数据应该被注入到 window.mockData 对象上
  */
-export function applyMock(
-  id: keyof Window['mockData'],
-  params?: Record<string, unknown>,
-) {
+export function applyMock(id: keyof Window['mockData']) {
   return (_: unknown, name: string, descriptor: PropertyDescriptor) => {
     if (!/apply-mock=1/.test(window.location.search)) return descriptor;
     const oldRequest = descriptor.value;
     descriptor.value = function (...args: unknown[]) {
       return Promise.resolve()
         .then(() => oldRequest(...args))
-        .catch((err) =>
-          window.mockData ? window.mockData[id]?.(params) : Promise.reject(err),
-        );
+        .catch((err) => {
+          if (window.mockData[id]) return window.mockData[id](...args);
+          return Promise.reject(err);
+        });
     };
     return descriptor;
   };

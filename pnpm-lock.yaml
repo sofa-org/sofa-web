@@ -107,6 +107,7 @@ importers:
       qs: ^6.11.2
       react: ^18.2.0
       react-dom: ^18.2.0
+      react-draggable: ^4.4.6
       react-i18next: ^13.3.1
       react-rnd: ^10.4.11
       react-router: ^6.18.0
@@ -168,6 +169,7 @@ importers:
       qs: 6.11.2
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+      react-draggable: 4.4.6_biqbaboplfbrettd7655fr4n2y
       react-i18next: 13.5.0_vjow25zt5c4n2jtveyjnguixb4
       react-rnd: 10.4.11_biqbaboplfbrettd7655fr4n2y
       react-router: 6.20.1_react@18.2.0

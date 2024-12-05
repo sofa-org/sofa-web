@@ -30,6 +30,10 @@
       @include bold;
     }
   }
+
+  &.dark {
+    background: #000;
+  }
 }
 
 .ccy-dropdown {

@@ -1,6 +1,5 @@
 import {
   memo,
-  MouseEvent,
   ReactNode,
   useLayoutEffect,
   useMemo,
@@ -63,13 +62,6 @@ const AmountInput = memo<AmountInputProps>((props) => {
     () => Math.min(1, props.max ? +tempValue / Number(props.max) : 0),
     [props.max, tempValue],
   );
-
-  const handleSliderClick = useLazyCallback((e: MouseEvent<HTMLDivElement>) => {
-    if (!props.max) return;
-    const width = e.currentTarget.offsetWidth;
-    const x = e.clientX - e.currentTarget.getBoundingClientRect().left;
-    setTempValue(round((x / width) * Number(props.max))!);
-  });
 
   const stop = useRef(false);
   const bump = useLazyCallback((percentOffset: number, n: number = 1) => {
@@ -197,7 +189,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
           <ProgressBar
             className={styles['progress']}
             percent={percent}
-            onClick={handleSliderClick}
+            onPercentChange={(p) => setTempValue(round(p * Number(props.max))!)}
           />
           <Button
             className={styles['btn-plus']}
