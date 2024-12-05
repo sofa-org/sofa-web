@@ -27,40 +27,9 @@
   }
 }
 
-.new-icon {
-  width: 41px;
-  height: 16px;
-  background: url("./assets/icon-new.svg") no-repeat center;
-  background-size: contain;
-  position: absolute;
-  margin-top: 14px;
-  margin-left: 5px;
-  user-select: none;
-}
-
-.battle-tower-icon {
-  width: 75px;
-  height: 16px;
-  background: url("./assets/icon-battle-tower.png") no-repeat center;
-  background-size: contain;
-  position: absolute;
-  margin-top: 14px;
-  margin-left: 5px;
-  user-select: none;
-}
-
 :global {
   .main-content.main-content {
     margin-top: $header-height;
-  }
-
-  .semi-select-option-text {
-    > .new-icon,
-    > .battle-tower-icon {
-      position: static;
-      margin-left: 5px;
-      margin-top: 0;
-    }
   }
 }
 
@@ -84,8 +53,8 @@
 }
 
 .logo {
-  width: 112px;
-  height: 24px;
+  width: 75px;
+  height: 16px;
 }
 
 .product-selector {
@@ -124,7 +93,7 @@
       content: "";
       position: absolute;
       left: 0;
-      bottom: 0;
+      bottom: 4px;
       width: 100%;
       height: 2px;
       border-radius: 1px;
@@ -133,14 +102,12 @@
   }
 }
 
-.nav-selector-item {
-  a {
-    color: #000;
+.txt-gradient {
+  @include gradient-txt;
+}
 
-    &:hover {
-      color: #000;
-    }
-  }
+.txt-gradient-2 {
+  @include gradient-txt-2;
 }
 
 .btn-link {
@@ -171,6 +138,70 @@
   &:global(.btn-gradient) {
     color: #000 !important;
     background: linear-gradient(to right, #51acf1, #fffa00);
+  }
+}
+
+.nav-selector-item {
+  max-width: none;
+  width: min(90vw, 520px);
+
+  a {
+    color: #000;
+
+    &:hover {
+      color: #000;
+    }
+  }
+
+  :global(.semi-select-option-text) {
+    @include flex-center;
+    flex-wrap: nowrap;
+    gap: 12px;
+    width: 100%;
+    white-space: initial;
+
+    .icon {
+      svg,
+      img {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    .txt {
+      flex: 1;
+
+      .txt-label {
+        display: block;
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .txt-desc {
+        display: block;
+        width: auto;
+        font-size: 14px;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+.nav-selector {
+  padding: 8px;
+  border-radius: 24px;
+
+  :global(.semi-dropdown-title) {
+    margin: 24px 0 8px;
+    padding: 16px 20px 4px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  :global(.semi-dropdown-item) {
+    padding: 12px 20px;
   }
 }
 

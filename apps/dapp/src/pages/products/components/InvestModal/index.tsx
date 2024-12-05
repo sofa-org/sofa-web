@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Spin } from '@douyinfe/semi-ui';
+import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteResult,
@@ -77,7 +78,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
 
   const $vault = useMemo(
     () =>
-      ProductsService.findVault(useGlobalState.getState().vaults, {
+      ProductsService.findVault(ContractsService.vaults, {
         chainId: props.product.vault.chainId,
         vault: props.product.vault.vault,
       }),
@@ -85,19 +86,21 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
   );
 
   const [vaultAddress, $setVaultAddress] = useState<string>();
-  const vault = useGlobalState((state) =>
-    ProductsService.findVault(state.vaults, {
-      ...omit($vault, [
-        'abis',
-        'vault',
-        'riskType',
-        'usePermit2',
-        'balanceDecimal',
-      ]),
-      ...(!vaultAddress
-        ? { riskType: $vault?.riskType }
-        : { vault: vaultAddress }),
-    }),
+  const vault = useMemo(
+    () =>
+      ProductsService.findVault(ContractsService.vaults, {
+        ...omit($vault, [
+          'abis',
+          'vault',
+          'riskType',
+          'usePermit2',
+          'balanceDecimal',
+        ]),
+        ...(!vaultAddress
+          ? { riskType: $vault?.riskType }
+          : { vault: vaultAddress }),
+      }),
+    [$vault, vaultAddress],
   );
 
   const product = useProductsState(
@@ -107,19 +110,16 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
 
   const setVaultAddress = useLazyCallback((v?: string) => {
     if (!$vault) return;
-    const nextVault = ProductsService.findVault(
-      useGlobalState.getState().vaults,
-      {
-        ...omit($vault, [
-          'abis',
-          'vault',
-          'riskType',
-          'usePermit2',
-          'balanceDecimal',
-        ]),
-        ...(!v ? { riskType: $vault?.riskType } : { vault: v }),
-      },
-    )!;
+    const nextVault = ProductsService.findVault(ContractsService.vaults, {
+      ...omit($vault, [
+        'abis',
+        'vault',
+        'riskType',
+        'usePermit2',
+        'balanceDecimal',
+      ]),
+      ...(!v ? { riskType: $vault?.riskType } : { vault: v }),
+    })!;
     const protectedApy = (() => {
       if ($vault.riskType === RiskType.PROTECTED) return product?.protectedApy;
       if (nextVault.riskType === RiskType.LEVERAGE) return undefined;

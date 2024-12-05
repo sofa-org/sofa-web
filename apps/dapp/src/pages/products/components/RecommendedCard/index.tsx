@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
@@ -28,7 +28,6 @@ import {
 } from '@/components/ProductSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
-import { useGlobalState } from '@/store';
 
 import { useProductsState } from '../../store';
 import InvestModal, { InvestModalPropsRef } from '../InvestModal';
@@ -44,6 +43,165 @@ export interface RecommendedCardProps {
   depositCcy?: VaultInfo['depositCcy'];
 }
 
+export const RecommendedCardItem = (props: {
+  it: ProductQuoteResult;
+  active?: boolean;
+  onClick?(): void;
+  hideTerm?: boolean;
+  extraPayoffProps?: {
+    displayRchYield?: boolean;
+    showYAxis?: boolean;
+  };
+  noHover?: boolean;
+  className?: string;
+}) => {
+  const [t] = useTranslation('RecommendedCard');
+
+  const { it, active, onClick } = props;
+
+  const precision = useMemo(
+    () => (it.vault?.depositCcy.startsWith('USD') ? 2 : 4),
+    [it.vault?.depositCcy],
+  );
+
+  const positionAmount = useLazyCallback((product: ProductQuoteResult) => {
+    if (!it.vault) return 0;
+    const totalCollateral = Big(product.quote.totalCollateral || 0).div(
+      it.vault.collateralDecimal,
+    );
+    if (it.vault.riskType === RiskType.RISKY) return +totalCollateral;
+    return +Big(product.quote.collateralAtRisk || 0).div(
+      it.vault.collateralDecimal,
+    );
+  });
+
+  return (
+    <div
+      className={classNames(
+        styles['product'],
+        {
+          [styles['active']]: active,
+          [styles['no-hover']]: props.noHover,
+          [styles['risky']]: it.vault.riskType === RiskType.RISKY,
+          risky: it.vault.riskType === RiskType.RISKY,
+        },
+        props.className,
+      )}
+      onClick={onClick}
+    >
+      {it.vault.riskType !== RiskType.RISKY ? (
+        <Payoff
+          riskType={it.vault.riskType}
+          productType={it.vault.productType}
+          forCcy={it.vault.forCcy}
+          depositCcy={it.vault.depositCcy}
+          depositAmount={+it.amounts.own}
+          positionAmount={positionAmount(it)}
+          refMs={next8h(it.timestamp * 1000)}
+          expMs={it.expiry * 1000}
+          rchYield={Number(it.apyInfo?.rch)}
+          anchorPrices={it.anchorPrices}
+          protectedYield={Number(it.apyInfo?.min)}
+          enhancedYield={simplePlus(it.apyInfo?.max, -(it.apyInfo?.min || 0))}
+          {...props.extraPayoffProps}
+        />
+      ) : (
+        <div className={styles['infos']}>
+          <div className={styles['info-item']}>
+            🎯 {it.anchorPrices.map((i) => amountFormatter(i, 0)).join(' - ')}
+          </div>
+          <div className={styles['info-item']}>
+            {/* {t('win')}
+            <span className={styles['value']}>
+              {amountFormatter(positionAmount(it), precision)}
+            </span>
+            <span className={styles['unit']}>{it.vault.depositCcy}</span> */}
+            <span className={styles['value']}>
+              {amountFormatter(
+                simplePlus(it.oddsInfo?.max, it.oddsInfo?.rch),
+                0,
+              )}
+              x
+            </span>
+            <span className={styles['unit']}>
+              {t({ enUS: 'Payout', zhCN: '赔率' })}
+            </span>
+          </div>
+        </div>
+      )}
+      {!props.hideTerm && (
+        <div className={styles['tag']}>
+          {displayTenor(dayjs(it.expiry * 1000).diff(next8h(), 'day'), t)}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export async function handleRecommendCardClick(
+  investModalRef: RefObject<InvestModalPropsRef>,
+  it: ProductQuoteResult,
+  navigate: ReturnType<typeof useNavigate>,
+) {
+  const { vault } = it;
+  const { riskType } = it.vault;
+  if (riskType !== RiskType.RISKY && window.innerHeight < window.innerWidth) {
+    setTimeout(() => investModalRef.current?.show());
+  } else {
+    if (riskType === RiskType.RISKY) {
+      const currProducts =
+        vault &&
+        useProductsState.getState().cart[
+          `${vault.vault.toLowerCase()}-${vault.chainId}`
+        ];
+      const product = currProducts?.find(
+        ($it) =>
+          ProductsService.productKey({
+            ...$it,
+            depositAmount: it.amounts.own,
+          }) == ProductsService.productKey(it),
+      );
+      if (!product) {
+        const id = currProducts?.find(
+          ($it) => !$it.anchorPrices?.every(Boolean) && !$it.expiry,
+        )?.id;
+        useProductsState.updateCart({
+          id: id || nanoid(),
+          ...it,
+        });
+      }
+    } else {
+      const params = {
+        id: nanoid(),
+        ...it,
+        protectedApy: it.apyInfo && Number(it.apyInfo.min),
+        fundingApy: it.apyInfo && Number(it.apyInfo.interest),
+        depositAmount: it.amounts.own,
+      };
+      useProductsState.updateCart(params);
+      useProductsState.quote(params);
+    }
+
+    navigate({
+      pathname: '/products/customize',
+      search: stringify({
+        ...parse(window.location.search, {
+          ignoreQueryPrefix: true,
+        }),
+        project:
+          vault.riskType === RiskType.RISKY
+            ? ProjectType.Surge
+            : ProjectType.Earn,
+        'risk-type': it.vault.riskType || '',
+        'product-type': it.vault.productType || '',
+        'for-ccy': it.vault.forCcy,
+        'deposit-ccy': it.vault.depositCcy,
+        expanded: 1,
+      }),
+    });
+  }
+}
+
 const RecommendedCard = (props: RecommendedCardProps) => {
   const navigate = useNavigate();
   const [t] = useTranslation('RecommendedCard');
@@ -52,14 +210,16 @@ const RecommendedCard = (props: RecommendedCardProps) => {
   const riskType =
     project === ProjectType.Surge ? RiskType.RISKY : RiskType.PROTECTED;
   const [productType] = useProductSelect();
-  const vault = useGlobalState((state) =>
-    ProductsService.findVault(state.vaults, {
-      chainId: wallet.chainId,
-      riskType,
-      productType,
-      depositCcy: props.depositCcy ?? 'USDT',
-      forCcy: props.forCcy,
-    }),
+  const vault = useMemo(
+    () =>
+      ProductsService.findVault(ContractsService.vaults, {
+        chainId: wallet.chainId,
+        riskType,
+        productType,
+        depositCcy: props.depositCcy ?? 'USDT',
+        forCcy: props.forCcy,
+      }),
+    [productType, props.depositCcy, props.forCcy, riskType, wallet.chainId],
   );
 
   const data = useProductsState((state) => {
@@ -99,17 +259,6 @@ const RecommendedCard = (props: RecommendedCardProps) => {
     }
   }, [vault, loading]);
   const [product, setProduct] = useState<ProductQuoteResult>();
-
-  const positionAmount = useLazyCallback((product: ProductQuoteResult) => {
-    if (!vault) return 0;
-    const totalCollateral = Big(product.quote.totalCollateral || 0).div(
-      vault.collateralDecimal,
-    );
-    if (riskType === RiskType.RISKY) return +totalCollateral;
-    return +Big(product.quote.collateralAtRisk || 0).div(
-      vault.collateralDecimal,
-    );
-  });
 
   // const ticketMeta = useMemo(
   //   () => TicketTypeOptions.find((it) => it.value === vault?.depositCcy),
@@ -209,118 +358,17 @@ const RecommendedCard = (props: RecommendedCardProps) => {
                   .filter(Boolean)
                   .slice(0, 2) as ProductQuoteResult[])
             )?.map((it, i) => (
-              <div
+              <RecommendedCardItem
                 key={`${it.vault.vault.toLowerCase()}-${it.vault.vault}-${
                   it.expiry
                 }-${it.anchorPrices.join('-')}-${it.vault.riskType}-${i}`}
-                className={classNames(styles['product'], {
-                  [styles['active']]: it === product,
-                  [styles['risky']]: riskType === RiskType.RISKY,
-                })}
-                onClick={async () => {
-                  if (
-                    riskType !== RiskType.RISKY &&
-                    window.innerHeight < window.innerWidth
-                  ) {
-                    setProduct(it);
-                    setTimeout(() => investModalRef.current?.show());
-                  } else {
-                    if (riskType === RiskType.RISKY) {
-                      const currProducts =
-                        vault &&
-                        useProductsState.getState().cart[
-                          `${vault.vault.toLowerCase()}-${vault.chainId}`
-                        ];
-                      const product = currProducts?.find(
-                        ($it) =>
-                          ProductsService.productKey({
-                            ...$it,
-                            depositAmount: it.amounts.own,
-                          }) == ProductsService.productKey(it),
-                      );
-                      if (!product) {
-                        const id = currProducts?.find(
-                          (it) =>
-                            !it.anchorPrices?.every(Boolean) && !it.expiry,
-                        )?.id;
-                        useProductsState.updateCart({
-                          id: id || nanoid(),
-                          ...it,
-                        });
-                      }
-                    } else {
-                      const params = {
-                        id: nanoid(),
-                        ...it,
-                        protectedApy: it.apyInfo && Number(it.apyInfo.min),
-                        fundingApy: it.apyInfo && Number(it.apyInfo.interest),
-                        depositAmount: it.amounts.own,
-                      };
-                      useProductsState.updateCart(params);
-                      useProductsState.quote(params);
-                    }
-
-                    navigate({
-                      pathname: '/products/customize',
-                      search: stringify({
-                        ...parse(window.location.search, {
-                          ignoreQueryPrefix: true,
-                        }),
-                        project,
-                        'risk-type': it.vault.riskType || '',
-                        'product-type': it.vault.productType || '',
-                        'for-ccy': it.vault.forCcy,
-                        'deposit-ccy': it.vault.depositCcy,
-                        expanded: 1,
-                      }),
-                    });
-                  }
+                it={it}
+                active={it === product}
+                onClick={() => {
+                  setProduct(it);
+                  handleRecommendCardClick(investModalRef, it, navigate);
                 }}
-              >
-                {riskType !== RiskType.RISKY ? (
-                  <Payoff
-                    riskType={it.vault.riskType}
-                    productType={it.vault.productType}
-                    forCcy={props.forCcy}
-                    depositCcy={it.vault.depositCcy}
-                    depositAmount={+it.amounts.own}
-                    positionAmount={positionAmount(it)}
-                    refMs={next8h(it.timestamp * 1000)}
-                    expMs={it.expiry * 1000}
-                    rchYield={Number(it.apyInfo?.rch)}
-                    anchorPrices={it.anchorPrices}
-                    protectedYield={Number(it.apyInfo?.min)}
-                    enhancedYield={simplePlus(
-                      it.apyInfo?.max,
-                      -(it.apyInfo?.min || 0),
-                    )}
-                  />
-                ) : (
-                  <div className={styles['infos']}>
-                    <div className={styles['info-item']}>
-                      🎯{' '}
-                      {it.anchorPrices
-                        .map((i) => amountFormatter(i, 0))
-                        .join(' - ')}
-                    </div>
-                    <div className={styles['info-item']}>
-                      {t('win')}
-                      <span className={styles['value']}>
-                        {amountFormatter(positionAmount(it), precision)}
-                      </span>
-                      <span className={styles['unit']}>
-                        {it.vault.depositCcy}
-                      </span>
-                    </div>
-                  </div>
-                )}
-                <div className={styles['tag']}>
-                  {displayTenor(
-                    dayjs(it.expiry * 1000).diff(next8h(), 'day'),
-                    t,
-                  )}
-                </div>
-              </div>
+              />
             ))}
           </div>
         </Skeleton>

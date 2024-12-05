@@ -1,25 +1,95 @@
-import { MouseEvent, ReactNode } from 'react';
+import {
+  MouseEvent,
+  ReactNode,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
+import Draggable from 'react-draggable';
+import { useLazyCallback } from '@sofa/utils/hooks';
+import { useSize } from 'ahooks';
 import classNames from 'classnames';
 
 import styles from './index.module.scss';
 
 export interface ProgressBarProps extends BaseProps {
+  type?: '1' | '2';
   percent: number;
   children?: ReactNode;
   onClick?(e: MouseEvent<HTMLDivElement>): void;
+  onPercentChange?(percent: number): void;
 }
 
 const ProgressBar = (props: ProgressBarProps) => {
+  const wrapper = useRef<HTMLDivElement>(null);
+  const slider = useRef<HTMLDivElement>(null);
+
+  const wrapperSize = useSize(wrapper);
+  const sliderSize = useSize(slider);
+
+  const [tempVal, setTempVal] = useState(() => Number(props.percent) || 0);
+  useLayoutEffect(() => {
+    setTempVal(props.percent);
+  }, [props.percent]);
+  const handleChange = useLazyCallback((x: number, temp?: boolean) => {
+    const el = wrapper.current;
+    if (!el) return;
+    const width = el?.offsetWidth;
+    const percent = Math.min(1, x / width);
+    setTempVal(percent);
+    console.log(1111, temp, percent);
+    if (!temp) props.onPercentChange?.(percent);
+  });
+
   return (
     <div
-      className={classNames(styles['progress'], props.className)}
+      className={classNames(
+        styles['progress'],
+        'progress-wrapper',
+        props.className,
+        { [styles['type-2']]: props.type === '2' },
+      )}
       style={props.style}
-      onClick={props.onClick}
+      onClick={(e) => {
+        props.onClick?.(e);
+        handleChange(e.clientX - wrapper.current!.getBoundingClientRect().left);
+      }}
+      ref={wrapper}
     >
+      {props.type === '2' &&
+        [...Array(10)].map((_, i) => <div className={styles['dot']} key={i} />)}
       <div
-        className={styles['progress-bar']}
-        style={{ width: `${Math.max(props.percent * 100, 0.3)}%` }}
+        className={classNames(styles['progress-bar'], 'progress-bar')}
+        style={{ width: `${Math.max(tempVal * 100, 0.1)}%` }}
       />
+      {props.type === '2' && !!wrapperSize?.width && (
+        <Draggable
+          axis="x"
+          position={{
+            x: tempVal * (wrapperSize.width - (sliderSize?.width || 20)),
+            y: 0,
+          }}
+          onDrag={(_, d) => {
+            handleChange(
+              ((d.x || 0) * wrapperSize.width) /
+                (wrapperSize.width - (sliderSize?.width || 20)),
+              true,
+            );
+          }}
+          onStop={(_, d) => {
+            handleChange(
+              ((d.x || 0) * wrapperSize.width) /
+                (wrapperSize.width - (sliderSize?.width || 20)),
+            );
+          }}
+          bounds={{
+            left: 0,
+            right: wrapperSize.width - (sliderSize?.width || 20),
+          }}
+        >
+          <div className={styles['slider']} ref={slider} />
+        </Draggable>
+      )}
       {props.children}
     </div>
   );

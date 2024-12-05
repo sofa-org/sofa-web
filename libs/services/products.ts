@@ -213,10 +213,29 @@ export class ProductsService {
     };
   }
 
+  static matchVault(vault: VaultInfo, filters: Partial<VaultInfo>) {
+    for (const $k in vault) {
+      const k = $k as keyof VaultInfo;
+      if (isNullLike(filters[k])) continue;
+      if (k === 'vault') {
+        if (vault.vault.toLowerCase() === filters.vault!.toLowerCase())
+          continue;
+        return false;
+      }
+      if (k.includes('forCcy')) {
+        if (ProductsService.ccyEqual(vault.forCcy, filters.forCcy!)) continue;
+        return false;
+      }
+      if (vault[k] !== filters[k]) return false;
+    }
+    return true;
+  }
+
   static filterVaults(
     vaults: VaultInfo[],
     filters: Partial<VaultInfo>,
     alsoFindOldVault = false, // 是否把老的合约（不能交易但能看头寸）也查出来
+    strictRiskType = false,
   ) {
     return vaults.filter((it) => {
       if (!alsoFindOldVault && it.tradeDisable) return false;
@@ -236,7 +255,7 @@ export class ProductsService {
         ) {
           continue;
         }
-        if (k === 'riskType') {
+        if (k === 'riskType' && !strictRiskType) {
           if (filters.riskType === RiskType.RISKY) {
             if (it.riskType !== RiskType.RISKY) return false;
           } else if (it.riskType === RiskType.RISKY) return false;
@@ -263,20 +282,7 @@ export class ProductsService {
   ) {
     return vaults.find((it) => {
       if (!alsoFindOldVault && it.tradeDisable) return false;
-      for (const $k in it) {
-        const k = $k as keyof VaultInfo;
-        if (isNullLike(filters[k])) continue;
-        if (k === 'vault') {
-          if (it.vault.toLowerCase() === filters.vault!.toLowerCase()) continue;
-          return false;
-        }
-        if (k.includes('forCcy')) {
-          if (ProductsService.ccyEqual(it.forCcy, filters.forCcy!)) continue;
-          return false;
-        }
-        if (it[k] !== filters[k]) return false;
-      }
-      return true;
+      return ProductsService.matchVault(it, filters);
     });
   }
 
@@ -418,6 +424,17 @@ export class ProductsService {
         },
       })
       .then((res) => res.value);
+  }
+
+  static calcProbability(
+    productType: ProductType,
+    probabilities: WinningProbabilities,
+  ) {
+    if (productType === ProductType.DNT)
+      return probabilities.probDntStayInRange;
+    if (productType === ProductType.BullSpread)
+      return probabilities.probBullTrendItmLowerStrike;
+    return probabilities.probBearTrendItmUpperStrike;
   }
 
   static genProtectedApyList(apy: number | undefined, dev = false) {

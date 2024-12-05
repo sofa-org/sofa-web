@@ -8,6 +8,7 @@
 @import "@/styles/rewrite/datepicker";
 @import "@/styles/rewrite/checkbox";
 @import "@/styles/rewrite/input";
+@import "@/styles/rewrite/dropdown";
 @import "locomotive-scroll/dist/locomotive-scroll.css";
 
 :root {
@@ -62,6 +63,15 @@ body[theme-mode="dark"] {
   --color-rch: #51acf1;
   --semi-color-fill-0: #f0f0f0;
   --color-gradient: linear-gradient(96deg, #50d113 0.36%, #ffe500 100%);
+  --color-gradient-1: linear-gradient(to right, #fffa00, #ffa82e);
+  --color-gradient-2: linear-gradient(
+    90deg,
+    #d665a3 0,
+    #e05e2b 21.35%,
+    #f8d748 45.31%,
+    #36af73 70.31%,
+    #2d6fb9 100%
+  );
   --w3m-z-index: 2000;
 }
 
