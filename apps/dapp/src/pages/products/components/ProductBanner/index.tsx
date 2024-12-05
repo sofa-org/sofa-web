@@ -33,9 +33,11 @@ const ProductBanner = (props: { title: ReactNode }) => {
   const [riskType] = useRiskSelect(project);
   return (
     <div
-      className={classNames(styles['product-banner-wrapper'], {
-        [styles['risky']]: riskType === RiskType.RISKY,
-      })}
+      className={classNames(
+        styles['product-banner-wrapper'],
+        'product-banner-wrapper',
+        { [styles['risky']]: riskType === RiskType.RISKY },
+      )}
     >
       <div className={styles['content']}>{props.title}</div>
     </div>

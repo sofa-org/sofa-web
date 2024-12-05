@@ -15,8 +15,11 @@ import iconDntProtectedInverse from './assets/dnt-protected-inverse.png';
 import iconDntRisky from './assets/dnt-risky.png';
 import iconDntRiskyInverse from './assets/dnt-risky-inverse.png';
 import IconAutomator from './assets/icon-automator.png';
+import { Comp as IconDown } from './assets/icon-down.svg';
+import { Comp as IconFlat } from './assets/icon-flat.svg';
 import IconHighYield from './assets/icon-high-yield.png';
 import IconLowRisk from './assets/icon-low-risk.png';
+import { Comp as IconUp } from './assets/icon-up.svg';
 import { Comp as ImgBearSpread } from './assets/product-bear-spread.svg';
 import { Comp as ImgBullSpread } from './assets/product-bull-spread.svg';
 import { Comp as ImgDNT } from './assets/product-dnt.svg';
@@ -35,6 +38,11 @@ export const ProjectTypeRefs = {
       t(
         'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
       ),
+    desc1: (t: TFunction) =>
+      t({
+        enUS: 'Stable yield and low-risk. Ideal for risk-averse users seeking consistent returns.',
+        zhCN: '稳定收益，低风险。适合追求稳定回报的风险规避型用户。',
+      }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: ProjectType.Earn,
     link: EnvLinks.config.VITE_EARN_LINK,
@@ -45,6 +53,11 @@ export const ProjectTypeRefs = {
       t(
         'Popular TradFi exotics investments can now be safely invested on-chain, allowing users to speculate on token price action through a diverse product suite including Rangebound, Trends, and Shark Fin products.  Higher returns will come at the risk of principal losses, though users will have full control over the product parameters under our flexible RFQ interface.',
       ),
+    desc1: (t: TFunction) =>
+      t({
+        enUS: 'High returns & high risk. Designed for risk-takers who can stomach potential losses.',
+        zhCN: '高回报 & 高风险。为能够承受潜在亏损的冒险者量身打造。',
+      }),
     icon: <img src={IconHighYield} width="24px" />,
     value: ProjectType.Surge,
     link: EnvLinks.config.VITE_SURGE_LINK,
@@ -56,6 +69,11 @@ export const ProjectTypeRefs = {
         enUS: 'Delegate your funds to high-performing Automator traders & strategies. Funds will be utilized and continuously re-invested in optimized return strategies until user redemption.',
         zhCN: '将资金托管给高绩效的 Automator 交易者及策略。资金将被充分利用，持续再投资以实现最佳回报，直至用户赎回。',
       }),
+    desc1: (t: TFunction) =>
+      t({
+        enUS: `Mirror the top trader's positions with just a click!`,
+        zhCN: '一键复制顶级交易者的持仓！',
+      }),
     icon: <img src={IconAutomator} width="24px" />,
     value: ProjectType.Automator,
     link: EnvLinks.config.VITE_AUTOMATOR_LINK,
@@ -66,18 +84,27 @@ export const RiskTypeRefs = {
   [RiskType.PROTECTED]: {
     label: (t: TFunction) => t('Earn'),
     label2: (t: TFunction) => t('Secured'),
+    label3: (t: TFunction) => t('Earn'),
+    desc: (t: TFunction) =>
+      t({ enUS: 'No losses, please', zhCN: '不接受损失' }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.PROTECTED,
   },
   [RiskType.LEVERAGE]: {
     label: (t: TFunction) => t('Leverage'),
     label2: (t: TFunction) => t('Leverage'),
+    label3: (t: TFunction) => t('Earn'),
+    desc: (t: TFunction) =>
+      t({ enUS: 'No pain, no gain', zhCN: '能接受少量损失' }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.LEVERAGE,
   },
   [RiskType.RISKY]: {
     label: (t: TFunction) => t('Surge'),
     label2: (t: TFunction) => t('All-or-None'),
+    label3: (t: TFunction) => t('Surge'),
+    desc: (t: TFunction) =>
+      t({ enUS: 'Risking it all', zhCN: '能接受全部损失' }),
     icon: <img src={IconHighYield} width="24px" />,
     value: RiskType.RISKY,
   },
@@ -86,6 +113,7 @@ export const RiskTypeRefs = {
 export const ProductTypeRefs = {
   [ProductType.BullSpread]: {
     label: (t: TFunction) => t('Bull Trend'),
+    label1: (t: TFunction) => t({ enUS: 'Go up', zhCN: '上涨' }),
     desc: (t: TFunction) =>
       t('Earn Extra Yield on directional market movements'),
     suitableDesc: (t: TFunction) =>
@@ -155,6 +183,7 @@ export const ProductTypeRefs = {
           color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
         },
       })[`${riskType}-${inverse}`],
+    icon1: <IconUp />,
     tag: 'Hot',
     tagStyle: {
       background: 'linear-gradient(to left, #FFFA00 0, #FFA82E 100%)',
@@ -190,6 +219,7 @@ export const ProductTypeRefs = {
   },
   [ProductType.DNT]: {
     label: (t: TFunction) => t('Rangebound'),
+    label1: (t: TFunction) => t({ enUS: 'Flat', zhCN: '震荡' }),
     desc: (t: TFunction) => t('Win if price always in Range before expiry.'),
     suitableDesc: (t: TFunction) =>
       t(
@@ -253,6 +283,7 @@ export const ProductTypeRefs = {
           color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
         },
       })[`${riskType}-${inverse}`],
+    icon1: <IconFlat />,
     tag: '',
     // tagStyle: {
     //   background:
@@ -283,6 +314,7 @@ export const ProductTypeRefs = {
   },
   [ProductType.BearSpread]: {
     label: (t: TFunction) => t('Bear Trend'),
+    label1: (t: TFunction) => t({ enUS: 'Go down', zhCN: '下跌' }),
     desc: (t: TFunction) =>
       t('Earn Extra Yield on directional market movements'),
     suitableDesc: (t: TFunction) =>
@@ -352,6 +384,7 @@ export const ProductTypeRefs = {
           color: 'linear-gradient(135deg, #D1B32F 0%, #FFCF00 100%)',
         },
       })[`${riskType}-${inverse}`],
+    icon1: <IconDown />,
     tag: '',
     tagStyle: {
       background: 'linear-gradient(to left, #FFFA00 0, #FFA82E 100%)',

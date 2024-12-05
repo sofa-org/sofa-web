@@ -1,14 +1,3 @@
-.progress {
-  @include flex-center;
-
-  justify-content: flex-start;
-  flex: 1;
-  height: 8px;
-  margin: 0 -8px;
-  background: #e0e0e0;
-  cursor: pointer;
-}
-
 .progress-bar {
   height: 100%;
   margin: 0;
@@ -35,5 +24,62 @@
     );
     background-repeat: repeat-x;
     background-size: 10px 100%;
+  }
+}
+
+.progress {
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex: 1;
+  position: relative;
+  height: 8px;
+  margin: 0 -8px;
+  background: #e0e0e0;
+  cursor: pointer;
+
+  &.type-2 {
+    height: 4px;
+    border-top: none;
+    border-bottom: none;
+
+    .progress-bar {
+      position: relative;
+      height: 8px;
+      box-sizing: border-box;
+      padding: 0 4px;
+      transform: none;
+      background: #092038;
+      border-radius: 4px;
+      transition: none;
+    }
+
+    .slider {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      z-index: 10;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0;
+      border-radius: 50%;
+      background: #092038;
+    }
+
+    .dot {
+      position: absolute;
+      top: 50%;
+      transform: translate(0, -50%);
+      width: 8px;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 50%;
+    }
+
+    @for $i from 1 through 10 {
+      .dot:nth-child(#{$i}) {
+        left: calc((100% - 8px) / 9 * ($i - 1));
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useMemo } from 'react';
 import { Button, DatePicker } from '@douyinfe/semi-ui';
+import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteParams,
@@ -21,7 +22,6 @@ import AmountInput from '@/components/AmountInput';
 import PriceRangeInput from '@/components/PriceRangeInput';
 import { Time } from '@/components/TimezoneSelector';
 import { addI18nResources } from '@/locales';
-import { useGlobalState } from '@/store';
 
 import { useHoverTicket, useProductsState } from '../../store';
 import { TicketTypeOptions } from '../TicketTypeSelector';
@@ -43,11 +43,13 @@ const CustomTicket = (props: CustomTicketProps) => {
 
   const customDev = useMemo(() => currQuery()['custom-dev'] === '1', []);
 
-  const vault = useGlobalState((state) =>
-    ProductsService.findVault(state.vaults, {
-      chainId: props.product.vault.chainId,
-      vault: props.product.vault.vault,
-    }),
+  const vault = useMemo(
+    () =>
+      ProductsService.findVault(ContractsService.vaults, {
+        chainId: props.product.vault.chainId,
+        vault: props.product.vault.vault,
+      }),
+    [props.product.vault.chainId, props.product.vault.vault],
   );
 
   const onChange = useLazyCallback((val: Partial<ProductQuoteParams>) => {

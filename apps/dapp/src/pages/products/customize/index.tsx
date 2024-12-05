@@ -45,7 +45,7 @@ import {
   ProductTypeRefs,
   RiskTypeRefs,
 } from '@/components/ProductSelector/enums';
-import RadioBtnGroup from '@/components/RadioBtnGroup';
+import { RadioBtnGroup } from '@/components/RadioBtnGroup';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import { useGlobalState } from '@/store';
@@ -67,7 +67,7 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'ProductCustomize');
 
-const ProductCustomize = () => {
+const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('ProductCustomize');
   const wallet = useWalletStore();
   const prices = useIndexPrices((state) => state.prices);
@@ -103,14 +103,16 @@ const ProductCustomize = () => {
     [vaultOptions],
   );
 
-  const vault = useGlobalState((state) =>
-    ProductsService.findVault(state.vaults, {
-      forCcy,
-      depositCcy,
-      productType,
-      chainId: wallet.chainId,
-      ...(!leverageVault ? { riskType } : { vault: leverageVault }),
-    }),
+  const vault = useMemo(
+    () =>
+      ProductsService.findVault(ContractsService.vaults, {
+        forCcy,
+        depositCcy,
+        productType,
+        chainId: wallet.chainId,
+        ...(!leverageVault ? { riskType } : { vault: leverageVault }),
+      }),
+    [depositCcy, forCcy, leverageVault, productType, riskType, wallet.chainId],
   );
 
   useEffect(() => {
@@ -144,16 +146,13 @@ const ProductCustomize = () => {
   );
 
   const setLeverageVault = useLazyCallback((v?: string) => {
-    const nextVault = ProductsService.findVault(
-      useGlobalState.getState().vaults,
-      {
-        forCcy,
-        depositCcy,
-        productType,
-        chainId: wallet.chainId,
-        ...(!v ? { riskType } : { vault: v }),
-      },
-    )!;
+    const nextVault = ProductsService.findVault(ContractsService.vaults, {
+      forCcy,
+      depositCcy,
+      productType,
+      chainId: wallet.chainId,
+      ...(!v ? { riskType } : { vault: v }),
+    })!;
     useProductsState.updateCart({
       id: nanoid(),
       ...product,
@@ -250,15 +249,27 @@ const ProductCustomize = () => {
   }, [product]);
 
   return (
-    <>
+    <div
+      className={classNames(styles['customize'], {
+        [styles['only-form']]: props.onlyForm,
+      })}
+    >
       <ProductBanner title={<></>} />
-      <div className={styles['header']}>
-        <ProductTypeSelector />
-        <CCYSelector prefix={t('Anchor')} />
-      </div>
+      {!props.onlyForm && (
+        <div className={styles['header']}>
+          <ProductTypeSelector />
+          <CCYSelector prefix={t('Anchor')} />
+        </div>
+      )}
       <div className={styles['form']}>
         <div className={styles['content']}>
           <div className={styles['left']}>
+            {props.onlyForm && (
+              <div className={styles['header']}>
+                <ProductTypeSelector dark />
+                <CCYSelector prefix={t('Anchor')} dark />
+              </div>
+            )}
             {vault?.riskType === RiskType.PROTECTED && (
               <div className={styles['form-item']}>
                 <div className={styles['label']}>
@@ -473,28 +484,30 @@ const ProductCustomize = () => {
           </div>
         </div>
       </div>
-      <ProductBrief
-        riskType={riskType}
-        productType={productType}
-        protectedReturnApy={Number(product?.protectedApy)}
-      />
-      {product?.vault && (
+      {!props.onlyForm && (
+        <ProductBrief
+          riskType={riskType}
+          productType={productType}
+          protectedReturnApy={Number(product?.protectedApy)}
+        />
+      )}
+      {!props.onlyForm && product?.vault && (
         <ProductDesc
           product={quoteInfo || product}
           className={styles['product-desc-wrapper']}
         />
       )}
       <div className={styles['placeholder']} />
-    </>
+    </div>
   );
 };
 
-const Comp = () => {
+const Comp = (props: BaseProps & { onlyForm?: boolean }) => {
   const [project] = useProjectChange();
   return project === ProjectType.Earn ? (
-    <ProductCustomize />
+    <ProductCustomize {...props} />
   ) : (
-    <ProductLottery />
+    <ProductLottery {...props} />
   );
 };
 

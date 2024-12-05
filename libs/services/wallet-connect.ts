@@ -156,6 +156,7 @@ export class WalletConnect {
   ) {
     const currNetwork = await provider._detectNetwork();
     if (Number(currNetwork.chainId) === chainId) return;
+    console.error(`Switch network to ${chainId}`);
 
     const networkData = {
       chainId: `0x${ChainMap[chainId].chainId.toString(16)}`,

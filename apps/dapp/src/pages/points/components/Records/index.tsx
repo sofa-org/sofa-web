@@ -10,7 +10,7 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 
 import CEmpty from '@/components/Empty';
-import RadioBtnGroup from '@/components/RadioBtnGroup';
+import { RadioBtnGroup } from '@/components/RadioBtnGroup';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
 import styles from './index.module.scss';

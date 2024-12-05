@@ -1,6 +1,5 @@
 import { ContractsService } from '@sofa/services/contracts';
 import { MarketService } from '@sofa/services/market';
-import { VaultInfo } from '@sofa/services/products';
 import { AuthValue } from '@sofa/utils/env';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
@@ -12,7 +11,6 @@ export const useGlobalState = Object.assign(
     persist(
       () => ({
         loading: true,
-        vaults: [] as VaultInfo[],
         interestRate: {} as PartialRecord<
           number /* chainId */,
           PartialRecord<
@@ -35,10 +33,7 @@ export const useGlobalState = Object.assign(
   {
     getVaultInfo: ContractsService.getVaultInfo,
     async getVaults() {
-      useGlobalState.setState({
-        loading: false,
-        vaults: ContractsService.vaults,
-      });
+      useGlobalState.setState({ loading: false });
     },
     async updateInterestRate() {
       const { chainId } = useWalletStore.getState();

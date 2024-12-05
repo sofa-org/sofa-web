@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type.ts';
@@ -13,13 +13,19 @@ import { EnvLinks } from '@/env-links';
 import { addI18nResources, LangSelector } from '@/locales';
 
 import IndexPrices from '../IndexPrices';
-import LaunchApp from '../LaunchApp';
 import NetworkSelector from '../NetworkSelector';
-import { ProjectSelector, useProjectChange } from '../ProductSelector';
+import { useProjectChange } from '../ProductSelector';
+import { ProjectTypeRefs } from '../ProductSelector/enums';
 import TimezoneSelector from '../TimezoneSelector';
 import WalletConnector from '../WalletConnector';
 
+import { Comp as IconBlog } from './assets/icon-blog.svg';
+import { Comp as IconClock } from './assets/icon-clock.svg';
+import { Comp as IconDefiMode } from './assets/icon-defimode.svg';
 import { Comp as IconMenu } from './assets/icon-menu.svg';
+import { Comp as IconPos } from './assets/icon-pos.svg';
+import { Comp as IconSOFA } from './assets/icon-sofa.svg';
+import { Comp as IconUsers } from './assets/icon-users.svg';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -32,10 +38,12 @@ interface MenuItem {
   path: string;
   type?: 1 | 2;
   target?: string;
-  icon?: string;
+  icon?: ReactNode;
   children?: MenuItem[];
 
-  label(t: TFunction): string;
+  label(t: TFunction): ReactNode;
+  desc?(t: TFunction): ReactNode;
+  group?(t: TFunction): string;
 
   hide?(): boolean;
 }
@@ -46,54 +54,119 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
   const campaign = {
     label: (t: TFunction) =>
       t({
-        enUS: 'Campaign',
-        zhCN: '活动中心',
+        enUS: 'Game Center',
+        zhCN: '游戏中心',
       }),
     target: '_blank',
-    // icon: 'battle-tower',
-    type: 2 as const,
     path: EnvLinks.config.VITE_CAMPAIGN_LINK,
     hide: () => Env.isTelegram,
   };
   return [
-    { label: (t: TFunction) => t('home'), path: '/', type: 1 },
-    { label: (t: TFunction) => t('Project'), path: '/mechanism', type: 1 },
-    { label: (t: TFunction) => t('Capabilities'), path: '/strengths', type: 1 },
-    { label: (t: TFunction) => t('RCH'), path: '/rch', type: 1 },
-    { ...campaign, type: 1 },
     {
-      label: (t: TFunction) => t({ enUS: 'Points', zhCN: '积分' }),
-      path: '/points',
-      type: 1,
+      label: (t: TFunction) => t('Trade'),
+      path: '',
+      children: [
+        {
+          icon: <IconDefiMode />,
+          group: (t: TFunction) => t({ enUS: 'DeFi Mode', zhCN: 'DeFi Mode' }),
+          label: (t: TFunction) => t({ enUS: 'DeFi Mode', zhCN: 'DeFi Mode' }),
+          desc: (t: TFunction) =>
+            t({
+              enUS: 'Yield earning made easy.  Discover the best solutions for you!',
+              zhCN: '轻松赚取收益，发现最适合您的解决方案！',
+            }),
+          path: '/products',
+        },
+        {
+          icon: ProjectTypeRefs[ProjectType.Earn].icon,
+          group: (t: TFunction) => t({ enUS: 'Professional', zhCN: '专业' }),
+          label: (t: TFunction) => (
+            <span className={styles['txt-gradient']}>
+              {ProjectTypeRefs[ProjectType.Earn].label(t)}
+            </span>
+          ),
+          desc: (t: TFunction) => ProjectTypeRefs[ProjectType.Earn].desc1(t),
+          path: EnvLinks.config.VITE_EARN_LINK,
+        },
+        {
+          icon: ProjectTypeRefs[ProjectType.Surge].icon,
+          group: (t: TFunction) => t({ enUS: 'Professional', zhCN: '专业' }),
+          label: (t: TFunction) => (
+            <span className={styles['txt-gradient-2']}>
+              {ProjectTypeRefs[ProjectType.Surge].label(t)}
+            </span>
+          ),
+          desc: (t: TFunction) => ProjectTypeRefs[ProjectType.Surge].desc1(t),
+          path: EnvLinks.config.VITE_SURGE_LINK,
+        },
+        {
+          icon: <IconPos />,
+          group: (t: TFunction) => t({ enUS: 'Position', zhCN: '持仓' }),
+          label: (t: TFunction) => t({ enUS: 'Position', zhCN: '持仓' }),
+          desc: (t: TFunction) =>
+            t({
+              enUS: 'Your Earn & Surge Positions.',
+              zhCN: '你交易的 Earn 和 Surge 的头寸',
+            }),
+          path: '/positions',
+        },
+      ],
+    },
+    {
+      label: (t: TFunction) => ProjectTypeRefs[ProjectType.Automator].label(t),
+      path: '',
+      children: [
+        {
+          icon: ProjectTypeRefs[ProjectType.Automator].icon,
+          group: (t: TFunction) =>
+            ProjectTypeRefs[ProjectType.Automator].label(t),
+          label: (t: TFunction) =>
+            ProjectTypeRefs[ProjectType.Automator].label(t),
+          desc: (t: TFunction) =>
+            ProjectTypeRefs[ProjectType.Automator].desc1(t),
+          path: EnvLinks.config.VITE_AUTOMATOR_LINK,
+        },
+        {
+          icon: <IconClock />,
+          group: (t: TFunction) =>
+            ProjectTypeRefs[ProjectType.Automator].label(t),
+          label: (t: TFunction) => t({ enUS: 'History', zhCN: '历史' }),
+          desc: (t: TFunction) =>
+            t({
+              enUS: 'Review your active and past performance records.',
+              zhCN: '查看您的当前和历史绩效记录。',
+            }),
+          path: '/transactions',
+        },
+      ],
+    },
+    {
+      label: (t: TFunction) => t({ enUS: 'Community', zhCN: '联系我们' }),
+      path: '',
+      children: [
+        {
+          icon: <IconUsers />,
+          label: (t: TFunction) =>
+            t({ enUS: 'Ambassador Program', zhCN: '宣传大使项目' }),
+          path: 'https://blog.sofa.org/ambassador/',
+        },
+        {
+          icon: <IconSOFA />,
+          label: (t: TFunction) =>
+            t({ enUS: 'SOFA Points', zhCN: 'SOFA 积分' }),
+          path: '/points',
+        },
+        {
+          icon: <IconBlog />,
+          label: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
+          path: 'https://blog.sofa.org/',
+        },
+      ],
     },
     {
       label: (t: TFunction) => t('Docs'),
       path: 'https://docs.sofa.org',
       type: 1,
-    },
-    {
-      label: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
-      path: 'https://blog.sofa.org/',
-      type: 1,
-    },
-    {
-      label: (t: TFunction) =>
-        t({ enUS: 'Ambassador Program', zhCN: '宣传大使项目' }),
-      path: 'https://blog.sofa.org/ambassador/',
-      type: 1,
-    },
-    { label: (t: TFunction) => t('Trade'), path: '/products', type: 2 },
-    {
-      label: (t: TFunction) => t('Position'),
-      path: '/positions',
-      type: 2,
-      hide: () => project === ProjectType.Automator,
-    },
-    {
-      label: (t: TFunction) => t({ enUS: 'Transaction', zhCN: '交易记录' }),
-      path: '/transactions',
-      type: 2,
-      hide: () => project !== ProjectType.Automator,
     },
     campaign,
   ];
@@ -130,24 +203,9 @@ const Header = () => {
 
   const opacity = useOpacity();
 
-  const type = useMemo<number>(() => {
-    if (/^\/$|rch/.test(location.pathname)) return 1;
-    return (
-      allMenuItems(project).find(
-        (it) => it.path !== '/' && location.pathname.startsWith(it.path),
-      )?.type ?? 2
-    );
-  }, [location.pathname, project]);
+  const menusForRender = useMemo(() => allMenuItems(project), [project]);
 
-  const menusForRender = useMemo(
-    () => allMenuItems(project).filter((it) => it.type === type),
-    [type, project],
-  );
-
-  const more = useMemo(
-    () => /rch|products|positions/.test(location.pathname) || type === 2,
-    [location.pathname, type],
-  );
+  const more = useMemo(() => true, []);
 
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
@@ -164,11 +222,7 @@ const Header = () => {
       <div className={styles['bg']} style={{ opacity }} />
       <nav className={styles['left']}>
         <div className={styles['logo-wrapper']}>
-          {type === 2 ? (
-            <ProjectSelector className={styles['product-selector']} />
-          ) : (
-            <Logo className={styles['logo']} onClick={() => navigate('/')} />
-          )}
+          <Logo className={styles['logo']} onClick={() => navigate('/')} />
           <IconMenu
             className={styles['icon-menu']}
             onClick={() => setExpanded((pre) => !pre)}
@@ -176,11 +230,11 @@ const Header = () => {
         </div>
 
         {menusForRender.map((it) => {
-          if (it.hide?.()) return <Fragment key={it.label(t)} />;
+          if (it.hide?.()) return <Fragment key={it.path} />;
           if (it.path && !it.path.startsWith('http')) {
             return (
               <NavLink
-                key={it.label(t)}
+                key={it.path}
                 to={joinUrl(it.path, location.search)}
                 className={classNames(styles['link'], {
                   [styles['active']]:
@@ -201,7 +255,7 @@ const Header = () => {
           if (!it.children) {
             return (
               <a
-                key={it.label(t)}
+                key={it.path}
                 href={joinUrl(it.path, `?project=${project}`)}
                 className={classNames(styles['link'])}
                 target={
@@ -226,43 +280,71 @@ const Header = () => {
               </a>
             );
           }
+          const groups = it.children.reduce(
+            (pre, it) => {
+              const group = String(it.group?.(t));
+              if (!pre[group]) pre[group] = [];
+              pre[group].push(it);
+              return pre;
+            },
+            {} as Record<string, MenuItem[]>,
+          );
           return (
             <Dropdown
-              key={it.label(t)}
+              key={it.path}
               trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
-              className={styles['nav-selector']}
+              className={classNames(styles['nav-selector'], 'semi-always-dark')}
               position={'bottomLeft'}
               render={
                 <Dropdown.Menu className={styles['nav-selector-items']}>
-                  {it.children.map((m) => {
-                    if (it.hide?.()) return <Fragment key={it.path} />;
+                  {Object.entries(groups).map(([group, children], _, arr) => {
                     return (
-                      <Dropdown.Item
-                        key={m.path}
-                        className={classNames(styles['nav-selector-item'])}
-                        onClick={() => {
-                          window.location.href = m.path;
-                        }}
-                      >
-                        <span className="semi-select-option-text">
-                          {m.label(t)}
-                          {m.icon && (
-                            <span
+                      <>
+                        {arr.length > 1 && (
+                          <Dropdown.Title>{group}</Dropdown.Title>
+                        )}
+                        {children.map((m) => {
+                          if (it.hide?.()) return <Fragment key={it.path} />;
+                          return (
+                            <Dropdown.Item
+                              key={m.path}
                               className={classNames(
-                                styles[`${m.icon}-icon`],
-                                `${m.icon}-icon`,
+                                styles['nav-selector-item'],
                               )}
-                            />
-                          )}
-                        </span>
-                      </Dropdown.Item>
+                              onClick={() => {
+                                window.location.href = m.path;
+                              }}
+                            >
+                              <span className="semi-select-option-text">
+                                {m.icon && (
+                                  <span
+                                    className={classNames(
+                                      styles[`icon`],
+                                      `icon`,
+                                    )}
+                                  >
+                                    {m.icon}
+                                  </span>
+                                )}
+                                <span className={styles['txt']}>
+                                  <span className={styles['txt-label']}>
+                                    {m.label(t)}
+                                  </span>
+                                  <span className={styles['txt-desc']}>
+                                    {m.desc?.(t)}
+                                  </span>
+                                </span>
+                              </span>
+                            </Dropdown.Item>
+                          );
+                        })}
+                      </>
                     );
                   })}
                 </Dropdown.Menu>
               }
             >
               <a
-                key={it.label(t)}
                 className={classNames(styles['link'])}
                 href={it.path}
                 onClick={(e) => !it.path && e.preventDefault()}
@@ -291,8 +373,7 @@ const Header = () => {
         )}
         {more && <TimezoneSelector />}
         {more && <IndexPrices />}
-        {type === 1 && <LaunchApp />}
-        {more && type === 2 && (
+        {more && (
           <div className={styles['other-links']}>
             <a
               className={classNames(styles['btn-link'], 'btn-gradient', {

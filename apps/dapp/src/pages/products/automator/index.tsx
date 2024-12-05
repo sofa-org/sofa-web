@@ -26,7 +26,7 @@ import { useAutomatorStore } from './store';
 
 import styles from './index.module.scss';
 
-export const Automator = () => {
+export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('Automator');
   const { tab } = useQuery();
   const { chainId, address } = useWalletStore((state) => state);
@@ -55,27 +55,30 @@ export const Automator = () => {
   return (
     <TopTabs
       type={'banner-expandable'}
+      className={classNames({ [styles['only-form']]: props.onlyForm })}
       banner={
-        <>
-          <h1 className={styles['head-title']}>
-            {t({ enUS: 'Automator', zhCN: 'Automator' })}
-            {/* <span className={styles['badge']}>
+        !props.onlyForm && (
+          <>
+            <h1 className={styles['head-title']}>
+              {t({ enUS: 'Automator', zhCN: 'Automator' })}
+              {/* <span className={styles['badge']}>
               {t({ enUS: 'Aggressive', zhCN: '激进的' })}
             </span> */}
-          </h1>
-          <div className={styles['desc']}>
-            {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-          </div>
-        </>
+            </h1>
+            <div className={styles['desc']}>
+              {ProjectTypeRefs[ProjectType.Automator].desc(t)}
+            </div>
+          </>
+        )
       }
       options={[]}
-      dark
+      dark={!props.onlyForm}
       prefix={t({ enUS: 'Product', zhCN: '产品' })}
       sticky
     >
       {!vault ? (
         <CEmpty
-          className="semi-always-dark"
+          className={classNames({ 'semi-always-dark': !props.onlyForm })}
           description={t(
             {
               enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
@@ -124,17 +127,19 @@ export const Automator = () => {
               </Tabs>
             </div>
           </div>
-          <ProductDesc
-            noMoreInfo
-            className={styles['product-desc-wrapper']}
-            prefixTabs={[
-              {
-                itemKey: 'more',
-                tab: t({ enUS: 'More Info', zhCN: '更多信息' }),
-                element: <AutomatorProjectDesc vault={vault} />,
-              },
-            ]}
-          />
+          {!props.onlyForm && (
+            <ProductDesc
+              noMoreInfo
+              className={styles['product-desc-wrapper']}
+              prefixTabs={[
+                {
+                  itemKey: 'more',
+                  tab: t({ enUS: 'More Info', zhCN: '更多信息' }),
+                  element: <AutomatorProjectDesc vault={vault} />,
+                },
+              ]}
+            />
+          )}
         </>
       )}
     </TopTabs>

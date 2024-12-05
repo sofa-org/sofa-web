@@ -9,7 +9,6 @@ import { getErrorMsg } from '@sofa/utils/fns';
 import { useRequest } from 'ahooks';
 
 import Address from '@/components/Address';
-import AmountDisplay from '@/components/AmountDisplay';
 import CEmpty from '@/components/Empty';
 import { useProductSelect } from '@/components/ProductSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
@@ -97,18 +96,19 @@ const BigWins = () => {
             );
           },
         },
-        // {
-        //   title: t('ROI'),
-        //   key: 'roi',
-        //   render: (_, it) =>
-        //     displayPercentage(
-        //       simplePlus(
-        //         it.enhancedReturnApy,
-        //         it.protectedReturnApy,
-        //         it.rchReturnApy,
-        //       ),
-        //     ),
-        // },
+        {
+          title: t('ROI'),
+          key: 'roi',
+          render: (_, it) => (
+            <span className={styles['roi']}>
+              {amountFormatter(
+                Number(it.amounts.redeemable) / Number(it.amounts.own),
+                2,
+              )}
+              x
+            </span>
+          ),
+        },
       ] as ColumnProps<PositionInfo>[],
     [t],
   );

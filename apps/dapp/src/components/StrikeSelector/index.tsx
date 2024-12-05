@@ -2,7 +2,7 @@ import { ReactNode, useMemo } from 'react';
 import { amountFormatter } from '@sofa/utils/amount';
 import classNames from 'classnames';
 
-import RadioBtnGroup from '../RadioBtnGroup';
+import { RadioBtnGroup } from '../RadioBtnGroup';
 
 import styles from './index.module.scss';
 

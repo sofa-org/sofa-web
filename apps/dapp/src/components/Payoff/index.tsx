@@ -271,7 +271,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
           />
         )}
         {rchYieldPath && <path d={rchYieldPath} fill="var(--color-rch)" />}
-        {maxYieldPath && (
+        {maxYieldPath && props.showYAxis && (
           <path
             d={maxYieldPath}
             strokeWidth={0.4}
@@ -393,16 +393,7 @@ const Payoff = (props: PayoffProps) => {
         </span>
         <ApyDesc>{t('type')}</ApyDesc>
       </div>
-      <PayoffChart
-        atm={atm}
-        depositCcy={props.depositCcy}
-        productType={props.productType}
-        anchorPrices={props.anchorPrices}
-        protectedYield={props.protectedYield}
-        enhancedYield={props.enhancedYield}
-        rchYield={props.rchYield}
-        affectByOther
-      />
+      <PayoffChart atm={atm} {...props} affectByOther />
     </div>
   );
 };

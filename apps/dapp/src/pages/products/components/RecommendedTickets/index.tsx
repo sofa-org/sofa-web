@@ -167,12 +167,12 @@ const RecommendedTickets = (props: TicketsProps) => {
                   <span className={styles['prefix']}>{t('Win')}</span>
                   <span className={styles['amount']}>
                     {amountFormatter(
-                      (+it.amounts.maxRedeemable / +it.amounts.own) *
-                        ticketMeta.per,
+                      +it.amounts.maxRedeemable / +it.amounts.own,
                       2,
                     )}
+                    x
                   </span>
-                  <span className={styles['unit']}>{it.vault.depositCcy}</span>
+                  {/* <span className={styles['unit']}>{it.vault.depositCcy}</span> */}
                 </>
               )}
             </div>

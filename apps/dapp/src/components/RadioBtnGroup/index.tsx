@@ -1,5 +1,6 @@
-import { CSSProperties, memo, ReactNode, useState } from 'react';
+import { CSSProperties, memo, ReactNode, useMemo, useState } from 'react';
 import { useLazyCallback } from '@sofa/utils/hooks';
+import { arrToDict } from '@sofa/utils/object';
 import classNames from 'classnames';
 
 import styles from './index.module.scss';
@@ -8,6 +9,8 @@ export interface RadioBtnOption {
   label: ReactNode;
   value: string | number;
   disabled?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 export interface RadioBtnGroupProps {
@@ -17,19 +20,22 @@ export interface RadioBtnGroupProps {
   options?: RadioBtnOption[];
   defaultValue?: string | number;
   value?: string | number;
-  onChange?: (value: string | number) => void;
+  onChange?: (value: string | number, item: RadioBtnOption) => void;
   renderLabel?(props: RadioBtnOption): ReactNode;
   children?: ReactNode;
 }
 
-const RadioBtnGroup = memo<RadioBtnGroupProps>((props) => {
+export const RadioBtnGroup = memo<RadioBtnGroupProps>((props) => {
   const { options, defaultValue, onChange } = props;
+
   const [$value, setValue] = useState(defaultValue);
   const value = 'value' in props ? props.value : $value;
+
+  const optionsMap = useMemo(() => arrToDict(options, 'value'), [options]);
   const handleClick = useLazyCallback((_value: string | number) => {
     setValue(_value);
     if (onChange) {
-      onChange(_value);
+      onChange(_value, optionsMap[_value]);
     }
   });
   return (
@@ -61,5 +67,3 @@ const RadioBtnGroup = memo<RadioBtnGroupProps>((props) => {
     </div>
   );
 });
-
-export default RadioBtnGroup;

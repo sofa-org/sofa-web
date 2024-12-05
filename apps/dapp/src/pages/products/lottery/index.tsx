@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductsService, VaultInfo } from '@sofa/services/products';
 import { amountFormatter, cvtAmountsInUsd } from '@sofa/utils/amount';
@@ -22,7 +23,6 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import BigWins from '@/pages/positions/components/BigWins';
 import BuyingSpree from '@/pages/positions/components/BuyingSpree';
-import { useGlobalState } from '@/store';
 
 import CustomTickets from '../components/CustomTickets';
 import { HowToPlay } from '../components/HowToPlay';
@@ -41,7 +41,7 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'ProductLottery');
 
-const ProductLottery = () => {
+const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('ProductLottery');
   const wallet = useWalletStore();
   const prices = useIndexPrices((state) => state.prices);
@@ -52,14 +52,16 @@ const ProductLottery = () => {
   const [ticket] = useTicketType(forCcy);
   const depositCcy = ticket?.value as VaultInfo['depositCcy'];
 
-  const vault = useGlobalState((state) =>
-    ProductsService.findVault(state.vaults, {
-      chainId: wallet.chainId,
-      productType,
-      riskType,
-      forCcy,
-      depositCcy,
-    }),
+  const vault = useMemo(
+    () =>
+      ProductsService.findVault(ContractsService.vaults, {
+        chainId: wallet.chainId,
+        productType,
+        riskType,
+        forCcy,
+        depositCcy,
+      }),
+    [depositCcy, forCcy, productType, riskType, wallet.chainId],
   );
 
   const products = useProductsState(

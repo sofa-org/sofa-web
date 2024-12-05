@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Button, Toast } from '@douyinfe/semi-ui';
 import { wait, waitUntil } from '@livelybone/promise-wait';
+import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionsService,
@@ -132,11 +133,13 @@ const InvestButton = (props: InvestButtonProps) => {
     useWalletStore.updateBalanceByVault(props.vault);
   }, [props.vault, wallet.address]);
 
-  const vault = useGlobalState((state) =>
-    ProductsService.findVault(state.vaults, {
-      chainId: props.chainId,
-      vault: props.vault,
-    }),
+  const vault = useMemo(
+    () =>
+      ProductsService.findVault(ContractsService.vaults, {
+        chainId: props.chainId,
+        vault: props.vault,
+      }),
+    [props.chainId, props.vault],
   );
 
   const $products = useProductsState(

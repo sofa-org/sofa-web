@@ -177,6 +177,9 @@ const USDTVaults = [
     rchMultiplier: 20,
     usePermit2: false,
   },
+];
+
+const OKXCampaignVaults = [
   // AAVESmartBullVault(ETH/USDT)
   {
     chainId: 1,
@@ -186,7 +189,7 @@ const USDTVaults = [
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'USDT',
-    rchMultiplier: 20,
+    rchMultiplier: 0,
     usePermit2: false,
     tradeDisable: true,
   },
@@ -199,7 +202,7 @@ const USDTVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'USDT',
-    rchMultiplier: 20,
+    rchMultiplier: 0,
     usePermit2: false,
     tradeDisable: true,
   },
@@ -212,7 +215,7 @@ const USDTVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'USDT',
-    rchMultiplier: 20,
+    rchMultiplier: 0,
     usePermit2: false,
     tradeDisable: true,
   },
@@ -225,7 +228,7 @@ const USDTVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'USDT',
-    rchMultiplier: 20,
+    rchMultiplier: 0,
     usePermit2: false,
     tradeDisable: true,
   },
@@ -510,6 +513,12 @@ const crvUSDVaults = [
   },
 ];
 
-const vaults = [...crvUSDVaults, ...USDTVaults, ...RCHVaults, ...stETHVaults];
+const vaults = [
+  ...crvUSDVaults,
+  ...USDTVaults,
+  ...OKXCampaignVaults,
+  ...RCHVaults,
+  ...stETHVaults,
+];
 
 export default vaults;

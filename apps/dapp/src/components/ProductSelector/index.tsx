@@ -132,6 +132,7 @@ export const ProjectSelector = (props: ProductSelectorProps) => {
 export const ProductTypeSelector = (
   props: BaseProps & {
     dropdownClassName?: string;
+    dark?: boolean;
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
@@ -164,7 +165,11 @@ export const ProductTypeSelector = (
   return (
     <CSelect
       prefix={t('Product')}
-      className={classNames(styles['product-type-selector'], props.className)}
+      className={classNames(
+        styles['product-type-selector'],
+        { [styles['dark']]: props.dark },
+        props.className,
+      )}
       dropdownClassName={classNames(
         styles['product-type-dropdown'],
         props.dropdownClassName,
