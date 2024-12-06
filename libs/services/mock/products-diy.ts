@@ -22,7 +22,7 @@ function mockDIYConfig(params: ProductsDIYConfigRequest) {
     expiryDateTimes: [1, 2, 3, 5, 8, 12, 20, 32].map(
       (it) => next8h(undefined, it + 1) / 1000,
     ),
-    apyPercentages: [0, 15, 25, 50, 75, 100],
+    apyList: [0, 15, 25, 50, 75, 100],
     payoutMultiples: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   }));
 }

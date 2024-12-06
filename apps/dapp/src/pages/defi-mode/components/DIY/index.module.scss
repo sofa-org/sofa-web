@@ -18,6 +18,16 @@
   justify-content: flex-start;
   margin: 0;
 
+  .value {
+    @include bold;
+    font-size: 20px;
+
+    .unit {
+      @include regular;
+      font-size: 0.7em;
+    }
+  }
+
   :global {
     .radio-btn-group {
       gap: 16px;

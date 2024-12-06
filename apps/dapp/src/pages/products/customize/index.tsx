@@ -67,7 +67,7 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'ProductCustomize');
 
-const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
+export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('ProductCustomize');
   const wallet = useWalletStore();
   const prices = useIndexPrices((state) => state.prices);

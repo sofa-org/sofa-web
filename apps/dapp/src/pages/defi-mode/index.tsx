@@ -4,7 +4,7 @@ import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 
 import { Automator } from '../products/automator';
-import Customize from '../products/customize';
+import { ProductCustomize } from '../products/customize';
 
 import { DIY } from './components/DIY';
 
@@ -26,7 +26,7 @@ const tabs = [
     label: (t: TFunction) => t({ enUS: 'Customize', zhCN: '自定义' }),
     icon: ProjectTypeRefs.Earn.icon,
     value: 'customize',
-    comp: () => <Customize onlyForm className={styles['automator']} />,
+    comp: () => <ProductCustomize onlyForm className={styles['automator']} />,
   },
 ];
 

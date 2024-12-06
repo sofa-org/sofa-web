@@ -12,7 +12,7 @@ export interface ProductsDIYConfig {
   chainId: number;
   vault: string;
   expiryDateTimes: number[]; // 推荐支持的到期日时间 秒
-  apyPercentages: number[]; // 年化百分比，例：[25,50,75,100]，对Earn和Leverage
+  apyList: number[]; // 年化百分比，例：[0.25,0.50, 0.75,1]，对Earn和Leverage
   payoutMultiples: number[]; // 对Surge类适用 每投入一块钱最后的Payout是几个x
 }
 
@@ -32,7 +32,12 @@ export class ProductsDIYService {
         '/rfq/diy/configuration',
         { params },
       )
-      .then((res) => res.value);
+      .then((res) =>
+        res.value.map((it) => ({
+          ...it,
+          apyList: it.apyList.map(($it) => $it * 100),
+        })),
+      );
   }
 
   @applyMock('diyRecommendedList')

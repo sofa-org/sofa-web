@@ -201,7 +201,7 @@ export const useDIYState = Object.assign(
           multiplierTarget:
             formData?.multiplierTarget ?? defaultFormData.multiplierTarget,
         };
-        const apyList = config?.apyPercentages;
+        const apyList = config?.apyList;
         const multiplierList = config?.payoutMultiples;
         const expiryList = config?.expiryDateTimes;
         return {
