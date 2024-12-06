@@ -137,10 +137,14 @@ const HowLong = () => {
             useDIYState.updateExpiry(chainId, nearest8h(p * (max - min) + min))
           }
         />
-        {term || '-'}{' '}
-        {term > 1
-          ? t({ enUS: 'Days', zhCN: '天' })
-          : t({ enUS: 'Day', zhCN: '天' })}
+        <span className={styles['value']}>
+          {term || '-'}{' '}
+          <span className={styles['unit']}>
+            {term > 1
+              ? t({ enUS: 'Days', zhCN: '天' })
+              : t({ enUS: 'Day', zhCN: '天' })}
+          </span>
+        </span>
       </div>
     </div>
   );
@@ -225,7 +229,7 @@ const ApyTarget = () => {
     return (
       useDIYConfigState
         .getConfig(chainId, formData, config)
-        ?.apyPercentages?.map((it) => +Big(it).div(100)) || [0, 1]
+        ?.apyList?.map((it) => +Big(it).div(100)) || [0, 1]
     );
   }, [chainId, config, formData]);
   const middle = rest.slice(0, rest.length - 1);
@@ -261,8 +265,12 @@ const ApyTarget = () => {
             )
           }
         />
-        {displayPercentage(formData?.apyTarget)}{' '}
-        {t({ enUS: 'APY', zhCN: 'APY' })}
+        <span className={styles['value']}>
+          {displayPercentage(formData?.apyTarget, 0)}{' '}
+          <span className={styles['unit']}>
+            {t({ enUS: 'APY', zhCN: 'APY' })}
+          </span>
+        </span>
         <span className={styles['badge']}>{probabilityDesc}</span>
       </div>
     </div>
@@ -317,8 +325,10 @@ const MultiplierTarget = () => {
             )
           }
         />
-        {formData?.multiplierTarget ?? '-'}
-        {t({ enUS: 'x', zhCN: 'x' })}
+        <span className={styles['value']}>
+          {formData?.multiplierTarget ?? '-'}
+          {t({ enUS: 'x', zhCN: 'x' })}
+        </span>
         <span className={styles['badge']}>{probabilityDesc}</span>
       </div>
     </div>

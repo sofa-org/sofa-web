@@ -86,7 +86,7 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
             </span>
           ),
           desc: (t: TFunction) => ProjectTypeRefs[ProjectType.Earn].desc1(t),
-          path: EnvLinks.config.VITE_EARN_LINK,
+          path: joinUrl(EnvLinks.config.VITE_EARN_LINK, '/customize'),
         },
         {
           icon: ProjectTypeRefs[ProjectType.Surge].icon,
@@ -97,7 +97,7 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
             </span>
           ),
           desc: (t: TFunction) => ProjectTypeRefs[ProjectType.Surge].desc1(t),
-          path: EnvLinks.config.VITE_SURGE_LINK,
+          path: joinUrl(EnvLinks.config.VITE_SURGE_LINK, '/customize'),
         },
         {
           icon: <IconPos />,
