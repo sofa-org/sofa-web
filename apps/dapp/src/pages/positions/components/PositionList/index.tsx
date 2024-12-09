@@ -11,6 +11,7 @@ import { PositionStatus } from '@sofa/services/the-graph';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useInfiniteScroll } from 'ahooks';
+import classNames from 'classnames';
 import { uniqBy } from 'lodash-es';
 
 import AsyncButton from '@/components/AsyncButton';
@@ -202,23 +203,12 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
         />
       </Spin>
       <div className={styles['btn-bottom-wrapper']}>
-        {!!unClaimedList.length && (
-          <Button
-            size="large"
-            theme="solid"
-            type="primary"
-            className={styles['btn-bottom']}
-            onClick={claimAll}
-          >
-            {t('CLAIM ALL')} ({unClaimedList.length})
-          </Button>
-        )}
         {!!loseList.length && (
           <AsyncButton
             size="large"
             theme="solid"
             type="primary"
-            className={styles['btn-bottom']}
+            className={classNames(styles['btn-bottom'], styles['btn-txt'])}
             onClick={() =>
               new Promise((res, rej) =>
                 Modal.confirm({
@@ -260,7 +250,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           size="large"
           theme="solid"
           type="primary"
-          className={styles['btn-bottom']}
+          className={classNames(styles['btn-bottom'], styles['btn-txt'])}
           onClick={() => {
             const link = `/positions/orders${window.location.search}`;
             window.location.href = link;
@@ -268,6 +258,17 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
         >
           {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}
         </Button>
+        {!!unClaimedList.length && (
+          <Button
+            size="large"
+            theme="solid"
+            type="primary"
+            className={styles['btn-bottom']}
+            onClick={claimAll}
+          >
+            {t('CLAIM ALL')} ({unClaimedList.length})
+          </Button>
+        )}
       </div>
       <PositionClaimProgress
         ref={claimProgressRef}

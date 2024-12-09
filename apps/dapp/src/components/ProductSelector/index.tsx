@@ -49,8 +49,7 @@ export function useProjectChange(defaultVal = ProjectType.Earn) {
   const setProject = useLazyCallback(
     (action: SetStateAction<ProjectType | undefined>) => {
       const nextProject = calcVal(action, project) || defaultVal;
-      const link = ProjectTypeRefs[nextProject].link;
-      window.location.href = link;
+      updateQuery({ project: nextProject });
     },
   );
   return [project, setProject] as const;
