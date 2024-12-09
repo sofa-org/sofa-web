@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ProjectType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
@@ -7,6 +7,7 @@ import { useQuery } from '@sofa/utils/hooks';
 
 import { useProjectChange } from '@/components/ProductSelector';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
+import { RadioBtnGroup } from '@/components/RadioBtnGroup';
 import TopTabs from '@/components/TopTabs';
 import { addI18nResources } from '@/locales';
 
@@ -24,26 +25,39 @@ addI18nResources(locale, 'Positions');
 const Positions = () => {
   const [t] = useTranslation('Positions');
   const navigate = useNavigate();
-  const [project] = useProjectChange();
+  const [project, setProject] = useProjectChange();
+  const projects = useMemo(
+    () =>
+      [ProjectType.Earn, ProjectType.Surge].map((it) => ({
+        label: (
+          <>
+            {ProjectTypeRefs[it].icon}
+            {ProjectTypeRefs[it].label(t)}
+          </>
+        ),
+        value: it,
+      })),
+    [t],
+  );
 
   const query = useQuery();
   const tab = (query.tab as string) || '1';
   const tabs = [
     {
       label: (
-        <span className={styles['tab']}>
+        <>
           <IconPosition width="1.2em" />
           {t('POSITION')}
-        </span>
+        </>
       ),
       value: '1',
     },
     {
       label: (
-        <span className={styles['tab']}>
+        <>
           <IconMoment width="1.2em" />
           {t('WONDERFUL MOMENT')}
-        </span>
+        </>
       ),
       value: '2',
     },
@@ -60,6 +74,7 @@ const Positions = () => {
 
   return (
     <TopTabs
+      tabClassName={styles['tabs']}
       banner={
         <div className={styles['banner']}>
           <span className={styles['banner-txt']}>
@@ -71,12 +86,18 @@ const Positions = () => {
         </div>
       }
       type="banner-expandable"
-      value={tab}
-      onChange={(v) => updateQuery({ tab: v })}
-      options={tabs}
+      value={project}
+      onChange={(v) => setProject(v as ProjectType)}
+      options={projects}
       dark
     >
       <div className={styles['content']}>
+        <RadioBtnGroup
+          className={styles['btn-group']}
+          options={tabs}
+          value={tab}
+          onChange={(v) => updateQuery({ tab: v })}
+        />
         {tab === '1' ? <PositionList /> : <WonderfulMoments />}
       </div>
     </TopTabs>

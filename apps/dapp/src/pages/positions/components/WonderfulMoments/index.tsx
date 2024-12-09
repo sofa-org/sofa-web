@@ -3,6 +3,7 @@ import { useTranslation } from '@sofa/services/i18n';
 import { PositionsService } from '@sofa/services/positions';
 import { ProductType, RiskType } from '@sofa/services/products';
 import { useRequest } from 'ahooks';
+import classNames from 'classnames';
 
 import CEmpty from '@/components/Empty';
 import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
@@ -14,8 +15,9 @@ import { RuleDescriptions } from '../WonderfulMomentCard/level';
 
 import locale from './locale';
 
-addI18nResources(locale, 'WonderfulMoment');
 import styles from './index.module.scss';
+
+addI18nResources(locale, 'WonderfulMoment');
 
 const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   const [t] = useTranslation('WonderfulMoment');
@@ -61,7 +63,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           size="large"
           theme="solid"
           type="primary"
-          className={styles['btn-bottom']}
+          className={classNames(styles['btn-bottom'], styles['btn-txt'])}
           onClick={() => {
             const link = `/positions/orders${window.location.search}`;
             window.location.href = link;

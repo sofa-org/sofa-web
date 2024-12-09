@@ -15,15 +15,68 @@
   position: relative;
   width: min(1160px, calc(100vw - 24px));
   min-height: calc(100vh - 200px);
+  padding: 80px 0 0;
   margin: 0 auto;
 }
 
-.tab {
+.btn-group {
   @include flex-center;
 
-  justify-content: flex-start;
+  position: absolute;
+  left: 0;
+  top: 16px;
+  z-index: 10;
+  height: 40px;
 
-  svg {
-    width: 1.2em;
+  :global(.radio-btn) {
+    flex: 1;
+    width: auto;
+    height: 40px;
+    padding: 0 16px;
+    font-size: 12px;
+    color: rgba(#fff, 0.65);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: #262626;
+    white-space: nowrap;
+
+    svg {
+      flex: none;
+      width: 1.5em;
+    }
+
+    &:active,
+    &:hover {
+      background: rgba(#555, 1) !important;
+      box-shadow: 0 5px 10px 0 rgba(#000, 0.5);
+    }
+  }
+}
+
+.tabs.tabs {
+  height: 80px;
+  padding: 0;
+  border-bottom: 1px solid rgba(#fff, 0.12);
+
+  :global {
+    .top-tabs-tab {
+      width: 50%;
+      height: 80px;
+      background: transparent !important;
+      border-radius: 0;
+
+      svg,
+      img {
+        width: 2em;
+      }
+
+      &.active {
+        border-bottom: 2px solid #fff;
+      }
+    }
+  }
+
+  > div {
+    width: min(1160px, calc(100vw - 24px));
   }
 }

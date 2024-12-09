@@ -17,6 +17,7 @@ export interface TopTabsProps extends BaseInputProps<string | number> {
   prefix?: ReactNode;
   suffix?: ReactNode;
   bannerClassName?: string;
+  tabClassName?: string;
   sticky?: boolean;
 }
 
@@ -44,21 +45,26 @@ const TopTabs = (props: TopTabsProps) => {
         {props.banner}
       </div>
       <div
-        className={classNames('top-tabs', styles['top-tabs'], {
-          'top-btn-tabs': props.type === 'btn',
-          [styles['top-btn-tabs']]: props.type === 'btn',
-          'banner-expandable': props.type === 'banner-expandable',
-          [styles['banner-expandable']]: props.type === 'banner-expandable',
-          [styles['dark']]: props.dark,
-          [styles['sticky']]: props.sticky,
-        })}
+        className={classNames(
+          'top-tabs',
+          styles['top-tabs'],
+          props.tabClassName,
+          {
+            'top-btn-tabs': props.type === 'btn',
+            [styles['top-btn-tabs']]: props.type === 'btn',
+            'banner-expandable': props.type === 'banner-expandable',
+            [styles['banner-expandable']]: props.type === 'banner-expandable',
+            [styles['dark']]: props.dark,
+            [styles['sticky']]: props.sticky,
+          },
+        )}
       >
         {props.extraTopContent && (
           <div className={styles['extra-top-content']}>
             {props.extraTopContent}
           </div>
         )}
-        <div className={styles['tabs']}>
+        <div className={classNames(styles['tabs'], 'tabs')}>
           {!isPortrait
             ? props.options.map((it) => (
                 <div
@@ -68,6 +74,7 @@ const TopTabs = (props: TopTabsProps) => {
                     styles['top-tabs-tab'],
                     {
                       [styles['active']]: it.value === props.value,
+                      active: it.value === props.value,
                     },
                   )}
                   onClick={() => !props.disabled && props.onChange?.(it.value)}

@@ -26,29 +26,31 @@
 
   position: absolute;
   right: 0;
-  top: -96px;
+  top: 16px;
   z-index: 10;
   height: 40px;
 }
 
 .btn-bottom {
   flex: 1;
-  padding: 0 16px;
+  height: min(34px, 7vw);
+  padding: 0 12px;
   font-size: 12px;
   color: rgba(#fff, 0.65);
   border-radius: 8px;
   transition: all 0.3s ease;
-  background: #262626;
+  background: transparent !important;
+  border: 1px solid rgba(#fff, 0.24) !important;
+  border-radius: 17px;
+  opacity: 0.8;
 
   &:active,
   &:hover {
-    background: rgba(#555, 1) !important;
-    box-shadow: 0 5px 10px 0 rgba(#000, 0.5);
+    opacity: 1;
   }
 
-  &.ghost {
-    background: transparent;
-    border: 1px solid rgba(#fff, 0.24);
+  &.btn-txt {
+    border: none !important;
   }
 }
 
