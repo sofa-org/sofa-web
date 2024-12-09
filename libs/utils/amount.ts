@@ -93,10 +93,10 @@ export function roundWith<T extends number | string | undefined>(
   : number | string | undefined {
   if (isNullLike(num) || !isLegalNum(num)) return num as number | undefined;
   if (Number(num) < Number(minSize)) {
-    return Number(minSize);
+    return roundWith(minSize, tickSize, minSize, maxSize, 'upper') as number;
   }
   if (!isNullLike(maxSize) && Number(num) > Number(maxSize)) {
-    return Number(maxSize);
+    return roundWith(maxSize, tickSize, minSize, maxSize, 'lower') as number;
   }
 
   if (!tickSize) return num as number | undefined;
