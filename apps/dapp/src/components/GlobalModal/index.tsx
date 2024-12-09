@@ -61,25 +61,8 @@ export const GlobalModal = () => {
         className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: '2. OKX Web3 x SOFA.org Joint Event Now Live',
-            zhCN: '2. OKX Web3 x SOFA.org 联合活动已上线！',
-          }),
-        }}
-      />
-      <p
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: 'From November 8 at 8:00 UTC to December 8 at 8:00 UTC, we’re excited to announce an adjustment to the $RCH airdrop allocation. During this period, 8,000 $RCH out of the daily 12,500 $RCH airdrop will be exclusively dedicated to the OKX Web3 x SOFA.org event. Head over to <a href="https://www.okx.com/web3/defi/activity/33" target="_blank">OKX Web3</a>, purchase SOFA Earn products, and enjoy high returns.',
-            zhCN: '11月8日 16:00 - 12月8日 16:00 (UTC+8) 期间，$RCH 空投规则将临时调整：每天的 12,500 $RCH 空投中，将有 8,000 $RCH 分配至 OKX Web3 x SOFA.org 活动中。欢迎大家前往 <a href="https://www.okx.com/web3/defi/activity/33" target="_blank">OKX Web3</a> 购买Earn 产品，享受高收益回报！',
-          }),
-        }}
-      />
-      <p
-        className={styles['head']}
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: '3. Surge Poker Museum Update',
-            zhCN: '3. Surge 扑克博物馆',
+            enUS: '2. Surge Poker Museum Update',
+            zhCN: '2. Surge 扑克博物馆',
           }),
         }}
       />
