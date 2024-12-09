@@ -6,7 +6,7 @@ export const RouteGuard = (props: { Comp: ComponentType }) => {
   if (Env.isTelegram) return <props.Comp />;
 
   const isDapp = /dapp\./i.test(location.origin);
-  const isDappPath = [
+  const isDappPath = ![
     '/',
     '/policy',
     '/mechanism',
