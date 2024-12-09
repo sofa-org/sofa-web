@@ -55,7 +55,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
       props.onChange?.(round(tempValue));
     },
     [tempValue],
-    { wait: 1000 },
+    { wait: 1000, trailing: true, leading: false },
   );
 
   const percent = useMemo(

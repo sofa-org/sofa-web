@@ -17,7 +17,7 @@ import {
   ProductType,
   RiskType,
 } from '@sofa/services/products';
-import { amountFormatter } from '@sofa/utils/amount';
+import { amountFormatter, roundWith } from '@sofa/utils/amount';
 import { displayExpiry } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
@@ -222,10 +222,9 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
           <div className={styles['label']}>{t('Deposit Amount')}</div>
           <AmountInput
             max={
-              wallet.balance?.[data.vault.depositCcy] &&
-              wallet.balance[data.vault.depositCcy]! >
-                Number(vault?.depositMinAmount)
-                ? wallet.balance[data.vault.depositCcy]
+              Number(wallet.balance?.[data.vault.depositCcy]) >
+              Number(vault?.depositMinAmount)
+                ? wallet.balance![data.vault.depositCcy]
                 : undefined
             }
             min={vault?.depositMinAmount}
@@ -234,10 +233,12 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
             suffix={
               <span className={styles['unit-1']}>{vault?.depositCcy}</span>
             }
-            onChange={(v) =>
-              product &&
-              useProductsState.updateCart({ ...product, depositAmount: v })
-            }
+            onChange={(v) => {
+              return (
+                product &&
+                useProductsState.updateCart({ ...product, depositAmount: v })
+              );
+            }}
             onBlur={() => product && useProductsState.quote(product)}
           />
           <div className={styles['balance']}>
@@ -287,6 +288,9 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
     const [visible, setVisible] = useState(false);
 
     const wallet = useWalletStore();
+    const balance = wallet.balance?.[props.product.vault.depositCcy];
+    const shouldInit = !wallet.address || balance;
+
     const initProduct = useLazyCallback(
       (
         fundingApy: string | number | undefined = props.product.apyInfo
@@ -297,7 +301,12 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
         chainId: props.product.vault.chainId,
         expiry: props.product.expiry,
         anchorPrices: props.product.anchorPrices,
-        depositAmount: props.product.amounts.own,
+        depositAmount: roundWith(
+          props.product.amounts.own,
+          props.product.vault.depositTickAmount,
+          props.product.vault.depositMinAmount,
+          balance,
+        ),
         protectedApy: props.product.apyInfo?.min,
         fundingApy,
       }),
@@ -305,16 +314,18 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
 
     const [preparing, setPreparing] = useState(true);
     useEffect(() => {
-      useProductsState.updateCart(
-        initProduct(
-          useGlobalState.getState().interestRate[wallet.chainId]?.[
-            props.product.vault.depositCcy
-          ]?.apyUsed,
-        ),
-      );
-      if (preparing) setTimeout(() => setPreparing(false), 0);
+      if (shouldInit) {
+        useProductsState.updateCart(
+          initProduct(
+            useGlobalState.getState().interestRate[wallet.chainId]?.[
+              props.product.vault.depositCcy
+            ]?.apyUsed,
+          ),
+        );
+        if (preparing) setTimeout(() => setPreparing(false), 0);
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.product]);
+    }, [props.product, shouldInit]);
 
     useImperativeHandle(ref, () => ({
       hide: () => setVisible(false),

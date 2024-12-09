@@ -37,7 +37,6 @@ const ProgressBar = (props: ProgressBarProps) => {
     const width = el?.offsetWidth;
     const percent = Math.min(1, x / width);
     setTempVal(percent);
-    console.log(1111, temp, percent);
     if (!temp) props.onPercentChange?.(percent);
   });
 
