@@ -37,7 +37,12 @@ const Index = () => {
     <div className={styles['container']}>
       <Tabs className={styles['tabs']} lazyRender>
         {tabs.map((it) => (
-          <Tabs.TabPane itemKey={it.value} icon={it.icon} tab={it.label(t)}>
+          <Tabs.TabPane
+            key={it.value}
+            itemKey={it.value}
+            icon={it.icon}
+            tab={it.label(t)}
+          >
             {it.comp()}
           </Tabs.TabPane>
         ))}

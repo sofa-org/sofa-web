@@ -140,6 +140,7 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
         },
       ],
     },
+    campaign,
     {
       label: (t: TFunction) => t({ enUS: 'Community', zhCN: '联系我们' }),
       path: '',
@@ -168,7 +169,6 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
       path: 'https://docs.sofa.org',
       type: 1,
     },
-    campaign,
   ];
 };
 
@@ -229,12 +229,12 @@ const Header = () => {
           />
         </div>
 
-        {menusForRender.map((it) => {
-          if (it.hide?.()) return <Fragment key={it.path} />;
+        {menusForRender.map((it, i) => {
+          if (it.hide?.()) return <Fragment key={i} />;
           if (it.path && !it.path.startsWith('http')) {
             return (
               <NavLink
-                key={it.path}
+                key={i}
                 to={joinUrl(it.path, location.search)}
                 className={classNames(styles['link'], {
                   [styles['active']]:
@@ -255,7 +255,7 @@ const Header = () => {
           if (!it.children) {
             return (
               <a
-                key={it.path}
+                key={i}
                 href={joinUrl(it.path, `?project=${project}`)}
                 className={classNames(styles['link'])}
                 target={
@@ -291,7 +291,7 @@ const Header = () => {
           );
           return (
             <Dropdown
-              key={it.path}
+              key={i}
               trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
               className={classNames(styles['nav-selector'], 'semi-always-dark')}
               position={'bottomLeft'}
@@ -299,12 +299,12 @@ const Header = () => {
                 <Dropdown.Menu className={styles['nav-selector-items']}>
                   {Object.entries(groups).map(([group, children], _, arr) => {
                     return (
-                      <>
+                      <Fragment key={group}>
                         {arr.length > 1 && (
                           <Dropdown.Title>{group}</Dropdown.Title>
                         )}
                         {children.map((m) => {
-                          if (it.hide?.()) return <Fragment key={it.path} />;
+                          if (it.hide?.()) return <Fragment key={m.path} />;
                           return (
                             <Dropdown.Item
                               key={m.path}
@@ -338,7 +338,7 @@ const Header = () => {
                             </Dropdown.Item>
                           );
                         })}
-                      </>
+                      </Fragment>
                     );
                   })}
                 </Dropdown.Menu>

@@ -5,19 +5,21 @@ import { Env } from '@sofa/utils/env';
 export const RouteGuard = (props: { Comp: ComponentType }) => {
   if (Env.isTelegram) return <props.Comp />;
 
-  const isSubProject =
-    /earn|surge/i.test(location.origin) ||
-    (/localhost|front.sofa.org|(\d+\.){3}\d+/.test(location.origin) &&
-      /project=\w+/.test(location.search));
-  const isSubProjectPath = /products|positions|transactions/.test(
-    location.pathname,
-  );
+  const isDapp = /dapp\./i.test(location.origin);
+  const isDappPath = [
+    '/',
+    '/policy',
+    '/mechanism',
+    '/strengths',
+    '/rch',
+    '/points',
+  ].includes(location.pathname);
 
-  if (isSubProject && !isSubProjectPath) {
+  if (isDapp && !isDappPath) {
     return <Navigate to={{ pathname: '/products', search: location.search }} />;
   }
 
-  if (!isSubProject && isSubProjectPath) {
+  if (!isDapp && isDappPath) {
     return <Navigate to={{ pathname: '/', search: location.search }} />;
   }
 
