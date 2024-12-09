@@ -281,9 +281,9 @@ export const PayoffChart = (props: PayoffChartProps) => {
         )}
         {texts?.map((it) => (
           <text
+            key={it.x}
             x={it.x}
             y={it.y}
-            key={it.x}
             dominantBaseline="middle"
             textAnchor="middle"
             fill="#50D113"

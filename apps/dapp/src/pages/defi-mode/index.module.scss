@@ -5,7 +5,7 @@
 .tabs {
   width: $width-content;
   margin: 0 auto;
-  padding: 32px 0 0;
+  padding: min(32px, 6.4vw) 0 0;
 
   :global(> .semi-tabs-bar) {
     border: none !important;
@@ -37,8 +37,26 @@
   }
 
   :global(> .semi-tabs-content) {
-    padding: 32px;
+    padding: min(32px, 6.4vw);
     background: #fff;
     border-radius: 0 24px 24px;
+  }
+}
+
+@mixin rewrite {
+  .tabs {
+    margin: 0 auto;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
   }
 }
