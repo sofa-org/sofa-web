@@ -128,6 +128,22 @@ export class RCHService {
     );
   }
 
+  @asyncRetry()
+  static isClaimedBatch(
+    timestampMsList: number[], // 注意：空投合约的时间戳是结算日中的起点，这里传的是结算日的终点
+    signer: ethers.JsonRpcSigner,
+  ): Promise<Record<number, boolean>> {
+    const rchAirdropContract = ContractsService.rchAirdropContract(signer);
+    return rchAirdropContract['isClaimed(uint256[])'](
+      timestampMsList.map((it) => (it - MsIntervals.day) / 1000),
+    ).then((res) => {
+      return timestampMsList.reduce(
+        (pre, it, i) => ({ ...pre, [it]: res[i] }),
+        {} as Record<number, boolean>,
+      );
+    });
+  }
+
   static async listAirdrop(
     wallet: string,
     signer: ethers.JsonRpcSigner,
@@ -146,26 +162,25 @@ export class RCHService {
           }[]
         >
       >('/airdrop/history', { params: { wallet } })
-      .then((res) =>
-        Promise.all(
+      .then(async (res) => {
+        const indexes = res.value.map(
+          (it) => (it.dateTime ?? it.daytime)! * 1000,
+        );
+        const claimedRes = await RCHService.isClaimedBatch(indexes, signer);
+        return Promise.all(
           res.value.map(async (it) => ({
             proof: it.merkleProof,
             address: it.wallet,
             investNotional: Number(it.volume),
             amount: +ethers.formatUnits(it.rch || 0, 18),
             amountInt: it.rch,
-            status: await (async () => {
-              const claimed = await RCHService.isClaimed(
-                (it.dateTime ?? it.daytime)! * 1000,
-                signer,
-              );
-              if (claimed) return AirdropStatus.Claimed;
-              return AirdropStatus.Unclaimed;
-            })(),
+            status: claimedRes[(it.dateTime ?? it.daytime)! * 1000]
+              ? AirdropStatus.Claimed
+              : AirdropStatus.Unclaimed,
             timestamp: (it.dateTime ?? it.daytime)! * 1000,
           })),
-        ),
-      );
+        );
+      });
   }
 
   static async burn(
