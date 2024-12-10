@@ -32,10 +32,22 @@
   @include gradient-txt;
   @include medium;
 
-  height: 40px;
+  gap: 20px;
+  height: min(40px, 9.6vw);
   margin: 0;
+  padding: 0 12px;
   border-bottom: 1px solid #e0e0e0;
-  font-size: 16px;
+  font-size: min(16px, 3.8vw);
+
+  .apy {
+    @include flex-center;
+
+    display: none;
+
+    .icon-expand {
+      width: 1em;
+    }
+  }
 }
 
 .risk-type {
@@ -43,25 +55,25 @@
 
   position: relative;
   margin: 12px 0 8px;
-  padding: 0 32px;
-  font-size: 20px;
+  padding: 0 min(32px, 6.4vw);
+  font-size: min(20px, 4.2vw);
 }
 
 .product {
   @include flex-center;
   @include medium;
 
-  margin: 0 0 10px;
-  padding: 0 32px;
-  font-size: 14px;
+  padding: 0 min(32px, 6.4vw);
+  font-size: min(14px, 3.2vw);
+  white-space: nowrap;
 
   .badge {
     @include flex-center;
 
-    height: 24px;
+    height: min(24px, 4.5vw);
     margin: 0;
-    padding: 0 12px;
-    font-size: 14px;
+    padding: 0 min(12px, 2vw);
+    font-size: min(14px, 3.2vw);
     background: #f0f0f0;
     border-radius: 4px;
   }
@@ -70,20 +82,20 @@
 .charts {
   @include flex-center;
 
-  min-width: 360px;
-  height: 210px;
-  margin: 0;
+  min-width: min(360px, 80vw);
+  height: min(210px, 40vw);
+  margin: -5px 0 20px;
   padding: 0 12px;
 
   .quote-infos {
-    height: 180px;
+    height: min(180px, 40vw);
     background: transparent;
 
     &:global(.risky) {
       @include flex-center;
 
       width: auto;
-      margin: 0 32px;
+      margin: 0 min(32px, 6.4vw);
       background: linear-gradient(96deg, #50d11330 0.36%, #ffe50030 100%);
 
       > div {
@@ -92,10 +104,10 @@
         flex-direction: column;
 
         > div:first-child {
-          font-size: 24px;
+          font-size: min(24px, 5vw);
 
           &::first-letter {
-            font-size: 30px;
+            font-size: min(30px, 6vw);
           }
         }
 
@@ -103,7 +115,7 @@
           color: $color-rise;
 
           > span:first-child {
-            font-size: 44px;
+            font-size: min(44px, 7vw);
           }
 
           > span:nth-child(2) {
@@ -120,14 +132,14 @@
   @include flex-center;
 
   flex-direction: column;
-  gap: 24px;
+  gap: min(24px);
   margin: 16px 0 0;
-  padding: 0 32px;
+  padding: 0 min(32px, 6.4vw);
 
   button {
     width: 100%;
-    height: 48px;
-    border-radius: 25px;
+    height: min(48px, 10vw);
+    border-radius: min(24px, 5vw);
 
     svg {
       width: 1em;
@@ -183,7 +195,83 @@
 .diy-product {
   height: 100%;
   margin: 0;
-  padding: 0 0 32px;
+  padding: 0 0 min(32px, 6.4vw);
   border: 1px solid #e0e0e0;
   border-radius: 8px;
+}
+
+@mixin rewrite {
+  .diy-product {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 0;
+    background: #fff;
+
+    .risk-type,
+    .product,
+    .charts {
+      display: none;
+    }
+
+    .title {
+      justify-content: space-between;
+
+      .apy {
+        display: flex;
+
+        .icon-expand {
+          transform: rotate(180deg);
+          transition: 0.3s transform ease;
+        }
+      }
+    }
+
+    &.expanded {
+      .risk-type,
+      .product,
+      .charts {
+        display: flex;
+      }
+
+      .title {
+        .apy {
+          .icon-expand {
+            transform: rotate(0deg);
+            transition: 0.3s transform ease;
+          }
+        }
+      }
+    }
+  }
+
+  .quote-infos {
+    :global {
+      .max-apy {
+        display: none;
+      }
+    }
+  }
+
+  .btn-wrapper {
+    @include flex-center;
+
+    justify-content: space-between;
+    padding: 8px 12px 16px;
+    margin: 0;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
 }

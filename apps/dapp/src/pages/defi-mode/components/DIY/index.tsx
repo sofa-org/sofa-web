@@ -4,7 +4,6 @@ import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
-import Big from 'big.js';
 
 import {
   ProductTypeRefs,
@@ -40,7 +39,15 @@ const BettingOn = () => {
           value: it.key,
           disabled: it.disabled,
           data: it.data,
-        })),
+        }))
+        .sort((a, b) => {
+          const index = (it: typeof a) => {
+            if (/BTC/.test(it.data.forCcy!)) return 0;
+            if (/ETH/.test(it.data.forCcy!)) return 1;
+            return 2;
+          };
+          return index(a) - index(b);
+        }),
     [chainId, formData, t],
   );
   return (
@@ -223,15 +230,9 @@ const ApyTarget = () => {
   const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
   const formData = useDIYState((state) => state.formData[chainId]);
-  const config = useDIYConfigState((state) => state.configs[chainId]);
-  const [min, ...rest] = useMemo(() => {
-    if (!formData) return [0, 1];
-    return (
-      useDIYConfigState
-        .getConfig(chainId, formData, config)
-        ?.apyList?.map((it) => +Big(it).div(100)) || [0, 1]
-    );
-  }, [chainId, config, formData]);
+  const [min, ...rest] = useDIYState((state) =>
+    useDIYState.getApyList(chainId, state),
+  );
   const middle = rest.slice(0, rest.length - 1);
   const max = rest[rest.length - 1];
 
@@ -242,10 +243,19 @@ const ApyTarget = () => {
   const probabilityDesc = useMemo(() => {
     if (!formData?.apyTarget) return undefined;
     if (formData?.apyTarget < 0.15)
-      return t({ enUS: 'Good likelihood', zhCN: '大概率' });
+      return {
+        txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),
+        color: '#49AA19',
+      };
     if (formData?.apyTarget < 0.5)
-      return t({ enUS: 'Neutral', zhCN: '中性概率' });
-    return t({ enUS: 'Low likelihood', zhCN: '小概率' });
+      return {
+        txt: t({ enUS: 'Neutral', zhCN: '中性概率' }),
+        color: '#177DDC',
+      };
+    return {
+      txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
+      color: '#CD8E8E',
+    };
   }, [formData?.apyTarget, t]);
   return (
     <div className={styles['form-item']}>
@@ -271,42 +281,49 @@ const ApyTarget = () => {
             {t({ enUS: 'APY', zhCN: 'APY' })}
           </span>
         </span>
-        <span className={styles['badge']}>{probabilityDesc}</span>
+        <span
+          className={styles['badge']}
+          style={{ color: probabilityDesc?.color }}
+        >
+          {probabilityDesc?.txt}
+        </span>
       </div>
     </div>
   );
 };
 
-const MultiplierTarget = () => {
+const OddsTarget = () => {
   const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
   const formData = useDIYState((state) => state.formData[chainId]);
-  const config = useDIYConfigState((state) => state.configs[chainId]);
-  const [min, ...rest] = useMemo(() => {
-    if (!formData) return [0, 10];
-    return (
-      useDIYConfigState.getConfig(chainId, formData, config)
-        ?.payoutMultiples || [0, 10]
-    );
-  }, [chainId, config, formData]);
+  const [min, ...rest] = useDIYState((state) =>
+    useDIYState.getOddsList(chainId, state),
+  );
   const middle = rest.slice(0, rest.length - 1);
   const max = rest[rest.length - 1];
 
   const percentage = useMemo(
     () =>
-      formData?.multiplierTarget
-        ? (formData.multiplierTarget - min) / (max - min)
-        : 0,
-    [formData?.multiplierTarget, max, min],
+      formData?.oddsTarget ? (formData.oddsTarget - min) / (max - min) : 0,
+    [formData?.oddsTarget, max, min],
   );
   const probabilityDesc = useMemo(() => {
-    if (!formData?.multiplierTarget) return undefined;
-    if (formData?.multiplierTarget < 1.5)
-      return t({ enUS: 'Good likelihood', zhCN: '大概率' });
-    if (formData?.multiplierTarget < 3)
-      return t({ enUS: 'Neutral', zhCN: '中性概率' });
-    return t({ enUS: 'Low likelihood', zhCN: '小概率' });
-  }, [formData?.multiplierTarget, t]);
+    if (!formData?.oddsTarget) return undefined;
+    if (formData?.oddsTarget < 1.5)
+      return {
+        txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),
+        color: '#49AA19',
+      };
+    if (formData?.oddsTarget < 3)
+      return {
+        txt: t({ enUS: 'Neutral', zhCN: '中性概率' }),
+        color: '#177DDC',
+      };
+    return {
+      txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
+      color: '#CD8E8E',
+    };
+  }, [formData?.oddsTarget, t]);
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
@@ -326,10 +343,15 @@ const MultiplierTarget = () => {
           }
         />
         <span className={styles['value']}>
-          {formData?.multiplierTarget ?? '-'}
+          {formData?.oddsTarget ?? '-'}
           {t({ enUS: 'x', zhCN: 'x' })}
         </span>
-        <span className={styles['badge']}>{probabilityDesc}</span>
+        <span
+          className={styles['badge']}
+          style={{ color: probabilityDesc?.color }}
+        >
+          {probabilityDesc?.txt}
+        </span>
       </div>
     </div>
   );
@@ -337,13 +359,24 @@ const MultiplierTarget = () => {
 
 export const DIY = () => {
   const chainId = useWalletStore((state) => state.chainId);
-
   useEffect(() => {
     useDIYConfigState.fetchConfig(chainId);
-    useDIYState.initFormData(chainId);
   }, [chainId]);
 
   const formData = useDIYState((state) => state.formData[chainId]);
+  const config = useMemo(
+    () => useDIYConfigState.getConfig(chainId, formData || {}),
+    [chainId, formData],
+  );
+  const apyList = useDIYState((state) =>
+    useDIYState.getApyList(chainId, state),
+  );
+  const oddsList = useDIYState((state) =>
+    useDIYState.getOddsList(chainId, state),
+  );
+  useEffect(() => {
+    useDIYState.initFormData(chainId, config, apyList, oddsList);
+  }, [apyList, chainId, config, oddsList]);
 
   const riskType = formData?.riskType;
   return (
@@ -354,7 +387,7 @@ export const DIY = () => {
         <HowLong />
         <DepositToken />
         <RiskTolerance />
-        {riskType === RiskType.RISKY ? <MultiplierTarget /> : <ApyTarget />}
+        {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>
       <div className={styles['right']}>
         <DIYProductDisplay />

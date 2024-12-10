@@ -4,12 +4,17 @@
 
 .badge {
   margin: 0;
+  padding: 0 6px;
+  font-size: 12px;
+  border: 1px solid currentcolor;
+  border-radius: 3px;
+  white-space: nowrap;
 }
 
 .label {
-  margin: 0 0 16px;
+  margin: 0 0 min(16px, 3vw);
   line-height: 1.2em;
-  font-size: 16px;
+  font-size: min(16px, 3.6vw);
 }
 
 .input-wrapper {
@@ -20,24 +25,27 @@
 
   .value {
     @include bold;
-    font-size: 20px;
+
+    font-size: min(20px, 4.2vw);
+    white-space: nowrap;
 
     .unit {
       @include regular;
+
       font-size: 0.7em;
     }
   }
 
   :global {
     .radio-btn-group {
-      gap: 16px;
+      gap: min(16px, 2vw);
     }
 
     .radio-btn {
       width: fit-content;
-      height: 32px;
+      height: min(32px, 6.4vw);
       padding: 0 12px;
-      font-size: 16px;
+      font-size: min(16px, 3.6vw);
       white-space: nowrap;
 
       img,
@@ -49,14 +57,14 @@
 
     .progress-wrapper {
       flex: none;
-      width: 312px;
+      width: min(312px, 55vw);
     }
   }
 }
 
 .form-item {
   position: relative;
-  padding: 0 0 20px 34px;
+  padding: 0 0 min(16px, 3.6vw) min(34px, 6.4vw);
   margin: 0;
   counter-increment: step-counter;
 
@@ -102,4 +110,30 @@
   justify-content: space-between;
   align-items: stretch;
   margin: 0;
+}
+
+@mixin rewrite {
+  .badge {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin: 0 0 -24px;
+  }
+
+  .defi-mode-wrapper {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
 }

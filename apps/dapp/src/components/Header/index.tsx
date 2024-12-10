@@ -1,16 +1,15 @@
-import { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Dropdown } from '@douyinfe/semi-ui';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { joinUrl } from '@sofa/utils/url';
-import { useScroll } from 'ahooks';
 import classNames from 'classnames';
 
 import { Comp as Logo } from '@/assets/logo';
 import { EnvLinks } from '@/env-links';
 import { addI18nResources, LangSelector } from '@/locales';
+import { RootDomainPaths } from '@/route-guard';
 
 import IndexPrices from '../IndexPrices';
 import NetworkSelector from '../NetworkSelector';
@@ -26,27 +25,17 @@ import { Comp as IconMenu } from './assets/icon-menu.svg';
 import { Comp as IconPos } from './assets/icon-pos.svg';
 import { Comp as IconSOFA } from './assets/icon-sofa.svg';
 import { Comp as IconUsers } from './assets/icon-users.svg';
+import {
+  HomeHeader,
+  MenuItem,
+  RenderMenu,
+  useHeaderOpacity,
+} from './index-home';
 import locale from './locale';
 
 import styles from './index.module.scss';
 
 addI18nResources(locale, 'Header');
-
-declare const winScale: Global['winScale'];
-
-interface MenuItem {
-  path: string;
-  type?: 1 | 2;
-  target?: string;
-  icon?: ReactNode;
-  children?: MenuItem[];
-
-  label(t: TFunction): ReactNode;
-  desc?(t: TFunction): ReactNode;
-  group?(t: TFunction): string;
-
-  hide?(): boolean;
-}
 
 const allMenuItems = (project: ProjectType): MenuItem[] => {
   // 下面这行被注释掉的code 告诉 ai18n 下面的 t 都是在 Header 包下
@@ -155,7 +144,7 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
           icon: <IconSOFA />,
           label: (t: TFunction) =>
             t({ enUS: 'SOFA Points', zhCN: 'SOFA 积分' }),
-          path: '/points',
+          path: joinUrl(EnvLinks.config.VITE_SOFA_LINK, '/points'),
         },
         {
           icon: <IconBlog />,
@@ -172,36 +161,13 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
   ];
 };
 
-function useOpacity() {
-  const location = useLocation();
-  const disableOpacityChange = useMemo(
-    () => /strengths|faq/i.test(location.pathname),
-    [location.pathname],
-  );
-
-  const position = useScroll(
-    () => document.getElementById('root'),
-    () => !disableOpacityChange,
-  );
-  const opacity = useMemo(() => {
-    const scrollLen = /^\/$/i.test(location.pathname)
-      ? window.innerHeight * 4
-      : /products\/customize/i.test(location.pathname)
-        ? 100 / winScale
-        : 140 / winScale;
-    return !position?.top ? 0 : Math.min(1, position.top / scrollLen);
-  }, [location.pathname, position?.top]);
-
-  return disableOpacityChange ? 1 : opacity;
-}
-
-const Header = () => {
+const DappHeader = () => {
   const [t] = useTranslation('Header');
   const navigate = useNavigate();
   const location = useLocation();
   const [project] = useProjectChange(ProjectType.Surge);
 
-  const opacity = useOpacity();
+  const opacity = useHeaderOpacity();
 
   const menusForRender = useMemo(() => allMenuItems(project), [project]);
 
@@ -229,139 +195,9 @@ const Header = () => {
           />
         </div>
 
-        {menusForRender.map((it, i) => {
-          if (it.hide?.()) return <Fragment key={i} />;
-          if (it.path && !it.path.startsWith('http')) {
-            return (
-              <NavLink
-                key={i}
-                to={joinUrl(it.path, location.search)}
-                className={classNames(styles['link'], {
-                  [styles['active']]:
-                    it.path === '/'
-                      ? it.path === location.pathname
-                      : location.pathname.startsWith(
-                          it.path.replace(/\?.*$/, ''),
-                        ),
-                })}
-              >
-                {it.label(t)}
-                {it.icon ? (
-                  <span className={styles[`${it.icon}-icon`]} />
-                ) : undefined}
-              </NavLink>
-            );
-          }
-          if (!it.children) {
-            return (
-              <a
-                key={i}
-                href={joinUrl(it.path, `?project=${project}`)}
-                className={classNames(styles['link'])}
-                target={
-                  Env.isMetaMaskAndroid ||
-                  (Env.isTelegram &&
-                    it.path.includes('sofa.org') &&
-                    !it.path.includes('docs.sofa.org'))
-                    ? undefined
-                    : it.target
-                }
-                rel="noopener noreferrer"
-              >
-                {it.label(t)}
-                {it.icon ? (
-                  <span
-                    className={classNames(
-                      styles[`${it.icon}-icon`],
-                      `${it.icon}-icon`,
-                    )}
-                  />
-                ) : undefined}
-              </a>
-            );
-          }
-          const groups = it.children.reduce(
-            (pre, it) => {
-              const group = String(it.group?.(t));
-              if (!pre[group]) pre[group] = [];
-              pre[group].push(it);
-              return pre;
-            },
-            {} as Record<string, MenuItem[]>,
-          );
-          return (
-            <Dropdown
-              key={i}
-              trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
-              className={classNames(styles['nav-selector'], 'semi-always-dark')}
-              position={'bottomLeft'}
-              render={
-                <Dropdown.Menu className={styles['nav-selector-items']}>
-                  {Object.entries(groups).map(([group, children], _, arr) => {
-                    return (
-                      <Fragment key={group}>
-                        {arr.length > 1 && (
-                          <Dropdown.Title>{group}</Dropdown.Title>
-                        )}
-                        {children.map((m) => {
-                          if (it.hide?.()) return <Fragment key={m.path} />;
-                          return (
-                            <Dropdown.Item
-                              key={m.path}
-                              className={classNames(
-                                styles['nav-selector-item'],
-                              )}
-                              onClick={() => {
-                                window.location.href = m.path;
-                              }}
-                            >
-                              <span className="semi-select-option-text">
-                                {m.icon && (
-                                  <span
-                                    className={classNames(
-                                      styles[`icon`],
-                                      `icon`,
-                                    )}
-                                  >
-                                    {m.icon}
-                                  </span>
-                                )}
-                                <span className={styles['txt']}>
-                                  <span className={styles['txt-label']}>
-                                    {m.label(t)}
-                                  </span>
-                                  <span className={styles['txt-desc']}>
-                                    {m.desc?.(t)}
-                                  </span>
-                                </span>
-                              </span>
-                            </Dropdown.Item>
-                          );
-                        })}
-                      </Fragment>
-                    );
-                  })}
-                </Dropdown.Menu>
-              }
-            >
-              <a
-                className={classNames(styles['link'])}
-                href={it.path}
-                onClick={(e) => !it.path && e.preventDefault()}
-              >
-                {it.label(t)}
-                {it.icon && (
-                  <span
-                    className={classNames(
-                      styles[`${it.icon}-icon`],
-                      `${it.icon}-icon`,
-                    )}
-                  />
-                )}
-              </a>
-            </Dropdown>
-          );
-        })}
+        {menusForRender.map((it, i) => (
+          <RenderMenu {...it} key={i} />
+        ))}
       </nav>
       <aside className={styles['right']}>
         <LangSelector className={styles['lang-selector']} />
@@ -392,6 +228,12 @@ const Header = () => {
       </aside>
     </header>
   );
+};
+
+const Header = () => {
+  const location = useLocation();
+  if (RootDomainPaths.includes(location.pathname)) return <HomeHeader />;
+  return <DappHeader />;
 };
 
 export default Header;

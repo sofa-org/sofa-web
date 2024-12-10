@@ -2,18 +2,20 @@ import { ComponentType } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Env } from '@sofa/utils/env';
 
+export const RootDomainPaths = [
+  '/',
+  '/policy',
+  '/mechanism',
+  '/strengths',
+  '/rch',
+  '/points',
+];
+
 export const RouteGuard = (props: { Comp: ComponentType }) => {
-  if (Env.isTelegram) return <props.Comp />;
+  if (Env.isTelegram || Env.isDev) return <props.Comp />;
 
   const isDapp = /dapp\./i.test(location.origin);
-  const isDappPath = ![
-    '/',
-    '/policy',
-    '/mechanism',
-    '/strengths',
-    '/rch',
-    '/points',
-  ].includes(location.pathname);
+  const isDappPath = !RootDomainPaths.includes(location.pathname);
 
   if (isDapp && !isDappPath) {
     return <Navigate to={{ pathname: '/products', search: location.search }} />;

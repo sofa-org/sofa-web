@@ -1,7 +1,11 @@
-import { Tabs } from '@douyinfe/semi-ui';
+import { useMemo } from 'react';
+import { ProjectType } from '@sofa/services/base-type';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
+import { updateQuery } from '@sofa/utils/history';
+import { useQuery } from '@sofa/utils/hooks';
 
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
+import TopTabs from '@/components/TopTabs';
 
 import { Automator } from '../products/automator';
 import { ProductCustomize } from '../products/customize';
@@ -17,13 +21,23 @@ const tabs = [
     comp: () => <DIY />,
   },
   {
-    label: (t: TFunction) => t({ enUS: 'Follow The Best', zhCN: '跟单' }),
+    label: (t: TFunction) => (
+      <>
+        {ProjectTypeRefs[ProjectType.Automator].icon}
+        {t({ enUS: 'Follow The Best', zhCN: '跟单' })}
+      </>
+    ),
     icon: ProjectTypeRefs.Automator.icon,
     value: 'automator',
     comp: () => <Automator onlyForm className={styles['automator']} />,
   },
   {
-    label: (t: TFunction) => t({ enUS: 'Customize', zhCN: '自定义' }),
+    label: (t: TFunction) => (
+      <>
+        {ProjectTypeRefs[ProjectType.Earn].icon}
+        {t({ enUS: 'Customize', zhCN: '自定义' })}
+      </>
+    ),
     icon: ProjectTypeRefs.Earn.icon,
     value: 'customize',
     comp: () => <ProductCustomize onlyForm className={styles['automator']} />,
@@ -33,21 +47,35 @@ const tabs = [
 const Index = () => {
   const [t] = useTranslation('DefiMode');
 
+  const { mode } = useQuery();
+
+  const options = useMemo(
+    () =>
+      tabs.map((it) => ({
+        ...it,
+        label: it.label(t),
+      })),
+    [t],
+  );
+
+  const tab = useMemo(
+    () => tabs.find((it) => it.value === mode) || tabs[0],
+    [mode],
+  );
+
   return (
-    <div className={styles['container']}>
-      <Tabs className={styles['tabs']} lazyRender>
-        {tabs.map((it) => (
-          <Tabs.TabPane
-            key={it.value}
-            itemKey={it.value}
-            icon={it.icon}
-            tab={it.label(t)}
-          >
-            {it.comp()}
-          </Tabs.TabPane>
-        ))}
-      </Tabs>
-    </div>
+    <TopTabs
+      bannerClassName={styles['banner']}
+      tabClassName={styles['tabs']}
+      className={styles['content']}
+      contentDecorationClassName={styles['decoration']}
+      banner={<></>}
+      value={mode as string}
+      options={options}
+      onChange={(v) => updateQuery({ mode: v })}
+    >
+      {tab.comp()}
+    </TopTabs>
   );
 };
 

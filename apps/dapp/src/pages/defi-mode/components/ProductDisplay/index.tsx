@@ -1,11 +1,14 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spin, Toast } from '@douyinfe/semi-ui';
 import { RiskType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
+import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
+import { simplePlus } from '@sofa/utils/object';
 import { useRequest } from 'ahooks';
+import classNames from 'classnames';
 
 import AsyncButton from '@/components/AsyncButton';
 import {
@@ -21,6 +24,7 @@ import {
   RecommendedCardItem,
 } from '@/pages/products/components/RecommendedCard';
 
+import { Comp as IconExpand } from '../../assets/icon-expand.svg';
 import { Comp as IconRefresh } from '../../assets/icon-refresh.svg';
 import { useDIYState } from '../DIY/store';
 
@@ -33,17 +37,14 @@ export const DIYProductDisplay = () => {
   const chainId = useWalletStore((state) => state.chainId);
   const formData = useDIYState((state) => state.formData[chainId]);
 
-  const quote = useDIYState((state) => state.selectedQuote);
+  const quote = useDIYState((state) => state.selectedQuote[0]);
 
-  const { refresh } = useRequest(
-    () => useDIYState.fetchRecommendedList(chainId),
-    {
-      refreshDeps: [chainId, formData],
-      pollingInterval: 60000,
-      debounceWait: 500,
-      onError: (err) => Toast.error(`Fetch error: ${getErrorMsg(err)}`),
-    },
-  );
+  useRequest(() => useDIYState.fetchRecommendedList(chainId), {
+    refreshDeps: [chainId, formData],
+    pollingInterval: 5 * MsIntervals.min,
+    debounceWait: 500,
+    onError: (err) => Toast.error(`Fetch error: ${getErrorMsg(err)}`),
+  });
 
   const riskRef = quote?.vault.riskType && RiskTypeRefs[quote.vault.riskType];
   const productRef =
@@ -60,10 +61,26 @@ export const DIYProductDisplay = () => {
 
   const investModalRef = useRef<InvestModalPropsRef>(null);
 
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <Spin wrapperClassName={styles['diy-product']} spinning={!quote}>
+    <Spin
+      wrapperClassName={classNames(styles['diy-product'], {
+        [styles['expanded']]: expanded,
+      })}
+      spinning={!quote}
+    >
       <div className={styles['title']}>
         {t({ enUS: 'Optimizer', zhCN: '产品' })}
+        <span className={styles['apy']}>
+          {displayPercentage(
+            simplePlus(quote?.apyInfo?.rch, quote?.apyInfo?.max),
+          )}
+          <IconExpand
+            className={styles['icon-expand']}
+            onClick={() => setExpanded((pre) => !pre)}
+          />
+        </span>
       </div>
       <div className={styles['risk-type']}>
         {riskRef?.icon}
@@ -102,7 +119,7 @@ export const DIYProductDisplay = () => {
         >
           {t({ enUS: 'BUY', zhCN: '买' })}
         </AsyncButton>
-        <AsyncButton onClick={() => refresh()}>
+        <AsyncButton onClick={() => useDIYState.selectQuote(chainId)}>
           <IconRefresh />
           {t({ enUS: 'Re-Generate', zhCN: '重新推荐' })}
         </AsyncButton>

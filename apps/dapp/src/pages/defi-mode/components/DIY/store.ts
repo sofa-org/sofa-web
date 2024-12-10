@@ -7,6 +7,8 @@ import {
   ProductsDIYService,
 } from '@sofa/services/products-diy';
 import { next8h } from '@sofa/utils/expiry';
+import { getNearestItemIndex, isLegalNum } from '@sofa/utils/fns';
+import { simplePlus } from '@sofa/utils/object';
 import { isEqual, omit, pick } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
@@ -25,7 +27,7 @@ export interface DIYFormData
   > {
   expiry: number; // 毫秒
   apyTarget: number;
-  multiplierTarget: number;
+  oddsTarget: number;
 }
 
 export const useDIYConfigState = Object.assign(
@@ -61,70 +63,87 @@ export const useDIYConfigState = Object.assign(
     ) => {
       const vaults = ProductsService.filterVaults(
         ContractsService.vaults,
-        {
-          chainId,
-          ...formData,
-        },
+        { chainId, ...formData },
         false,
         true,
       );
       const config = $config ?? useDIYConfigState.getState().configs[chainId];
-      return config?.find((it) => vaults.some(($it) => $it.vault === it.vault));
+      return config?.find((it) =>
+        vaults.some(
+          ($it) => $it.vault.toLowerCase() === it.vault.toLowerCase(),
+        ),
+      );
     },
   },
 );
 
-export const useDIYState = Object.assign(
-  createWithEqualityFn(
-    persist(
-      () => ({
-        formData: {} as Record<
-          number /* chainId */,
-          Partial<DIYFormData> | undefined
-        >,
-        selectedQuote: null as ProductQuoteResult | null,
-        selectedQuoteProbability: null as {
-          productType: ProductType;
-          anchorPrices: (string | number)[];
-          probability: number;
-        } | null,
-      }),
-      {
-        name: 'diy-state',
-        storage: createJSONStorage(() => localStorage),
-      },
-    ),
-  ),
-  {
-    getVaultOptions: (
-      filters: Partial<VaultInfo>,
-      fields: (keyof VaultInfo)[],
-    ) => {
-      const vaults = ProductsService.filterVaults(
-        ContractsService.vaults,
-        omit(filters, fields),
-        false,
-        true,
-      );
-      const genKey = (it: VaultInfo) => fields.map((k) => it[k]).join('-');
-      return ContractsService.vaults
-        .filter((it) => it.chainId === filters.chainId)
-        .reduce(
-          (pre, it) => {
-            const key = genKey(it);
-            if (pre.every((it) => it.key !== key))
-              pre.push({ key, data: pick(it, fields) });
-            return pre;
-          },
-          [] as { key: string; data: Partial<VaultInfo> }[],
-        )
-        .map((it) => ({
-          ...it,
-          disabled: vaults.every(($it) => genKey($it) !== it.key),
-        }));
+const instant = createWithEqualityFn(
+  persist(
+    () => ({
+      formData: {} as Record<
+        number /* chainId */,
+        Partial<DIYFormData> | undefined
+      >,
+      selectedQuote: [null, 0, 0] as [
+        ProductQuoteResult | null,
+        number /* index */,
+        number /* refresh - count */,
+      ],
+      selectedQuoteProbability: null as {
+        productType: ProductType;
+        anchorPrices: (string | number)[];
+        probability: number;
+      } | null,
+      quotes: {} as Record<
+        `${VaultInfo['chainId']}-${VaultInfo['vault']}-${DIYFormData['expiry']}`,
+        {
+          keys: ReturnType<typeof ProductsService.productKey>[];
+          apyRange: [number, number];
+          oddsRange: [number, number];
+        }
+      >,
+    }),
+    {
+      name: 'diy-state',
+      storage: createJSONStorage(() => localStorage),
     },
-    fetchRecommendedList: async (chainId: number) => {
-      const formData = useDIYState.getState().formData[chainId];
+  ),
+  isEqual,
+);
+
+export const useDIYState = Object.assign(instant, {
+  getVaultOptions: (
+    filters: Partial<VaultInfo>,
+    fields: (keyof VaultInfo)[],
+  ) => {
+    const vaults = ProductsService.filterVaults(
+      ContractsService.vaults,
+      omit(filters, fields),
+      false,
+      true,
+    );
+    const genKey = (it: VaultInfo) => fields.map((k) => it[k]).join('-');
+    return ContractsService.vaults
+      .filter((it) => it.chainId === filters.chainId)
+      .reduce(
+        (pre, it) => {
+          const key = genKey(it);
+          if (pre.every((it) => it.key !== key))
+            pre.push({ key, data: pick(it, fields) });
+          return pre;
+        },
+        [] as { key: string; data: Partial<VaultInfo> }[],
+      )
+      .map((it) => ({
+        ...it,
+        disabled: vaults.every(($it) => genKey($it) !== it.key),
+      }));
+  },
+  validateFormData: (
+    formData?: Partial<DIYFormData>,
+    throwError?: boolean,
+  ): formData is XPartial<DIYFormData, 'apyTarget' | 'oddsTarget'> => {
+    try {
       if (
         !formData ||
         (['forCcy', 'domCcy', 'trackingSource'] as const).some(
@@ -145,178 +164,306 @@ export const useDIYState = Object.assign(
       if ((['riskType'] as const).some((k) => !formData[k])) {
         throw new Error('Please choose your risk tolerance');
       }
-      if (formData.riskType === RiskType.RISKY) {
-        if (!formData.multiplierTarget)
-          throw new Error('Please choose your payout multiplier target');
-      } else {
-        if (!formData.apyTarget)
-          throw new Error('Please choose your apy target');
-      }
-      const vaults = ProductsService.filterVaults(
-        ContractsService.vaults,
-        {
-          chainId,
-          ...formData,
-        },
-        false,
-        true,
-      );
-      return ProductsDIYService.recommendList({
-        chainId,
-        vaults: vaults.map((it) => it.vault).join(','), // 合约组合，以","区分
-        apyPercentage: formData.apyTarget!, // 年化百分比
-        payoutMultiple: formData.multiplierTarget, // surge必填
-        expiryDateTime: formData.expiry! / 1000, // 选择的到期日
-      }).then((res) => {
-        useDIYState.selectQuote(res[Math.floor(Math.random() * res.length)]);
-        useProductsState.updateQuotes(res);
-        return res;
-      });
-    },
-    selectQuote: (quote: ProductQuoteResult) => {
-      useDIYState.setState({ selectedQuote: quote });
-    },
-    initFormData: (chainId: number, config?: ProductsDIYConfig) => {
-      const defaultFormData: DIYFormData = {
-        forCcy: 'WBTC',
-        domCcy: 'USD',
-        depositCcy: 'USDT',
-        productType: ProductType.BullSpread,
-        riskType: RiskType.PROTECTED,
-        apyTarget: 0.15,
-        multiplierTarget: 4,
-        expiry: next8h(undefined, 7),
-        trackingSource: 'COINBASE',
-      };
-      return useDIYState.setState((pre) => {
-        const formData = pre.formData[chainId];
-        const data = {
-          ...defaultFormData,
-          ...formData,
-          expiry:
-            Number(formData?.expiry) >= next8h(undefined, 2)
-              ? formData!.expiry
-              : defaultFormData.expiry,
-          apyTarget: formData?.apyTarget ?? defaultFormData.apyTarget,
-          multiplierTarget:
-            formData?.multiplierTarget ?? defaultFormData.multiplierTarget,
-        };
-        const apyList = config?.apyList;
-        const multiplierList = config?.payoutMultiples;
-        const expiryList = config?.expiryDateTimes;
-        return {
-          ...pre,
-          formData: {
-            ...pre.formData,
-            [chainId]: {
-              ...data,
-              apyTarget:
-                data.apyTarget && apyList?.length
-                  ? Math.max(
-                      apyList[0],
-                      Math.min(apyList[apyList.length - 1], data.apyTarget),
-                    )
-                  : data.apyTarget,
-              multiplierTarget:
-                data.multiplierTarget && multiplierList?.length
-                  ? Math.max(
-                      multiplierList[0],
-                      Math.min(
-                        multiplierList[multiplierList.length - 1],
-                        data.multiplierTarget,
-                      ),
-                    )
-                  : data.multiplierTarget,
-              expiry:
-                data.expiry && expiryList?.length
-                  ? Math.max(
-                      expiryList[0],
-                      Math.min(expiryList[expiryList.length - 1], data.expiry),
-                    )
-                  : data.expiry,
-            },
-          },
-        };
-      });
-    },
-    updateVaultOptions: (
-      chainId: number,
-      formData: Partial<
-        Pick<
-          VaultInfo,
-          | 'forCcy'
-          | 'domCcy'
-          | 'trackingSource'
-          | 'depositCcy'
-          | 'productType'
-          | 'riskType'
-        >
-      >,
-    ) => {
-      useDIYState.setState((pre) => {
-        if (
-          pre.formData[chainId] &&
-          Object.keys(formData).every(
-            (k) =>
-              formData[k as keyof typeof formData] ===
-              pre.formData[chainId]![k as keyof typeof formData],
-          )
-        )
-          return pre;
-        return {
-          ...pre,
-          formData: {
-            ...pre.formData,
-            [chainId]: { ...pre.formData[chainId], ...formData },
-          },
-          selectedQuote: undefined,
-          selectedQuoteProbabilities: undefined,
-        };
-      });
-    },
-    updateExpiry: (chainId: number, expiry: number) => {
-      useDIYState.setState((pre) => {
-        if (pre.formData[chainId]?.expiry === expiry) return pre;
-        return {
-          ...pre,
-          formData: {
-            ...pre.formData,
-            [chainId]: { ...pre.formData[chainId], expiry },
-          },
-          selectedQuote: undefined,
-          selectedQuoteProbabilities: undefined,
-        };
-      });
-    },
-    updateApyTarget: (chainId: number, apyTarget: number) => {
-      useDIYState.setState((pre) => {
-        if (pre.formData[chainId]?.apyTarget === apyTarget) return pre;
-        return {
-          ...pre,
-          formData: {
-            ...pre.formData,
-            [chainId]: { ...pre.formData[chainId], apyTarget },
-          },
-          selectedQuote: undefined,
-          selectedQuoteProbabilities: undefined,
-        };
-      });
-    },
-    updateMultipleTarget: (chainId: number, multiplierTarget: number) => {
-      useDIYState.setState((pre) => {
-        if (pre.formData[chainId]?.multiplierTarget === multiplierTarget)
-          return pre;
-        return {
-          ...pre,
-          formData: {
-            ...pre.formData,
-            [chainId]: { ...pre.formData[chainId], multiplierTarget },
-          },
-          selectedQuote: undefined,
-          selectedQuoteProbabilities: undefined,
-        };
-      });
-    },
+    } catch (e) {
+      if (throwError) throw e;
+      return false;
+    }
+    return true;
   },
-  isEqual,
-);
+  fetchRecommendedList: async (chainId: number) => {
+    const formData = useDIYState.getState().formData[chainId];
+    if (!useDIYState.validateFormData(formData)) return;
+    const vaults = ProductsService.filterVaults(
+      ContractsService.vaults,
+      { chainId, ...formData },
+      false,
+      true,
+    );
+    return ProductsDIYService.recommendList({
+      chainId,
+      vaults: vaults.map((it) => it.vault).join(','), // 合约组合，以","区分
+      expiryDateTime: formData.expiry! / 1000, // 选择的到期日
+    }).then((res) => {
+      useDIYState.updateQuotes(res);
+      setTimeout(() => useDIYState.selectQuote(chainId, true), 100);
+      return res;
+    });
+  },
+  updateQuotes: (quotes: ProductQuoteResult[]) => {
+    useProductsState.updateQuotes(quotes);
+    useDIYState.setState((pre) => ({
+      quotes: {
+        ...pre.quotes,
+        ...quotes.reduce(
+          (pre, it) => {
+            const key = `${it.vault.chainId}-${it.vault.vault.toLowerCase()}-${
+              it.expiry
+            }` as const;
+            if (!pre[key])
+              pre[key] = {
+                keys: [],
+                apyRange: [Infinity, -100],
+                oddsRange: [Infinity, 0],
+              };
+            pre[key].keys.push(ProductsService.productKey(it));
+            const apy = (() => {
+              const v = simplePlus(it.apyInfo?.rch, it.apyInfo?.max);
+              if (!v) return v;
+              return Math.round(v * 100) / 100;
+            })();
+            if (isLegalNum(apy)) {
+              pre[key].apyRange[0] = Math.min(pre[key].apyRange[0], apy);
+              pre[key].apyRange[1] = Math.max(pre[key].apyRange[1], apy);
+            }
+            const odds = (() => {
+              const v = simplePlus(it.oddsInfo?.rch, it.oddsInfo?.max);
+              if (!v) return v;
+              return Math.round(v);
+            })();
+            if (isLegalNum(odds)) {
+              pre[key].oddsRange[0] = Math.min(pre[key].oddsRange[0], odds);
+              pre[key].oddsRange[1] = Math.max(pre[key].oddsRange[1], odds);
+            }
+            return pre;
+          },
+          {} as typeof pre.quotes,
+        ),
+      },
+    }));
+  },
+  selectQuote: async (chainId: number, resetIndex?: boolean) => {
+    const pre = useDIYState.getState();
+    const formData = pre.formData[chainId];
+    if (!useDIYState.validateFormData(formData)) return;
+
+    if (!resetIndex && pre.selectedQuote[2] >= 3)
+      return useDIYState.fetchRecommendedList(chainId);
+
+    const quoteInfos = useProductsState.getState().quoteInfos;
+    const vaults = ProductsService.filterVaults(
+      ContractsService.vaults,
+      { chainId, ...formData },
+      false,
+      true,
+    );
+    const keys = vaults.map(
+      (it) =>
+        `${it.chainId}-${it.vault.toLowerCase()}-${
+          formData.expiry / 1000
+        }` as const,
+    );
+    const quotes = keys
+      .flatMap((k) => pre.quotes[k]?.keys || [])
+      .map((k) => quoteInfos[k])
+      .filter((it) => !!it) as ProductQuoteResult[];
+    const { sortList, index } = (() => {
+      if (formData.riskType === RiskType.RISKY) {
+        if (!formData.oddsTarget)
+          throw new Error(`Invalid oddsTarget(${formData.oddsTarget})`);
+        return getNearestItemIndex(quotes, formData.oddsTarget, {
+          calcCompareNum: (it) =>
+            simplePlus(it.oddsInfo?.max, it.oddsInfo?.rch) || 0,
+        });
+      }
+      if (!formData.apyTarget)
+        throw new Error(`Invalid apyTarget(${formData.apyTarget})`);
+      return getNearestItemIndex(quotes, formData.apyTarget, {
+        calcCompareNum: (it) =>
+          simplePlus(it.apyInfo?.max, it.apyInfo?.rch) || 0,
+      });
+    })();
+
+    const [quote, nIndex] = (() => {
+      if (resetIndex) return [sortList[index], index];
+      let i = 0;
+      while (!sortList[index + [1, -1, 2, -2][pre.selectedQuote[2] + i]]) {
+        i += 1;
+      }
+      const quoteIndex = index + [1, -1, 2, -2][pre.selectedQuote[2] + i];
+      return [sortList[quoteIndex], quoteIndex];
+    })();
+
+    if (!quote) return useDIYState.fetchRecommendedList(chainId);
+    useDIYState.setState({
+      selectedQuote: [quote, nIndex, resetIndex ? 0 : pre.selectedQuote[2] + 1],
+    });
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getApyList: (chainId: number, $state?: any) => {
+    const state: ReturnType<typeof useDIYState.getState> =
+      $state ?? useDIYState.getState();
+    const formData = state.formData[chainId];
+    if (!useDIYState.validateFormData(formData, false)) return [0, 5];
+    const vaults = ProductsService.filterVaults(
+      ContractsService.vaults,
+      formData,
+      false,
+      true,
+    );
+    return vaults.flatMap(
+      (it) =>
+        state.quotes[
+          `${it.chainId}-${it.vault.toLowerCase()}-${formData.expiry / 1000}`
+        ]?.apyRange || [],
+    );
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getOddsList: (chainId: number, $state?: any) => {
+    const state: ReturnType<typeof useDIYState.getState> =
+      $state ?? useDIYState.getState();
+    const formData = state.formData[chainId];
+    if (!useDIYState.validateFormData(formData, false)) return [0, 10];
+    const vaults = ProductsService.filterVaults(
+      ContractsService.vaults,
+      formData,
+      false,
+      true,
+    );
+    return vaults.flatMap(
+      (it) =>
+        state.quotes[
+          `${it.chainId}-${it.vault.toLowerCase()}-${formData.expiry / 1000}`
+        ]?.oddsRange || [],
+    );
+  },
+  initFormData: (
+    chainId: number,
+    config?: ProductsDIYConfig,
+    apyList?: number[],
+    oddsList?: number[],
+  ) => {
+    const defaultFormData: DIYFormData = {
+      forCcy: 'WBTC',
+      domCcy: 'USD',
+      depositCcy: 'USDT',
+      productType: ProductType.BullSpread,
+      riskType: RiskType.PROTECTED,
+      apyTarget: 0.15,
+      oddsTarget: 4,
+      expiry: next8h(undefined, 7),
+      trackingSource: 'COINBASE',
+    };
+    return useDIYState.setState((pre) => {
+      const formData = pre.formData[chainId];
+      const data = {
+        ...defaultFormData,
+        ...formData,
+        expiry:
+          Number(formData?.expiry) >= next8h(undefined, 2)
+            ? formData!.expiry!
+            : defaultFormData.expiry,
+        apyTarget: formData?.apyTarget ?? defaultFormData.apyTarget,
+        oddsTarget: formData?.oddsTarget ?? defaultFormData.oddsTarget,
+      };
+      const expiryList = config?.expiryDateTimes;
+      const expiry =
+        data.expiry && expiryList?.length
+          ? Math.max(
+              expiryList[0] * 1000,
+              Math.min(expiryList[expiryList.length - 1] * 1000, data.expiry),
+            )
+          : data.expiry || next8h(undefined, 7);
+      return {
+        ...pre,
+        formData: {
+          ...pre.formData,
+          [chainId]: {
+            ...data,
+            expiry,
+            apyTarget:
+              data.apyTarget && apyList?.length
+                ? Math.max(
+                    apyList[0],
+                    Math.min(apyList[apyList.length - 1], data.apyTarget),
+                  )
+                : data.apyTarget,
+            oddsTarget:
+              data.oddsTarget && oddsList?.length
+                ? Math.max(
+                    oddsList[0],
+                    Math.min(oddsList[oddsList.length - 1], data.oddsTarget),
+                  )
+                : data.oddsTarget,
+          },
+        },
+      };
+    });
+  },
+  updateVaultOptions: (
+    chainId: number,
+    formData: Partial<
+      Pick<
+        VaultInfo,
+        | 'forCcy'
+        | 'domCcy'
+        | 'trackingSource'
+        | 'depositCcy'
+        | 'productType'
+        | 'riskType'
+      >
+    >,
+  ) => {
+    useDIYState.setState((pre) => {
+      if (
+        pre.formData[chainId] &&
+        Object.keys(formData).every(
+          (k) =>
+            formData[k as keyof typeof formData] ===
+            pre.formData[chainId]![k as keyof typeof formData],
+        )
+      )
+        return pre;
+      return {
+        ...pre,
+        formData: {
+          ...pre.formData,
+          [chainId]: { ...pre.formData[chainId], ...formData },
+        },
+        selectedQuote: [null, 0, 0],
+        selectedQuoteProbabilities: undefined,
+      };
+    });
+  },
+  updateExpiry: (chainId: number, expiry: number) => {
+    useDIYState.setState((pre) => {
+      if (pre.formData[chainId]?.expiry === expiry) return pre;
+      return {
+        ...pre,
+        formData: {
+          ...pre.formData,
+          [chainId]: { ...pre.formData[chainId], expiry },
+        },
+        selectedQuote: [null, 0, 0],
+        selectedQuoteProbabilities: undefined,
+      };
+    });
+  },
+  updateApyTarget: (chainId: number, apyTarget: number) => {
+    useDIYState.setState((pre) => {
+      if (pre.formData[chainId]?.apyTarget === apyTarget) return pre;
+      return {
+        ...pre,
+        formData: {
+          ...pre.formData,
+          [chainId]: { ...pre.formData[chainId], apyTarget },
+        },
+        selectedQuote: [null, 0, 0],
+        selectedQuoteProbabilities: undefined,
+      };
+    });
+  },
+  updateMultipleTarget: (chainId: number, oddsTarget: number) => {
+    useDIYState.setState((pre) => {
+      if (pre.formData[chainId]?.oddsTarget === oddsTarget) return pre;
+      return {
+        ...pre,
+        formData: {
+          ...pre.formData,
+          [chainId]: { ...pre.formData[chainId], oddsTarget },
+        },
+        selectedQuote: [null, 0, 0],
+        selectedQuoteProbabilities: undefined,
+      };
+    });
+  },
+});

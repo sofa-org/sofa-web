@@ -23,7 +23,8 @@ declare type PartialRequired<
 > = Partial<T> & Required<Pick<T, Keys>>;
 
 declare type XPartial<
-  T extends Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends Record<string, any>,
   Keys extends keyof T,
 > = Omit<T, Keys> & Partial<Pick<T, Keys>>;
 

@@ -119,7 +119,8 @@ export const useProductsState = Object.assign(
           ...Object.fromEntries(
             dirtyArrayOmit(
               Object.entries(pre.quoteInfos),
-              (it) => !it[1] || it[1].quote.deadline * 1000 <= Date.now(),
+              (it) =>
+                !it[1] || it[1].quote.deadline * 1000 - 30 * 1000 <= Date.now(),
             ),
           ),
           ...Object.fromEntries(

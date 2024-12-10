@@ -18,6 +18,7 @@ export interface TopTabsProps extends BaseInputProps<string | number> {
   suffix?: ReactNode;
   bannerClassName?: string;
   tabClassName?: string;
+  contentDecorationClassName?: string;
   sticky?: boolean;
 }
 
@@ -98,6 +99,7 @@ const TopTabs = (props: TopTabsProps) => {
         className={classNames(
           'top-tabs-content-decoration',
           styles['top-tabs-content-decoration'],
+          props.contentDecorationClassName,
           {
             'top-btn-tabs-content-decoration': props.type === 'btn',
             [styles['top-btn-tabs-content-decoration']]: props.type === 'btn',

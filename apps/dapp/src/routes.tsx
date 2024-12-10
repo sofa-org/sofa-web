@@ -11,7 +11,7 @@ const Points = React.lazy(() => import('@/pages/points'));
 const Mechanism = React.lazy(() => import('@/pages/mechanism'));
 const Advantages = React.lazy(() => import('@/pages/advantages'));
 const OrderHistory = React.lazy(() => import('@/pages/history'));
-const DefiMode = React.lazy(() => import('@/pages/defi-mode'));
+const Products = React.lazy(() => import('@/pages/products'));
 
 export const routes: {
   path: string;
@@ -52,7 +52,7 @@ export const routes: {
   },
   {
     path: '/products',
-    Component: DefiMode,
+    Component: Products,
   },
   {
     path: '/products/customize',

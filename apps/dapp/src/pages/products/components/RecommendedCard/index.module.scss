@@ -334,13 +334,13 @@
     display: none;
   }
 
-  .product {
+  .product:not(.no-hover) {
     @include gradient-border(1px, #fff, 12px);
 
     opacity: 1;
   }
 
-  .risky {
+  .risky:not(.no-hover) {
     @include gradient-border(1px, #52d216, 12px);
 
     opacity: 1;
