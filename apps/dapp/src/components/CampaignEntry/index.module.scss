@@ -56,3 +56,21 @@
     }
   }
 }
+
+@mixin rewrite {
+  .campaign-entry {
+    display: none;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

@@ -123,9 +123,20 @@
   }
 }
 
+@mixin rewrite {
+  .only-form {
+    margin: 60px 0 0;
+  }
+}
+
 @media (orientation: portrait) {
-  .section-top.section-top {
-    flex-direction: column-reverse;
-    margin: 0 auto;
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
   }
 }

@@ -55,7 +55,10 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
   return (
     <TopTabs
       type={'banner-expandable'}
-      className={classNames({ [styles['only-form']]: props.onlyForm })}
+      className={classNames(
+        { [styles['only-form']]: props.onlyForm },
+        props.className,
+      )}
       banner={
         !props.onlyForm && (
           <>

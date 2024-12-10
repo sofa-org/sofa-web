@@ -95,3 +95,61 @@ export function calcMinAndMax(
     ),
   };
 }
+
+export function getNearestItemIndex<T>(
+  list: T[],
+  referNum: number,
+  options?: {
+    useGte?: boolean;
+    useLte?: boolean;
+    calcCompareNum?(item: T): number;
+  },
+) {
+  if (!list?.length) return { sortList: [], index: -1 };
+  const calc = options?.calcCompareNum || Number;
+  const $list = [...list].sort((a, b) => calc(a) - calc(b));
+
+  // 二分法
+  // 变量：leftCursor - 左边的索引，rightCursor - 右边的索引
+  // 比较左右索引的中间元素与 referNum：
+  //    如果中间元素比 referNum 大，则将 rightCursor 修改为中间元素的索引;
+  //    如果中间元素比 referNum 小，则将 leftCursor 修改为中间元素的索引;
+  //    如果中间元素与 referNum 相等，直接返回;
+  // 直到 leftCursor 与 rightCursor 之间没有中间元素了
+  const index = (() => {
+    let leftCursor = 0;
+    let rightCursor = $list.length - 1;
+    while (rightCursor - leftCursor > 1) {
+      const middle = Math.floor((rightCursor + leftCursor) / 2);
+      const offset = referNum - calc($list[middle]);
+      if (offset === 0) return middle;
+      else if (offset < 0) rightCursor = middle;
+      else leftCursor = middle;
+    }
+    const leftOffset = referNum - calc($list[leftCursor]);
+    const rightOffset = referNum - calc($list[rightCursor]);
+    if (leftOffset === 0) return leftCursor;
+    if (leftOffset < 0) return options?.useLte ? -1 : leftCursor;
+    if (rightOffset === 0) return rightCursor;
+    if (rightOffset > 0) return options?.useGte ? rightCursor + 1 : rightCursor;
+    if (options?.useGte) return rightCursor;
+    if (options?.useLte) return leftCursor;
+    return Math.abs(leftOffset) <= Math.abs(rightOffset)
+      ? leftCursor
+      : rightCursor;
+  })();
+  return { sortList: $list, index };
+}
+
+export function getNearestItem<T>(
+  list: T[],
+  referNum: number,
+  options?: {
+    useGte?: boolean;
+    useLte?: boolean;
+    calcCompareNum?(item: T): number;
+  },
+): T | undefined {
+  const { sortList, index } = getNearestItemIndex(list, referNum, options);
+  return sortList[index];
+}

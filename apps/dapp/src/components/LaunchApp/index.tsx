@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import { Popover } from '@douyinfe/semi-ui';
 import { useTranslation } from '@sofa/services/i18n';
 import { useIsPortrait } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
+import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
 
 import { C_Select } from '../CSelect';
@@ -50,37 +50,38 @@ const LaunchApp = (props: BaseProps) => {
 
   if (!isPortrait)
     return (
-      <Popover
-        content={
-          <>
-            {options.map((it) => (
-              <a
-                className={classNames(styles['option'], {
-                  [styles['disabled']]: !it.value,
-                })}
-                href={it.value}
-                key={it.value}
-                onClick={(e) => !it.value && e.preventDefault()}
-              >
-                {it.label}
-              </a>
-            ))}
-          </>
-        }
-        contentClassName={styles['options']}
-        trigger="hover"
+      // <Popover
+      //   content={
+      //     <>
+      //       {options.map((it) => (
+      //         <a
+      //           className={classNames(styles['option'], {
+      //             [styles['disabled']]: !it.value,
+      //           })}
+      //           href={it.value}
+      //           key={it.value}
+      //           onClick={(e) => !it.value && e.preventDefault()}
+      //         >
+      //           {it.label}
+      //         </a>
+      //       ))}
+      //     </>
+      //   }
+      //   contentClassName={styles['options']}
+      //   trigger="hover"
+      // >
+      <span
+        className={classNames(
+          styles['launch-app'],
+          styles['btn'],
+          'bg-gradient',
+        )}
+        style={props.style}
+        onClick={() => window.open(EnvLinks.config.VITE_EARN_LINK, '_blank')}
       >
-        <span
-          className={classNames(
-            styles['launch-app'],
-            styles['btn'],
-            'bg-gradient',
-          )}
-          style={props.style}
-        >
-          {t('LAUNCH APP')}
-        </span>
-      </Popover>
+        {t('LAUNCH APP')}
+      </span>
+      // </Popover>
     );
 
   return (

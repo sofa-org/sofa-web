@@ -6,7 +6,6 @@
     "lint:js": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 6 --fix",
     "lint:css": "stylelint \"./**/*.{css,less,scss,sass}\" --max-warnings 6 --fix",
     "lint": "pnpm lint:js && pnpm lint:css",
-    "lint-staged": "npx lint-staged",
     "test": "pnpm nx run @sofa/utils:test",
     "extract:lang": "node lang-extractor.mjs",
     "prepare": "husky install"
