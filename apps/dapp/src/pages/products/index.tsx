@@ -23,6 +23,8 @@ import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
+import DefiMode from '../defi-mode';
+
 import { ProductsFixedNav } from './components/FixedNav';
 import { FlowEarn } from './components/FlowEarn';
 import { FlowSurge } from './components/FlowSurge';
@@ -194,6 +196,6 @@ const Index = () => {
 
 const Comp = () => {
   const [project] = useProjectChange();
-  return project === ProjectType.Automator ? <Automator /> : <Index />;
+  return project === ProjectType.Automator ? <Automator /> : <DefiMode />;
 };
 export default Comp;
