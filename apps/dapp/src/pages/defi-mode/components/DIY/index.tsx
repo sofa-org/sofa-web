@@ -233,7 +233,6 @@ const ApyTarget = () => {
   const [min, ...rest] = useDIYState((state) =>
     useDIYState.getApyList(chainId, state),
   );
-  const middle = rest.slice(0, rest.length - 1);
   const max = rest[rest.length - 1];
 
   const percentage = useMemo(
@@ -242,12 +241,14 @@ const ApyTarget = () => {
   );
   const probabilityDesc = useMemo(() => {
     if (!formData?.apyTarget) return undefined;
-    if (formData?.apyTarget < 0.15)
+    const low = min + (max - min) * 0.2;
+    const high = min + (max - min) * 0.8;
+    if (formData?.apyTarget < low)
       return {
         txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),
         color: '#49AA19',
       };
-    if (formData?.apyTarget < 0.5)
+    if (formData?.apyTarget < high)
       return {
         txt: t({ enUS: 'Neutral', zhCN: '中性概率' }),
         color: '#177DDC',
@@ -256,7 +257,7 @@ const ApyTarget = () => {
       txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
       color: '#CD8E8E',
     };
-  }, [formData?.apyTarget, t]);
+  }, [formData?.apyTarget, max, min, t]);
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
@@ -299,7 +300,6 @@ const OddsTarget = () => {
   const [min, ...rest] = useDIYState((state) =>
     useDIYState.getOddsList(chainId, state),
   );
-  const middle = rest.slice(0, rest.length - 1);
   const max = rest[rest.length - 1];
 
   const percentage = useMemo(
@@ -309,12 +309,14 @@ const OddsTarget = () => {
   );
   const probabilityDesc = useMemo(() => {
     if (!formData?.oddsTarget) return undefined;
-    if (formData?.oddsTarget < 1.5)
+    const low = min + (max - min) * 0.2;
+    const high = min + (max - min) * 0.8;
+    if (formData?.oddsTarget < low)
       return {
         txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),
         color: '#49AA19',
       };
-    if (formData?.oddsTarget < 3)
+    if (formData?.oddsTarget < high)
       return {
         txt: t({ enUS: 'Neutral', zhCN: '中性概率' }),
         color: '#177DDC',
@@ -323,7 +325,7 @@ const OddsTarget = () => {
       txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
       color: '#CD8E8E',
     };
-  }, [formData?.oddsTarget, t]);
+  }, [formData?.oddsTarget, max, min, t]);
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>

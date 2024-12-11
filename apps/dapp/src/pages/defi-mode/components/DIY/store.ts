@@ -283,7 +283,7 @@ export const useDIYState = Object.assign(instant, {
       return [sortList[quoteIndex], quoteIndex];
     })();
 
-    if (!quote) return useDIYState.fetchRecommendedList(chainId);
+    if (!quote && !resetIndex) return useDIYState.fetchRecommendedList(chainId);
     useDIYState.setState({
       selectedQuote: [quote, nIndex, resetIndex ? 0 : pre.selectedQuote[2] + 1],
     });
