@@ -4,6 +4,7 @@ import { omitBy } from 'lodash-es';
 import IconArb from './assets/icon-arb.svg?url';
 import IconBNB from './assets/icon-bnb.webp';
 import IconETH from './assets/icon-eth.svg?url';
+import IconPol from './assets/icon-pol.webp';
 import IconSepolia from './assets/icon-sepolia.svg?url';
 import IconSepoliaArb from './assets/icon-sepolia-arb.svg?url';
 
@@ -176,6 +177,49 @@ export const ChainMap: Record<
       spotPriceOracle: {
         BTC: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
         ETH: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
+      },
+      stRCHAddress: '', // 只有 defaultChain 有
+    },
+    137: {
+      chainId: 137,
+      isTest: false,
+      name: 'Polygon',
+      currency: 'POL',
+      icon: IconPol,
+      explorerUrl: 'https://polygonscan.com',
+      rpcUrl: 'https://polygon.llamarpc.com',
+      rpcUrlsForAddNetwork: [
+        'https://polygon.llamarpc.com',
+        'https://endpoints.omniatech.io/v1/matic/mainnet/public',
+        'https://polygon.rpc.subquery.network/public',
+        'https://polygon.drpc.org',
+        'https://polygon.meowrpc.com',
+      ],
+      nativeCurrency: {
+        name: 'POL',
+        symbol: 'POL', // 2-6 characters long
+        decimals: 18,
+      },
+      vaultGraphUrl:
+        'https://api.studio.thegraph.com/query/77961/sofa-polygon/version/latest',
+      automatorTheGraphUrl: '', // TODO
+      usdtAddress: '', // 只有 defaultChain 有
+      rchAddress: '', // 只有 defaultChain 有
+      rchAirdropAddress: '', // 只有 defaultChain 有
+      rchUniswapAddress: '', // 只有 defaultChain 有
+      rchUniswapVersion: 'v3',
+      bonusAirdropAddress: '', // 只有 defaultChain 有
+      feeContractAddress: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
+      automatorFeeContractAddress: '', // TODO
+      uniswapUrl: 'https://app.uniswap.org/explore/tokens/polygon/{address}',
+      // TODO
+      hlPriceOracle: {
+        BTC: '',
+        ETH: '',
+      },
+      spotPriceOracle: {
+        BTC: '0x05A60aE5705411EF03f162FeAb8fAbde77fb4597',
+        ETH: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
       },
       stRCHAddress: '', // 只有 defaultChain 有
     },
