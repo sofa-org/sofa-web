@@ -190,7 +190,7 @@ export const useDIYState = Object.assign(instant, {
     });
   },
   updateQuotes: (quotes: ProductQuoteResult[]) => {
-    useProductsState.updateQuotes(quotes);
+    useProductsState.updateQuotes(quotes, true);
     useDIYState.setState((pre) => ({
       quotes: {
         ...pre.quotes,
@@ -218,7 +218,7 @@ export const useDIYState = Object.assign(instant, {
             const odds = (() => {
               const v = simplePlus(it.oddsInfo?.rch, it.oddsInfo?.max);
               if (!v) return v;
-              return Math.round(v);
+              return +v.toFixed(2);
             })();
             if (isLegalNum(odds)) {
               pre[key].oddsRange[0] = Math.min(pre[key].oddsRange[0], odds);

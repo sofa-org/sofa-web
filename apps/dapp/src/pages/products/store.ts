@@ -113,16 +113,22 @@ export const useProductsState = Object.assign(
         );
       return null;
     },
-    updateQuotes: (quote: ProductQuoteResult | ProductQuoteResult[]) => {
+    updateQuotes: (
+      quote: ProductQuoteResult | ProductQuoteResult[],
+      replaceAll?: boolean,
+    ) => {
       useProductsState.setState((pre) => ({
         quoteInfos: {
-          ...Object.fromEntries(
-            dirtyArrayOmit(
-              Object.entries(pre.quoteInfos),
-              (it) =>
-                !it[1] || it[1].quote.deadline * 1000 - 30 * 1000 <= Date.now(),
-            ),
-          ),
+          ...(replaceAll
+            ? {}
+            : Object.fromEntries(
+                dirtyArrayOmit(
+                  Object.entries(pre.quoteInfos),
+                  (it) =>
+                    !it[1] ||
+                    it[1].quote.deadline * 1000 - 30 * 1000 <= Date.now(),
+                ),
+              )),
           ...Object.fromEntries(
             toArray(quote).map((it) => [ProductsService.productKey(it), it]),
           ),
