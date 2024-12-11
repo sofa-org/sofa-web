@@ -70,7 +70,7 @@ const Index = () => {
       className={styles['content']}
       contentDecorationClassName={styles['decoration']}
       banner={<></>}
-      value={mode as string}
+      value={(mode as string) || 'diy'}
       options={options}
       onChange={(v) => updateQuery({ mode: v })}
     >
