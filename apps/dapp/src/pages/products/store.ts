@@ -64,6 +64,7 @@ export const useProductsState = Object.assign(
     updateCart: (
       params: PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
     ) => {
+      console.error(1111, params);
       const vault = params.vault;
       const key = `${vault.vault.toLowerCase()}-${vault.chainId}` as const;
       if ([RiskType.PROTECTED, RiskType.LEVERAGE].includes(vault.riskType)) {

@@ -289,7 +289,7 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
 
     const wallet = useWalletStore();
     const balance = wallet.balance?.[props.product.vault.depositCcy];
-    const shouldInit = !wallet.address || !isNullLike(balance);
+    const shouldInit = !wallet.address || (!isNullLike(balance) && visible);
 
     const initProduct = useLazyCallback(
       (
