@@ -161,6 +161,7 @@ export async function handleRecommendCardClick(
             depositAmount: it.amounts.own,
           }) == ProductsService.productKey(it),
       );
+      console.log(1111, currProducts, product, it);
       if (!product) {
         const id = currProducts?.find(
           ($it) => !$it.anchorPrices?.every(Boolean) && !$it.expiry,

@@ -31,22 +31,12 @@
   width: 50%;
   height: 90px;
   margin: 0;
-  padding: 0 0 0 40px;
+  padding: 0 0 0 min(40px, 4vw);
 }
 
 .title {
   margin: 0 0 min(8px, 1vw);
   opacity: 0.45;
-}
-
-.value {
-  margin: 0;
-  font-size: min(20px, 5vw);
-
-  .decorative {
-    font-size: 14px;
-    opacity: 0.6;
-  }
 }
 
 .unit {
@@ -55,11 +45,26 @@
   font-size: 14px;
 }
 
+.value {
+  margin: 0;
+  font-size: min(20px, 5vw);
+  white-space: nowrap;
+
+  .decorative {
+    font-size: 14px;
+    opacity: 0.6;
+  }
+
+  .unit {
+    font-size: max(10px, 0.6em);
+  }
+}
+
 .nav {
   width: 50%;
   height: 100px;
   margin: 0;
-  padding: 0 0 0 40px;
+  padding: 0 0 0 min(40px, 4vw);
   border-left: 1px dashed rgba(#000, 0.12);
 }
 

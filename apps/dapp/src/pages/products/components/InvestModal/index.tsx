@@ -327,8 +327,6 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.product, shouldInit]);
 
-    console.log(1111, shouldInit, balance, wallet);
-
     useImperativeHandle(ref, () => ({
       hide: () => setVisible(false),
       show: () => setVisible(true),

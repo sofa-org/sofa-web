@@ -1,3 +1,27 @@
 .semi-dropdown-item {
   margin: 0;
 }
+
+@mixin rewrite {
+  .semi-dropdown-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    transition: none !important;
+  }
+}
+
+@media (orientation: portrait) {
+  .is-mobile {
+    @include rewrite;
+  }
+}
+
+@media screen and (width <=500px) {
+  .is-pc {
+    @include rewrite;
+  }
+}

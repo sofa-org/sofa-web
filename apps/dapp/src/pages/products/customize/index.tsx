@@ -32,6 +32,7 @@ import {
   useForCcySelect,
 } from '@/components/CCYSelector';
 import { CSelect } from '@/components/CSelect';
+import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { PayoffChart } from '@/components/Payoff';
 import { PriceRangeInputEl } from '@/components/PriceRangeInput';
@@ -503,8 +504,33 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
 };
 
 const Comp = (props: BaseProps & { onlyForm?: boolean }) => {
+  const [t] = useTranslation('Customize');
   const [project] = useProjectChange();
-  return project === ProjectType.Earn ? (
+  const chainId = useWalletStore((state) => state.chainId);
+  const vaults = useMemo(
+    () =>
+      ProductsService.filterVaults(ContractsService.vaults, {
+        chainId,
+        riskType:
+          project === ProjectType.Surge ? RiskType.RISKY : RiskType.PROTECTED,
+      }),
+    [chainId, project],
+  );
+
+  if (!vaults.length) {
+    return (
+      <CEmpty
+        style={{ padding: '20vh 0' }}
+        description={t({
+          enUS: 'There are no supported vaults on this chain. Please switch to another chain.',
+          zhCN: '这条链上没有支持的合约，请切换到其它的链',
+        })}
+        className="semi-always-dark"
+      />
+    );
+  }
+
+  return project !== ProjectType.Surge ? (
     <ProductCustomize {...props} />
   ) : (
     <ProductLottery {...props} />

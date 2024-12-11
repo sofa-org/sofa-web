@@ -73,7 +73,7 @@
   @include pointer;
 
   position: relative;
-  line-height: 48px;
+  line-height: min(48px, 9vw);
   font-size: 16px;
   color: #fff;
   opacity: 0.65;
@@ -143,7 +143,7 @@
 
 .nav-selector-item {
   max-width: none;
-  width: min(90vw, 520px);
+  width: min($width-content, 520px);
 
   a {
     color: #000;
@@ -155,6 +155,7 @@
 
   :global(.semi-select-option-text) {
     @include flex-center;
+
     flex-wrap: nowrap;
     gap: 12px;
     width: 100%;
@@ -163,8 +164,8 @@
     .icon {
       svg,
       img {
-        width: 48px;
-        height: 48px;
+        width: min(48px, 9vw);
+        height: min(48px, 9vw);
       }
     }
 
@@ -174,13 +175,13 @@
       .txt-label {
         display: block;
         margin: 0 0 8px;
-        font-size: 18px;
+        font-size: min(18px, 3.6vw);
       }
 
       .txt-desc {
         display: block;
         width: auto;
-        font-size: 14px;
+        font-size: min(14px, 3.2vw);
         opacity: 0.8;
       }
     }
@@ -189,11 +190,11 @@
 
 .nav-selector {
   padding: 8px;
-  border-radius: 24px;
+  border-radius: min(24px, 4vw);
 
   :global(.semi-dropdown-title) {
-    margin: 24px 0 8px;
-    padding: 16px 20px 4px;
+    margin: min(24px, 4vw) 0 min(8px, 1.6vw);
+    padding: min(16px, 3.2vw) min(20px, 4vw) 4px;
 
     &:first-child {
       margin-top: 0;
@@ -201,7 +202,7 @@
   }
 
   :global(.semi-dropdown-item) {
-    padding: 12px 20px;
+    padding: min(12px, 2vw) min(20px, 4vw);
   }
 }
 

@@ -9,6 +9,7 @@
 
 .content {
   width: 100%;
+  padding: min(40px, 3vw) !important;
 }
 
 .legend {
@@ -45,13 +46,13 @@
 
     justify-content: space-between;
     width: calc((100% - min(120px, 32vw)) / 2);
-    font-size: min(14px, 3.4vw);
+    font-size: min(14px, 3vw);
 
     .left {
       @include flex-center;
 
       justify-content: flex-start;
-      gap: min(16px, 4vw);
+      gap: min(16px, 2vw);
       flex: none;
     }
 

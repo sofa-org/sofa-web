@@ -116,7 +116,7 @@
   }
 }
 
-@media (orientation: portrait) {
+@mixin rewrite {
   .logo {
     height: 12px;
   }
@@ -165,5 +165,17 @@
     .risk-item {
       font-size: 14px;
     }
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
   }
 }

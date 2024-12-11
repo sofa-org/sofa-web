@@ -4,6 +4,7 @@
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: 12px;
+  max-width: 100%;
   width: $width-content;
   margin: -480px auto 0;
 }
@@ -234,6 +235,53 @@
   }
 }
 
+.customize {
+  margin: 0;
+
+  &.only-form {
+    :global {
+      .product-banner-wrapper {
+        display: none;
+      }
+    }
+
+    .content {
+      margin: 0;
+    }
+
+    .header {
+      margin: 0 0 28px;
+    }
+
+    .form {
+      width: 100%;
+      margin: 0;
+      border-radius: 0;
+
+      .left {
+        min-width: min(calc(718px - 32px), calc(100vw - 48px));
+        padding-left: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      .right {
+        min-width: min(calc(1080px - 718px - 64px), calc(100vw - 48px));
+        padding-right: 0;
+      }
+    }
+  }
+
+  .btn-expand {
+    display: flex;
+  }
+
+  .details {
+    max-height: 35vh;
+    overflow: auto;
+  }
+}
+
 .quote-infos {
   position: relative;
   width: 100%;
@@ -327,11 +375,17 @@
   margin: 40px auto;
 }
 
-@media (orientation: portrait) {
+.calculation {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+@mixin rewrite {
   .header {
     width: 100vw;
     gap: 0;
-    border-radius: 4vw 4vw 0 0;
+    border-radius: 4vw;
     overflow: hidden;
   }
 
@@ -437,72 +491,14 @@
   }
 }
 
-.calculation {
-  position: absolute;
-  right: 8px;
-  top: 8px;
-}
-
-.customize {
-  margin: 0;
-
-  &.only-form {
-    :global {
-      .product-banner-wrapper {
-        display: none;
-      }
-    }
-
-    .content {
-      margin: 0;
-    }
-
-    .header {
-      margin: 0 0 28px;
-    }
-
-    .form {
-      width: 100%;
-      margin: 0;
-      border-radius: 0;
-
-      .left {
-        min-width: min(calc(718px - 32px), calc(100vw - 48px));
-        padding-left: 0;
-        padding-top: 0;
-        padding-bottom: 0;
-      }
-
-      .right {
-        min-width: min(calc(1080px - 718px - 64px), calc(100vw - 48px));
-        padding-right: 0;
-      }
-    }
-  }
-}
-
 @media (orientation: portrait) {
   :global(.is-mobile) {
-    .btn-expand {
-      display: flex;
-    }
-
-    .details {
-      max-height: 35vh;
-      overflow: auto;
-    }
+    @include rewrite;
   }
 }
 
 @media (width <=1100px) {
   :global(.is-pc) {
-    .btn-expand {
-      display: flex;
-    }
-
-    .details {
-      max-height: 25vh;
-      overflow: auto;
-    }
+    @include rewrite;
   }
 }
