@@ -289,7 +289,7 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
 
     const wallet = useWalletStore();
     const balance = wallet.balance?.[props.product.vault.depositCcy];
-    const shouldInit = !wallet.address || balance;
+    const shouldInit = !wallet.address || !isNullLike(balance);
 
     const initProduct = useLazyCallback(
       (
@@ -305,7 +305,7 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
           props.product.amounts.own,
           props.product.vault.depositTickAmount,
           props.product.vault.depositMinAmount,
-          balance,
+          balance || undefined,
         ),
         protectedApy: props.product.apyInfo?.min,
         fundingApy,
