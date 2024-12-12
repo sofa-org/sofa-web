@@ -335,8 +335,10 @@
       .lang-selector {
         display: none;
       }
+    }
 
-      &.expanded {
+    &.expanded {
+      .menu {
         @include flex-column-center;
 
         align-items: flex-start;
