@@ -17,7 +17,13 @@ $color-gray: #666;
 $color-border: rgba(#000, 0.12);
 $color-rch: #51acf1;
 $width-content: min(1080px, calc(100vw - 24px));
-$header-height: 48px;
+$header-menu-height: 48px;
+$header-ticker-height: 40px;
+$color-mobile-header-gradient: linear-gradient(
+  to right,
+  rgba(#3887df, 0.5),
+  rgba(#00b373, 0.5) 100%
+);
 
 @mixin flex-center {
   display: flex;

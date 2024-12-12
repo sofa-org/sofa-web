@@ -1,6 +1,6 @@
 .product-banner-wrapper {
   height: 560px;
-  margin: -$header-height 0 0;
+  margin: -$header-menu-height 0 0;
   padding: 80px 0 0;
   background: linear-gradient(0deg, #000 13.89%, #0000 100%),
     linear-gradient(
@@ -104,6 +104,8 @@
         rgb(56 135 223 / 40%) 0.25%,
         rgb(0 179 115 / 40%) 95.88%
       );
+    margin-top: -$header-ticker-height - $header-menu-height;
+    padding-top: $header-ticker-height;
 
     &.risky {
       background: linear-gradient(0deg, #000 80%, #000a 100%), $color-gradient-2;

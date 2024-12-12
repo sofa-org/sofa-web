@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import ReactDOM from 'react-dom';
+import { useEffect, useMemo } from 'react';
+import { HorizontalTicker } from 'react-infinite-ticker';
 import { Rnd } from 'react-rnd';
 import { amountFormatter } from '@sofa/utils/amount';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import { useLocalStorageState, usePrevious } from 'ahooks';
 import classNames from 'classnames';
+import { escapeRegExp } from 'lodash-es';
 import { Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -12,11 +14,8 @@ import { Comp as IconArrowUp } from '@/assets/icon-arrow-up.svg';
 import { Comp as IconBTC } from '@/assets/icon-btc.svg';
 import { Comp as IconETH } from '@/assets/icon-eth.svg';
 import IconRCH from '@/assets/icon-rch.png';
-import img from '@/assets/img.png';
 
 import 'swiper/css';
-
-import SplineModel from '../SplineModel';
 
 import { useIndexPrices } from './store';
 
@@ -43,7 +42,9 @@ const IndexPrice = (props: { ccy: CCY }) => {
     <div
       className={classNames(
         styles['index-price'],
+        'index-price',
         Number(price) >= Number(prePrice) ? styles['up'] : styles['down'],
+        price === undefined ? styles['loading'] : undefined,
       )}
     >
       {ccyInfo?.icon && <ccyInfo.icon className={styles['icon-ccy']} />}
@@ -88,38 +89,107 @@ const IndexPrices = (props: BaseProps) => {
     [$position],
   );
 
-  return ReactDOM.createPortal(
-    <Rnd
-      className={classNames(styles['index-prices'], props.className)}
-      style={props.style}
-      size={{ width: 195, height: 'auto' }}
-      position={position}
-      onDragStop={(e, d) => setPosition({ x: d.x, y: d.y })}
-      enableResizing={false}
-    >
-      <img src={img} alt="img" />
-      <SplineModel id="discoball" />
-      <Swiper
-        direction="vertical"
-        slidesPerView={2}
-        pagination={false}
-        modules={[Autoplay]}
-        className={styles['content']}
-        autoplay
-        loop
+  const highlightTicker = useLazyCallback(() => {
+    const tickerElement = document.querySelector('.index-prices-ticker');
+    if (!tickerElement || !tickerElement.checkVisibility()) {
+      return;
+    }
+    const focusingElement = document.querySelectorAll(
+      `.index-prices-ticker .index-price.${styles['focused']}`,
+    );
+    let newFocusElement: HTMLDivElement | undefined = undefined;
+    let newFocusElementBox: DOMRect | undefined = undefined;
+
+    for (const indexPriceElement of document.querySelectorAll<HTMLDivElement>(
+      '.index-prices-ticker .index-price',
+    )) {
+      const box = indexPriceElement.getBoundingClientRect();
+      if (!newFocusElement || !newFocusElementBox) {
+        newFocusElement = indexPriceElement;
+        newFocusElementBox = box;
+        continue;
+      }
+      if (
+        (!focusingElement.length || box.left >= -30) &&
+        (box.left < newFocusElementBox.left || newFocusElementBox.left < 0)
+      ) {
+        newFocusElementBox = box;
+        newFocusElement = indexPriceElement;
+        continue;
+      }
+    }
+    if (newFocusElement) {
+      if (focusingElement.length) {
+        if (
+          focusingElement.length == 1 &&
+          newFocusElement == focusingElement[0]
+        ) {
+          return;
+        }
+        for (const ele of focusingElement) {
+          ele.className = ele.className.replace(
+            new RegExp(
+              /\b/.source + escapeRegExp(styles['focused']) + /\b/.source,
+              'g',
+            ),
+            '',
+          );
+        }
+      }
+      newFocusElement.className += ' ' + styles['focused'];
+    }
+  });
+
+  useEffect(() => {
+    const i = setInterval(highlightTicker, 1000);
+    highlightTicker();
+    return () => clearInterval(i);
+  }, []);
+
+  return (
+    <>
+      <div
+        className={classNames(
+          styles['index-prices-ticker'],
+          'index-prices-ticker',
+          props.className,
+        )}
       >
-        <SwiperSlide>
+        <HorizontalTicker duration={25000}>
           <IndexPrice ccy="BTC" />
-        </SwiperSlide>
-        <SwiperSlide>
           <IndexPrice ccy="ETH" />
-        </SwiperSlide>
-        <SwiperSlide>
           <IndexPrice ccy="RCH" />
-        </SwiperSlide>
-      </Swiper>
-    </Rnd>,
-    document.querySelector('.main-content') || document.body,
+        </HorizontalTicker>
+      </div>
+      <Rnd
+        className={classNames(styles['index-prices'], props.className)}
+        style={props.style}
+        size={{ width: 195, height: 'auto' }}
+        position={position}
+        onDragStop={(e, d) => setPosition({ x: d.x, y: d.y })}
+        enableResizing={false}
+      >
+        <Swiper
+          direction="vertical"
+          slidesPerView={2}
+          pagination={false}
+          modules={[Autoplay]}
+          className={styles['content']}
+          autoplay
+          loop
+        >
+          <SwiperSlide>
+            <IndexPrice ccy="BTC" />
+          </SwiperSlide>
+          <SwiperSlide>
+            <IndexPrice ccy="ETH" />
+          </SwiperSlide>
+          <SwiperSlide>
+            <IndexPrice ccy="RCH" />
+          </SwiperSlide>
+        </Swiper>
+      </Rnd>
+    </>
   );
 };
 

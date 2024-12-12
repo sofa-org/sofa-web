@@ -179,54 +179,58 @@ const DappHeader = () => {
   }, [location.pathname]);
 
   return (
-    <header
-      className={classNames(styles['header'], {
-        [styles['expanded']]: expanded,
-      })}
-      id="header"
-    >
-      <div className={styles['bg']} style={{ opacity }} />
-      <nav className={styles['left']}>
-        <div className={styles['logo-wrapper']}>
-          <Logo className={styles['logo']} onClick={() => navigate('/')} />
-          <IconMenu
-            className={styles['icon-menu']}
-            onClick={() => setExpanded((pre) => !pre)}
-          />
-        </div>
+    <>
+      <header
+        className={classNames(styles['header'], {
+          [styles['expanded']]: expanded,
+        })}
+        id="header"
+      >
+        <div className={styles['bg']} style={{ opacity }} />
+        <div className={styles['menu']}>
+          <nav className={styles['left']}>
+            <div className={styles['logo-wrapper']}>
+              <Logo className={styles['logo']} onClick={() => navigate('/')} />
+              <IconMenu
+                className={styles['icon-menu']}
+                onClick={() => setExpanded((pre) => !pre)}
+              />
+            </div>
 
-        {menusForRender.map((it, i) => (
-          <RenderMenu {...it} key={i} />
-        ))}
-      </nav>
-      <aside className={styles['right']}>
-        <LangSelector className={styles['lang-selector']} />
-        {more && (
-          <div className={styles['wallet']}>
-            <NetworkSelector />
-            <WalletConnector />
-          </div>
-        )}
-        {more && <TimezoneSelector />}
+            {menusForRender.map((it, i) => (
+              <RenderMenu {...it} key={i} />
+            ))}
+          </nav>
+          <aside className={styles['right']}>
+            <LangSelector className={styles['lang-selector']} />
+            {more && (
+              <div className={styles['wallet']}>
+                <NetworkSelector />
+                <WalletConnector />
+              </div>
+            )}
+            {more && <TimezoneSelector />}
+            {more && (
+              <div className={styles['other-links']}>
+                <a
+                  className={classNames(styles['btn-link'], 'btn-gradient', {
+                    [styles['active']]: location.pathname.startsWith('/rch'),
+                  })}
+                  href={EnvLinks.config.VITE_RCH_LINK}
+                  target={
+                    Env.isMetaMaskAndroid || Env.isTelegram ? undefined : 'rch'
+                  }
+                >
+                  <span>{t('Claim')}</span>
+                  {t('RCH')}
+                </a>
+              </div>
+            )}
+          </aside>
+        </div>
         {more && <IndexPrices />}
-        {more && (
-          <div className={styles['other-links']}>
-            <a
-              className={classNames(styles['btn-link'], 'btn-gradient', {
-                [styles['active']]: location.pathname.startsWith('/rch'),
-              })}
-              href={EnvLinks.config.VITE_RCH_LINK}
-              target={
-                Env.isMetaMaskAndroid || Env.isTelegram ? undefined : 'rch'
-              }
-            >
-              <span>{t('Claim')}</span>
-              {t('RCH')}
-            </a>
-          </div>
-        )}
-      </aside>
-    </header>
+      </header>
+    </>
   );
 };
 

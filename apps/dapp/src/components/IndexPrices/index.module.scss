@@ -1,7 +1,7 @@
 .index-prices {
   position: absolute;
   z-index: 10;
-  padding: 10px 12px 10px 40px;
+  padding: 10px 12px 10px 10px;
 
   * {
     z-index: 2;
@@ -85,6 +85,12 @@
     padding: 0 0 0 2px;
   }
 
+  &.loading {
+    > svg:last-child {
+      display: none;
+    }
+  }
+
   &.down {
     svg:not(.icon-ccy),
     img:not(.icon-ccy) {
@@ -93,9 +99,52 @@
   }
 }
 
+.index-prices-ticker {
+  display: none;
+
+  .index-price {
+    padding-top: 9px;
+    width: fit-content;
+    margin-right: 30px;
+
+    > span {
+      display: inline-block;
+    }
+
+    > svg:last-child {
+      position: static;
+      margin: 12px 4px 0 0;
+    }
+
+    &.loading {
+      > span {
+        // set min-width b.c. when Ticker calc the width the prices is not ready yet
+        min-width: 120px;
+      }
+    }
+
+    color: rgba(#fff, 0.45);
+
+    &.focused {
+      color: #fff;
+    }
+  }
+
+  border-top: 1px solid rgba(#fff, 0.08);
+  height: $header-ticker-height;
+}
+
 @media (orientation: portrait) {
+  .index-prices-ticker {
+    display: block;
+
+    .index-price {
+      margin-left: 30px;
+    }
+  }
+
   .index-prices {
-    display: none;
+    display: none !important;
   }
 
   .rch-entry {

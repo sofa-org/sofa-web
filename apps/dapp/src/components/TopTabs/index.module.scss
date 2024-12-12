@@ -1,7 +1,7 @@
 .banner {
   position: relative;
   height: 500px;
-  margin-top: -$header-height;
+  margin-top: -$header-menu-height;
   background: linear-gradient(
     93deg,
     rgb(56 135 223 / 60%) 0.25%,
@@ -132,6 +132,7 @@
 
   .tabs {
     @include flex-center;
+
     pointer-events: initial;
   }
 
@@ -216,6 +217,8 @@
 
 @media (orientation: portrait) {
   .banner {
+    margin-top: -$header-ticker-height - $header-menu-height;
+    padding-top: $header-ticker-height;
     background: linear-gradient(to right, rgba(#000, 0.3), rgba(#000, 0.3)),
       linear-gradient(
         93deg,
