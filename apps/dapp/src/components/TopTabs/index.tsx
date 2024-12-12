@@ -29,22 +29,24 @@ const TopTabs = (props: TopTabsProps) => {
 
   return (
     <>
-      <div
-        className={classNames(
-          'banner',
-          styles['banner'],
-          props.bannerClassName,
-          {
-            [styles['dark']]: props.dark,
-            [styles['risky']]: riskType === RiskType.RISKY,
-            risky: riskType === RiskType.RISKY,
-            'banner-expandable': props.type === 'banner-expandable',
-            [styles['banner-expandable']]: props.type === 'banner-expandable',
-          },
-        )}
-      >
-        {props.banner}
-      </div>
+      {props.banner && (
+        <div
+          className={classNames(
+            'banner',
+            styles['banner'],
+            props.bannerClassName,
+            {
+              [styles['dark']]: props.dark,
+              [styles['risky']]: riskType === RiskType.RISKY,
+              risky: riskType === RiskType.RISKY,
+              'banner-expandable': props.type === 'banner-expandable',
+              [styles['banner-expandable']]: props.type === 'banner-expandable',
+            },
+          )}
+        >
+          {props.banner}
+        </div>
+      )}
       <div
         className={classNames(
           'top-tabs',
