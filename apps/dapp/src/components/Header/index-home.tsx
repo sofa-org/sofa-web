@@ -166,11 +166,9 @@ export const RenderMenu = (it: MenuItem) => {
   );
   return (
     <Dropdown
-      // trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
-      trigger={'click'}
+      trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
       className={classNames(styles['nav-selector'], 'semi-always-dark')}
       position={'bottomLeft'}
-      // keepDOM
       render={
         <Dropdown.Menu className={styles['nav-selector-items']}>
           {Object.entries(groups).map(([group, children], _, arr) => {
