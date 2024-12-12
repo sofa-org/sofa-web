@@ -199,6 +199,7 @@ export class PositionsService {
       true,
     ).map((it) => it.vault.toLowerCase());
     const limit = extra?.limit ?? 20;
+    if (!vault_in.length) return { hasMore: false, cursor: 0, limit, list: [] };
     const res = await http.post<unknown, HttpResponse<PositionInfo[]>>(
       '/rfq/position-list',
       {
