@@ -5,6 +5,10 @@
   background: #000;
   border-radius: 25px;
 
+  button {
+    background: transparent;
+  }
+
   :global {
     .semi-button-content {
       @include gradient-txt;

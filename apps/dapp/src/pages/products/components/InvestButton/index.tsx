@@ -61,16 +61,11 @@ export const BaseInvestButton = (props: BaseInvestButtonProps) => {
   ) : !wallet.address ? (
     <WalletConnector
       style={{ padding: 0 }}
-      className={props.className}
+      className={classNames(styles['btn-deposit'], props.className)}
       hideArrow
     >
       {(connecting) => (
-        <Button
-          style={props.style}
-          size="large"
-          className={styles['btn-deposit']}
-          loading={connecting}
-        >
+        <Button style={props.style} size="large" loading={connecting}>
           {t('Connect Wallet')}
         </Button>
       )}

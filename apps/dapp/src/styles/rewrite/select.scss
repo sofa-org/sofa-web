@@ -52,6 +52,12 @@
   border-color: transparent;
 }
 
+.semi-select-selection-text {
+  @include flex-center;
+
+  justify-content: flex-start;
+}
+
 @mixin rewrite() {
   .semi-select-option {
     height: 48px;
@@ -65,7 +71,7 @@
   }
 }
 
-@media screen and (width <= 500px) {
+@media screen and (width <=500px) {
   .is-pc {
     @include rewrite;
   }

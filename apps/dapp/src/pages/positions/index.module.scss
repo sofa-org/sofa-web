@@ -54,14 +54,14 @@
 }
 
 .tabs.tabs {
-  height: 80px;
+  height: min(80px, 14vw);
   padding: 0;
   border-bottom: 1px solid rgba(#fff, 0.12);
 
   :global {
     .top-tabs-tab {
       width: 50%;
-      height: 80px;
+      height: min(80px, 14vw);
       background: transparent !important;
       border-radius: 0;
 

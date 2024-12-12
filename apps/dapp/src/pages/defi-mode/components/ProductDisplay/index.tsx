@@ -71,15 +71,15 @@ export const DIYProductDisplay = () => {
       spinning={!quote}
     >
       <div className={styles['title']}>
-        {t({ enUS: 'Optimizer', zhCN: '产品' })}
-        <span className={styles['apy']}>
+        <span>{t({ enUS: 'Optimizer', zhCN: '产品' })}</span>
+        <span
+          className={styles['apy']}
+          onClick={() => setExpanded((pre) => !pre)}
+        >
           {displayPercentage(
             simplePlus(quote?.apyInfo?.rch, quote?.apyInfo?.max),
           )}
-          <IconExpand
-            className={styles['icon-expand']}
-            onClick={() => setExpanded((pre) => !pre)}
-          />
+          <IconExpand className={styles['icon-expand']} />
         </span>
       </div>
       <div className={styles['risk-type']}>

@@ -67,11 +67,11 @@
     &.c-select-option-selected {
       @include bold;
 
-      color: #5fe2ff;
+      // color: #5fe2ff;
       background: rgba(#000, 0.1);
 
       span {
-        @include gradient-txt;
+        // @include gradient-txt;
       }
     }
 

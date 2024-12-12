@@ -24,6 +24,10 @@
   .legend-item {
     @include flex-center;
 
+    width: fit-content;
+    white-space: nowrap;
+    font-size: min(14px, 3vw);
+
     .color {
       width: 20px;
       height: 10px;
@@ -54,6 +58,7 @@
       justify-content: flex-start;
       gap: min(16px, 2vw);
       flex: none;
+      min-width: auto;
     }
 
     .direction {

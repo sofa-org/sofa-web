@@ -57,8 +57,8 @@ const Snapshot = (props: { vault?: AutomatorVaultInfo }) => {
                 {it.side}
               </div>
               <div className={styles['product']}>
-                {it.forCcy}{' '}
-                {{ BULLISH: 'Bull Trend', BEARISH: 'Bear Trend' }[it.direction]}{' '}
+                {it.forCcy.replace(/^w/i, '')}{' '}
+                {{ BULLISH: 'BullTrend', BEARISH: 'BearTrend' }[it.direction]}{' '}
                 {displayExpiry(it.expiry * 1000)} {it.lowerStrike}-
                 {it.upperStrike}
               </div>

@@ -29,7 +29,6 @@
 
 .title {
   @include flex-center;
-  @include gradient-txt;
   @include medium;
 
   gap: 20px;
@@ -39,10 +38,15 @@
   border-bottom: 1px solid #e0e0e0;
   font-size: min(16px, 3.8vw);
 
+  > span:first-child {
+    @include gradient-txt;
+  }
+
   .apy {
     @include flex-center;
 
     display: none;
+    color: $color-rise;
 
     .icon-expand {
       width: 1em;
@@ -64,6 +68,7 @@
   @include medium;
 
   padding: 0 min(32px, 6.4vw);
+  margin: 0 0 10px;
   font-size: min(14px, 3.2vw);
   white-space: nowrap;
 
@@ -83,19 +88,23 @@
   @include flex-center;
 
   min-width: min(360px, 80vw);
-  height: min(210px, 40vw);
+  height: min(210px, 30vw);
   margin: -5px 0 20px;
   padding: 0 12px;
 
   .quote-infos {
-    height: min(180px, 40vw);
+    height: min(180px, 30vw);
     background: transparent;
+
+    &:global(:not(.risky)) {
+      margin: 0 0 30px;
+    }
 
     &:global(.risky) {
       @include flex-center;
 
       width: auto;
-      margin: 0 min(32px, 6.4vw);
+      margin: 0 min(32px, 6.4vw) -20px;
       background: linear-gradient(96deg, #50d11330 0.36%, #ffe50030 100%);
 
       > div {
