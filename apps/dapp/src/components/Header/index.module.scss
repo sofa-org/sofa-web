@@ -338,6 +338,10 @@
     }
 
     &.expanded {
+      .index-prices {
+        display: none;
+      }
+
       .menu {
         @include flex-column-center;
 

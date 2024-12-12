@@ -228,7 +228,7 @@ const DappHeader = () => {
             )}
           </aside>
         </div>
-        {more && <IndexPrices />}
+        {more && <IndexPrices className={styles['index-prices']} />}
       </header>
     </>
   );
