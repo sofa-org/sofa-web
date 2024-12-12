@@ -23,3 +23,21 @@
     background: rgba(#000, 0.6) !important;
   }
 }
+
+@mixin rewrite {
+  .btn-deposit {
+    height: 44px;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

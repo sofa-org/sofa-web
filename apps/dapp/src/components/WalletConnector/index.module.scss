@@ -16,6 +16,10 @@
   img:not(.logo) {
     width: 16px;
   }
+
+  button {
+    height: 100%;
+  }
 }
 
 .address {
@@ -24,9 +28,9 @@
   padding: 4px 0;
 }
 
-@media (orientation: portrait) {
+@mixin rewrite {
   .wallet-connector {
-    height: 32px;
+    height: 44px;
     padding: 0 10px;
     font-size: 12px;
 
@@ -38,5 +42,17 @@
     img:not(.logo) {
       display: none;
     }
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
   }
 }
