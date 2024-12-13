@@ -16,7 +16,7 @@ import styles from './index.module.scss';
 
 const tabs = [
   {
-    label: (t: TFunction) => t({ enUS: 'DIY', zhCN: 'DIY' }),
+    label: (t: TFunction) => t({ enUS: 'DeFi Mode', zhCN: 'DiFi 模式' }),
     value: 'diy',
     comp: () => <DIY />,
   },
@@ -35,7 +35,7 @@ const tabs = [
     label: (t: TFunction) => (
       <>
         {ProjectTypeRefs[ProjectType.Earn].icon}
-        {t({ enUS: 'Customize', zhCN: '自定义' })}
+        {t({ enUS: 'Professional', zhCN: '专业模式' })}
       </>
     ),
     icon: ProjectTypeRefs.Earn.icon,

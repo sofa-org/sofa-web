@@ -248,8 +248,8 @@ const ApyTarget = () => {
 
   const probabilityDesc = useMemo(() => {
     if (!formData?.apyTarget) return undefined;
-    const low = min + (max - min) * 0.2;
-    const high = min + (max - min) * 0.8;
+    const low = Math.min(min + (max - min) * 0.2, 0.5);
+    const high = Math.min(min + (max - min) * 0.8, 2);
     if (formData?.apyTarget < low)
       return {
         txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),
@@ -321,8 +321,8 @@ const OddsTarget = () => {
   }, [formData?.oddsTarget, logMax, logMin]);
   const probabilityDesc = useMemo(() => {
     if (!formData?.oddsTarget) return undefined;
-    const low = min + (max - min) * 0.2;
-    const high = min + (max - min) * 0.8;
+    const low = Math.min(min + (max - min) * 0.2, 4);
+    const high = Math.min(min + (max - min) * 0.8, 10);
     if (formData?.oddsTarget < low)
       return {
         txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),

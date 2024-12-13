@@ -71,7 +71,7 @@ export const ProjectTypeRefs = {
       }),
     desc1: (t: TFunction) =>
       t({
-        enUS: `Mirror the top trader's positions with just a click!`,
+        enUS: `Mirror the top traders' positions with just a click!`,
         zhCN: '一键复制顶级交易者的持仓！',
       }),
     icon: <img src={IconAutomator} width="24px" />,

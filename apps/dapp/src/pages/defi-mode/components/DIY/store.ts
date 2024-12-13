@@ -1,4 +1,9 @@
-import { ProductType, RiskType, VaultInfo } from '@sofa/services/base-type';
+import {
+  ProductType,
+  ProjectType,
+  RiskType,
+  VaultInfo,
+} from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { ProductsService } from '@sofa/services/products';
 import { ProductQuoteResult } from '@sofa/services/products';
@@ -8,6 +13,7 @@ import {
 } from '@sofa/services/products-diy';
 import { next8h } from '@sofa/utils/expiry';
 import { getNearestItemIndex, isLegalNum } from '@sofa/utils/fns';
+import { currQuery } from '@sofa/utils/history';
 import { simplePlus } from '@sofa/utils/object';
 import { isEqual, omit, pick } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -337,7 +343,10 @@ export const useDIYState = Object.assign(instant, {
       domCcy: 'USD',
       depositCcy: 'USDT',
       productType: ProductType.BullSpread,
-      riskType: RiskType.PROTECTED,
+      riskType:
+        currQuery().project === ProjectType.Surge
+          ? RiskType.RISKY
+          : RiskType.PROTECTED,
       apyTarget: 0.15,
       oddsTarget: 4,
       expiry: next8h(undefined, 7),
