@@ -14,15 +14,16 @@ export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
   const [data, setData] = useLocalStorageState('global-modal-4', {
-    defaultValue: { closedAt: 0 },
+    defaultValue: { closedAt: 0, count: 0 },
   });
   const visible = useMemo(() => {
     if (!/products|positions|transactions/.test(location.pathname)) {
       return false;
     }
-    // 7 天显示一次
+    if (Number(data?.count) >= 3) return false;
+    // 2 天显示一次
     return (
-      !data?.closedAt || next8h() - next8h(data?.closedAt) > MsIntervals.day * 7
+      !data?.closedAt || next8h() - next8h(data?.closedAt) > MsIntervals.day * 2
     );
   }, [data, location.pathname]);
 
@@ -37,7 +38,10 @@ export const GlobalModal = () => {
       maskClosable={false}
       width={720}
       onCancel={() => {
-        setData({ closedAt: Date.now() });
+        setData((pre) => ({
+          closedAt: Date.now(),
+          count: (pre?.count || 0) + 1,
+        }));
       }}
     >
       <p
@@ -97,7 +101,10 @@ export const GlobalModal = () => {
           type="primary"
           theme="solid"
           onClick={() => {
-            setData({ closedAt: Date.now() });
+            setData((pre) => ({
+              closedAt: Date.now(),
+              count: (pre?.count || 0) + 1,
+            }));
             window.location.href = EnvLinks.config.VITE_AUTOMATOR_LINK;
           }}
         >
