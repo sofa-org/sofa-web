@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import videoAtom from './assets/atom.webm';
 import videoBee from './assets/bee.webm';
 import videoCloud from './assets/cloud.webm';
+import videoDiscoball from './assets/discoball.webm';
 import videoHammer from './assets/hammer.webm';
 import imgAtom from './assets/img-atom.png';
 import imgBee from './assets/img-bee.png';
@@ -36,6 +37,12 @@ const models = {
     // resource: 'https://prod.spline.design/MK0TOv9kOK27XZpk/scene.splinecode',
     resource: videoPlanet,
     size: [240, 240],
+  },
+  discoball: {
+    loading: '',
+    // resource: 'https://prod.spline.design/Gb2AZCcuJJT8FgXa/scene.splinecode',
+    resource: videoDiscoball,
+    size: [80, 80],
   },
   rubik: {
     loading: imgRubik,
