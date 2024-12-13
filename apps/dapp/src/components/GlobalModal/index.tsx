@@ -13,7 +13,7 @@ import styles from './index.module.scss';
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
-  const [data, setData] = useLocalStorageState('global-modal-3', {
+  const [data, setData] = useLocalStorageState('global-modal-4', {
     defaultValue: { closedAt: 0 },
   });
   const visible = useMemo(() => {
@@ -44,8 +44,42 @@ export const GlobalModal = () => {
         className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: '1. SOFA.org Automator is officially live!',
-            zhCN: '1. SOFA.org 全新产品 Automator 正式上线！',
+            enUS: '1. The OKX Web3 Joint Campaign has officially ended!',
+            zhCN: '1. OKX Web3 联合活动已结束',
+          }),
+        }}
+      />
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: 'Starting today, all $RCH airdrop rewards are available for you on SOFA.org - head over now and place your orders! ',
+            zhCN: '即日起，$RCH 空投奖励已统一回归 SOFA.org，欢迎大家在 SOFA.org 下单！',
+          }),
+        }}
+      />
+      <p
+        className={styles['head']}
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: '2. Big News: Earn and Surge purchases are now both eligible for the Poker Museum event!',
+            zhCN: '2. Earn / Surge 都可参与扑克博物馆',
+          }),
+        }}
+      />
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: 'Simply make a purchase of either Earn or Surge products to score exclusive poker cards, each redeemable for up to 100 $RCH.',
+            zhCN: '新规调整：购买 Earn 产品也能参与活动！购买一笔 Earn 或 Surge 即可赢扑克，每张扑克最高兑换 100 $RCH！',
+          }),
+        }}
+      />
+      <p
+        className={styles['head']}
+        dangerouslySetInnerHTML={{
+          __html: t({
+            enUS: '3. SOFA.org Automator is officially live!',
+            zhCN: '3. SOFA.org 全新产品 Automator 正式上线！',
           }),
         }}
       />
@@ -54,23 +88,6 @@ export const GlobalModal = () => {
           __html: t({
             enUS: 'Delegate your funds to high-performing Automator traders & strategies. Funds will be utilized and continuously re-invested in optimized return strategies until user redemption. (Switch to the Arbitrum One network to access Automator.)',
             zhCN: '将资金托管给高绩效的 Automator 交易者及策略。资金将被充分利用，持续再投资以实现最佳回报，直至用户赎回。（切换至 Arbitrum One 链，即可进入 Automator）',
-          }),
-        }}
-      />
-      <p
-        className={styles['head']}
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: '2. Surge Poker Museum Update',
-            zhCN: '2. Surge 扑克博物馆',
-          }),
-        }}
-      />
-      <p
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: 'Rule Update: Earn products are not included in this event. <br/>Event Rules: Buy a Surge to participate in the poker game.Each poker can be redeemed for up to 100 $RCH.',
-            zhCN: '规则调整：Earn 产品暂不参与本期活动<br/>具体规则：购买一笔 Surge 即可参与赢扑克，每张扑克最高可兑换 100 $RCH！',
           }),
         }}
       />
