@@ -104,6 +104,12 @@ export function useHeaderOpacity() {
       : /products\/customize/i.test(location.pathname)
         ? 100 / winScale
         : 140 / winScale;
+    const isMobileUI = window.matchMedia('(orientation: portrait)').matches;
+    if (isMobileUI) {
+      return !position?.top || position.top <= 0
+        ? 1
+        : Math.max(Math.min(1, (scrollLen - position.top) / scrollLen), 0.6);
+    }
     return !position?.top ? 0 : Math.min(1, position.top / scrollLen);
   }, [location.pathname, position?.top]);
 
