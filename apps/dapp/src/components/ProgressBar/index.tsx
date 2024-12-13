@@ -14,6 +14,7 @@ import styles from './index.module.scss';
 
 export interface ProgressBarProps extends BaseProps {
   type?: '1' | '2';
+  disabled?: boolean;
   percent: number;
   children?: ReactNode;
   onClick?(e: MouseEvent<HTMLDivElement>): void;
@@ -32,6 +33,7 @@ const ProgressBar = (props: ProgressBarProps) => {
     setTempVal(props.percent);
   }, [props.percent]);
   const handleChange = useLazyCallback((x: number, temp?: boolean) => {
+    if (props.disabled) return;
     const el = wrapper.current;
     if (!el) return;
     const width = el?.offsetWidth;
@@ -64,6 +66,7 @@ const ProgressBar = (props: ProgressBarProps) => {
       {props.type === '2' && !!wrapperSize?.width && (
         <Draggable
           axis="x"
+          disabled={props.disabled}
           position={{
             x: tempVal * (wrapperSize.width - (sliderSize?.width || 20)),
             y: 0,

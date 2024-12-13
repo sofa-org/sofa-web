@@ -119,7 +119,7 @@ export const RecommendedCardItem = (props: {
             <span className={styles['value']}>
               {amountFormatter(
                 simplePlus(it.oddsInfo?.max, it.oddsInfo?.rch),
-                0,
+                2,
               )}
               x
             </span>
@@ -161,7 +161,6 @@ export async function handleRecommendCardClick(
             depositAmount: it.amounts.own,
           }) == ProductsService.productKey(it),
       );
-      console.log(1111, currProducts, product, it);
       if (!product) {
         const id = currProducts?.find(
           ($it) => !$it.anchorPrices?.every(Boolean) && !$it.expiry,

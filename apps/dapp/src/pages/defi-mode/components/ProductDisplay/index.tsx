@@ -90,7 +90,8 @@ export const DIYProductDisplay = () => {
         )}
       </div>
       <div className={styles['product']}>
-        {productRef?.label(t)} {quote?.expiry && displayExpiry(quote.expiry)}{' '}
+        {productRef?.label(t)}{' '}
+        {quote?.expiry && displayExpiry(quote.expiry * 1000)}{' '}
         {anchorPrices?.join('-') || '-'}
         <span className={styles['badge']}>
           {term || '-'}{' '}

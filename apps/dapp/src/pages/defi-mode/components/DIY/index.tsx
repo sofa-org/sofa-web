@@ -4,6 +4,7 @@ import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
+import { isNullLike } from '@sofa/utils/fns';
 
 import {
   ProductTypeRefs,
@@ -234,11 +235,17 @@ const ApyTarget = () => {
     useDIYState.getApyList(chainId, state),
   );
   const max = rest[rest.length - 1];
-
-  const percentage = useMemo(
-    () => (formData?.apyTarget ? (formData.apyTarget - min) / (max - min) : 0),
-    [formData?.apyTarget, max, min],
+  const [logMin, logMax] = useMemo(
+    () => [Math.log(min), Math.log(max)],
+    [max, min],
   );
+
+  const percentage = useMemo(() => {
+    if (isNullLike(formData?.apyTarget)) return 0;
+    const log = Math.log(formData.apyTarget);
+    return (log - logMin) / (logMax - logMin);
+  }, [formData?.apyTarget, logMax, logMin]);
+
   const probabilityDesc = useMemo(() => {
     if (!formData?.apyTarget) return undefined;
     const low = min + (max - min) * 0.2;
@@ -268,11 +275,12 @@ const ApyTarget = () => {
           type="2"
           key={chainId}
           className={styles['progress']}
+          disabled={!max}
           percent={percentage}
           onPercentChange={(p) =>
             useDIYState.updateApyTarget(
               chainId,
-              Math.round((p * (max - min) + min) * 100) / 100,
+              +Math.exp(p * (logMax - logMin) + logMin).toFixed(2),
             )
           }
         />
@@ -301,12 +309,16 @@ const OddsTarget = () => {
     useDIYState.getOddsList(chainId, state),
   );
   const max = rest[rest.length - 1];
-
-  const percentage = useMemo(
-    () =>
-      formData?.oddsTarget ? (formData.oddsTarget - min) / (max - min) : 0,
-    [formData?.oddsTarget, max, min],
+  const [logMin, logMax] = useMemo(
+    () => [Math.log(min), Math.log(max)],
+    [max, min],
   );
+
+  const percentage = useMemo(() => {
+    if (isNullLike(formData?.oddsTarget)) return 0;
+    const log = Math.log(formData.oddsTarget);
+    return (log - logMin) / (logMax - logMin);
+  }, [formData?.oddsTarget, logMax, logMin]);
   const probabilityDesc = useMemo(() => {
     if (!formData?.oddsTarget) return undefined;
     const low = min + (max - min) * 0.2;
@@ -336,11 +348,12 @@ const OddsTarget = () => {
           key={chainId}
           type="2"
           className={styles['progress']}
+          disabled={!max}
           percent={percentage}
           onPercentChange={(p) =>
             useDIYState.updateMultipleTarget(
               chainId,
-              Math.round(p * (max - min) + min),
+              +Math.exp(p * (logMax - logMin) + logMin).toFixed(2),
             )
           }
         />
