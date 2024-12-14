@@ -50,7 +50,6 @@ const Root = WasmSuspenseHoc(
 
     const location = useLocation();
     useEffect(() => {
-      console.log('location.pathname: ' + location.pathname);
       document.getElementById('root')?.scrollTo(0, 0);
       document.body.classList.add('no-scrollbar');
       if (Env.isMobile) document.body.classList.add('is-mobile');
