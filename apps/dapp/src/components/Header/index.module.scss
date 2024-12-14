@@ -251,7 +251,7 @@
 
 @media (orientation: portrait) {
   :global {
-    .main-content {
+    .main-content.main-content {
       margin-top: $header-menu-height + $header-ticker-height;
     }
 
@@ -263,6 +263,7 @@
 
   .header {
     border-bottom: 1px solid rgba(#fff, 0.08);
+
     .bg {
       background: $color-mobile-header-gradient;
     }
