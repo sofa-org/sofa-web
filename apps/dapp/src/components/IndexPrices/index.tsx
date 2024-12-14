@@ -91,7 +91,7 @@ const IndexPrices = (props: BaseProps) => {
 
   const highlightTicker = useLazyCallback(() => {
     const tickerElement = document.querySelector('.index-prices-ticker');
-    if (!tickerElement || !tickerElement.checkVisibility()) {
+    if (!tickerElement || !tickerElement.checkVisibility?.()) {
       return;
     }
     const focusingElement = document.querySelectorAll(

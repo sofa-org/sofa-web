@@ -51,7 +51,8 @@
 @media (orientation: portrait) {
   .launch-app {
     height: 32px;
-    background: transparent !important;
+
+    // background: transparent !important;
     border: none !important;
 
     :global {

@@ -17,6 +17,7 @@ import { Env } from '@sofa/utils/env';
 import { useQuery } from '@sofa/utils/hooks';
 import { joinUrl } from '@sofa/utils/url';
 import { versionGuardian } from '@sofa/utils/version';
+import classNames from 'classnames';
 
 import ErrorBoundary from '@/components/ErrorBoundary/index';
 import Footer from '@/components/Footer/index';
@@ -32,7 +33,7 @@ import { CampaignEntry } from './components/CampaignEntry';
 import { GlobalModal } from './components/GlobalModal';
 import { GlobalTips } from './components/GlobalTips';
 import { EnvLinks } from './env-links';
-import { RouteGuard } from './route-guard';
+import { RootDomainPaths, RouteGuard } from './route-guard';
 import { routes } from './routes';
 import { useGlobalState } from './store';
 
@@ -49,6 +50,7 @@ const Root = WasmSuspenseHoc(
 
     const location = useLocation();
     useEffect(() => {
+      console.log('location.pathname: ' + location.pathname);
       document.getElementById('root')?.scrollTo(0, 0);
       document.body.classList.add('no-scrollbar');
       if (Env.isMobile) document.body.classList.add('is-mobile');
@@ -71,7 +73,14 @@ const Root = WasmSuspenseHoc(
       >
         <ErrorBoundary style={{ height: '100vh' }}>
           <Header />
-          <main className="main-content">
+          <main
+            className={classNames(
+              'main-content',
+              RootDomainPaths.includes(location.pathname)
+                ? 'main-home'
+                : undefined,
+            )}
+          >
             <Suspense>
               <Outlet />
             </Suspense>

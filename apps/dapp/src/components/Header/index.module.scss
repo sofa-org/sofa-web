@@ -28,8 +28,6 @@
       color: #fff;
     }
   }
-
-  border-bottom: 1px solid rgba(#fff, 0.08);
 }
 
 :global {
@@ -253,12 +251,18 @@
 
 @media (orientation: portrait) {
   :global {
-    .main-content.main-content {
+    .main-content {
       margin-top: $header-menu-height + $header-ticker-height;
+    }
+
+    .main-content.main-home {
+      // no ticker in home header
+      margin-top: $header-menu-height;
     }
   }
 
   .header {
+    border-bottom: 1px solid rgba(#fff, 0.08);
     .bg {
       background: $color-mobile-header-gradient;
     }
