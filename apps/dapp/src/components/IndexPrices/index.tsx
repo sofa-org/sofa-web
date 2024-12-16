@@ -92,6 +92,10 @@ const IndexPrices = (props: BaseProps) => {
   const [stopMobileTicker, setStopMobileTicker] = useState(true);
 
   const highlightTicker = useLazyCallback(() => {
+    const tickerElement = document.querySelector('.index-prices-ticker');
+    if (!tickerElement || !tickerElement.checkVisibility?.()) {
+      return;
+    }
     // Current ticker implementation(react-infinite-ticker) is using **2** horizontal element and do the rotation
     // (one horizontal_element_width = all index prices element's width added up)
     // so, if the total window width > 2 * horizontal_element_width, the page will looks weird
@@ -131,11 +135,6 @@ const IndexPrices = (props: BaseProps) => {
       return;
     }
     setStopMobileTicker(false);
-    // const windowWidthNotEnough = window.innerWidth <
-    const tickerElement = document.querySelector('.index-prices-ticker');
-    if (!tickerElement || !tickerElement.checkVisibility?.()) {
-      return;
-    }
     let newFocusElement: HTMLDivElement | undefined = undefined;
     let newFocusElementBox: DOMRect | undefined = undefined;
 

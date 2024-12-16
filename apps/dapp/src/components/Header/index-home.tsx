@@ -7,6 +7,7 @@ import { Env } from '@sofa/utils/env';
 import { joinUrl } from '@sofa/utils/url';
 import { useScroll } from 'ahooks';
 import classNames from 'classnames';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import { Comp as Logo } from '@/assets/logo';
 import { EnvLinks } from '@/env-links';
@@ -40,9 +41,14 @@ export interface MenuItem {
   group?(t: TFunction): string;
 
   hide?(): boolean;
+
+  active?: boolean;
 }
 
-const allMenuItems = (project: ProjectType): MenuItem[] => {
+const allMenuItems = (
+  project: ProjectType,
+  location: ReturnType<typeof useLocation>,
+): MenuItem[] => {
   // 下面这行被注释掉的code 告诉 ai18n 下面的 t 都是在 Header 包下
   // const [t] = useTranslation('Header');
   const campaign = {
@@ -57,36 +63,89 @@ const allMenuItems = (project: ProjectType): MenuItem[] => {
     path: EnvLinks.config.VITE_CAMPAIGN_LINK,
     hide: () => Env.isTelegram,
   };
-  return [
-    { label: (t: TFunction) => t('home'), path: '/', type: 1 },
-    { label: (t: TFunction) => t('Project'), path: '/mechanism', type: 1 },
-    { label: (t: TFunction) => t('Capabilities'), path: '/strengths', type: 1 },
-    { label: (t: TFunction) => t('RCH'), path: '/rch', type: 1 },
-    { ...campaign, type: 1 },
-    {
-      label: (t: TFunction) => t({ enUS: 'Points', zhCN: '积分' }),
-      path: '/points',
-      type: 1,
-    },
-    {
-      label: (t: TFunction) => t('Docs'),
-      path: 'https://docs.sofa.org',
-      type: 1,
-    },
-    {
-      label: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
-      path: 'https://blog.sofa.org/',
-      type: 1,
-    },
-    {
-      label: (t: TFunction) =>
-        t({ enUS: 'Ambassador Program', zhCN: '宣传大使项目' }),
-      path: 'https://blog.sofa.org/ambassador/',
-      type: 1,
-    },
-  ];
+  return markSelectedMenuItems(
+    [
+      { label: (t: TFunction) => t('home'), path: '/', type: 1 },
+      { label: (t: TFunction) => t('Project'), path: '/mechanism', type: 1 },
+      {
+        label: (t: TFunction) => t('Capabilities'),
+        path: '/strengths',
+        type: 1,
+      },
+      { label: (t: TFunction) => t('RCH'), path: '/rch', type: 1 },
+      { ...campaign, type: 1 },
+      {
+        label: (t: TFunction) => t({ enUS: 'Points', zhCN: '积分' }),
+        path: '/points',
+        type: 1,
+      },
+      {
+        label: (t: TFunction) => t('Docs'),
+        path: 'https://docs.sofa.org',
+        type: 1,
+      },
+      {
+        label: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
+        path: 'https://blog.sofa.org/',
+        type: 1,
+      },
+      {
+        label: (t: TFunction) =>
+          t({ enUS: 'Ambassador Program', zhCN: '宣传大使项目' }),
+        path: 'https://blog.sofa.org/ambassador/',
+        type: 1,
+      },
+    ],
+    location,
+  );
 };
 
+export interface MobileHeaderState {
+  selectedMenuItem?: MenuItem;
+  setSelectedMenuItem: (menuItem: MenuItem) => void;
+}
+
+export const useMobileHeaderState = createWithEqualityFn<MobileHeaderState>(
+  (set) => ({
+    setSelectedMenuItem(item) {
+      set({ selectedMenuItem: item });
+    },
+  }),
+);
+
+function locationMatches(
+  item: MenuItem,
+  location: ReturnType<typeof useLocation>,
+) {
+  const itemPath =
+    (item.path && item.path.replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
+    '';
+  const itemSearch =
+    (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
+  const locationPath =
+    (location.pathname && location.pathname.replace(/(^\/+|\/+$)/g, '')) || '';
+  return (
+    itemPath == locationPath &&
+    (!itemSearch || location.search.includes(itemSearch))
+  );
+}
+export function markSelectedMenuItems(
+  items: MenuItem[],
+  location: ReturnType<typeof useLocation>,
+): MenuItem[] {
+  for (const item of items) {
+    let selected = locationMatches(item, location);
+    if (item.children) {
+      markSelectedMenuItems(item.children, location);
+      // if any of my children is selected, the parent menu item is selected
+      if (!selected && item.children?.filter((c) => c.active)?.length) {
+        selected = true;
+      }
+    }
+    item.active = selected;
+  }
+  return items;
+}
 export function useHeaderOpacity() {
   const location = useLocation();
   const disableOpacityChange = useMemo(
@@ -113,17 +172,15 @@ export function useHeaderOpacity() {
 export const RenderMenu = (it: MenuItem) => {
   const [t] = useTranslation('Header');
   const [project] = useProjectChange(ProjectType.Surge);
-
+  const { selectedMenuItem, setSelectedMenuItem } = useMobileHeaderState();
   if (it.hide?.()) return <Fragment />;
   if (it.path && !it.path.startsWith('http')) {
     return (
       <NavLink
         to={joinUrl(it.path, location.search)}
-        className={classNames(styles['link'], {
-          [styles['active']]:
-            it.path === '/'
-              ? it.path === location.pathname
-              : location.pathname.startsWith(it.path.replace(/\?.*$/, '')),
+        className={classNames(styles['link'], 'link', {
+          [styles['active']]: it.active,
+          ['active']: it.active,
         })}
       >
         {it.label(t)}
@@ -135,7 +192,10 @@ export const RenderMenu = (it: MenuItem) => {
     return (
       <a
         href={joinUrl(it.path, `?project=${project}`)}
-        className={classNames(styles['link'])}
+        className={classNames(styles['link'], 'link', {
+          [styles['active']]: it.active,
+          ['active']: it.active,
+        })}
         target={
           Env.isMetaMaskAndroid ||
           (Env.isTelegram &&
@@ -167,8 +227,20 @@ export const RenderMenu = (it: MenuItem) => {
   return (
     <Dropdown
       trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
-      className={classNames(styles['nav-selector'], 'semi-always-dark')}
+      className={classNames(
+        styles['nav-selector'],
+        'header-menu',
+        'semi-always-dark',
+      )}
       position={'bottomLeft'}
+      getPopupContainer={() =>
+        document.querySelector('#header-menu-container')!
+      }
+      onVisibleChange={(v) => {
+        if (v) {
+          setSelectedMenuItem(it);
+        }
+      }}
       render={
         <Dropdown.Menu className={styles['nav-selector-items']}>
           {Object.entries(groups).map(([group, children], _, arr) => {
@@ -180,7 +252,14 @@ export const RenderMenu = (it: MenuItem) => {
                   return (
                     <Dropdown.Item
                       key={m.path}
-                      className={classNames(styles['nav-selector-item'])}
+                      className={classNames(
+                        styles['nav-selector-item'],
+                        'nav-selector-item',
+                        {
+                          [styles['active']]: m.active,
+                          ['active']: m.active,
+                        },
+                      )}
                       onClick={() => {
                         window.location.href = m.path;
                       }}
@@ -192,10 +271,20 @@ export const RenderMenu = (it: MenuItem) => {
                           </span>
                         )}
                         <span className={styles['txt']}>
-                          <span className={styles['txt-label']}>
+                          <span
+                            className={classNames(
+                              styles['txt-label'],
+                              'txt-label',
+                            )}
+                          >
                             {m.label(t)}
                           </span>
-                          <span className={styles['txt-desc']}>
+                          <span
+                            className={classNames(
+                              styles['txt-desc'],
+                              'txt-desc',
+                            )}
+                          >
                             {m.desc?.(t)}
                           </span>
                         </span>
@@ -210,7 +299,12 @@ export const RenderMenu = (it: MenuItem) => {
       }
     >
       <a
-        className={classNames(styles['link'])}
+        className={classNames(styles['link'], 'link', {
+          [styles['active']]: it.active,
+          ['active']: it.active,
+          [styles['selected']]: selectedMenuItem == it,
+          ['selected']: selectedMenuItem == it,
+        })}
         href={it.path}
         onClick={(e) => !it.path && e.preventDefault()}
       >
@@ -232,7 +326,10 @@ export const HomeHeader = () => {
 
   const opacity = useHeaderOpacity();
 
-  const menusForRender = useMemo(() => allMenuItems(project), [project]);
+  const menusForRender = useMemo(
+    () => allMenuItems(project, location),
+    [project, location],
+  );
 
   const more = useMemo(
     () => /rch|points/.test(location.pathname),
@@ -247,13 +344,14 @@ export const HomeHeader = () => {
   return (
     <>
       <header
-        className={classNames(styles['header'], {
+        className={classNames(styles['header'], 'header', {
           [styles['expanded']]: expanded,
+          ['expanded']: expanded,
         })}
         id="header"
       >
         <div className={styles['bg']} style={{ opacity }} />
-        <div className={styles['menu']}>
+        <div className={classNames(styles['menu'], 'menu')}>
           <nav className={styles['left']}>
             <div className={styles['logo-wrapper']}>
               <Logo className={styles['logo']} onClick={() => navigate('/')} />
@@ -281,6 +379,7 @@ export const HomeHeader = () => {
         </div>
         {more && <IndexPrices className={styles['index-prices']} />}
       </header>
+      <div id="header-menu-container" />
     </>
   );
 };
