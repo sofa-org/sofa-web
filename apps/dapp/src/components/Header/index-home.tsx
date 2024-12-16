@@ -126,7 +126,12 @@ function locationMatches(
     (location.pathname && location.pathname.replace(/(^\/+|\/+$)/g, '')) || '';
   return (
     itemPath == locationPath &&
-    (!itemSearch || location.search.includes(itemSearch))
+    (!itemSearch || location.search.includes(itemSearch)) &&
+    (itemSearch ||
+      // this is to differentiate:
+      // Automator: /products?project=Automator
+      // Trade - Defi Mode: /products
+      !/project=/.test(location.search))
   );
 }
 export function markSelectedMenuItems(
