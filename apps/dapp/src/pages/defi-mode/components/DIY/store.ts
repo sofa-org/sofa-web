@@ -302,7 +302,7 @@ export const useDIYState = Object.assign(instant, {
     if (!useDIYState.validateFormData(formData, false)) return [0, 5];
     const vaults = ProductsService.filterVaults(
       ContractsService.vaults,
-      formData,
+      { ...formData, chainId },
       false,
       true,
     );
@@ -321,7 +321,7 @@ export const useDIYState = Object.assign(instant, {
     if (!useDIYState.validateFormData(formData, false)) return [0, 10];
     const vaults = ProductsService.filterVaults(
       ContractsService.vaults,
-      formData,
+      { ...formData, chainId },
       false,
       true,
     );
