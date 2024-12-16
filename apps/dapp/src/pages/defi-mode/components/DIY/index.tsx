@@ -246,16 +246,17 @@ const ApyTarget = () => {
     return (log - logMin) / (logMax - logMin);
   }, [formData?.apyTarget, logMax, logMin]);
 
+  const rchApy = useDIYState((state) => state.selectedQuote[0]?.apyInfo?.rch);
   const probabilityDesc = useMemo(() => {
-    if (!formData?.apyTarget) return undefined;
-    const low = Math.min(min + (max - min) * 0.2, 0.5);
-    const high = Math.min(min + (max - min) * 0.8, 2);
-    if (formData?.apyTarget < low)
+    if (!formData?.apyTarget || !rchApy) return undefined;
+    const low = Math.min(min + (max - min) * 0.2, 0.5 + +rchApy);
+    const high = Math.min(min + (max - min) * 0.8, 2 + +rchApy);
+    if (formData.apyTarget < low)
       return {
         txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),
         color: '#49AA19',
       };
-    if (formData?.apyTarget < high)
+    if (formData.apyTarget < high)
       return {
         txt: t({ enUS: 'Neutral', zhCN: '中性概率' }),
         color: '#177DDC',
@@ -264,7 +265,7 @@ const ApyTarget = () => {
       txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
       color: '#CD8E8E',
     };
-  }, [formData?.apyTarget, max, min, t]);
+  }, [formData?.apyTarget, max, min, t, rchApy]);
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
@@ -319,10 +320,12 @@ const OddsTarget = () => {
     const log = Math.log(formData.oddsTarget);
     return (log - logMin) / (logMax - logMin);
   }, [formData?.oddsTarget, logMax, logMin]);
+
+  const rchOdds = useDIYState((state) => state.selectedQuote[0]?.oddsInfo?.rch);
   const probabilityDesc = useMemo(() => {
-    if (!formData?.oddsTarget) return undefined;
-    const low = Math.min(min + (max - min) * 0.2, 4);
-    const high = Math.min(min + (max - min) * 0.8, 10);
+    if (!formData?.oddsTarget || !rchOdds) return undefined;
+    const low = Math.min(min + (max - min) * 0.2, 4 + +rchOdds);
+    const high = Math.min(min + (max - min) * 0.8, 10 + +rchOdds);
     if (formData?.oddsTarget < low)
       return {
         txt: t({ enUS: 'Good likelihood', zhCN: '大概率' }),
@@ -337,7 +340,7 @@ const OddsTarget = () => {
       txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
       color: '#CD8E8E',
     };
-  }, [formData?.oddsTarget, max, min, t]);
+  }, [formData?.oddsTarget, max, min, t, rchOdds]);
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>

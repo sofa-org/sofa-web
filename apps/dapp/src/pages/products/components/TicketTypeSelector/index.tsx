@@ -51,7 +51,7 @@ export function useTicketType(forCcy: VaultInfo['forCcy']) {
     [chainId, productType, riskType],
   );
   const ticketMeta = useMemo(() => {
-    return options.find((it) => depositCcy === it.value);
+    return options.find((it) => depositCcy === it.value) || options[0];
   }, [depositCcy, options]);
   const setDepositCcy = useLazyCallback((ccy: VaultInfo['depositCcy']) => {
     updateQuery({ 'deposit-ccy': ccy });
