@@ -16,7 +16,7 @@ import styles from './index.module.scss';
 
 const tabs = [
   {
-    label: (t: TFunction) => t({ enUS: 'DeFi Mode', zhCN: 'DiFi 模式' }),
+    label: (t: TFunction) => t({ enUS: 'DeFi Mode', zhCN: 'DeFi 模式' }),
     value: 'diy',
     comp: () => <DIY />,
   },
