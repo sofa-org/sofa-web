@@ -102,7 +102,7 @@ const allMenuItems = (
 
 export interface MobileHeaderState {
   selectedMenuItem?: MenuItem;
-  setSelectedMenuItem: (menuItem: MenuItem) => void;
+  setSelectedMenuItem: (menuItem?: MenuItem) => void;
 }
 
 export const useMobileHeaderState = createWithEqualityFn<MobileHeaderState>(
@@ -239,6 +239,10 @@ export const RenderMenu = (it: MenuItem) => {
       onVisibleChange={(v) => {
         if (v) {
           setSelectedMenuItem(it);
+        } else {
+          if (it == selectedMenuItem) {
+            setSelectedMenuItem(undefined);
+          }
         }
       }}
       render={
