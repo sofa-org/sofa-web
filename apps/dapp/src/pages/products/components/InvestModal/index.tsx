@@ -305,7 +305,7 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
           props.product.amounts.own,
           props.product.vault.depositTickAmount,
           props.product.vault.depositMinAmount,
-          balance || undefined,
+          Math.max(balance || 0, props.product.vault.depositMinAmount),
         ),
         protectedApy: props.product.apyInfo?.min,
         fundingApy,

@@ -281,7 +281,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
         )}
         {texts?.map((it) => (
           <text
-            key={it.txt}
+            key={`${it.x}-${it.y}-${it.txt}`}
             x={it.x}
             y={it.y}
             dominantBaseline="middle"
