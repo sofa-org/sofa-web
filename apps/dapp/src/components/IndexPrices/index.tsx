@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { HorizontalTicker } from 'react-infinite-ticker';
 import { Rnd } from 'react-rnd';
 import { amountFormatter } from '@sofa/utils/amount';
@@ -89,14 +89,53 @@ const IndexPrices = (props: BaseProps) => {
     [$position],
   );
 
+  const [stopMobileTicker, setStopMobileTicker] = useState(true);
+
   const highlightTicker = useLazyCallback(() => {
-    const tickerElement = document.querySelector('.index-prices-ticker');
-    if (!tickerElement || !tickerElement.checkVisibility?.()) {
+    // Current ticker implementation(react-infinite-ticker) is using **2** horizontal element and do the rotation
+    // (one horizontal_element_width = all index prices element's width added up)
+    // so, if the total window width > 2 * horizontal_element_width, the page will looks weird
+    // Solution:
+    // - If the screen width < 1.2 * horizontal_element_width, disable the ticker;
+    // - Otherwise, enable the ticker and auto focus to the left most index price as the design;
+
+    const horizontalElementContainer = document.querySelector(
+      '.index-prices-ticker>div',
+    );
+    const horizontalElement =
+      horizontalElementContainer &&
+      horizontalElementContainer.childElementCount == 2 &&
+      horizontalElementContainer.childNodes[0]?.nodeName?.toLowerCase?.() ==
+        'div'
+        ? (horizontalElementContainer.childNodes[0] as HTMLDivElement)
+        : undefined;
+    if (!horizontalElement) {
       return;
     }
     const focusingElement = document.querySelectorAll(
       `.index-prices-ticker .index-price.${styles['focused']}`,
     );
+    if (window.innerWidth > 1.2 * horizontalElement.clientWidth) {
+      setStopMobileTicker(true);
+      if (focusingElement.length) {
+        for (const ele of focusingElement) {
+          ele.className = ele.className.replace(
+            new RegExp(
+              /\b/.source + escapeRegExp(styles['focused']) + /\b/.source,
+              'g',
+            ),
+            '',
+          );
+        }
+      }
+      return;
+    }
+    setStopMobileTicker(false);
+    // const windowWidthNotEnough = window.innerWidth <
+    const tickerElement = document.querySelector('.index-prices-ticker');
+    if (!tickerElement || !tickerElement.checkVisibility?.()) {
+      return;
+    }
     let newFocusElement: HTMLDivElement | undefined = undefined;
     let newFocusElementBox: DOMRect | undefined = undefined;
 
@@ -155,7 +194,10 @@ const IndexPrices = (props: BaseProps) => {
           props.className,
         )}
       >
-        <HorizontalTicker duration={25000}>
+        <HorizontalTicker
+          key={`HorizontalTicker-${stopMobileTicker ? 0 : 1}`}
+          duration={stopMobileTicker ? 0 : 25000}
+        >
           <IndexPrice ccy="BTC" />
           <IndexPrice ccy="ETH" />
           <IndexPrice ccy="RCH" />
