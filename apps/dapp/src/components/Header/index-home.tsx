@@ -234,6 +234,7 @@ export const RenderMenu = (it: MenuItem) => {
       trigger={Env.isMobile || Env.isTelegram ? 'click' : 'hover'}
       className={classNames(
         styles['nav-selector'],
+        'nav-selector',
         'header-menu',
         'semi-always-dark',
       )}

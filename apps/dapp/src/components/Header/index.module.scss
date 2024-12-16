@@ -148,6 +148,8 @@
   width: min($width-content, 520px);
   position: relative;
   margin-bottom: 12px !important;
+  margin-left: 12px !important;
+  margin-right: 12px !important;
 
   &:hover,
   &:active {
@@ -156,7 +158,7 @@
 
   &::before {
     content: "";
-    border-radius: 16px;
+    border-radius: 8px;
     background: rgba(#fff, 0.16);
 
     // border: 1px solid red;
@@ -171,17 +173,19 @@
   }
 
   &:last-child {
-    margin-bottom: 0 !important;
+    margin-bottom: 10px !important;
   }
 
   &::after {
     content: "";
-    border-radius: 16px;
-    background: $color-main-gradient;
+    border-radius: 8px;
     background: var(--semi-color-bg-3);
     position: absolute;
     inset: 0;
     z-index: 3;
+  }
+  &.active::after {
+    background: #000;
   }
 
   > * {
@@ -233,15 +237,15 @@
 }
 
 .nav-selector {
-  padding: 8px;
+  padding: 18px 8px 8px 8px;
   border-radius: min(24px, 4vw);
 
   :global(.semi-dropdown-title) {
-    margin: min(24px, 4vw) 0 min(8px, 1.6vw);
-    padding: min(16px, 3.2vw) min(20px, 4vw) 4px;
+    margin: 16px 0 8px;
+    padding: 10px 10px 4px;
 
     &:first-child {
-      margin-top: 0;
+      margin-top: -12px;
     }
   }
 
@@ -311,8 +315,15 @@
         }
       }
 
+      .nav-selector {
+        .semi-dropdown-title {
+          padding: 4px 8px 3px;
+        }
+      }
       .nav-selector-item {
-        width: calc(100vw - 156px);
+        width: calc(100vw - 170px);
+        margin-left: 8px !important;
+        margin-right: 8px !important;
 
         &::before,
         &::after {
