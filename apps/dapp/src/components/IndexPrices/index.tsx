@@ -100,26 +100,12 @@ const IndexPrices = (props: BaseProps) => {
     // (one horizontal_element_width = all index prices element's width added up)
     // so, if the total window width > 2 * horizontal_element_width, the page will looks weird
     // Solution:
-    // - If the screen width < 1.2 * horizontal_element_width, disable the ticker;
+    // - If the screen width < 540px, disable the ticker;
     // - Otherwise, enable the ticker and auto focus to the left most index price as the design;
-
-    const horizontalElementContainer = document.querySelector(
-      '.index-prices-ticker>div',
-    );
-    const horizontalElement =
-      horizontalElementContainer &&
-      horizontalElementContainer.childElementCount == 2 &&
-      horizontalElementContainer.childNodes[0]?.nodeName?.toLowerCase?.() ==
-        'div'
-        ? (horizontalElementContainer.childNodes[0] as HTMLDivElement)
-        : undefined;
-    if (!horizontalElement) {
-      return;
-    }
     const focusingElement = document.querySelectorAll(
       `.index-prices-ticker .index-price.${styles['focused']}`,
     );
-    if (window.innerWidth > 1.2 * horizontalElement.clientWidth) {
+    if (window.innerWidth > 540) {
       setStopMobileTicker(true);
       if (focusingElement.length) {
         for (const ele of focusingElement) {
