@@ -272,10 +272,6 @@
     }
   }
 
-  .btn-expand {
-    display: flex;
-  }
-
   .details {
     max-height: 35vh;
     overflow: auto;
@@ -387,6 +383,10 @@
     gap: 0;
     border-radius: 4vw;
     overflow: hidden;
+  }
+
+  .btn-expand {
+    display: flex;
   }
 
   .form {

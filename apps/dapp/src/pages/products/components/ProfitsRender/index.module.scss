@@ -88,7 +88,12 @@
 .profit-render-wrapper {
   flex: 1;
   margin: 0;
-  min-width: 290px;
+  min-width: 280px;
+  white-space: nowrap;
+
+  .title {
+    white-space: initial;
+  }
 }
 
 .profits-render {
