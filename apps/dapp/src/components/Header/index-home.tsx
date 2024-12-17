@@ -117,17 +117,21 @@ function locationMatches(
   item: MenuItem,
   location: ReturnType<typeof useLocation>,
 ) {
-  const itemPath =
-    (item.path &&
-      item.path
-        .replace(/^\w+:\/\/[^/]+/, '')
-        .replace(/\?.*/, '')
-        .replace(/(^\/+|\/+$)/g, '')) ||
+  let itemPath =
+    (item.path && item.path.replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
     '';
+  if (!/^\w+:/.test(itemPath)) {
+    if (itemPath) {
+      itemPath = window.location.origin + '/' + itemPath;
+    } else {
+      itemPath = window.location.origin;
+    }
+  }
   const itemSearch =
     (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
-  const locationPath =
-    (location.pathname && location.pathname.replace(/(^\/+|\/+$)/g, '')) || '';
+  const locationPath = (
+    window.location.origin + location.pathname || ''
+  ).replace(/(^\/+|\/+$)/g, '');
   return !!(
     itemPath == locationPath &&
     (!itemSearch || location.search.includes(itemSearch)) &&
