@@ -118,7 +118,7 @@ function locationMatches(
   location: ReturnType<typeof useLocation>,
 ) {
   const itemPath =
-    (item.path && item.path.replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
+    (item.path && item.path.replace(/^\w+:\/\/[^/]+/, '').replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
     '';
   const itemSearch =
     (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
