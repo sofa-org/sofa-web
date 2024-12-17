@@ -29,6 +29,13 @@
   border: 1px solid $color-border;
 }
 
+:global(.dark) {
+  .content.content {
+    border: 1px solid rgba(#fff, 0.12);
+    background: rgba(#fff, 0.08);
+  }
+}
+
 .leverage > svg:first-child > path:nth-last-child(2) {
   fill: #eb4476 !important;
   fill-opacity: 1 !important;

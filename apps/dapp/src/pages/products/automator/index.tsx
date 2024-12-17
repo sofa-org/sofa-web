@@ -164,6 +164,7 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
           {!props.onlyForm && (
             <ProductDesc
               noMoreInfo
+              dark={Env.isMobile}
               className={styles['product-desc-wrapper']}
               prefixTabs={[
                 {

@@ -2,6 +2,11 @@
   outline: none !important;
 }
 
+.dark {
+  .semi-tabs-pane {
+    color: rgba(#fff, 0.85) !important;
+  }
+}
 @media (orientation: portrait) {
   .semi-tabs-tab-line.semi-tabs-tab-top.semi-tabs-tab {
     padding: 10px 4px 8px;

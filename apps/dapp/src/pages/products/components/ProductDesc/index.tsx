@@ -21,11 +21,14 @@ const ProductDesc = (
     prefixTabs?: { itemKey: string; tab: string; element: ReactNode }[];
     noReturnTab?: boolean;
     noMoreInfo?: boolean;
+    dark?: boolean;
   },
 ) => {
   return (
     <Tabs
-      className={classNames(styles['product-desc'], props.className)}
+      className={classNames(styles['product-desc'], props.className, {
+        ['dark']: props.dark,
+      })}
       style={props.style}
       lazyRender
     >

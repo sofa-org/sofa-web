@@ -75,22 +75,24 @@
       border-color: #000 !important;
       opacity: 1;
     }
+
     .redeem {
       &::before {
         content: "";
         width: 21px;
         height: 21px;
         display: inline-block;
-        background: url(./assets/icon-deposit.svg);
+        background: url("./assets/icon-deposit.svg");
       }
     }
+
     .deposit {
       &::before {
         content: "";
         width: 21px;
         height: 21px;
         display: inline-block;
-        background: url(./assets/icon-withdraw.svg);
+        background: url("./assets/icon-withdraw.svg");
       }
     }
   }
@@ -141,6 +143,8 @@
 
 @mixin rewrite {
   .section {
+    display: block;
+
     &.section-top {
       margin: 12px auto 0;
     }
@@ -149,15 +153,11 @@
   .only-form {
     // margin: 36px 0 0;
     .section {
-      display: block;
-
       .left {
-        display: block;
         padding: 0 0 min(40px, 5vw);
       }
 
       .right {
-        display: block;
         padding: min(40px, 5vw) 0 0;
       }
     }
@@ -170,6 +170,7 @@
       bottom: 0;
       width: 100vw;
       display: block;
+
       > div {
         border-radius: 0 !important;
         position: fixed;
@@ -187,21 +188,24 @@
           font-size: 16px;
           line-height: 64px;
         }
+
         &:active {
           filter: brightness(1.25);
         }
 
         .deposit {
           &::before {
-            background: url(./assets/icon-withdraw-light.svg);
+            background: url("./assets/icon-withdraw-light.svg");
           }
         }
       }
+
       > :first-child {
         left: 0;
         background: #191d20 !important;
         color: #fff;
       }
+
       > :last-child {
         right: 0;
         background: $color-main-gradient !important;
@@ -217,13 +221,11 @@
   .mobile-tab-deposit {
     > .mobile-tab-bg {
       position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      background: rgba($color: #000, $alpha: 0.4);
+      inset: 0;
+      background: rgba($color: #000, $alpha: 40%);
       z-index: 2;
     }
+
     > :global(.semi-tabs) {
       position: fixed;
       z-index: 3;
@@ -236,17 +238,20 @@
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
       padding: 16px;
+
       :global(.semi-tabs-bar) {
         > div {
           display: none;
         }
+
         > :global(.semi-tabs-tab-active) {
           display: block;
           padding-bottom: 12px;
           border: none !important;
-          border-bottom: 1px solid rgba($color: #000000, $alpha: 0.12) !important;
+          border-bottom: 1px solid rgba($color: #000, $alpha: 12%) !important;
           margin: 0 -16px;
           padding-top: 0;
+
           > span {
             font-size: 20px;
           }
