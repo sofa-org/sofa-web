@@ -1,10 +1,12 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ProductType, RiskType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
+import { Env } from '@sofa/utils/env';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
+import classNames from 'classnames';
 
 import {
   ProductTypeRefs,
@@ -117,8 +119,11 @@ const HowLong = () => {
   const config = useDIYConfigState((state) => state.configs[chainId]);
   const [min, max] = useMemo(() => {
     if (!formData) return [next8h(undefined, 2), next8h(undefined, 7)];
-    const options = useDIYConfigState.getConfig(chainId, formData, config)
-      ?.expiryDateTimes;
+    const options = useDIYConfigState.getConfig(
+      chainId,
+      formData,
+      config,
+    )?.expiryDateTimes;
     if (!options) return [next8h(undefined, 2), next8h(undefined, 7)];
     return [options[0] * 1000, options[options.length - 1] * 1000];
   }, [chainId, config, formData]);
@@ -376,6 +381,7 @@ const OddsTarget = () => {
 };
 
 export const DIY = () => {
+  const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
   useEffect(() => {
     useDIYConfigState.fetchConfig(chainId);
@@ -397,6 +403,11 @@ export const DIY = () => {
   }, [apyList, chainId, config, oddsList]);
 
   const riskType = formData?.riskType;
+
+  const [mobileNextStepBtnClickd, setMobileNextStepBtnClicked] = useState<
+    boolean | 'not-mobile'
+  >(Env.isMobile ? false : 'not-mobile');
+
   return (
     <div className={styles['defi-mode-wrapper']}>
       <div className={styles['left']}>
@@ -407,7 +418,26 @@ export const DIY = () => {
         <RiskTolerance />
         {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>
-      <div className={styles['right']}>
+      {mobileNextStepBtnClickd !== 'not-mobile' ? (
+        <a
+          className={classNames(styles['mobile-next-step-btn'])}
+          onClick={() => setMobileNextStepBtnClicked(true)}
+        >
+          {t({ enUS: 'Next Step', zhCN: '下一步' })}
+        </a>
+      ) : undefined}
+      <div
+        className={classNames(styles['right'], {
+          [styles['mobile-hide-product-display']]:
+            mobileNextStepBtnClickd === false,
+        })}
+      >
+        <div
+          className={styles['mobile-next-step-bg']}
+          onClick={() =>
+            setMobileNextStepBtnClicked(Env.isMobile ? false : 'not-mobile')
+          }
+        />
         <DIYProductDisplay />
       </div>
     </div>

@@ -99,9 +99,31 @@
   margin: 0;
   counter-reset: step-counter;
 }
+.mobile-next-step-btn {
+  @include bold;
 
+  display: block;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 20px;
+  color: #000;
+  background: $color-main-gradient;
+}
 .right {
   margin: 0;
+  &.mobile-hide-product-display {
+    display: none;
+  }
+  .mobile-next-step-bg {
+    position: fixed;
+    z-index: 9;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(#000, 0.4);
+  }
 }
 
 .defi-mode-wrapper {

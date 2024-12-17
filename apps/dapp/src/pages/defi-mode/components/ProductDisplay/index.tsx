@@ -4,6 +4,7 @@ import { Spin, Toast } from '@douyinfe/semi-ui';
 import { RiskType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
+import { Env } from '@sofa/utils/env';
 import { displayExpiry, MsIntervals } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { simplePlus } from '@sofa/utils/object';
@@ -61,7 +62,7 @@ export const DIYProductDisplay = () => {
 
   const investModalRef = useRef<InvestModalPropsRef>(null);
 
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(Env.isMobile ? true : false);
 
   return (
     <Spin
