@@ -129,9 +129,10 @@ function locationMatches(
   }
   const itemSearch =
     (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
-  const locationPath = (
-    window.location.origin + location.pathname || ''
-  ).replace(/(^\/+|\/+$)/g, '');
+  const locationPath = (window.location.origin + location.pathname).replace(
+    /\/+$/g,
+    '',
+  );
   return !!(
     itemPath == locationPath &&
     (!itemSearch || location.search.includes(itemSearch)) &&
