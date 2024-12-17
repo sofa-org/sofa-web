@@ -202,13 +202,14 @@
 
       > :first-child {
         left: 0;
-        background: #191d20 !important;
+        background: #222 !important;
         color: #fff;
       }
 
       > :last-child {
         right: 0;
         background: $color-main-gradient !important;
+        color: #000;
       }
     }
 
