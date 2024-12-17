@@ -118,15 +118,16 @@ function locationMatches(
   location: ReturnType<typeof useLocation>,
 ) {
   const itemPath =
-    (item.path && item.path.replace(/^\w+:\/\/[^/]+/, '').replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
+    (item.path &&
+      item.path
+        .replace(/^\w+:\/\/[^/]+/, '')
+        .replace(/\?.*/, '')
+        .replace(/(^\/+|\/+$)/g, '')) ||
     '';
   const itemSearch =
     (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
   const locationPath =
     (location.pathname && location.pathname.replace(/(^\/+|\/+$)/g, '')) || '';
-  if (/Automator/.test(item.path)){ 
-    debugger;
-  }
   return !!(
     itemPath == locationPath &&
     (!itemSearch || location.search.includes(itemSearch)) &&
