@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Tabs } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
+import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
@@ -15,8 +16,6 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 
 import ProductDesc from '../components/ProductDesc';
 
-import { Comp as DepositIcon } from './assets/icon-deposit.svg';
-import { Comp as WithdrawIcon } from './assets/icon-withdraw.svg';
 import { AutomatorDeposit } from './components/Deposit';
 import { AutomatorOverview } from './components/Overview';
 import { AutomatorProjectDesc } from './components/ProjectDesc';
@@ -25,6 +24,11 @@ import { AutomatorWithdraw } from './components/Withdraw';
 import { useAutomatorStore } from './store';
 
 import styles from './index.module.scss';
+
+const isMobileUI = () => {
+  // align w/ index.mobile.scss
+  return Env.isMobile || window.innerWidth <= 500;
+};
 
 export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('Automator');
@@ -49,6 +53,16 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
     if (vault && address) {
       useAutomatorStore.updateUserInfo(vault, address);
       useWalletStore.updateBalanceByAutomatorVault(vault);
+    }
+  });
+
+  const [mobileUITab, setMobileUITab] = useState<string>('');
+  const onTabClick = useLazyCallback((tab: string) => {
+    if (tab) {
+      updateQuery({ tab });
+    }
+    if (isMobileUI()) {
+      setMobileUITab(tab);
     }
   });
 
@@ -97,19 +111,32 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
               <AutomatorOverview vault={vault} />
               <AutomatorUserInfo vault={vault} />
             </div>
-            <div className={styles['right']}>
+            <div
+              className={classNames(
+                styles['right'],
+                styles[`mobile-tab-${mobileUITab || 'none'}`],
+              )}
+            >
+              <div
+                className={styles['mobile-tab-bg']}
+                onClick={() => onTabClick('')}
+              />
               <Tabs
                 type="card"
                 size="small"
                 className={styles['tabs']}
                 activeKey={tab === 'redeem' ? 'redeem' : 'deposit'}
-                onTabClick={(it) => updateQuery({ tab: it })}
+                onTabClick={onTabClick}
               >
                 <Tabs.TabPane
                   itemKey="deposit"
                   tab={
-                    <span className={styles['tab-title']}>
-                      <DepositIcon />
+                    <span
+                      className={classNames(
+                        styles['tab-title'],
+                        styles['deposit'],
+                      )}
+                    >
                       {t({ enUS: 'Mint', zhCN: '铸造' })}
                     </span>
                   }
@@ -119,8 +146,12 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
                 <Tabs.TabPane
                   itemKey="redeem"
                   tab={
-                    <span className={styles['tab-title']}>
-                      <WithdrawIcon />
+                    <span
+                      className={classNames(
+                        styles['tab-title'],
+                        styles['redeem'],
+                      )}
+                    >
                       {t({ enUS: 'Redeem', zhCN: '赎回' })}
                     </span>
                   }

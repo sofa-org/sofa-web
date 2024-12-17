@@ -83,3 +83,36 @@
     color: #50d113;
   }
 }
+
+@mixin rewrite-ux-mobile {
+  .overview {
+    :global(.semi-spin-children) {
+      .yield {
+        .title {
+          border-bottom: 1px dashed rgba(#000, 0.22);
+        }
+      }
+      margin-top: 0;
+      padding-top: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border: none;
+      background: none;
+      border-bottom: 1px dashed rgba(#000, 0.12);
+    }
+  }
+  .nav {
+    border-left: none;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite-ux-mobile;
+  }
+}
+@media screen and (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite-ux-mobile;
+  }
+}

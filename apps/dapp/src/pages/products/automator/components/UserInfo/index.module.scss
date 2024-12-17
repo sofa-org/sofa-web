@@ -99,3 +99,34 @@
 //     transform: translateX(-50%) rotate(180deg);
 //   }
 // }
+
+@mixin rewrite-ux-mobile {
+  .user-info {
+    border: none;
+    padding-bottom: 40px;
+  }
+  .transaction-history-link {
+    position: absolute;
+    bottom: 0;
+    margin-left: 18px;
+    &::before {
+      content: "";
+      margin-left: -18px;
+      width: 14px;
+      height: 19px;
+      background: url(../../assets/icon-history.svg) no-repeat center;
+      position: absolute;
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite-ux-mobile;
+  }
+}
+@media screen and (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite-ux-mobile;
+  }
+}

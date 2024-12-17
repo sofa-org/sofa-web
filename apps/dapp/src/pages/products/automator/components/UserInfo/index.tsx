@@ -59,6 +59,7 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
           <div className={styles['title']}>
             {t({ enUS: 'My Position', zhCN: '我的持仓' })}
             <Link
+              className={styles['transaction-history-link']}
               to={`/positions?project=${ProjectType.Automator}&vault=${
                 props.vault?.vault || ''
               }`}
