@@ -97,7 +97,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
       },
       {
         label: t('Underlying'),
-        value: product.vault.forCcy,
+        value: product.vault.forCcy.replace(/^w/i, ''),
       },
       {
         label: t('Price Range'),
