@@ -247,9 +247,19 @@ export const RenderMenu = (it: MenuItem) => {
         'semi-always-dark',
       )}
       position={'bottomLeft'}
-      getPopupContainer={() =>
-        document.querySelector('#header-menu-container')!
-      }
+      getPopupContainer={() => {
+        // b.c. we are no longer using body as popup container
+        // due to semi Dropdown implementation, we need to set a minus top for the menu container
+        const root = document.querySelector<HTMLDivElement>('#root');
+        document.documentElement.style.setProperty(
+          '--header-menu-container-margin-top',
+          (root ? -root.scrollTop : 0) + 'px',
+        );
+        const res = document.querySelector<HTMLDivElement>(
+          '#header-menu-container',
+        )!;
+        return res;
+      }}
       onVisibleChange={(v) => {
         if (v) {
           setSelectedMenuItem(it);

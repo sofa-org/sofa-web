@@ -12,6 +12,8 @@
 @import "locomotive-scroll/dist/locomotive-scroll.css";
 
 :root {
+  --header-menu-container-margin-top: 0;
+
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
@@ -97,6 +99,12 @@ body.no-scrollbar {
   height: 100%;
   overflow: hidden auto;
   overscroll-behavior: none;
+}
+
+#header-menu-container {
+  position: absolute;
+  left: 0;
+  top: var(--header-menu-container-margin-top);
 }
 
 h1 {
