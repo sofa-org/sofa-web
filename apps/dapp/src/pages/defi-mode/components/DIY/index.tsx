@@ -8,6 +8,7 @@ import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import classNames from 'classnames';
 
+import { MobileOnly, useIsMobileUI } from '@/components/MobileOnly';
 import {
   ProductTypeRefs,
   RiskTypeRefs,
@@ -403,10 +404,9 @@ export const DIY = () => {
   }, [apyList, chainId, config, oddsList]);
 
   const riskType = formData?.riskType;
-
-  const [mobileNextStepBtnClickd, setMobileNextStepBtnClicked] = useState<
-    boolean | 'not-mobile'
-  >(Env.isMobile ? false : 'not-mobile');
+  const isMobileUI = useIsMobileUI();
+  const [mobileNextStepBtnClickd, setMobileNextStepBtnClicked] =
+    useState(false);
 
   return (
     <div className={styles['defi-mode-wrapper']}>
@@ -418,26 +418,26 @@ export const DIY = () => {
         <RiskTolerance />
         {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>
-      {mobileNextStepBtnClickd !== 'not-mobile' ? (
+      <MobileOnly>
         <a
           className={classNames(styles['mobile-next-step-btn'])}
           onClick={() => setMobileNextStepBtnClicked(true)}
         >
           {t({ enUS: 'Next Step', zhCN: '下一步' })}
         </a>
-      ) : undefined}
+      </MobileOnly>
       <div
         className={classNames(styles['right'], {
           [styles['mobile-hide-product-display']]:
-            mobileNextStepBtnClickd === false,
+            !mobileNextStepBtnClickd && isMobileUI,
         })}
       >
-        <div
-          className={styles['mobile-next-step-bg']}
-          onClick={() =>
-            setMobileNextStepBtnClicked(Env.isMobile ? false : 'not-mobile')
-          }
-        />
+        <MobileOnly>
+          <div
+            className={styles['mobile-next-step-bg']}
+            onClick={() => setMobileNextStepBtnClicked(false)}
+          />
+        </MobileOnly>
         <DIYProductDisplay />
       </div>
     </div>

@@ -10,6 +10,7 @@ import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import CEmpty from '@/components/Empty';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
@@ -25,16 +26,11 @@ import { useAutomatorStore } from './store';
 
 import styles from './index.module.scss';
 
-const isMobileUI = () => {
-  // align w/ index.mobile.scss
-  return Env.isMobile || window.innerWidth <= 500;
-};
-
 export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('Automator');
   const { tab } = useQuery();
   const { chainId, address } = useWalletStore((state) => state);
-
+  const isMobileUI = useIsMobileUI();
   const vault = useMemo(
     () => ContractsService.AutomatorVaults.find((it) => it.chainId === chainId),
     [chainId],
@@ -61,7 +57,7 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
     if (tab) {
       updateQuery({ tab });
     }
-    if (isMobileUI()) {
+    if (isMobileUI) {
       setMobileUITab(tab);
     }
   });
@@ -164,7 +160,7 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
           {!props.onlyForm && (
             <ProductDesc
               noMoreInfo
-              dark={Env.isMobile}
+              dark={isMobileUI}
               className={styles['product-desc-wrapper']}
               prefixTabs={[
                 {

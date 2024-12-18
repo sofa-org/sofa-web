@@ -20,23 +20,27 @@
     }
   }
 }
+
 :global(.dark) {
   &.product-desc {
     border: none;
     border-radius: 0;
     background: transparent;
+
     :global {
       .semi-tabs-tab-single.semi-tabs-tab {
-        color: rgba($color: #fff, $alpha: 0.45);
+        color: rgba($color: #fff, $alpha: 45%);
       }
+
       .semi-tabs-tab-single.semi-tabs-tab-active,
       .semi-tabs-tab-single:active {
         color: #fff;
-        border-bottom: #fff 2px solid !important;
+        border-bottom: #fff 1px solid !important;
       }
     }
   }
 }
+
 @media (orientation: portrait) {
   .product-desc {
     padding: 0 12px;

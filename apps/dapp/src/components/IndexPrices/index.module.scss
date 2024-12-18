@@ -100,8 +100,6 @@
 }
 
 .index-prices-ticker {
-  display: none;
-
   .index-price {
     padding-top: 9px;
     width: fit-content;
@@ -136,8 +134,6 @@
 
 @media (orientation: portrait) {
   .index-prices-ticker {
-    display: block;
-
     .index-price {
       margin-left: 10px;
     }

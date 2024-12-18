@@ -1,0 +1,21 @@
+.mobile-only {
+  visibility: collapse;
+}
+
+@mixin rewrite {
+  .mobile-only {
+    visibility: visible;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=500px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

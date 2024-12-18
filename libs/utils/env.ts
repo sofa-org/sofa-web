@@ -30,6 +30,11 @@ export class Env {
     if (Env._isMobile === undefined) Env._isMobile = mobile();
     return Env._isMobile;
   }
+  static recalcIsMobile() {
+    const isMobile = mobile();
+    Env._isMobile = isMobile;
+    return isMobile;
+  }
 
   private static _isTelegram?: boolean;
   static get isTelegram() {

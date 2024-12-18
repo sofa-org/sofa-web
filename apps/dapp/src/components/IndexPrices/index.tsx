@@ -17,6 +17,8 @@ import IconRCH from '@/assets/icon-rch.png';
 
 import 'swiper/css';
 
+import { MobileOnly, useIsMobileUI } from '../MobileOnly';
+
 import { useIndexPrices } from './store';
 
 import styles from './index.module.scss';
@@ -90,8 +92,11 @@ const IndexPrices = (props: BaseProps) => {
   );
 
   const [stopMobileTicker, setStopMobileTicker] = useState(true);
-
+  const isMobileUI = useIsMobileUI();
   const highlightTicker = useLazyCallback(() => {
+    if (!isMobileUI) {
+      return;
+    }
     const tickerElement = document.querySelector('.index-prices-ticker');
     if (!tickerElement || !tickerElement.checkVisibility?.()) {
       return;
@@ -172,7 +177,7 @@ const IndexPrices = (props: BaseProps) => {
 
   return (
     <>
-      <div
+      <MobileOnly
         className={classNames(
           styles['index-prices-ticker'],
           'index-prices-ticker',
@@ -187,7 +192,7 @@ const IndexPrices = (props: BaseProps) => {
           <IndexPrice ccy="ETH" />
           <IndexPrice ccy="RCH" />
         </HorizontalTicker>
-      </div>
+      </MobileOnly>
       <Rnd
         className={classNames(styles['index-prices'], props.className)}
         style={props.style}
