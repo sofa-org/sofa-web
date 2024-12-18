@@ -12,6 +12,7 @@ import { useRequest } from 'ahooks';
 import classNames from 'classnames';
 
 import AsyncButton from '@/components/AsyncButton';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import {
   ProductTypeRefs,
   RiskTypeRefs,
@@ -61,26 +62,21 @@ export const DIYProductDisplay = () => {
   );
 
   const investModalRef = useRef<InvestModalPropsRef>(null);
-
-  const [expanded, setExpanded] = useState(Env.isMobile ? true : false);
+  const isMobileUI = useIsMobileUI();
 
   return (
     <Spin
       wrapperClassName={classNames(styles['diy-product'], {
-        [styles['expanded']]: expanded,
+        [styles['expanded']]: isMobileUI,
       })}
       spinning={!quote}
     >
       <div className={styles['title']}>
         <span>{t({ enUS: 'Optimizer', zhCN: '产品' })}</span>
-        <span
-          className={styles['apy']}
-          onClick={() => setExpanded((pre) => !pre)}
-        >
+        <span className={styles['apy']}>
           {displayPercentage(
             simplePlus(quote?.apyInfo?.rch, quote?.apyInfo?.max),
           )}
-          <IconExpand className={styles['icon-expand']} />
         </span>
       </div>
       <div className={styles['risk-type']}>

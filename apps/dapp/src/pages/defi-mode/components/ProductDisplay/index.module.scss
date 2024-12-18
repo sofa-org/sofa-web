@@ -47,10 +47,6 @@
 
     display: none;
     color: $color-rise;
-
-    .icon-expand {
-      width: 1em;
-    }
   }
 }
 
@@ -222,7 +218,7 @@
     .risk-type,
     .product,
     .charts {
-      display: none;
+      display: flex;
     }
 
     .title {
@@ -231,17 +227,6 @@
       .apy {
         display: flex;
       }
-    }
-
-    &.expanded {
-      .risk-type,
-      .product,
-      .charts {
-        display: flex;
-      }
-    }
-    .icon-expand {
-      display: none;
     }
   }
 
