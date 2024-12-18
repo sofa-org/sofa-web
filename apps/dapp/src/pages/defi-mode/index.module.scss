@@ -75,9 +75,7 @@
 }
 
 @media (orientation: portrait) {
-  :global(.is-mobile) {
-    @include rewrite;
-  }
+  @include rewrite;
 }
 
 @media (width <=500px) {

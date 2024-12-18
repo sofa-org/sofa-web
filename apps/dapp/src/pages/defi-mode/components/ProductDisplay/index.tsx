@@ -85,9 +85,9 @@ export const DIYProductDisplay = () => {
       <div className={styles['risk-type']}>
         {riskRef?.icon}
         {riskRef?.label3(t) || '-'}
-        {riskRef?.value === RiskType.LEVERAGE && (
+        {/* {riskRef?.value === RiskType.LEVERAGE && (
           <span className={styles['badge-leverage']}>Lev.</span>
-        )}
+        )} */}
       </div>
       <div className={styles['product']}>
         {productRef?.label(t)}{' '}
