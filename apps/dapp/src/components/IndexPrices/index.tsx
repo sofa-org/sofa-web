@@ -183,6 +183,7 @@ const IndexPrices = (props: BaseProps) => {
           'index-prices-ticker',
           props.className,
         )}
+        display="block"
       >
         <HorizontalTicker
           key={`HorizontalTicker-${stopMobileTicker ? 0 : 1}`}
@@ -195,7 +196,10 @@ const IndexPrices = (props: BaseProps) => {
       </MobileOnly>
       <Rnd
         className={classNames(styles['index-prices'], props.className)}
-        style={props.style}
+        style={{
+          ...props.style,
+          display: isMobileUI ? 'none' : undefined,
+        }}
         size={{ width: 195, height: 'auto' }}
         position={position}
         onDragStop={(e, d) => setPosition({ x: d.x, y: d.y })}
