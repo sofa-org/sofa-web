@@ -15,6 +15,7 @@ import { addI18nResources, LangSelector } from '@/locales';
 
 import IndexPrices from '../IndexPrices';
 import LaunchApp from '../LaunchApp';
+import { useIsMobileUI } from '../MobileOnly';
 import NetworkSelector from '../NetworkSelector';
 import { useProjectChange } from '../ProductSelector';
 import TimezoneSelector from '../TimezoneSelector';
@@ -186,6 +187,7 @@ export function useHeaderOpacity() {
 export const RenderMenu = (it: MenuItem) => {
   const [t] = useTranslation('Header');
   const [project] = useProjectChange(ProjectType.Surge);
+  const isMobileUI = useIsMobileUI();
   const { selectedMenuItem, setSelectedMenuItem } = useMobileHeaderState();
   if (it.hide?.()) return <Fragment />;
   if (it.path && !it.path.startsWith('http')) {
@@ -335,7 +337,11 @@ export const RenderMenu = (it: MenuItem) => {
           ['selected']: selectedMenuItem == it,
         })}
         href={it.path}
-        onClick={(e) => !it.path && e.preventDefault()}
+        onClick={(e) => {
+          if (!it.path || (it.children?.length && isMobileUI)) {
+            e.preventDefault();
+          }
+        }}
       >
         {it.label(t)}
         {it.icon && (
