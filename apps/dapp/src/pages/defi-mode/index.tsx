@@ -3,7 +3,9 @@ import { ProjectType } from '@sofa/services/base-type';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
 import { useQuery } from '@sofa/utils/hooks';
+import classNames from 'classnames';
 
+import { useIsPortraitUI } from '@/components/MobileOnly';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 
@@ -44,6 +46,7 @@ const tabs = [
   },
 ];
 
+const portraitModeWidthThreshold = 900;
 const Index = () => {
   const [t] = useTranslation('DefiMode');
 
@@ -62,17 +65,24 @@ const Index = () => {
     () => tabs.find((it) => it.value === mode) || tabs[0],
     [mode],
   );
-
+  const isPortrait = useIsPortraitUI({
+    widthThreshold: portraitModeWidthThreshold,
+  });
   return (
     <TopTabs
       bannerClassName={styles['banner']}
-      tabClassName={styles['tabs']}
-      className={styles['content']}
+      tabClassName={classNames(styles['tabs'], {
+        [styles['portrait-ui']]: isPortrait,
+      })}
+      className={classNames(styles['content'], {
+        [styles['portrait-ui']]: isPortrait,
+      })}
       contentDecorationClassName={styles['decoration']}
       banner={<></>}
       value={(mode as string) || 'diy'}
       options={options}
       onChange={(v) => updateQuery({ mode: v })}
+      portraitModeWidthThreshold={portraitModeWidthThreshold}
     >
       {tab.comp()}
     </TopTabs>

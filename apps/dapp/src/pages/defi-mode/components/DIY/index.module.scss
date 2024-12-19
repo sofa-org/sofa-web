@@ -134,7 +134,7 @@
   margin: 0;
 }
 
-@mixin rewrite {
+@mixin rewrite-mobile {
   .badge {
     position: absolute;
     bottom: 100%;
@@ -148,14 +148,22 @@
   }
 }
 
+@mixin rewrite-portrait {
+  .defi-mode-wrapper {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
 @media (orientation: portrait) {
   :global(.is-mobile) {
-    @include rewrite;
+    @include rewrite-mobile;
   }
 }
 
 @media (width <=500px) {
-  :global(.is-pc) {
-    @include rewrite;
-  }
+  @include rewrite-mobile;
+}
+
+@media (width >500px) and (width <=950px) {
+  @include rewrite-portrait;
 }

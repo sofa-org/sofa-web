@@ -50,8 +50,8 @@
   }
 }
 
-@mixin rewrite {
-  .tabs {
+.portrait-ui {
+  &.tabs {
     width: 100vw;
     margin: 0 auto 10px;
 
@@ -69,17 +69,7 @@
     }
   }
 
-  .content {
+  &.content {
     border-radius: min(24px, 4.2vw);
-  }
-}
-
-@media (orientation: portrait) {
-  @include rewrite;
-}
-
-@media (width <=500px) {
-  :global(.is-pc) {
-    @include rewrite;
   }
 }

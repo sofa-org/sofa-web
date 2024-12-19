@@ -215,8 +215,8 @@
   }
 }
 
-@media (orientation: portrait) {
-  .banner {
+.portrait-ui {
+  &.banner {
     margin-top: -$header-ticker-height - $header-menu-height;
     padding-top: $header-ticker-height;
     background: linear-gradient(to right, rgba(#000, 0.3), rgba(#000, 0.3)),
@@ -232,13 +232,13 @@
     }
   }
 
-  .top-tabs-content-decoration {
+  &.top-tabs-content-decoration {
     &::before {
       border-radius: 0;
     }
   }
 
-  .top-tabs {
+  &.top-tabs {
     .tabs {
       width: 100%;
     }
@@ -258,10 +258,5 @@
     &.banner-expandable {
       padding: 0 0 12px;
     }
-  }
-
-  .top-tabs-content {
-    padding-top: 0;
-    margin-top: -110px;
   }
 }

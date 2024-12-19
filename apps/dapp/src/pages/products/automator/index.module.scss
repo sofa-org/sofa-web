@@ -141,7 +141,7 @@
   }
 }
 
-@mixin rewrite {
+@mixin rewrite-mobile {
   .section {
     display: block;
 
@@ -262,14 +262,26 @@
   }
 }
 
+@mixin rewrite-portrait {
+  .section {
+    flex-direction: column;
+  }
+}
+
 @media (orientation: portrait) {
+  .section.section-top {
+    margin-top: max(-40px, -16vw);
+  }
+
   :global(.is-mobile) {
-    @include rewrite;
+    @include rewrite-mobile;
   }
 }
 
 @media (width <=500px) {
-  :global(.is-pc) {
-    @include rewrite;
-  }
+  @include rewrite-mobile;
+}
+
+@media (width >500px) and (width <= 875px) {
+  @include rewrite-portrait;
 }

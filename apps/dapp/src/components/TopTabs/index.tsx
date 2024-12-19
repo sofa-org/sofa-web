@@ -4,6 +4,7 @@ import { useIsPortrait } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import { C_Select } from '../CSelect';
+import { useIsMobileUI, useIsPortraitUI } from '../MobileOnly';
 import { useProjectChange, useRiskSelect } from '../ProductSelector';
 
 import styles from './index.module.scss';
@@ -20,13 +21,17 @@ export interface TopTabsProps extends BaseInputProps<string | number> {
   tabClassName?: string;
   contentDecorationClassName?: string;
   sticky?: boolean;
+  portraitModeWidthThreshold?: number;
 }
 
 const TopTabs = (props: TopTabsProps) => {
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
-  const isPortrait = useIsPortrait();
 
+  const portraitMode = useIsMobileUI;
+  const isPortrait = useIsPortraitUI({
+    widthThreshold: props.portraitModeWidthThreshold,
+  });
   return (
     <>
       {props.banner && (
@@ -41,6 +46,7 @@ const TopTabs = (props: TopTabsProps) => {
               risky: riskType === RiskType.RISKY,
               'banner-expandable': props.type === 'banner-expandable',
               [styles['banner-expandable']]: props.type === 'banner-expandable',
+              [styles['portrait-ui']]: isPortrait,
             },
           )}
         >
@@ -59,6 +65,7 @@ const TopTabs = (props: TopTabsProps) => {
             [styles['banner-expandable']]: props.type === 'banner-expandable',
             [styles['dark']]: props.dark,
             [styles['sticky']]: props.sticky,
+            [styles['portrait-ui']]: isPortrait,
           },
         )}
       >
@@ -108,6 +115,7 @@ const TopTabs = (props: TopTabsProps) => {
             'banner-expandable': props.type === 'banner-expandable',
             [styles['banner-expandable']]: props.type === 'banner-expandable',
             [styles['dark']]: props.dark,
+            [styles['portrait-ui']]: isPortrait,
           },
         )}
       />
@@ -121,6 +129,7 @@ const TopTabs = (props: TopTabsProps) => {
             'banner-expandable': props.type === 'banner-expandable',
             [styles['banner-expandable']]: props.type === 'banner-expandable',
             [styles['dark']]: props.dark,
+            [styles['portrait-ui']]: isPortrait,
           },
           props.className,
         )}

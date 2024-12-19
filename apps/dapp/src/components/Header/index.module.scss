@@ -297,6 +297,10 @@
 }
 
 @mixin rewrite-header-menu-mobile {
+  .main-content.main-content {
+    margin-top: $header-menu-height + $header-ticker-height;
+  }
+
   :global {
     #header-menu-container {
       .semi-portal {
@@ -385,10 +389,6 @@
   :global {
     .is-mobile {
       @include rewrite-header-menu-mobile;
-    }
-
-    .main-content.main-content {
-      margin-top: $header-menu-height + $header-ticker-height;
     }
 
     .main-content.main-home {
