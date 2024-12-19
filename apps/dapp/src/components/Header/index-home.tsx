@@ -190,7 +190,7 @@ export const RenderMenu = (it: MenuItem) => {
   const isMobileUI = useIsMobileUI();
   const { selectedMenuItem, setSelectedMenuItem } = useMobileHeaderState();
   if (it.hide?.()) return <Fragment />;
-  if (it.path && !it.path.startsWith('http')) {
+  if (!it.children?.length && it.path && !it.path.startsWith('http')) {
     return (
       <NavLink
         to={joinUrl(it.path, location.search)}
@@ -204,7 +204,7 @@ export const RenderMenu = (it: MenuItem) => {
       </NavLink>
     );
   }
-  if (!it.children) {
+  if (!it.children?.length) {
     return (
       <a
         href={joinUrl(it.path, `?project=${project}`)}
