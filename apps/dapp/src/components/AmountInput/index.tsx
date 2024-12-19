@@ -18,6 +18,7 @@ import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 
 import ProgressBar from '../ProgressBar';
+import { useWalletStore, useWalletUIState } from '../WalletConnector/store.ts';
 
 import { IconMinus } from './assets/icon-minus.tsx';
 import { IconPlus } from './assets/icon-plus.tsx';
@@ -34,6 +35,7 @@ export interface AmountInputProps extends BaseInputProps<string | number> {
   // @default normal; 选择 internal 之后加减按钮会出现在输入框内部
   type?: 'normal' | 'internal';
   onBlur?(e: FocusEvent): void;
+  disabledUnlessWalletConnected?: boolean;
 }
 
 const AmountInput = memo<AmountInputProps>((props) => {
@@ -47,6 +49,8 @@ const AmountInput = memo<AmountInputProps>((props) => {
   const round = useLazyCallback((v?: string | number) =>
     roundWith(v, props.tick || 0.0001, props.min || 0, props.max, 'lower'),
   );
+  const { address } = useWalletStore();
+  const { bringUpConnect } = useWalletUIState();
 
   // 500 ms 向外同步
   useDebounceEffect(
@@ -157,6 +161,13 @@ const AmountInput = memo<AmountInputProps>((props) => {
               props.onChange?.(round(tempValue));
               await wait(100);
               props.onBlur?.(event);
+            }
+          }}
+          onFocus={(e) => {
+            if (props.disabledUnlessWalletConnected && !address) {
+              e.preventDefault();
+              bringUpConnect();
+              e.target.blur();
             }
           }}
         />
