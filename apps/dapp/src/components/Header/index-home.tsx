@@ -348,7 +348,13 @@ export const RenderMenu = (it: MenuItem) => {
   );
 };
 
-export const HomeHeader = () => {
+export const CommonHeader = (props: {
+  aside?: React.ReactNode;
+  menus: (
+    project: ProjectType,
+    location: ReturnType<typeof useLocation>,
+  ) => MenuItem[];
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [project] = useProjectChange(ProjectType.Surge);
@@ -356,7 +362,7 @@ export const HomeHeader = () => {
   const opacity = useHeaderOpacity();
 
   const menusForRender = useMemo(
-    () => allMenuItems(project, location),
+    () => props.menus(project, location),
     [project, location],
   );
 
@@ -381,8 +387,10 @@ export const HomeHeader = () => {
       >
         <div className={styles['bg']} style={{ opacity }} />
         <div className={classNames(styles['menu'], 'menu')}>
+          <div className={styles['expanded-bg']} />
           <nav className={styles['left']}>
-            <div className={styles['logo-wrapper']}>
+            <div className={classNames(styles['logo-wrapper'], 'logo-wrapper')}>
+              {' '}
               <Logo className={styles['logo']} onClick={() => navigate('/')} />
               <IconMenu
                 className={styles['icon-menu']}
@@ -403,12 +411,25 @@ export const HomeHeader = () => {
               </div>
             )}
             {more && <TimezoneSelector />}
-            <LaunchApp />
+            {props.aside}
           </aside>
         </div>
         {more && <IndexPrices className={styles['index-prices']} />}
       </header>
       <div id="header-menu-container" />
     </>
+  );
+};
+
+export const HomeHeader = () => {
+  return (
+    <CommonHeader
+      aside={
+        <>
+          <LaunchApp />
+        </>
+      }
+      menus={allMenuItems}
+    />
   );
 };

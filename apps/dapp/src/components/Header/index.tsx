@@ -26,6 +26,7 @@ import { Comp as IconPos } from './assets/icon-pos.svg';
 import { Comp as IconSOFA } from './assets/icon-sofa.svg';
 import { Comp as IconUsers } from './assets/icon-users.svg';
 import {
+  CommonHeader,
   HomeHeader,
   markSelectedMenuItems,
   MenuItem,
@@ -173,80 +174,33 @@ const allMenuItems = (
 
 const DappHeader = () => {
   const [t] = useTranslation('Header');
-  const navigate = useNavigate();
   const location = useLocation();
-  const [project] = useProjectChange(ProjectType.Surge);
-
-  const opacity = useHeaderOpacity();
-
-  const menusForRender = useMemo(
-    () => allMenuItems(project, location),
-    [project, location],
-  );
-
   const more = useMemo(() => true, []);
 
-  const [expanded, setExpanded] = useState(false);
-  useEffect(() => {
-    setExpanded(false);
-  }, [location.pathname]);
-
   return (
-    <>
-      <header
-        className={classNames(styles['header'], 'header', {
-          [styles['expanded']]: expanded,
-          ['expanded']: expanded,
-        })}
-        id="header"
-      >
-        <div className={styles['bg']} style={{ opacity }} />
-        <div className={classNames(styles['menu'], 'menu')}>
-          <div className={styles['expanded-bg']} />
-          <nav className={styles['left']}>
-            <div className={classNames(styles['logo-wrapper'], 'logo-wrapper')}>
-              <Logo className={styles['logo']} onClick={() => navigate('/')} />
-              <IconMenu
-                className={styles['icon-menu']}
-                onClick={() => setExpanded((pre) => !pre)}
-              />
+    <CommonHeader
+      aside={
+        <>
+          {more && (
+            <div className={styles['other-links']}>
+              <a
+                className={classNames(styles['btn-link'], 'btn-gradient', {
+                  [styles['active']]: location.pathname.startsWith('/rch'),
+                })}
+                href={EnvLinks.config.VITE_RCH_LINK}
+                target={
+                  Env.isMetaMaskAndroid || Env.isTelegram ? undefined : 'rch'
+                }
+              >
+                <span>{t('Claim')}</span>
+                {t('RCH')}
+              </a>
             </div>
-
-            {menusForRender.map((it, i) => (
-              <RenderMenu {...it} key={i} />
-            ))}
-          </nav>
-          <aside className={styles['right']}>
-            <LangSelector className={styles['lang-selector']} />
-            {more && (
-              <div className={styles['wallet']}>
-                <NetworkSelector />
-                <WalletConnector />
-              </div>
-            )}
-            {more && <TimezoneSelector />}
-            {more && (
-              <div className={styles['other-links']}>
-                <a
-                  className={classNames(styles['btn-link'], 'btn-gradient', {
-                    [styles['active']]: location.pathname.startsWith('/rch'),
-                  })}
-                  href={EnvLinks.config.VITE_RCH_LINK}
-                  target={
-                    Env.isMetaMaskAndroid || Env.isTelegram ? undefined : 'rch'
-                  }
-                >
-                  <span>{t('Claim')}</span>
-                  {t('RCH')}
-                </a>
-              </div>
-            )}
-          </aside>
-        </div>
-        {more && <IndexPrices className={styles['index-prices']} />}
-      </header>
-      <div id="header-menu-container" />
-    </>
+          )}
+        </>
+      }
+      menus={allMenuItems}
+    />
   );
 };
 
