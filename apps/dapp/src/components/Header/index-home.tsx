@@ -360,21 +360,17 @@ export const CommonHeader = (props: {
     project: ProjectType,
     location: ReturnType<typeof useLocation>,
   ) => MenuItem[];
+  moreIcons?: boolean;
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [project] = useProjectChange(ProjectType.Surge);
-
+  const more = props.moreIcons;
   const opacity = useHeaderOpacity();
 
   const menusForRender = useMemo(
     () => props.menus(project, location),
     [project, location],
-  );
-
-  const more = useMemo(
-    () => /rch|points/.test(location.pathname),
-    [location.pathname],
   );
 
   const [expanded, setExpanded] = useState(false);
@@ -428,6 +424,10 @@ export const CommonHeader = (props: {
 };
 
 export const HomeHeader = () => {
+  const more = useMemo(
+    () => /rch|points/.test(location.pathname),
+    [location.pathname],
+  );
   return (
     <CommonHeader
       aside={
@@ -436,6 +436,7 @@ export const HomeHeader = () => {
         </>
       }
       menus={allMenuItems}
+      moreIcons={more}
     />
   );
 };

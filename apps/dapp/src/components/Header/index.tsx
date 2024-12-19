@@ -200,6 +200,7 @@ const DappHeader = () => {
         </>
       }
       menus={allMenuItems}
+      moreIcons={more}
     />
   );
 };
