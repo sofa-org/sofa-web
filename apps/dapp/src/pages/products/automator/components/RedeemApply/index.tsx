@@ -98,6 +98,7 @@ export const AutomatorRedeemApply = (props: {
             suffix={
               <span className={styles['suffix']}>{vault?.balanceCcy}</span>
             }
+            disabledUnlessWalletConnected={true}
           />
         </div>
         <div className={styles['balance']}>

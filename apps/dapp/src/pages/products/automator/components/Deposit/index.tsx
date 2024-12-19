@@ -73,6 +73,7 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
               )
             }
             suffix={<span className={styles['suffix']}>{depositCcy}</span>}
+            disabledUnlessWalletConnected
           />
         </div>
         <div className={styles['balance']}>
