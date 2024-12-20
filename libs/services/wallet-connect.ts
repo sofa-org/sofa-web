@@ -345,24 +345,25 @@ export class WalletConnect {
       await connection;
 
       await waitUntil(() => modal.getWalletProvider(), {
-        timeout: 5000,
+        timeout: 1000,
         resolveTimeout: true,
       });
     }
 
     const originProvider =
       modal.getWalletProvider() ||
-      (await (async () => {
-        const providers = await getProviderByEip6963();
-        if (providers?.length) {
-          const index = (name: string) =>
-            /metamask/i.test(name) ? 0 : /okx/i.test(name) ? 1 : 2;
-          return providers.sort(
-            (a, b) => index(a.info.name) - index(b.info.name),
-          )[0].provider;
-        }
-        return window.ethereum as never;
-      })());
+      (modal.getIsConnected() &&
+        (await (async () => {
+          const providers = await getProviderByEip6963();
+          if (providers?.length) {
+            const index = (name: string) =>
+              /metamask/i.test(name) ? 0 : /okx/i.test(name) ? 1 : 2;
+            return providers.sort(
+              (a, b) => index(a.info.name) - index(b.info.name),
+            )[0].provider;
+          }
+          return window.ethereum as never;
+        })()));
 
     if (!originProvider) throw new Error('Connect failed: User rejected');
 
