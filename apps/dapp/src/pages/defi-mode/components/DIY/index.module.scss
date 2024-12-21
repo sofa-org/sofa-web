@@ -99,6 +99,7 @@
   margin: 0;
   counter-reset: step-counter;
 }
+
 .mobile-next-step-btn {
   @include bold;
 
@@ -110,18 +111,18 @@
   color: #000;
   background: $color-main-gradient;
 }
+
 .right {
   margin: 0;
+
   &.mobile-hide-product-display {
     display: none;
   }
+
   .mobile-next-step-bg {
     position: fixed;
     z-index: 9;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
+    inset: 0;
     background: rgba(#000, 0.4);
   }
 }
@@ -132,6 +133,7 @@
   justify-content: space-between;
   align-items: stretch;
   margin: 0;
+  flex-wrap: wrap;
 }
 
 @mixin rewrite-mobile {
@@ -143,17 +145,16 @@
   }
 
   .defi-mode-wrapper {
-    flex-direction: column;
     gap: 20px;
   }
 }
 
 @mixin rewrite-portrait {
   .defi-mode-wrapper {
-    flex-direction: column;
     gap: 20px;
   }
 }
+
 @media (orientation: portrait) {
   :global(.is-mobile) {
     @include rewrite-mobile;

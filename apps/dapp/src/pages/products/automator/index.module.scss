@@ -36,6 +36,7 @@
   border-radius: min(24px, 5vw);
   overflow: hidden;
   background: #e0e0e0;
+  flex-wrap: wrap;
 
   &.section-top {
     margin: max(-60px, -16vw) auto 0;
@@ -46,6 +47,8 @@
   flex: 1;
   padding: min(40px, 5vw);
   background: #fff;
+  // works together w/ flex-wrap: wrap in .section
+  min-width: min(450px, 60vw);
 }
 
 .right {
@@ -262,12 +265,6 @@
   }
 }
 
-@mixin rewrite-portrait {
-  .section {
-    flex-direction: column;
-  }
-}
-
 @media (orientation: portrait) {
   .section.section-top {
     margin-top: max(-40px, -16vw);
@@ -280,8 +277,4 @@
 
 @media (width <=500px) {
   @include rewrite-mobile;
-}
-
-@media (width >500px) and (width <= 875px) {
-  @include rewrite-portrait;
 }
