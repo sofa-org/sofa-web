@@ -1,7 +1,6 @@
 import { safeRun } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import Big from 'big.js';
-import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 
 import {
@@ -17,10 +16,17 @@ import { WalletService } from './wallet';
 export interface AutomatorInfo {
   chainId: number; // 链代码
   automatorVault: string; // Automator vault
+  vaultInfo: AutomatorVaultInfo;
   amount: number | string; // 当前aum值
   nav: number | string; // 净值
   dateTime: number; // 净值产生的时间（秒级时间戳）
   yieldPercentage: number | string; // 7D Yield(百分比)
+  automatorName?: string; // 名称
+  automatorDesc?: string; // 介绍
+  creatorWallet?: string; // 创建者钱包地址
+  creatorAmount?: number | string; // 创建者钱包地址
+  createTime?: number; // 创建时间
+  participantNum?: number | string; // 参与者数量
 }
 
 export interface AutomatorPosition {
@@ -48,12 +54,16 @@ export interface AutomatorPerformance {
 
 export interface AutomatorUserDetail {
   chainId: number; // 链代码
+  automatorName?: string; // Automator vault
   automatorVault: string; // Automator vault
+  vaultInfo: AutomatorVaultInfo;
   wallet: string; // 用户钱包地址
   amount: number | string; // 当前持有的总资产
   share: number | string; // 当前持有的份额
   depositTotalPnl: number | string; // 标的币种的总PNL
   rchTotalPnl: number | string; // Rch的总PNL
+  depositTotalPnlPercentage?: number | string; // 标的币种的总PNL年化
+  rchTotalPnlPercentage?: number | string; // Rch的总PNL年化
 }
 
 export interface AutomatorTransactionsParams {
@@ -69,7 +79,34 @@ export interface AutomatorTransaction {
   dateTime: number; // 日期（秒级时间戳）
 }
 
+export enum AutomatorDepositStatus {
+  ACTIVE = 'ACTIVE',
+  CLOSED = 'CLOSED',
+}
+
 export class AutomatorService {
+  static async getAutomatorList(params: {
+    chainId: number;
+    depositCcy?: AutomatorVaultInfo['depositCcy'];
+  }) {
+    // return http.get<unknown, HttpResponse<AutomatorInfo[]>>(`/automator/list`, {
+    //   params,
+    // });
+    // TODO 问问融天会不会给个聚合的接口
+    return Promise.all(
+      ContractsService.AutomatorVaults.filter((it) => {
+        if (it.chainId !== params.chainId) return false;
+        if (!params.depositCcy) return true;
+        return params.depositCcy === it.depositCcy;
+      }).map((it) =>
+        AutomatorService.getInfo(it).then((res) => ({
+          ...res.value,
+          vaultInfo: it,
+        })),
+      ),
+    );
+  }
+
   static async getInfo({ chainId, vault }: AutomatorVaultInfo) {
     return http.get<unknown, HttpResponse<AutomatorInfo>>(`/automator/info`, {
       params: { chainId, automatorVault: vault },
@@ -103,6 +140,28 @@ export class AutomatorService {
       {
         params: { chainId, automatorVault: vault, wallet },
       },
+    );
+  }
+
+  static async getUserPnlList(params: {
+    chainId: number;
+    wallet: string;
+    status: AutomatorDepositStatus;
+  }) {
+    // return http.get<unknown, HttpResponse<AutomatorUserDetail[]>>(
+    //   `/automator/user/list`,
+    //   { params },
+    // );
+    // TODO 问问融天会不会给个聚合的接口
+    return Promise.all(
+      ContractsService.AutomatorVaults.filter(
+        (it) => it.chainId === params.chainId,
+      ).map((it) =>
+        AutomatorService.getUserPnl(it, params.wallet).then((res) => ({
+          ...res.value,
+          vaultInfo: it,
+        })),
+      ),
     );
   }
 

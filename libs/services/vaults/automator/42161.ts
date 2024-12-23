@@ -5,6 +5,7 @@ const vaults = [
     chainId: 42161,
     vault: '0x4C241483B4a85e44C59bcEcFe17A4E7d0A073CDB',
     depositCcy: 'USDT',
+    balanceCcy: 'atUSDT',
     redeemWaitPeriod: MsIntervals.day * 7,
     claimPeriod: MsIntervals.day * 3,
   },

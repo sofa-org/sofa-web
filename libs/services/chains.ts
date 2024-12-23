@@ -85,7 +85,7 @@ export const ChainMap: Record<
       rchUniswapVersion: 'v3',
       bonusAirdropAddress: '0x1e833096089Df3F8E8BF15839683c17Ad7694888',
       feeContractAddress: '0x4140AB4AFc36B93270a9659BD8387660cC6509b5',
-      automatorFeeContractAddress: '', // TODO
+      automatorFeeContractAddress: '0x322665298cFa800518D4Ef7919893b59514BA9D1',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/ethereum/{address}',
       hlPriceOracle: {
         BTC: '0x088dBBeEC1489c557f8D4fD6146E0590E303d7d9',

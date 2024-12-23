@@ -1,0 +1,66 @@
+.head-title {
+  @include flex-center;
+
+  margin: 0;
+  padding: 75px 0 30px;
+  font-size: min(24px, 5vw);
+  text-align: center;
+  color: #fff;
+}
+
+.tabs.tabs {
+  padding: 24px 0;
+
+  :global {
+    .tabs {
+      justify-content: flex-start;
+      width: $width-content;
+    }
+
+    .top-tabs-tab {
+      border-radius: 24px;
+    }
+  }
+}
+
+.container.container.container {
+  margin: 0 auto;
+  width: $width-content;
+
+  :global {
+    .semi-empty {
+      @include flex-center;
+
+      height: 50vh;
+    }
+  }
+}
+
+.cards-wrapper {
+  margin: 10px 0 0;
+}
+
+.cards {
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 40px;
+}
+
+.title {
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex: none;
+  width: 100%;
+  margin: 0;
+  font-size: 20px;
+  color: #fff;
+
+  img {
+    width: 1.2em;
+    height: 1.2em;
+  }
+}

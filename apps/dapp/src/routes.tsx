@@ -12,6 +12,10 @@ const Mechanism = React.lazy(() => import('@/pages/mechanism'));
 const Advantages = React.lazy(() => import('@/pages/advantages'));
 const OrderHistory = React.lazy(() => import('@/pages/history'));
 const Products = React.lazy(() => import('@/pages/products'));
+const Automator = React.lazy(() => import('@/pages/products/automator'));
+const AutomatorPositions = React.lazy(
+  () => import('@/pages/positions/automator'),
+);
 
 export const routes: {
   path: string;
@@ -59,8 +63,16 @@ export const routes: {
     Component: ProductCustomize,
   },
   {
+    path: '/products/automator',
+    Component: Automator,
+  },
+  {
     path: '/positions/orders',
     Component: OrderHistory,
+  },
+  {
+    path: '/positions/automator',
+    Component: AutomatorPositions,
   },
   {
     path: '/transactions',

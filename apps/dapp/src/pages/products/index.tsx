@@ -29,7 +29,7 @@ import { ProductsFixedNav } from './components/FixedNav';
 import { FlowEarn } from './components/FlowEarn';
 import { FlowSurge } from './components/FlowSurge';
 import RecommendedCard from './components/RecommendedCard';
-import { Automator } from './automator';
+import AutomatorMarket from './automator-market';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -196,6 +196,6 @@ const Index = () => {
 
 const Comp = () => {
   const [project] = useProjectChange();
-  return project === ProjectType.Automator ? <Automator /> : <DefiMode />;
+  return project === ProjectType.Automator ? <AutomatorMarket /> : <DefiMode />;
 };
 export default Comp;
