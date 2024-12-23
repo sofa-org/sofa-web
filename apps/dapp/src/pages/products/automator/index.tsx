@@ -4,7 +4,6 @@ import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
-import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
@@ -26,7 +25,7 @@ import { useAutomatorStore } from './store';
 
 import styles from './index.module.scss';
 
-export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
+const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('Automator');
   const { tab } = useQuery();
   const { chainId, address } = useWalletStore((state) => state);
@@ -73,14 +72,15 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
         !props.onlyForm && (
           <>
             <h1 className={styles['head-title']}>
-              {t({ enUS: 'Automator', zhCN: 'Automator' })}
-              {/* <span className={styles['badge']}>
-              {t({ enUS: 'Aggressive', zhCN: '激进的' })}
-            </span> */}
+              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {t({
+                enUS: 'Automator: Follow The Best',
+                zhCN: 'Automator: 跟单',
+              })}
             </h1>
-            <div className={styles['desc']}>
+            {/* <div className={styles['desc']}>
               {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-            </div>
+            </div> */}
           </>
         )
       }
@@ -176,3 +176,5 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
     </TopTabs>
   );
 };
+
+export default Automator;

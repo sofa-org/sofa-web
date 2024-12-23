@@ -153,6 +153,35 @@ const RCHVaults = [
   },
 ];
 
-const vaults = [...USDTVaults, ...RCHVaults];
+const scrvUSDVaultsForAutomator = [
+  // SimpleSmartBullVault(ETH/USDT)
+  {
+    chainId: 1,
+    vault: '0x397C32D2A635aee7B28188Fd676DbD9cc47FF282',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'scrvUSD',
+    rchMultiplier: 1,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+  // SimpleSmartBullVault(BTC/USDT)
+  {
+    chainId: 1,
+    vault: '0xD4C30fF19f2FfD23Ba9B23548B1AC4B2C0C19DA4',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'scrvUSD',
+    rchMultiplier: 1,
+    usePermit2: false,
+    tradeDisable: true,
+  },
+];
+
+const vaults = [...USDTVaults, ...RCHVaults, ...scrvUSDVaultsForAutomator];
 
 export default vaults;

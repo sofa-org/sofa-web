@@ -29,7 +29,6 @@ export const AutomatorVaults = vaults.map((it) => {
       it.depositCcy,
       ProjectType.Automator,
     ),
-    balanceCcy: `at${it.depositCcy}`,
     anchorPricesDecimal: 1e8,
     collateralDecimal,
     abis: AutomatorAbis,

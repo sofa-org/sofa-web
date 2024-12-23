@@ -62,6 +62,7 @@ export interface VaultInfo {
 }
 
 export interface AutomatorVaultInfo {
+  name?: string;
   vault: string; // 合约地址
   chainId: number;
   depositCcy: CCY | USDS; // 申购币种

@@ -9,7 +9,7 @@ import { useIsPortraitUI } from '@/components/MobileOnly';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 
-import { Automator } from '../products/automator';
+import Automator from '../products/automator';
 import { ProductCustomize } from '../products/customize';
 
 import { DIY } from './components/DIY';

@@ -2,18 +2,21 @@ import { CSSProperties, memo, ReactNode, useMemo } from 'react';
 import { Toast } from '@douyinfe/semi-ui';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import { copy } from 'clipboard';
 
 import { Comp as IconCopy } from '@/assets/icon-copy.svg';
+import { Comp as IconShare } from '@/assets/icon-share.svg';
 import { addI18nResources } from '@/locales';
 
 import { useWalletStore } from '../WalletConnector/store';
 
 import locale from './locale';
 
-addI18nResources(locale, 'Address');
 import styles from './index.module.scss';
+
+addI18nResources(locale, 'Address');
 
 const Address = memo<{
   address: string;
@@ -22,6 +25,7 @@ const Address = memo<{
   prefix?: ReactNode;
   simple?: boolean;
   link?: string | boolean | { chainId: number };
+  linkBtn?: string | boolean | { chainId: number };
 }>((props) => {
   const [t] = useTranslation('Address');
   const [, str, last4Words] = useMemo(
@@ -31,6 +35,26 @@ const Address = memo<{
       ) || [],
     [props.address, props.simple],
   );
+
+  const handleLink = useLazyCallback(() => {
+    const url = (() => {
+      if (!props.link) return;
+      if (typeof props.link === 'string') return props.link;
+      const chainId =
+        props.link === true
+          ? useWalletStore.getState().chainId!
+          : props.link.chainId;
+      return `${ChainMap[chainId]?.explorerUrl}/address/${props.address}`;
+    })();
+    window.open(url, 'address');
+  });
+
+  const handleCopy = useLazyCallback(() => {
+    Promise.resolve()
+      .then(() => copy(props.address))
+      .then(() => Toast.success(t('copy.succ')));
+  });
+
   return props.address ? (
     <div
       className={classNames(styles['address'], 'address', props.className, {
@@ -41,37 +65,25 @@ const Address = memo<{
       onClick={(e) => {
         if (props.link) {
           e.stopPropagation();
-          const url = (() => {
-            if (typeof props.link === 'string') return props.link;
-            const chainId =
-              props.link === true
-                ? useWalletStore.getState().chainId!
-                : props.link.chainId;
-            return `${ChainMap[chainId]?.explorerUrl}/address/${props.address}`;
-          })();
-          window.open(url, 'address');
+          handleLink();
         } else if (!props.simple) {
           e.stopPropagation();
-          Promise.resolve()
-            .then(() => copy(props.address))
-            .then(() => Toast.success(t('copy.succ')));
+          handleCopy();
         }
       }}
     >
       {props.prefix}
       {str}...
       {last4Words}
-      {!props.simple && (
+      {!props.simple && !props.link && !props.linkBtn && (
         <IconCopy
           onClick={(e) => {
-            if (!props.simple) return;
             e.stopPropagation();
-            Promise.resolve()
-              .then(() => copy(props.address))
-              .then(() => Toast.success(t('copy.succ')));
+            handleCopy();
           }}
         />
       )}
+      {props.linkBtn && <IconShare onClick={handleLink} />}
     </div>
   ) : (
     <div

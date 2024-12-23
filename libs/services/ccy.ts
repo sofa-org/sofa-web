@@ -40,6 +40,12 @@ export class CCYService {
       color: '#366f49',
       precision: 2,
     },
+    scrvUSD: {
+      name: 'scrvUSD',
+      icon: IconCrvUSD,
+      color: '#366f49',
+      precision: 2,
+    },
     USDC: {
       name: 'USDC',
       icon: IconUSDC,
