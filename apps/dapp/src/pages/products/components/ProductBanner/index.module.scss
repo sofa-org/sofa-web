@@ -96,6 +96,13 @@
   }
 }
 
+.mobile-ui {
+  &.product-banner-wrapper {
+    margin-top: -$header-ticker-height - $header-menu-height;
+    padding-top: $header-ticker-height;
+  }
+}
+
 @media (orientation: portrait) {
   .product-banner-wrapper {
     background: linear-gradient(0deg, #000 80%, #0000 100%),
@@ -104,8 +111,6 @@
         rgb(56 135 223 / 40%) 0.25%,
         rgb(0 179 115 / 40%) 95.88%
       );
-    margin-top: -$header-ticker-height - $header-menu-height;
-    padding-top: $header-ticker-height;
 
     &.risky {
       background: linear-gradient(0deg, #000 80%, #000a 100%), $color-gradient-2;

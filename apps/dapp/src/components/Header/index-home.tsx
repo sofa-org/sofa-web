@@ -361,6 +361,7 @@ export const CommonHeader = (props: {
     location: ReturnType<typeof useLocation>,
   ) => MenuItem[];
   moreIcons?: boolean;
+  indexPrices?: boolean;
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -416,7 +417,9 @@ export const CommonHeader = (props: {
             {props.aside}
           </aside>
         </div>
-        {more && <IndexPrices className={styles['index-prices']} />}
+        {more && props.indexPrices !== false && (
+          <IndexPrices className={styles['index-prices']} />
+        )}
       </header>
       <div id="header-menu-container" />
     </>

@@ -215,10 +215,15 @@
   }
 }
 
-.portrait-ui {
+.mobile-ui {
   &.banner {
     margin-top: -$header-ticker-height - $header-menu-height;
     padding-top: $header-ticker-height;
+  }
+}
+
+.portrait-ui {
+  &.banner {
     background: linear-gradient(to right, rgba(#000, 0.3), rgba(#000, 0.3)),
       linear-gradient(
         93deg,

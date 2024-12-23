@@ -28,10 +28,10 @@ const TopTabs = (props: TopTabsProps) => {
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
 
-  const portraitMode = useIsMobileUI;
   const isPortrait = useIsPortraitUI({
     widthThreshold: props.portraitModeWidthThreshold,
   });
+  const isMobile = useIsMobileUI();
   return (
     <>
       {props.banner && (
@@ -47,6 +47,7 @@ const TopTabs = (props: TopTabsProps) => {
               'banner-expandable': props.type === 'banner-expandable',
               [styles['banner-expandable']]: props.type === 'banner-expandable',
               [styles['portrait-ui']]: isPortrait,
+              [styles['mobile-ui']]: isMobile,
             },
           )}
         >

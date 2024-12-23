@@ -184,6 +184,7 @@
     inset: 0;
     z-index: 3;
   }
+
   &.active::after {
     background: #000;
   }
@@ -237,7 +238,7 @@
 }
 
 .nav-selector {
-  padding: 18px 8px 8px 8px;
+  padding: 18px 8px 8px;
   border-radius: min(24px, 4vw);
 
   :global(.semi-dropdown-title) {
@@ -315,6 +316,7 @@
             inset: $header-menu-height - 1 0 0 140px;
             border-radius: 0;
             transition: none !important;
+            pointer-events: initial;
           }
         }
       }
@@ -324,6 +326,7 @@
           padding: 4px 8px 3px;
         }
       }
+
       .nav-selector-item {
         width: calc(100vw - 170px);
         margin-left: 8px !important;

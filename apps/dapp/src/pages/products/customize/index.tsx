@@ -34,6 +34,7 @@ import {
 import { CSelect } from '@/components/CSelect';
 import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { PayoffChart } from '@/components/Payoff';
 import { PriceRangeInputEl } from '@/components/PriceRangeInput';
 import {
@@ -77,6 +78,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
   const [forCcy] = useForCcySelect();
   const [depositCcy, setDepositCcy] = useDepositCcySelect();
   const [leverageVault, $setLeverageVault] = useState<string>();
+  const isMobileUI = useIsMobileUI();
 
   const vaultOptions = useMemo(
     () =>
@@ -253,6 +255,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
     <div
       className={classNames(styles['customize'], {
         [styles['only-form']]: props.onlyForm,
+        [styles['mobile-ui']]: isMobileUI,
       })}
     >
       <ProductBanner title={<></>} />
