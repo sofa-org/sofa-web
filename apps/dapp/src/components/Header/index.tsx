@@ -1,27 +1,20 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { joinUrl } from '@sofa/utils/url';
 import classNames from 'classnames';
 
-import { Comp as Logo } from '@/assets/logo';
 import { EnvLinks } from '@/env-links';
-import { addI18nResources, LangSelector } from '@/locales';
+import { addI18nResources } from '@/locales';
 import { RootDomainPaths } from '@/route-guard';
 
-import IndexPrices from '../IndexPrices';
-import NetworkSelector from '../NetworkSelector';
-import { useProjectChange } from '../ProductSelector';
 import { ProjectTypeRefs } from '../ProductSelector/enums';
-import TimezoneSelector from '../TimezoneSelector';
-import WalletConnector from '../WalletConnector';
 
 import { Comp as IconBlog } from './assets/icon-blog.svg';
 import { Comp as IconClock } from './assets/icon-clock.svg';
 import { Comp as IconDefiMode } from './assets/icon-defimode.svg';
-import { Comp as IconMenu } from './assets/icon-menu.svg';
 import { Comp as IconPos } from './assets/icon-pos.svg';
 import { Comp as IconSOFA } from './assets/icon-sofa.svg';
 import { Comp as IconUsers } from './assets/icon-users.svg';
@@ -30,8 +23,6 @@ import {
   HomeHeader,
   markSelectedMenuItems,
   MenuItem,
-  RenderMenu,
-  useHeaderOpacity,
 } from './index-home';
 import locale from './locale';
 
