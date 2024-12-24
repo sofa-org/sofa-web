@@ -1,0 +1,172 @@
+.head-title {
+  @include flex-center;
+
+  margin: 0;
+  padding: 75px 0 30px;
+  font-size: min(24px, 5vw);
+  text-align: center;
+  color: #fff;
+}
+
+.form {
+  width: $width-content;
+  // margin: 24px auto 40px;
+
+  @include flex-column-center;
+
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 24px auto 40px;
+  background: #fff;
+  border-radius: 24px;
+  padding: min(40px, 5vw);
+  text-align: center;
+  &:first-child {
+    margin-top: -84px;
+  }
+}
+.intro {
+  .steps {
+    font-size: 16px;
+    text-align: center;
+    margin-block: 0;
+    padding-inline: 0;
+    .highlighted {
+      color: #177ddc;
+    }
+    li {
+      margin-bottom: 20px;
+      list-style-type: none;
+      @include bold;
+      .step {
+        position: relative;
+        z-index: 1;
+        height: 28px;
+        border-radius: 14px;
+        display: inline-block;
+        line-height: 28px;
+        padding: 0 14px;
+        text-align: center;
+        background: $color-main-gradient;
+        margin-right: 10px;
+        &::before {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          left: 1px;
+          right: 1px;
+          top: 1px;
+          bottom: 1px;
+          border-radius: 14px;
+          background: #fff;
+        }
+      }
+    }
+  }
+  button {
+    font-size: 14px;
+    height: min(48px, 10vw);
+    border-radius: min(24px, 5vw);
+    padding: 0 min(40px, 5vw);
+    background: #000;
+    margin: 20px auto;
+    > span {
+      color: #fff;
+      line-break: anywheres;
+    }
+    &:hover {
+      background: rgba(#000, 0.8) !important;
+    }
+  }
+  .features {
+    @include flex-center;
+    align-items: baseline;
+    margin-block: 0;
+    padding-inline: 0;
+    margin-top: 40px;
+    gap: min(40px, 3vw);
+    li {
+      text-align: left;
+      list-style-type: none;
+      width: min(280px, 26vw);
+      svg {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 20px;
+      }
+      .title {
+        @include bold;
+        font-size: 20px;
+        line-height: 24px;
+        margin-bottom: 6px;
+      }
+      .desc {
+        font-size: 16px;
+        line-height: 19px;
+      }
+    }
+  }
+}
+.faq {
+  h2 {
+    margin: 0;
+  }
+  .faq-ol {
+    width: min(720px, 80vw);
+    margin-block: 0;
+    padding-inline: 0;
+    list-style-type: none;
+    li {
+      border-bottom: dotted 1px rgba(#000, 0.24);
+      text-align: left;
+
+      .title {
+        @include flex-center;
+        @include bold;
+
+        position: relative;
+        justify-content: flex-start;
+        height: 64px;
+        font-size: 16px;
+        line-height: 20px;
+        padding-right: 20px;
+        cursor: pointer;
+
+        &:hover {
+          color: rgba(#000, 0.5);
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          width: 18px;
+          top: 0;
+          bottom: 0;
+          right: 2px;
+          background: url(./assets/icon-fold.svg) no-repeat center;
+        }
+      }
+      .desc {
+        font-size: 14px;
+        line-height: 16px;
+        padding: 0 20px 20px 0;
+      }
+      &.folded {
+        .title {
+          &::after {
+            background-image: url(./assets/icon-expand.svg);
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .form {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
