@@ -18,7 +18,7 @@ import styles from './index.module.scss';
 
 const tabs = [
   {
-    label: (t: TFunction) => t({ enUS: 'DeFi Mode', zhCN: 'DeFi 模式' }),
+    label: (t: TFunction) => t({ enUS: 'Core mode', zhCN: '标准模式' }),
     value: 'diy',
     comp: () => <DIY />,
   },
@@ -26,7 +26,7 @@ const tabs = [
     label: (t: TFunction) => (
       <>
         {ProjectTypeRefs[ProjectType.Automator].icon}
-        {t({ enUS: 'Follow The Best', zhCN: '跟单' })}
+        {t({ enUS: 'Follow the Best', zhCN: '跟单' })}
       </>
     ),
     icon: ProjectTypeRefs.Automator.icon,
