@@ -11,11 +11,13 @@ import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import styles from './index.module.scss';
 
 export interface AutomatorCardProps {
   info: AutomatorUserDetail;
+  modalController: ReturnType<typeof useAutomatorModal>[1];
 }
 
 export const AutomatorPositionCard = (props: AutomatorCardProps) => {
@@ -51,7 +53,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
             props.info.vaultInfo.name ||
             props.info.vaultInfo.depositCcy}
         </div>
-        <Address address={props.info.automatorVault} simple linkBtn />
+        <Address address={props.info.vaultInfo.vault} simple linkBtn />
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
@@ -120,13 +122,27 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
         </div>
       </div>
       <div className={styles['footer']}>
-        <AsyncButton className={styles['btn-deposit']}>
+        <AsyncButton
+          className={styles['btn-deposit']}
+          onClick={() =>
+            props.modalController.open(props.info.vaultInfo, 'deposit')
+          }
+        >
           {t({ enUS: 'Mint Again', zhCN: '再铸造' })}
         </AsyncButton>
-        <AsyncButton className={classNames(styles['btn-redeem'], 'btn-ghost')}>
+        <AsyncButton
+          className={classNames(styles['btn-redeem'], 'btn-ghost')}
+          onClick={() =>
+            props.modalController.open(props.info.vaultInfo, 'redeem')
+          }
+        >
           {t({ enUS: 'Redeem', zhCN: '赎回' })}
         </AsyncButton>
-        <Link to={`/transactions?project=${ProjectType.Automator}`}>
+        <Link
+          to={`/transactions?project=${ProjectType.Automator}&vault=${
+            props.info.vaultInfo.vault || ''
+          }`}
+        >
           {t({ enUS: 'Transaction History', zhCN: '操作历史' })}
         </Link>
       </div>

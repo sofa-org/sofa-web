@@ -62,7 +62,8 @@ export interface VaultInfo {
 }
 
 export interface AutomatorVaultInfo {
-  name?: string;
+  name: string;
+  desc?: string;
   vault: string; // 合约地址
   chainId: number;
   depositCcy: CCY | USDS; // 申购币种
@@ -73,4 +74,7 @@ export interface AutomatorVaultInfo {
   redeemWaitPeriod: number; // 赎回等待期
   claimPeriod: number; // 赎回有效期
   abis: ethers.InterfaceAbi;
+  creatorWallet?: string; // 一期 automator 没有
+  creatorFeeRate: number | string; // 默认为 0
+  createTime: number | string; // 创建时间
 }

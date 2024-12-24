@@ -7,7 +7,7 @@ import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
 
 import { defaultChain } from './chains';
-import { ContractsService, VaultInfo } from './contracts';
+import { ContractsService, RiskType, VaultInfo } from './contracts';
 import { ApyDefinition } from './products';
 
 export interface AAVERecord {
@@ -284,7 +284,9 @@ export class MarketService {
   > {
     const ccyList = ContractsService.vaults.reduce(
       (pre, it) =>
-        it.chainId !== chainId || pre.includes(it.depositCcy)
+        it.chainId !== chainId ||
+        it.riskType === RiskType.RISKY ||
+        pre.includes(it.depositCcy)
           ? pre
           : pre.concat(it.depositCcy),
       [] as string[],

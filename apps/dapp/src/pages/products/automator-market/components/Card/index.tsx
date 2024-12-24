@@ -8,6 +8,7 @@ import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
+import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../assets/icon-people.svg';
@@ -16,6 +17,7 @@ import styles from './index.module.scss';
 
 export interface AutomatorCardProps {
   info: AutomatorInfo;
+  modalController: ReturnType<typeof useAutomatorModal>[1];
 }
 
 export const AutomatorCard = (props: AutomatorCardProps) => {
@@ -25,7 +27,12 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
     [props.info.vaultInfo.depositCcy],
   );
   return (
-    <div className={styles['card']}>
+    <div
+      className={styles['card']}
+      onClick={() =>
+        props.modalController.open(props.info.vaultInfo, 'deposit')
+      }
+    >
       <div className={styles['header']}>
         <img src={depositCcyConfig?.icon} alt="" />
         <div className={styles['name']}>
@@ -33,7 +40,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
             props.info.vaultInfo.name ||
             props.info.vaultInfo.depositCcy}
         </div>
-        <Address address={props.info.automatorVault} simple linkBtn />
+        <Address address={props.info.vaultInfo.vault} simple linkBtn />
       </div>
       <div className={styles['yield']}>
         <div className={styles['label']}>
@@ -85,8 +92,12 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
       <div className={styles['footer']}>
         <div className={styles['runtime']}>
           <IconCalendar />
-          {props.info.createTime
-            ? formatDuration(Date.now() - +props.info.createTime)
+          {props.info.vaultInfo.createTime
+            ? formatDuration(
+                Date.now() - +props.info.vaultInfo.createTime,
+                1,
+                true,
+              )
             : '-'}
         </div>
         <div className={styles['people']}>

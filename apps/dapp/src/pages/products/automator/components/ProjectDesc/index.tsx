@@ -293,10 +293,10 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
                 {
                   waitDuration:
                     props.vault?.redeemWaitPeriod &&
-                    formatDuration(props.vault?.redeemWaitPeriod, 1),
+                    formatDuration(props.vault?.redeemWaitPeriod, 1, true),
                   claimDuration:
                     props.vault?.claimPeriod &&
-                    formatDuration(props.vault?.claimPeriod, 1),
+                    formatDuration(props.vault?.claimPeriod, 1, true),
                 },
               ),
             }}

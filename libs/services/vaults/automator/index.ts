@@ -1,3 +1,5 @@
+import { get } from 'lodash-es';
+
 import AutomatorAbis from '../../abis/Automator.json';
 import { AutomatorVaultInfo, ProjectType } from '../../base-type';
 import {
@@ -24,6 +26,7 @@ export const AutomatorVaults = vaults.map((it) => {
   const collateralDecimal = getCollateralDecimal(it.chainId, it.depositCcy);
   return {
     ...it,
+    name: get(it, 'name') || it.depositCcy,
     depositMinAmount: getDepositMinAmount(it.depositCcy, ProjectType.Automator),
     depositTickAmount: getDepositTickAmount(
       it.depositCcy,
@@ -32,5 +35,6 @@ export const AutomatorVaults = vaults.map((it) => {
     anchorPricesDecimal: 1e8,
     collateralDecimal,
     abis: AutomatorAbis,
+    creatorFeeRate: get(it, 'creatorFeeRate') || 0,
   } as AutomatorVaultInfo;
 });

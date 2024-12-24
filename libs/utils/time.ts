@@ -38,7 +38,7 @@ export function formatDurationToSeconds(
   return ops?.surfix ? res + ops.surfix : res;
 }
 
-export function formatDuration(value: number, length = 3) {
+export function formatDuration(value: number, length = 3, noPad?: boolean) {
   if (!isLegalNum(value)) return '-';
   const order = [
     { key: 'year', alias: 'y' },
@@ -56,7 +56,7 @@ export function formatDuration(value: number, length = 3) {
     const times = Math.floor(leftVal / MsIntervals[key]);
     leftVal = leftVal % MsIntervals[key];
     if (leftVal !== value) {
-      result += `${String(times).padStart(2, '0')}${alias} `;
+      result += `${noPad ? times : String(times).padStart(2, '0')}${alias} `;
       leftLen -= 1;
     }
   }

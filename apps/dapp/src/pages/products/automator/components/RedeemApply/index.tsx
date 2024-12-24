@@ -176,10 +176,10 @@ export const AutomatorRedeemApply = (props: {
                       {
                         waitDuration:
                           vault?.redeemWaitPeriod &&
-                          formatDuration(vault?.redeemWaitPeriod, 1),
+                          formatDuration(vault?.redeemWaitPeriod, 1, true),
                         claimDuration:
                           vault?.claimPeriod &&
-                          formatDuration(vault?.claimPeriod, 1),
+                          formatDuration(vault?.claimPeriod, 1, true),
                       },
                     )}
                     redemptionInfo={

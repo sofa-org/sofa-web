@@ -13,7 +13,7 @@ import classNames from 'classnames';
 import styles from './index.module.scss';
 
 export interface ProgressBarProps extends BaseProps {
-  type?: '1' | '2';
+  type?: '1' | '2' | '3';
   disabled?: boolean;
   percent: number;
   children?: ReactNode;
@@ -48,7 +48,10 @@ const ProgressBar = (props: ProgressBarProps) => {
         styles['progress'],
         'progress-wrapper',
         props.className,
-        { [styles['type-2']]: props.type === '2' },
+        {
+          [styles['type-2']]: props.type === '2',
+          [styles['type-3']]: props.type === '3',
+        },
       )}
       style={props.style}
       onClick={(e) => {

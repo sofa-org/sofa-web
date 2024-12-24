@@ -1,4 +1,6 @@
 .card {
+  @include pointer;
+
   flex: 1;
   max-width: 258px;
   margin: 0;

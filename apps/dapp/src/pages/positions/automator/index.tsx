@@ -14,6 +14,7 @@ import CEmpty from '@/components/Empty';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
+import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { AutomatorPositionCard } from './components/Card';
 
@@ -62,6 +63,8 @@ const Index = () => {
 
   const loading = loading1 && !data?.length;
 
+  const [modal, modalController] = useAutomatorModal();
+
   return (
     <TopTabs
       type={'banner-expandable'}
@@ -90,10 +93,17 @@ const Index = () => {
     >
       <Spin wrapperClassName={styles['cards']} spinning={loading}>
         {data?.map((it) => {
-          return <AutomatorPositionCard key={it.automatorVault} info={it} />;
+          return (
+            <AutomatorPositionCard
+              key={it.vaultInfo.vault}
+              info={it}
+              modalController={modalController}
+            />
+          );
         })}
         {!data?.length && !loading && <CEmpty className="semi-always-dark" />}
       </Spin>
+      {modal}
     </TopTabs>
   );
 };
