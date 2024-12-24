@@ -131,11 +131,6 @@
         font-size: 16px;
         line-height: 20px;
         padding-right: 20px;
-        cursor: pointer;
-
-        &:hover {
-          color: rgba(#000, 0.5);
-        }
 
         &::after {
           content: "";
@@ -153,10 +148,16 @@
         padding: 0 20px 20px 0;
       }
       &.folded {
+        cursor: pointer;
+
         .title {
           &::after {
             background-image: url(./assets/icon-expand.svg);
           }
+        }
+
+        &:hover {
+          color: rgba(#000, 0.5);
         }
       }
     }
