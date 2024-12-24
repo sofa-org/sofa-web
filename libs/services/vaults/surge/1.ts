@@ -157,8 +157,8 @@ const scrvUSDVaultsForAutomator = [
   // SimpleSmartBullVault(ETH/USDT)
   {
     chainId: 1,
-    vault: '0x397C32D2A635aee7B28188Fd676DbD9cc47FF282',
-    productType: ProductType.BearSpread,
+    vault: '0x4A1Bc9d8B2eD7BF9B9C1979037992Cff064E4F40',
+    productType: ProductType.BullSpread,
     riskType: RiskType.RISKY,
     forCcy: 'WBTC',
     domCcy: 'USD',
@@ -170,8 +170,8 @@ const scrvUSDVaultsForAutomator = [
   // SimpleSmartBullVault(BTC/USDT)
   {
     chainId: 1,
-    vault: '0xD4C30fF19f2FfD23Ba9B23548B1AC4B2C0C19DA4',
-    productType: ProductType.BearSpread,
+    vault: '0x5e5E689284a614127Af9deA546b8D943B8b80e5c',
+    productType: ProductType.BullSpread,
     riskType: RiskType.RISKY,
     forCcy: 'WBTC',
     domCcy: 'USD',

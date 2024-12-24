@@ -38,12 +38,11 @@ const Address = memo<{
 
   const handleLink = useLazyCallback(() => {
     const url = (() => {
-      if (!props.link) return;
-      if (typeof props.link === 'string') return props.link;
+      const link = props.link || props.linkBtn;
+      if (!link) return;
+      if (typeof link === 'string') return link;
       const chainId =
-        props.link === true
-          ? useWalletStore.getState().chainId!
-          : props.link.chainId;
+        link === true ? useWalletStore.getState().chainId! : link.chainId;
       return `${ChainMap[chainId]?.explorerUrl}/address/${props.address}`;
     })();
     window.open(url, 'address');

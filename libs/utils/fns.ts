@@ -153,3 +153,8 @@ export function getNearestItem<T>(
   const { sortList, index } = getNearestItemIndex(list, referNum, options);
   return sortList[index];
 }
+
+export function ellipsis(str: string | number | undefined | null, len: number) {
+  if (!str || String(str).length <= len) return str?.toString();
+  return String(str).slice(0, len) + '...';
+}

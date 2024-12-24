@@ -30,27 +30,26 @@
 
   align-items: stretch;
   flex-wrap: wrap;
-  gap: 1px;
-  width: min(1080px, $width-content);
+  gap: min(40px, 5vw);
+  position: relative;
+  padding: 148px 0 0;
+  width: 100%;
   margin: 0 auto;
-  border-radius: min(24px, 5vw);
-  overflow: hidden;
-  background: #e0e0e0;
+  background: #fff;
 
   &.section-top {
-    margin: max(-60px, -16vw) auto 0;
+    overflow: hidden;
   }
 }
 
 .left {
   flex: 1;
-  padding: min(40px, 5vw);
   background: #fff;
 }
 
 .right {
   flex: 1;
-  padding: min(40px, 5vw);
+  padding-left: 0;
   margin: 0;
   background: #fff;
 
@@ -137,6 +136,77 @@
 
     .right {
       padding-right: 0;
+    }
+  }
+}
+
+.expand-widget {
+  @include pointer;
+  @include flex-center;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 44px;
+  padding: 0 0 12px;
+  margin: 0 -24px;
+  background: url("./assets/bg-expand.svg") no-repeat center / 100% 100%;
+  text-transform: capitalize;
+
+  svg {
+    width: 12px;
+    transition: 0.3s ease transform;
+  }
+
+  &.expanded {
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.form {
+  width: $width-content;
+  margin: max(-60px, -16vw) auto 0;
+  padding: min(40px, 5vw);
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.modal-form {
+  @include flex-center;
+
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 40px;
+  position: relative;
+  padding: min(40px, 5vw);
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+
+  + div {
+    margin: 0;
+  }
+
+  > div:first-child {
+    margin: 0;
+  }
+}
+
+.automator-modal {
+  margin: 0;
+
+  :global {
+    .semi-modal-body-wrapper {
+      margin: 0;
+    }
+
+    .semi-modal-content {
+      padding: 0;
+      background: transparent;
     }
   }
 }

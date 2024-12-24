@@ -1,22 +1,34 @@
+import { cvtAmountsInCcy } from '@sofa/utils/amount';
+import { asyncCache } from '@sofa/utils/decorators';
+import { MsIntervals } from '@sofa/utils/expiry';
 import { safeRun } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import Big from 'big.js';
 import { ethers } from 'ethers';
+import { get } from 'lodash-es';
 
+import AutomatorAbis from './abis/Automator.json';
+import {
+  getCollateralDecimal,
+  getDepositMinAmount,
+  getDepositTickAmount,
+} from './vaults/utils';
 import {
   AutomatorTransactionStatus,
   AutomatorVaultInfo,
+  ProjectType,
   TransactionStatus,
 } from './base-type';
 import { ContractsService } from './contracts';
+import { MarketService } from './market';
 import { TransactionProgress } from './positions';
 import { PositionStatus } from './the-graph';
 import { WalletService } from './wallet';
 
-export interface AutomatorInfo {
+// server 返回的结构
+export interface OriginAutomatorInfo {
   chainId: number; // 链代码
   automatorVault: string; // Automator vault
-  vaultInfo: AutomatorVaultInfo;
   amount: number | string; // 当前aum值
   nav: number | string; // 净值
   dateTime: number; // 净值产生的时间（秒级时间戳）
@@ -25,8 +37,13 @@ export interface AutomatorInfo {
   automatorDesc?: string; // 介绍
   creatorWallet?: string; // 创建者钱包地址
   creatorAmount?: number | string; // 创建者钱包地址
-  createTime?: number; // 创建时间
   participantNum?: number | string; // 参与者数量
+  depositCcy: string;
+}
+
+export interface AutomatorInfo
+  extends Omit<OriginAutomatorInfo, 'chainId' | 'automatorVault'> {
+  vaultInfo: AutomatorVaultInfo;
 }
 
 export interface AutomatorPosition {
@@ -52,16 +69,22 @@ export interface AutomatorPerformance {
   totalDepositCcyPnlForRch: number | string;
 }
 
-export interface AutomatorUserDetail {
+// server 返回的结构
+export interface OriginAutomatorUserDetail {
   chainId: number; // 链代码
   automatorName?: string; // Automator vault
   automatorVault: string; // Automator vault
-  vaultInfo: AutomatorVaultInfo;
   wallet: string; // 用户钱包地址
   amount: number | string; // 当前持有的总资产
   share: number | string; // 当前持有的份额
   depositTotalPnl: number | string; // 标的币种的总PNL
   rchTotalPnl: number | string; // Rch的总PNL
+  pnlPercentage?: number | string;
+}
+
+export interface AutomatorUserDetail
+  extends Omit<OriginAutomatorUserDetail, 'chainId' | 'automatorVault'> {
+  vaultInfo: AutomatorVaultInfo;
   depositTotalPnlPercentage?: number | string; // 标的币种的总PNL年化
   rchTotalPnlPercentage?: number | string; // Rch的总PNL年化
 }
@@ -85,32 +108,59 @@ export enum AutomatorDepositStatus {
 }
 
 export class AutomatorService {
+  @asyncCache({
+    until: (it, createdAt) =>
+      !it || !createdAt || Date.now() - createdAt > MsIntervals.min * 10,
+  })
   static async getAutomatorList(params: {
     chainId: number;
     depositCcy?: AutomatorVaultInfo['depositCcy'];
   }) {
-    // return http.get<unknown, HttpResponse<AutomatorInfo[]>>(`/automator/list`, {
-    //   params,
-    // });
-    // TODO 问问融天会不会给个聚合的接口
-    return Promise.all(
-      ContractsService.AutomatorVaults.filter((it) => {
-        if (it.chainId !== params.chainId) return false;
-        if (!params.depositCcy) return true;
-        return params.depositCcy === it.depositCcy;
-      }).map((it) =>
-        AutomatorService.getInfo(it).then((res) => ({
-          ...res.value,
-          vaultInfo: it,
-        })),
-      ),
-    );
+    return http
+      .get<unknown, HttpResponse<OriginAutomatorInfo[]>>(`/automator/list`, {
+        params,
+      })
+      .then((res) =>
+        res.value.map((it) => {
+          const collateralDecimal = getCollateralDecimal(
+            it.chainId,
+            it.depositCcy,
+          );
+          return {
+            ...it,
+            name: get(it, 'name') || it.depositCcy,
+            depositMinAmount: getDepositMinAmount(
+              it.depositCcy,
+              ProjectType.Automator,
+            ),
+            depositTickAmount: getDepositTickAmount(
+              it.depositCcy,
+              ProjectType.Automator,
+            ),
+            anchorPricesDecimal: 1e8,
+            collateralDecimal,
+            abis: AutomatorAbis,
+            creatorFeeRate: get(it, 'creatorFeeRate') || 0,
+            vaultInfo: {
+              ...it,
+              ...ContractsService.AutomatorVaults.find(
+                (item) =>
+                  item.chainId === it.chainId &&
+                  item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
+              ),
+            },
+          } as AutomatorInfo;
+        }),
+      );
   }
 
   static async getInfo({ chainId, vault }: AutomatorVaultInfo) {
-    return http.get<unknown, HttpResponse<AutomatorInfo>>(`/automator/info`, {
-      params: { chainId, automatorVault: vault },
-    });
+    return http.get<unknown, HttpResponse<OriginAutomatorInfo>>(
+      `/automator/info`,
+      {
+        params: { chainId, automatorVault: vault },
+      },
+    );
   }
 
   static async positionsSnapshot({ chainId, vault }: AutomatorVaultInfo) {
@@ -135,7 +185,7 @@ export class AutomatorService {
     { chainId, vault }: AutomatorVaultInfo,
     wallet: string,
   ) {
-    return http.get<unknown, HttpResponse<AutomatorUserDetail>>(
+    return http.get<unknown, HttpResponse<OriginAutomatorUserDetail>>(
       `/automator/user/detail`,
       {
         params: { chainId, automatorVault: vault, wallet },
@@ -148,21 +198,40 @@ export class AutomatorService {
     wallet: string;
     status: AutomatorDepositStatus;
   }) {
-    // return http.get<unknown, HttpResponse<AutomatorUserDetail[]>>(
-    //   `/automator/user/list`,
-    //   { params },
-    // );
-    // TODO 问问融天会不会给个聚合的接口
-    return Promise.all(
-      ContractsService.AutomatorVaults.filter(
-        (it) => it.chainId === params.chainId,
-      ).map((it) =>
-        AutomatorService.getUserPnl(it, params.wallet).then((res) => ({
-          ...res.value,
-          vaultInfo: it,
-        })),
-      ),
-    );
+    const [list, vaults, prices] = await Promise.all([
+      http
+        .get<unknown, HttpResponse<OriginAutomatorUserDetail[]>>(
+          `/automator/user/list`,
+          { params },
+        )
+        .then((res) => res.value),
+      AutomatorService.getAutomatorList({ chainId: params.chainId }),
+      MarketService.fetchIndexPx(),
+    ]);
+    return list.map((it) => {
+      const vaultInfo = vaults.find(
+        (item) =>
+          item.vaultInfo.chainId === it.chainId &&
+          item.vaultInfo.vault.toLowerCase() ===
+            it.automatorVault.toLowerCase(),
+      )!.vaultInfo;
+      const rchValueInDepositCcy = cvtAmountsInCcy(
+        [['RCH', it.rchTotalPnl]],
+        prices,
+        vaultInfo.depositCcy,
+      );
+      const totalPnl = Number(it.depositTotalPnl) + rchValueInDepositCcy;
+      const depositTotalPnlPercentage =
+        (Number(it.pnlPercentage) * Number(it.depositTotalPnl)) / totalPnl;
+      const rchTotalPnlPercentage =
+        (Number(it.pnlPercentage) * rchValueInDepositCcy) / totalPnl;
+      return {
+        ...it,
+        depositTotalPnlPercentage,
+        rchTotalPnlPercentage,
+        vaultInfo,
+      } as AutomatorUserDetail;
+    });
   }
 
   static async transactions(

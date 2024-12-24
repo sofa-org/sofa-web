@@ -7,7 +7,7 @@ import { useQuery } from '@sofa/utils/hooks';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 
-import Automator from '../products/automator';
+import { AutomatorEl } from '../products/automator';
 import { ProductCustomize } from '../products/customize';
 
 import { DIY } from './components/DIY';
@@ -29,7 +29,7 @@ const tabs = [
     ),
     icon: ProjectTypeRefs.Automator.icon,
     value: 'automator',
-    comp: () => <Automator onlyForm className={styles['automator']} />,
+    comp: () => <AutomatorEl className={styles['automator']} />,
   },
   {
     label: (t: TFunction) => (

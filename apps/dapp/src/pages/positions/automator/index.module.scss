@@ -42,7 +42,7 @@
 
   :global {
     .semi-empty {
-      @include flex-center;
+      @include flex-column-center;
 
       height: 50vh;
     }

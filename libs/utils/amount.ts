@@ -70,6 +70,7 @@ export function amountFormatter(
 ) {
   if (!isLegalNum(amount)) return '-';
   if (!Number(amount)) return '0';
+  if (!isFinite(+amount)) return +amount > 0 ? 'Infinity' : '-Infinity';
   const exponent = -Number(amount).toExponential().split('e')[1] || 0;
   const precision = forcePrecision
     ? $precision

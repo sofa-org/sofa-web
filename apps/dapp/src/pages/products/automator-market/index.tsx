@@ -19,6 +19,8 @@ import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
+import { useAutomatorModal } from '../automator/index-modal';
+
 import { AutomatorCard } from './components/Card';
 
 import styles from './index.module.scss';
@@ -68,16 +70,16 @@ const Index = () => {
   const lists = useMemo(() => {
     if (!data) return undefined;
     const bool = arrToDict(holding || [], (it) =>
-      it.automatorVault.toLowerCase(),
+      it.vaultInfo.vault.toLowerCase(),
     );
     const map = data.reduce(
       (pre, it) => {
-        if (tab === 'holding' && !bool[it.automatorVault.toLowerCase()])
+        if (tab === 'holding' && !bool[it.vaultInfo.vault.toLowerCase()])
           return pre;
         const vault = ContractsService.AutomatorVaults.find(
           (item) =>
             item.chainId === wallet.chainId &&
-            item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
+            item.vault.toLowerCase() === it.vaultInfo.vault.toLowerCase(),
         );
         if (!vault) return pre;
         if (!pre[vault.depositCcy]) pre[vault.depositCcy] = [];
@@ -90,6 +92,8 @@ const Index = () => {
   }, [data, holding, tab, wallet.chainId]);
 
   const loading = (tab === 'holding' ? loading2 : loading1) && !lists?.length;
+
+  const [modal, modalController] = useAutomatorModal();
 
   return (
     <TopTabs
@@ -128,13 +132,18 @@ const Index = () => {
                 </div>
               )}
               {it[1].map((a) => (
-                <AutomatorCard key={a.automatorVault} info={a} />
+                <AutomatorCard
+                  key={a.vaultInfo.vault}
+                  info={a}
+                  modalController={modalController}
+                />
               ))}
             </div>
           );
         })}
         {!lists?.length && !loading && <CEmpty className="semi-always-dark" />}
       </Spin>
+      {modal}
     </TopTabs>
   );
 };

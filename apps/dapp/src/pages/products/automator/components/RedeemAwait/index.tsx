@@ -95,7 +95,7 @@ const useAutomatorRedeemAwaitEl = (props: {
             {t({ enUS: 'Available For Claim', zhCN: '可领取时间' })}
             {/* {vault?.claimPeriod && (
               <span className={styles['badge']}>
-                {formatDuration(vault.claimPeriod, 1)}
+                {formatDuration(vault.claimPeriod, 1, true)}
               </span>
             )} */}
           </div>
@@ -159,7 +159,8 @@ export const AutomatorRedeemAwait = (props: {
         zhCN: '一旦可赎回，您将有 <span class="highlight">{{duration}}</span> 时间赎回。如未及时赎回，您将需要重新申请赎回。',
       },
       {
-        duration: vault?.claimPeriod && formatDuration(vault?.claimPeriod, 1),
+        duration:
+          vault?.claimPeriod && formatDuration(vault?.claimPeriod, 1, true),
       },
     ),
   });
@@ -193,7 +194,7 @@ export const AutomatorRedeemAwait = (props: {
           //               zhCN: '一旦取消赎回，您将需要 <span class="highlight">等待 {{duration}}</span> 才能发起新的赎回。您确认取消赎回吗？',
           //             },
           //             {
-          //               duration: formatDuration(vault.redeemWaitPeriod, 1),
+          //               duration: formatDuration(vault.redeemWaitPeriod, 1, true),
           //             },
           //           ),
           //         }}

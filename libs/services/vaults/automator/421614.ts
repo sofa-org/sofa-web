@@ -8,6 +8,7 @@ const Vaults = [
     balanceCcy: 'atUSDC',
     redeemWaitPeriod: MsIntervals.min * 20,
     claimPeriod: MsIntervals.min * 10,
+    createTime: new Date('2024-11-24T08:00Z').getTime(),
   },
 ];
 

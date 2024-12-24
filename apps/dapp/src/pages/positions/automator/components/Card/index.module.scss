@@ -1,6 +1,5 @@
 .card {
   @include flex-center;
-  @include pointer;
 
   align-items: flex-start;
   justify-content: space-between;
