@@ -7,9 +7,17 @@ import {
   Progress,
   Row,
   Spin,
+  Toast,
 } from '@douyinfe/semi-ui';
+import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
+import { RCHService } from '@sofa/services/rch';
+import { getErrorMsg } from '@sofa/utils/fns';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
+
+import AsyncButton from '@/components/AsyncButton';
+import { useWalletStore } from '@/components/WalletConnector/store';
 
 import {
   automatorCreateConfigs,
@@ -40,13 +48,13 @@ const steps: {
     comp: () => <StepCreating />,
   },
   {
-    arrived: (store) => store.rchBurnedManually || store.rchBurnHashValidated,
+    arrived: (store) => store.rchBurnedManually || store.rchBurned,
     processPercent: 50,
     step1: true,
     comp: () => <StepForm />,
   },
   {
-    arrived: (store) => store.rchBurnHashValidating,
+    arrived: (store) => store.rchBurning,
     processPercent: 30,
     comp: () => <StepBurning />,
   },
@@ -58,6 +66,36 @@ const steps: {
 ];
 const StepStart = () => {
   const [t] = useTranslation('AutomatorCreate');
+  const { chainId } = useWalletStore();
+
+  const burn = useLazyCallback(async () => {
+    try {
+      if (chainId != automatorCreateConfigs.chainIdToBurnRch) {
+        // switch chain
+        await useWalletStore.setChain(automatorCreateConfigs.chainIdToBurnRch);
+      }
+      useAutomatorCreateStore.setState({
+        rchBurning: true,
+      });
+      // burn
+      const hash = await RCHService.burn(
+        automatorCreateConfigs.chainIdToBurnRch,
+        automatorCreateConfigs.rchAmountToBurn,
+      );
+
+      useAutomatorCreateStore.setState({
+        rchBurned: true,
+        payload: {
+          ...useAutomatorCreateStore.getState().payload,
+          rchBurnHash: hash,
+        },
+      });
+    } catch (e) {
+      useAutomatorCreateStore.getState().reset();
+      console.error('error burn rch for automator creation', e);
+      Toast.error(getErrorMsg(e));
+    }
+  });
   return (
     <div className={styles['step-1-start']}>
       <div className={styles['rch-amount']}>
@@ -66,12 +104,31 @@ const StepStart = () => {
         </span>{' '}
         RCH
       </div>
-      <Button>
-        {t({
-          enUS: 'Switch to Ethereum Mainnet to Burn',
-        })}
-      </Button>
-      <Button>
+      <AsyncButton className={'btn-primary'} onClick={() => burn()}>
+        {chainId == automatorCreateConfigs.chainIdToBurnRch
+          ? t({
+              enUS: 'Confirm to Burn',
+            })
+          : t(
+              {
+                enUS: 'Switch to {{chainName}} to Burn',
+              },
+              {
+                chainName: getNameForChain(
+                  automatorCreateConfigs.chainIdToBurnRch,
+                  t,
+                ),
+              },
+            )}
+      </AsyncButton>
+      <Button
+        className={'btn-ghost'}
+        onClick={() => {
+          useAutomatorCreateStore.setState({
+            rchBurnedManually: true,
+          });
+        }}
+      >
         {t(
           {
             enUS: 'I’ve Already Burned {{amount}} RCH',
@@ -102,7 +159,7 @@ const StepForm = () => {
   const { payload, rchBurnedManually } = useAutomatorCreateStore();
   return (
     <div className={styles['step-3-form']}>
-      <Form labelPosition="top">
+      <Form labelPosition="top" initValues={payload}>
         <Row>
           <Col span={24}>
             <Form.Input
@@ -266,7 +323,7 @@ const StepForm = () => {
           </Col>
         </Row>
       </Form>
-      <Button>
+      <Button className="btn-gradient-text">
         {t({
           enUS: 'Switch to Arbitrum One to Deploy',
         })}

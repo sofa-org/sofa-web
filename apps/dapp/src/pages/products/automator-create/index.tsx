@@ -8,6 +8,7 @@ import {
 } from '@sofa/services/automator';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
@@ -26,7 +27,11 @@ import { Comp as IconPoints } from './assets/icon-points.svg';
 import { Comp as IconShare } from './assets/icon-share.svg';
 import { Comp as IconZero } from './assets/icon-zero.svg';
 import { AutomatorCreateModel } from './index-model';
-import { automatorCreateConfigs } from './store';
+import {
+  automatorCreateConfigs,
+  getNameForChain,
+  useAutomatorCreateStore,
+} from './store';
 
 import styles from './index.module.scss';
 
@@ -118,10 +123,14 @@ const AutomatorCreate = () => {
                 {formatHighlightedText(
                   t(
                     {
-                      enUS: 'Burn {{amount}} RCH on [[Ethereum Mainnet]]',
+                      enUS: 'Burn {{amount}} RCH on [[{{chainName}}]]',
                     },
                     {
                       amount: automatorCreateConfigs.rchAmountToBurn,
+                      chainName: getNameForChain(
+                        automatorCreateConfigs.chainIdToBurnRch,
+                        t,
+                      ),
                     },
                   ),
                   {
@@ -150,8 +159,11 @@ const AutomatorCreate = () => {
           </ol>
           <Button
             size="large"
-            className={styles['btn-create']}
-            onClick={() => setModelVisible(true)}
+            className={classNames(styles['btn-create'], 'btn-primary')}
+            onClick={() => {
+              useAutomatorCreateStore.getState().reset();
+              setModelVisible(true);
+            }}
           >
             {t({
               enUS: 'Burn RCH & Create Your Automator',

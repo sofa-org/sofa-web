@@ -183,13 +183,10 @@ export class RCHService {
       });
   }
 
-  static async burn(
-    signer: ethers.JsonRpcSigner,
-    chainId: number,
-    amount: string,
-  ) {
+  static async burn(chainId: number, amount: string) {
+    const { signer } = await WalletService.connect(chainId);
     const rchContract = ContractsService.rchContract(signer);
-    return ContractsService.dirtyCall(
+    const hash = await ContractsService.dirtyCall(
       rchContract,
       'burn',
       (gasLimit?: number) => [
@@ -197,6 +194,11 @@ export class RCHService {
         ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
       ],
     );
+    return WalletService.transactionResult(hash, chainId).then((res) => {
+      return res === TransactionStatus.FAILED
+        ? Promise.reject(new Error('Burn failed on chain'))
+        : Promise.resolve(hash);
+    });
   }
 
   static async claimAirdrop(list: AirdropRecord[]) {

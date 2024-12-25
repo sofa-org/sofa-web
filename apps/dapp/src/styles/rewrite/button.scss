@@ -8,6 +8,32 @@
   }
 }
 
+.btn-primary {
+  background: #000;
+  border-radius: 20px;
+  > span {
+    color: #fff;
+  }
+
+  &:hover {
+    background: rgba(#000, 0.8) !important;
+  }
+}
+
+.btn-gradient-text {
+  background: #000;
+  border-radius: 20px;
+  > span {
+    background-image: $color-main-gradient;
+    color: transparent;
+    background-clip: text;
+  }
+
+  &:hover {
+    background: rgba(#000, 0.8) !important;
+  }
+}
+
 .btn-ghost.btn-ghost {
   border: 1px solid currentcolor;
   background: transparent;
