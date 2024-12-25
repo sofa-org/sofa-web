@@ -25,6 +25,8 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 import { Comp as IconPoints } from './assets/icon-points.svg';
 import { Comp as IconShare } from './assets/icon-share.svg';
 import { Comp as IconZero } from './assets/icon-zero.svg';
+import { AutomatorCreateModel } from './index-model';
+import { automatorCreateConfigs } from './store';
 
 import styles from './index.module.scss';
 
@@ -77,6 +79,7 @@ const FAQ = (t: TFunction) => {
 const AutomatorCreate = () => {
   const [t] = useTranslation('AutomatorCreate');
   const wallet = useWalletStore((state) => state);
+  const [modelVisible, setModelVisible] = useState(false);
 
   const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({
     [0]: true,
@@ -85,117 +88,132 @@ const AutomatorCreate = () => {
     setFaqExpanded({ [idx]: true });
   });
   return (
-    <TopTabs
-      type={'banner-expandable'}
-      className={styles['container']}
-      tabClassName={styles['tabs']}
-      banner={
-        <>
-          <h1 className={styles['head-title']}>
-            {ProjectTypeRefs[ProjectType.Automator].icon}
-            {t({
-              enUS: 'Create A Automator, Showcase Your Strategy',
-            })}
-          </h1>
-        </>
-      }
-      dark
-      options={[]}
-    >
-      <div className={classNames(styles['form'], styles['intro'])}>
-        <ol className={styles['steps']}>
-          <li>
-            <span className={styles['step']}>
+    <>
+      <TopTabs
+        type={'banner-expandable'}
+        className={styles['container']}
+        tabClassName={styles['tabs']}
+        banner={
+          <>
+            <h1 className={styles['head-title']}>
+              {ProjectTypeRefs[ProjectType.Automator].icon}
               {t({
-                enUS: 'Step 1',
+                enUS: 'Create A Automator, Showcase Your Strategy',
               })}
-            </span>
-            <span>
-              {formatHighlightedText(
-                t({
-                  enUS: 'Burn 2000 RCH on [[Ethereum Mainnet]]',
-                }),
-                {
-                  hightlightedClassName: styles['highlighted'],
-                },
-              )}
-            </span>
-          </li>
-          <li>
-            <span className={styles['step']}>
-              {t({
-                enUS: 'Step 2',
-              })}
-            </span>
-            <span>
-              {formatHighlightedText(
-                t({
-                  enUS: 'Enter Automator Details & Pay Gas Fees to Deploy Automator Contract on [[You Selected Chain]]',
-                }),
-                {
-                  hightlightedClassName: styles['highlighted'],
-                },
-              )}
-            </span>
-          </li>
-        </ol>
-        <Button size="large" className={styles['btn-create']}>
-          {t({
-            enUS: 'Burn RCH & Create Your Automator',
-          })}
-        </Button>
-        <ul className={styles['features']}>
-          <li>
-            <IconZero />
-            <div className={styles['title']}>{t('Zero Trading Fees')}</div>
-            <div className={styles['desc']}>
-              {t(
-                'Enjoy 0 trading fees when executing trades through your AutoMator.',
-              )}
-            </div>
-          </li>
-          <li>
-            <IconShare />
-            <div className={styles['title']}>{t('Share Profits')}</div>
-            <div className={styles['desc']}>
-              {t(
-                'Earn up to 15% profit share from the users who subscribe to your AutoMator.',
-              )}
-            </div>
-          </li>
-          <li>
-            <IconPoints />
-            <div className={styles['title']}>{t('SOFA Points')}</div>
-            <div className={styles['desc']}>
-              {t('Get More SOFA Points BALABALA BALA')}
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <div className={classNames(styles['form'], styles['faq'])}>
-        <h2>{t('FAQ')}</h2>
-        <ol className={styles['faq-ol']}>
-          {FAQ(t).map((faq, idx) => (
-            <li
-              className={
-                faqExpanded[idx] ? styles['expended'] : styles['folded']
-              }
-            >
-              <div
-                className={styles['title']}
-                onClick={() => onFaqTitleClicked(idx)}
-              >
-                {faq.title}
-              </div>
-              {faqExpanded[idx] ? (
-                <div className={styles['desc']}>{faq.desc}</div>
-              ) : undefined}
+            </h1>
+          </>
+        }
+        dark
+        options={[]}
+      >
+        <div className={classNames(styles['form'], styles['intro'])}>
+          <ol className={styles['steps']}>
+            <li>
+              <span className={styles['step']}>
+                {t({
+                  enUS: 'Step 1',
+                })}
+              </span>
+              <span>
+                {formatHighlightedText(
+                  t(
+                    {
+                      enUS: 'Burn {{amount}} RCH on [[Ethereum Mainnet]]',
+                    },
+                    {
+                      amount: automatorCreateConfigs.rchAmountToBurn,
+                    },
+                  ),
+                  {
+                    hightlightedClassName: styles['highlighted'],
+                  },
+                )}
+              </span>
             </li>
-          ))}
-        </ol>
-      </div>
-    </TopTabs>
+            <li>
+              <span className={styles['step']}>
+                {t({
+                  enUS: 'Step 2',
+                })}
+              </span>
+              <span>
+                {formatHighlightedText(
+                  t({
+                    enUS: 'Enter Automator Details & Pay Gas Fees to Deploy Automator Contract on [[You Selected Chain]]',
+                  }),
+                  {
+                    hightlightedClassName: styles['highlighted'],
+                  },
+                )}
+              </span>
+            </li>
+          </ol>
+          <Button
+            size="large"
+            className={styles['btn-create']}
+            onClick={() => setModelVisible(true)}
+          >
+            {t({
+              enUS: 'Burn RCH & Create Your Automator',
+            })}
+          </Button>
+          <ul className={styles['features']}>
+            <li>
+              <IconZero />
+              <div className={styles['title']}>{t('Zero Trading Fees')}</div>
+              <div className={styles['desc']}>
+                {t(
+                  'Enjoy 0 trading fees when executing trades through your AutoMator.',
+                )}
+              </div>
+            </li>
+            <li>
+              <IconShare />
+              <div className={styles['title']}>{t('Share Profits')}</div>
+              <div className={styles['desc']}>
+                {t(
+                  'Earn up to 15% profit share from the users who subscribe to your AutoMator.',
+                )}
+              </div>
+            </li>
+            <li>
+              <IconPoints />
+              <div className={styles['title']}>{t('SOFA Points')}</div>
+              <div className={styles['desc']}>
+                {t('Get More SOFA Points BALABALA BALA')}
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div className={classNames(styles['form'], styles['faq'])}>
+          <h2>{t('FAQ')}</h2>
+          <ol className={styles['faq-ol']}>
+            {FAQ(t).map((faq, idx) => (
+              <li
+                className={
+                  faqExpanded[idx] ? styles['expended'] : styles['folded']
+                }
+              >
+                <div
+                  className={styles['title']}
+                  onClick={() => onFaqTitleClicked(idx)}
+                >
+                  {faq.title}
+                </div>
+                {faqExpanded[idx] ? (
+                  <div className={styles['desc']}>{faq.desc}</div>
+                ) : undefined}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </TopTabs>
+      <AutomatorCreateModel
+        value={modelVisible}
+        onChange={(v) => setModelVisible(v || false)}
+      />
+    </>
   );
 };
 

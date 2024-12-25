@@ -183,6 +183,16 @@ export enum AutomatorDepositStatus {
   CLOSED = 'CLOSED',
 }
 
+export interface AutomatorCreatePayload {
+  rchBurnHash: string;
+  automatorName: string;
+  chainId: number;
+  depositCcy: string;
+  redemptionWaitingPeriod: string;
+  sharePercent: number;
+  automatorDesc: string;
+}
+
 export class AutomatorService {
   static cvtAutomatorInfo(it: OriginAutomatorInfo) {
     const collateralDecimal = getCollateralDecimal(
@@ -319,10 +329,10 @@ export class AutomatorService {
   }) {
     const [list, vaults, prices] = await Promise.all([
       http
-        .get<unknown, HttpResponse<OriginAutomatorUserDetail[]>>(
-          `/automator/user/list`,
-          { params },
-        )
+        .get<
+          unknown,
+          HttpResponse<OriginAutomatorUserDetail[]>
+        >(`/automator/user/list`, { params })
         .then((res) => res.value),
       AutomatorService.getAutomatorList({ chainId: params.chainId }),
       MarketService.fetchIndexPx(),
