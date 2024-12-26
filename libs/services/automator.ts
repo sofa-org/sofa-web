@@ -28,17 +28,20 @@ import { WalletService } from './wallet';
 // server 返回的结构
 export interface OriginAutomatorInfo {
   chainId: number; // 链代码
+  automatorName: string; // automator名称
+  automatorDescription: string; // automator说明
   automatorVault: string; // Automator vault
+  participantNum: number; // 参与者数量
   amount: number | string; // 当前aum值
+  creatorAmount: number | string; // 基金管理者的aum值
   nav: number | string; // 净值
   dateTime: number; // 净值产生的时间（秒级时间戳）
   yieldPercentage: number | string; // 7D Yield(百分比)
-  automatorName?: string; // 名称
-  automatorDesc?: string; // 介绍
-  creatorWallet?: string; // 创建者钱包地址
-  creatorAmount?: number | string; // 创建者钱包地址
-  participantNum?: number | string; // 参与者数量
-  depositCcy: string;
+  creator: string; // 创建者
+  createTime: number; // automator创建时间
+  vaultDepositCcy: string; // Automator 拿到客户的钱之后 用来申购 vault 的币种
+  clientDepositCcy: string; // 用户存入的标的物
+  sharesToken: string; // Automator 的份额代币
 }
 
 export interface AutomatorInfo
@@ -124,17 +127,17 @@ export class AutomatorService {
         res.value.map((it) => {
           const collateralDecimal = getCollateralDecimal(
             it.chainId,
-            it.depositCcy,
+            it.clientDepositCcy,
           );
           return {
             ...it,
-            name: get(it, 'name') || it.depositCcy,
+            name: get(it, 'name') || it.clientDepositCcy,
             depositMinAmount: getDepositMinAmount(
-              it.depositCcy,
+              it.clientDepositCcy,
               ProjectType.Automator,
             ),
             depositTickAmount: getDepositTickAmount(
-              it.depositCcy,
+              it.clientDepositCcy,
               ProjectType.Automator,
             ),
             anchorPricesDecimal: 1e8,
@@ -143,6 +146,9 @@ export class AutomatorService {
             creatorFeeRate: get(it, 'creatorFeeRate') || 0,
             vaultInfo: {
               ...it,
+              depositCcy: it.clientDepositCcy,
+              vaultDepositCcy: it.vaultDepositCcy,
+              positionCcy: it.sharesToken,
               ...ContractsService.AutomatorVaults.find(
                 (item) =>
                   item.chainId === it.chainId &&

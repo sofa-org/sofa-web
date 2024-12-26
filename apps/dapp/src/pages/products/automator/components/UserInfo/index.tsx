@@ -85,7 +85,7 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay amount={data?.shareInfo?.shares} />{' '}
-            <span className={styles['unit']}>{props.vault?.balanceCcy}</span>
+            <span className={styles['unit']}>{props.vault?.positionCcy}</span>
             <span className={styles['decorative']}>
               {' '}
               ≈ <AmountDisplay amount={data?.shareInfo?.amount} />{' '}

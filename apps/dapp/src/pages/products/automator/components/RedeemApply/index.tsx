@@ -96,7 +96,7 @@ export const AutomatorRedeemApply = (props: {
               )
             }
             suffix={
-              <span className={styles['suffix']}>{vault?.balanceCcy}</span>
+              <span className={styles['suffix']}>{vault?.positionCcy}</span>
             }
           />
         </div>
@@ -105,7 +105,7 @@ export const AutomatorRedeemApply = (props: {
             {t({ enUS: 'Redeemable', zhCN: '可赎回' })}
           </span>
           <span className={styles['value']}>
-            {amountFormatter(balance, shareDecimals)} {vault?.balanceCcy}
+            {amountFormatter(balance, shareDecimals)} {vault?.positionCcy}
             <span className={styles['equals']}>
               ≈ {amountFormatter(shareInfo?.amount, 2)} {vault?.depositCcy}
             </span>
