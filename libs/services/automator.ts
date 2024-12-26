@@ -45,7 +45,14 @@ export interface OriginAutomatorInfo {
 }
 
 export interface AutomatorInfo
-  extends Omit<OriginAutomatorInfo, 'chainId' | 'automatorVault'> {
+  extends Omit<
+    OriginAutomatorInfo,
+    | 'chainId'
+    | 'automatorVault'
+    | 'vaultDepositCcy'
+    | 'clientDepositCcy'
+    | 'sharesToken'
+  > {
   vaultInfo: AutomatorVaultInfo;
 }
 

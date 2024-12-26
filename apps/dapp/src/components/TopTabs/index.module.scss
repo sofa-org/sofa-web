@@ -15,7 +15,8 @@
     object-position: top center;
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     height: auto;
   }
 
@@ -95,7 +96,8 @@
     }
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     display: none;
   }
 }
@@ -117,7 +119,8 @@
     padding: 0 0 40px;
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     margin: 0;
   }
 }
@@ -192,7 +195,8 @@
     }
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     height: auto;
     margin: 0;
     padding: 48px 0;
@@ -211,6 +215,38 @@
         color: #fff;
         background: rgba(#fff, 0.16);
       }
+    }
+  }
+
+  &.banner-expandable-tab {
+    height: min(65px, 12vw);
+    padding: 0;
+    box-shadow: 0 1px 0 rgba(#fff, 0.12);
+    z-index: 2;
+
+    .tabs {
+      justify-content: flex-start;
+    }
+
+    .top-tabs-tab {
+      min-width: 180px;
+      padding: 0 30px;
+      height: min(65px, 12vw);
+      background: transparent !important;
+      border-radius: 0;
+
+      svg,
+      img {
+        width: 2em;
+      }
+
+      &.active {
+        border-bottom: 2px solid #fff;
+      }
+    }
+
+    > div {
+      width: $width-content;
     }
   }
 }
@@ -255,7 +291,8 @@
       }
     }
 
-    &.banner-expandable {
+    &.banner-expandable,
+    &.banner-expandable-tab {
       padding: 0 0 12px;
     }
   }

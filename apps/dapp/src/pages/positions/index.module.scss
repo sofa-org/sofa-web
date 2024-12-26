@@ -52,31 +52,3 @@
     }
   }
 }
-
-.tabs.tabs {
-  height: min(80px, 14vw);
-  padding: 0;
-  box-shadow: 0 1px 0 rgba(#fff, 0.12);
-
-  :global {
-    .top-tabs-tab {
-      width: 50%;
-      height: min(80px, 14vw);
-      background: transparent !important;
-      border-radius: 0;
-
-      svg,
-      img {
-        width: 2em;
-      }
-
-      &.active {
-        border-bottom: 2px solid #fff;
-      }
-    }
-  }
-
-  > div {
-    width: min(1160px, calc(100vw - 24px));
-  }
-}

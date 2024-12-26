@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { CCYService } from '@sofa/services/ccy';
 import { amountFormatter } from '@sofa/utils/amount';
 
 import styles from './index.module.scss';
@@ -7,6 +8,7 @@ export interface AmountDisplayProps {
   amount: string | number | undefined;
   thresholdCount?: number; // default: 5
   precision?: number;
+  ccy?: string; // 用于默认的 precision 逻辑
   signed?: boolean; // 是否显示 + 符号
 }
 
@@ -22,18 +24,21 @@ const AmountDisplay = (props: AmountDisplayProps) => {
     return '-';
   }, [props.amount, props.signed]);
 
+  const precision = useMemo(() => {
+    if (!props.ccy) return props.precision ?? 4;
+    return CCYService.ccyConfigs[props.ccy]?.precision ?? 4;
+  }, [props.ccy, props.precision]);
+
   return (
     <span className={styles['amount-display']}>
       {sign && <span className={styles['sign']}>{sign}</span>}
       {zeroCount >= 5 ? (
         <>
           0.0<span className={styles['subscript']}>{zeroCount}</span>
-          {val
-            .replace(/[-.]/g, '')
-            .substring(0, Math.max(1, (props.precision ?? 4) - 1))}
+          {val.replace(/[-.]/g, '').substring(0, Math.max(1, precision - 1))}
         </>
       ) : (
-        amountFormatter(props.amount, props.precision).replace(/[-]/, '') || '-'
+        amountFormatter(props.amount, precision).replace(/[-]/, '') || '-'
       )}
     </span>
   );
