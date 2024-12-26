@@ -8,6 +8,7 @@ import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
+import ProgressBar from '@/components/ProgressBar';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
@@ -69,26 +70,36 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
             precision={0}
           />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.balanceCcy}
+            {props.info.vaultInfo.positionCcy}
           </span>
         </div>
       </div>
-      {props.info.creatorWallet && (
-        <div className={styles['creator']}>
-          <div className={styles['label']}>
-            {t({ enUS: `Creator's`, zhCN: '创建者份额' })}
+      {/* {props.info.creator && (
+        <>
+          <div className={styles['creator']}>
+            <div className={styles['label']}>
+              {t({ enUS: `Creator's`, zhCN: '创建者份额' })}
+            </div>
+            <div className={styles['value']}>
+              <AmountDisplay
+                amount={Number(props.info.creatorAmount) / +props.info.nav}
+                precision={0}
+              />
+              <span className={styles['unit']}>
+                {props.info.vaultInfo.positionCcy}
+              </span>
+            </div>
           </div>
-          <div className={styles['value']}>
-            <AmountDisplay
-              amount={Number(props.info.creatorAmount) / +props.info.nav}
-              precision={0}
-            />
-            <span className={styles['unit']}>
-              {props.info.vaultInfo.balanceCcy}
-            </span>
-          </div>
-        </div>
-      )}
+          <ProgressBar
+            type="3"
+            className={styles['progress']}
+            percent={
+              Number(props.info?.creatorAmount) / Number(props.info?.amount)
+            }
+            minWidthPercentage={0.05}
+          />
+        </>
+      )} */}
       <div className={styles['footer']}>
         <div className={styles['runtime']}>
           <IconCalendar />

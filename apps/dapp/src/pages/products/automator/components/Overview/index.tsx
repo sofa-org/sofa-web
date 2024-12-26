@@ -4,10 +4,8 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { formatDuration } from '@sofa/utils/time';
-import classNames from 'classnames';
 
 import AmountDisplay from '@/components/AmountDisplay';
-import ProgressBar from '@/components/ProgressBar';
 
 import { Comp as IconCalendar } from '../../../automator-market/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../../automator-market/assets/icon-people.svg';
@@ -65,41 +63,37 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
               amount={Number(data?.amount) / Number(data?.nav)}
               precision={0}
             />
-            <span className={styles['unit']}>{props.vault?.balanceCcy}</span>
+            <span className={styles['unit']}>{props.vault?.positionCcy}</span>
             <div className={styles['decorative']}>
               ≈ <AmountDisplay amount={data?.amount} />
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
             </div>
           </div>
         </div>
-        {/* {data?.creatorWallet && ( */}
-        <div className={styles['aum']}>
-          <div className={styles['title']}>
-            {t({ enUS: `Creator's Lead Assets`, zhCN: '创建者份额' })}
-          </div>
-          <div className={styles['value']}>
-            <AmountDisplay amount={data?.creatorAmount} precision={0} />
-            <span className={styles['unit']}>{props.vault?.depositCcy}</span>
-            <span className={styles['percentage']}>
-              {displayPercentage(
-                Number(data?.creatorAmount) / Number(data?.amount),
-              )}
-            </span>
-            {!!Number(data?.creatorAmount) && (
+        {/* {data?.creator && (
+          <div className={styles['aum']}>
+            <div className={styles['title']}>
+              {t({ enUS: `Creator's Lead Assets`, zhCN: '创建者份额' })}
+            </div>
+            <div className={styles['value']}>
+              <AmountDisplay amount={data?.creatorAmount} precision={0} />
+              <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+              <span className={styles['percentage']}>
+                {displayPercentage(
+                  Number(data?.creatorAmount) / Number(data?.amount),
+                )}
+              </span>
               <ProgressBar
                 type="3"
-                percent={Math.max(
-                  Number(data?.creatorAmount) / Number(data?.amount) || 0,
-                  0.05,
-                )}
+                percent={Number(data?.creatorAmount) / Number(data?.amount)}
+                minWidthPercentage={0.05}
               />
-            )}
+            </div>
           </div>
-        </div>
-        {/* )} */}
+        )} */}
         {/* <div className={styles['nav']}>
         <div className={styles['title']}>
-          1 {props.vault?.balanceCcy} (
+          1 {props.vault?.positionCcy} (
           <Time time={Number(data?.dateTime) * 1000} format="MMM. DD" />)
         </div>
         <div className={styles['value']}>

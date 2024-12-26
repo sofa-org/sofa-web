@@ -86,7 +86,7 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
         </div>
       </div>
       <div className={styles['nav']}>
-        1<span className={styles['unit']}>{vault?.balanceCcy}</span> ≈{' '}
+        1<span className={styles['unit']}>{vault?.positionCcy}</span> ≈{' '}
         {Number(overview?.nav)}
         <span className={styles['unit']}>{vault?.depositCcy}</span>
       </div>
@@ -112,11 +112,12 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
             );
           }}
         >
-          {t({ enUS: 'Mint', zhCN: '铸造' })} {props.vault?.balanceCcy}
+          {t({ enUS: 'Mint', zhCN: '铸造' })} {props.vault?.positionCcy}
           {!!convertedShare && (
             <span className={styles['converted-share']}>
               (≈ {amountFormatter(convertedShare, 2)}{' '}
-              <span className={styles['unit']}>{props.vault?.balanceCcy}</span>)
+              <span className={styles['unit']}>{props.vault?.positionCcy}</span>
+              )
             </span>
           )}
         </BaseInvestButton>

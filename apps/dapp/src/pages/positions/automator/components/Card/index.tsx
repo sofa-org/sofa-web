@@ -62,7 +62,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
         <div className={styles['value']}>
           <AmountDisplay amount={props.info?.share} />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.balanceCcy}
+            {props.info.vaultInfo.positionCcy}
           </span>
           <div className={styles['decorative']}>
             <span className={styles['operator']}>≈</span>
@@ -80,7 +80,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
         <div className={styles['value']}>
           <AmountDisplay amount={props.info?.depositTotalPnl} />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.balanceCcy}
+            {props.info.vaultInfo.positionCcy}
           </span>
           <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>

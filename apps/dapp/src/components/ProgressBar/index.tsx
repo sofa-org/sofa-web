@@ -17,6 +17,7 @@ export interface ProgressBarProps extends BaseProps {
   disabled?: boolean;
   percent: number;
   children?: ReactNode;
+  minWidthPercentage?: number;
   onClick?(e: MouseEvent<HTMLDivElement>): void;
   onPercentChange?(percent: number): void;
 }
@@ -64,7 +65,11 @@ const ProgressBar = (props: ProgressBarProps) => {
         [...Array(10)].map((_, i) => <div className={styles['dot']} key={i} />)}
       <div
         className={classNames(styles['progress-bar'], 'progress-bar')}
-        style={{ width: `${Math.max(tempVal * 100, 0.1)}%` }}
+        style={{
+          width: !tempVal
+            ? 0
+            : `${Math.max(tempVal * 100, props.minWidthPercentage || 0.1)}%`,
+        }}
       />
       {props.type === '2' && !!wrapperSize?.width && (
         <Draggable

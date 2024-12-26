@@ -53,6 +53,10 @@
   }
 }
 
+.progress.progress.progress {
+  height: 10px;
+}
+
 .unit {
   margin: 0;
   padding: 0 0 0 0.2em;
@@ -66,7 +70,7 @@
   @include flex-center;
 
   justify-content: space-between;
-  margin: 0;
+  margin: 0 0 6px;
   line-height: 25px;
 }
 

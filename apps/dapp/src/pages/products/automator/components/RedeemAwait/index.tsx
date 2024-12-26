@@ -68,7 +68,7 @@ const useAutomatorRedeemAwaitEl = (props: {
         <span className={styles['value']}>
           {amountFormatter(pendingShares, decimals)}
         </span>{' '}
-        <span className={styles['unit']}>{vault?.balanceCcy}</span>
+        <span className={styles['unit']}>{vault?.positionCcy}</span>
         <span className={styles['decorative']}>
           ≈{amountFormatter(pendingShares * pricePerShare, 2)}{' '}
           <span className={styles['unit']}>{vault?.depositCcy}</span>

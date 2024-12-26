@@ -94,7 +94,7 @@ export const AutomatorHistory = () => {
             render: (_, record) => (
               <>
                 {amountFormatter(record.share, 6)}
-                <span className={styles['unit']}>{vault?.balanceCcy}</span>
+                <span className={styles['unit']}>{vault?.positionCcy}</span>
               </>
             ),
           },

@@ -53,7 +53,7 @@ export const AutomatorClaim = (props: {
           <span className={styles['value']}>
             {amountFormatter(redemptionInfo?.pendingSharesWithDecimals, 0)}
           </span>{' '}
-          {vault?.balanceCcy}
+          {vault?.positionCcy}
           <span className={styles['decorative']}>
             ≈
             {amountFormatter(
