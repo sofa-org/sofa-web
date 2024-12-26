@@ -114,21 +114,19 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           <span
             style={{
               color:
-                Number(props.info.depositTotalPnlPercentage) >= 0
+                Number(props.info.pnlPercentage) >= 0
                   ? 'var(--color-rise)'
                   : 'var(--color-fall)',
             }}
           >
-            {Number(props.info.depositTotalPnlPercentage) >= 0 && '+'}
-            {displayPercentage(
-              Number(props.info.depositTotalPnlPercentage) / 100,
-            )}
+            {Number(props.info.pnlPercentage) >= 0 && '+'}
+            {displayPercentage(Number(props.info.pnlPercentage) / 100)}
           </span>
-          <span className={styles['operator']}>+</span>
+          {/* <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
             {Number(props.info.rchTotalPnlPercentage) >= 0 && '+'}
             {displayPercentage(Number(props.info.rchTotalPnlPercentage) / 100)}
-          </span>
+          </span> */}
         </div>
       </div>
       <div className={styles['footer']}>
