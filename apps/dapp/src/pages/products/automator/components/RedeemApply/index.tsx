@@ -4,7 +4,7 @@ import { wait } from '@livelybone/promise-wait';
 import { AutomatorService } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { amountFormatter } from '@sofa/utils/amount';
+import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
 import { formatDuration } from '@sofa/utils/time';
 import Big from 'big.js';
@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 
 import AmountInput from '@/components/AmountInput';
 import AsyncButton from '@/components/AsyncButton';
+import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { BaseInvestButton } from '@/pages/products/components/InvestButton';
 import { ProgressRef } from '@/pages/products/components/InvestProgress';
@@ -30,6 +31,7 @@ export const AutomatorRedeemApply = (props: {
   pendingSharesWithDecimals?: number;
 }) => {
   const [t] = useTranslation('Automator');
+  const prices = useIndexPrices((s) => s.prices);
   const vault = props.vault;
 
   const wallet = useWalletStore();
@@ -106,9 +108,21 @@ export const AutomatorRedeemApply = (props: {
             {t({ enUS: 'Redeemable', zhCN: '可赎回' })}
           </span>
           <span className={styles['value']}>
-            {amountFormatter(balance, shareDecimals)} {vault?.positionCcy}
+            {amountFormatter(balance, Math.min(4, shareDecimals))}{' '}
+            {vault?.positionCcy}
             <span className={styles['equals']}>
-              ≈ {amountFormatter(shareInfo?.amount, 2)} {vault?.depositCcy}
+              ≈{' '}
+              {!vault
+                ? '-'
+                : amountFormatter(
+                    cvtAmountsInCcy(
+                      [[vault.vaultDepositCcy, shareInfo?.amount]],
+                      prices,
+                      vault.depositCcy,
+                    ),
+                    2,
+                  )}{' '}
+              {vault?.depositCcy}
             </span>
           </span>
         </div>
