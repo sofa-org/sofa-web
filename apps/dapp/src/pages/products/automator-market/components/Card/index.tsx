@@ -2,12 +2,13 @@ import { useMemo } from 'react';
 import { AutomatorInfo } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import { displayPercentage } from '@sofa/utils/amount';
+import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
 import { formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
+import { useIndexPrices } from '@/components/IndexPrices/store';
 import ProgressBar from '@/components/ProgressBar';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
@@ -23,6 +24,7 @@ export interface AutomatorCardProps {
 
 export const AutomatorCard = (props: AutomatorCardProps) => {
   const [t] = useTranslation('AutomatorCard');
+  const prices = useIndexPrices((s) => s.prices);
   const depositCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
     [props.info.vaultInfo.depositCcy],
@@ -66,11 +68,15 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         </div>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={+props.info.amount / +props.info.nav}
-            precision={0}
+            amount={cvtAmountsInCcy(
+              [[props.info.vaultInfo.vaultDepositCcy, +props.info.amount]],
+              prices,
+              props.info.vaultInfo.depositCcy,
+            )}
+            ccy={props.info.vaultInfo.depositCcy}
           />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.positionCcy}
+            {props.info.vaultInfo.depositCcy}
           </span>
         </div>
       </div>
@@ -82,8 +88,17 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
             </div>
             <div className={styles['value']}>
               <AmountDisplay
-                amount={Number(props.info.creatorAmount) / +props.info.nav}
-                precision={0}
+                amount={cvtAmountsInCcy(
+                  [
+                    [
+                      props.info.vaultInfo.vaultDepositCcy,
+                      Number(props.info.creatorAmount),
+                    ],
+                  ],
+                  prices,
+                  props.info.vaultInfo.depositCcy,
+                )}
+                ccy={props.info.vaultInfo.depositCcy}
               />
               <span className={styles['unit']}>
                 {props.info.vaultInfo.positionCcy}

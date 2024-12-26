@@ -13,7 +13,7 @@ export interface TopTabsProps extends BaseInputProps<string | number> {
   banner: ReactNode;
   extraTopContent?: ReactNode;
   options: { label: ReactNode; value: string | number }[];
-  type?: 'tab' | 'btn' | 'banner-expandable';
+  type?: 'tab' | 'btn' | 'banner-expandable' | 'banner-expandable-tab';
   dark?: boolean;
   prefix?: ReactNode;
   suffix?: ReactNode;
@@ -48,6 +48,9 @@ const TopTabs = (props: TopTabsProps) => {
               [styles['banner-expandable']]: props.type === 'banner-expandable',
               [styles['portrait-ui']]: isPortrait,
               [styles['mobile-ui']]: isMobile,
+              'banner-expandable-tab': props.type === 'banner-expandable-tab',
+              [styles['banner-expandable-tab']]:
+                props.type === 'banner-expandable-tab',
             },
           )}
         >
@@ -64,6 +67,9 @@ const TopTabs = (props: TopTabsProps) => {
             [styles['top-btn-tabs']]: props.type === 'btn',
             'banner-expandable': props.type === 'banner-expandable',
             [styles['banner-expandable']]: props.type === 'banner-expandable',
+            'banner-expandable-tab': props.type === 'banner-expandable-tab',
+            [styles['banner-expandable-tab']]:
+              props.type === 'banner-expandable-tab',
             [styles['dark']]: props.dark,
             [styles['sticky']]: props.sticky,
             [styles['portrait-ui']]: isPortrait,
@@ -115,6 +121,9 @@ const TopTabs = (props: TopTabsProps) => {
             [styles['top-btn-tabs-content-decoration']]: props.type === 'btn',
             'banner-expandable': props.type === 'banner-expandable',
             [styles['banner-expandable']]: props.type === 'banner-expandable',
+            'banner-expandable-tab': props.type === 'banner-expandable-tab',
+            [styles['banner-expandable-tab']]:
+              props.type === 'banner-expandable-tab',
             [styles['dark']]: props.dark,
             [styles['portrait-ui']]: isPortrait,
           },
@@ -129,6 +138,9 @@ const TopTabs = (props: TopTabsProps) => {
             [styles['top-btn-tabs-content']]: props.type === 'btn',
             'banner-expandable': props.type === 'banner-expandable',
             [styles['banner-expandable']]: props.type === 'banner-expandable',
+            'banner-expandable-tab': props.type === 'banner-expandable-tab',
+            [styles['banner-expandable-tab']]:
+              props.type === 'banner-expandable-tab',
             [styles['dark']]: props.dark,
             [styles['portrait-ui']]: isPortrait,
           },

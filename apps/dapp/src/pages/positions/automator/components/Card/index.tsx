@@ -13,6 +13,8 @@ import AsyncButton from '@/components/AsyncButton';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
+import { Comp as IconAirdrop } from '../../assets/icon-airdrop.svg';
+
 import styles from './index.module.scss';
 
 export interface AutomatorCardProps {
@@ -31,7 +33,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
     () =>
       cvtAmountsInCcy(
         [
-          [props.info.vaultInfo.depositCcy, props.info.depositTotalPnl],
+          [props.info.vaultInfo.vaultDepositCcy, props.info.depositTotalPnl],
           ['RCH', props.info.rchTotalPnl],
         ],
         prices,
@@ -42,6 +44,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       props.info.depositTotalPnl,
       props.info.rchTotalPnl,
       props.info.vaultInfo.depositCcy,
+      props.info.vaultInfo.vaultDepositCcy,
     ],
   );
   return (
@@ -66,7 +69,13 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           </span>
           <div className={styles['decorative']}>
             <span className={styles['operator']}>≈</span>
-            <AmountDisplay amount={props.info?.amount} />
+            <AmountDisplay
+              amount={cvtAmountsInCcy(
+                [[props.info.vaultInfo.vaultDepositCcy, props.info?.amount]],
+                prices,
+                props.info.vaultInfo.depositCcy,
+              )}
+            />
             <span className={styles['unit']}>
               {props.info.vaultInfo.depositCcy}
             </span>
@@ -86,6 +95,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           <span style={{ color: 'var(--color-rch)' }}>
             <AmountDisplay amount={props.info.rchTotalPnl} />
             <span className={styles['unit']}>RCH</span>
+            <IconAirdrop className={styles['icon-airdrop']} />
           </span>
           <div className={styles['decorative']}>
             <span className={styles['operator']}>≈</span>
@@ -139,7 +149,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           {t({ enUS: 'Redeem', zhCN: '赎回' })}
         </AsyncButton>
         <Link
-          to={`/transactions?project=${ProjectType.Automator}&vault=${
+          to={`/transactions?project=${ProjectType.Automator}&automator-vault=${
             props.info.vaultInfo.vault || ''
           }`}
         >

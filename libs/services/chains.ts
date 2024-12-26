@@ -77,7 +77,8 @@ export const ChainMap: Record<
       },
       vaultGraphUrl:
         'https://api.studio.thegraph.com/query/77961/sofa-mainnet/version/latest',
-      automatorTheGraphUrl: '', // TODO
+      automatorTheGraphUrl:
+        'https://api.studio.thegraph.com/query/77961/sofa-automator-mainnet/version/latest',
       usdtAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
       rchAddress: '0x57B96D4aF698605563A4653D882635da59Bf11AF',
       rchAirdropAddress: '0x5a8cDDa6CA37B284b32eF8D513Ef71Ddac553270',

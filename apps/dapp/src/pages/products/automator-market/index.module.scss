@@ -8,21 +8,6 @@
   color: #fff;
 }
 
-.tabs.tabs {
-  padding: 24px 0;
-
-  :global {
-    .tabs {
-      justify-content: flex-start;
-      width: $width-content;
-    }
-
-    .top-tabs-tab {
-      border-radius: 24px;
-    }
-  }
-}
-
 .container.container.container {
   margin: 0 auto;
   width: $width-content;

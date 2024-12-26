@@ -2,10 +2,12 @@ import { useEffect } from 'react';
 import { Spin, Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { displayPercentage } from '@sofa/utils/amount';
+import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
 import { formatDuration } from '@sofa/utils/time';
 
 import AmountDisplay from '@/components/AmountDisplay';
+import { useIndexPrices } from '@/components/IndexPrices/store';
+import ProgressBar from '@/components/ProgressBar';
 
 import { Comp as IconCalendar } from '../../../automator-market/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../../automator-market/assets/icon-people.svg';
@@ -19,6 +21,7 @@ export interface AutomatorOverviewProps {
 
 export const AutomatorOverview = (props: AutomatorOverviewProps) => {
   const [t] = useTranslation('AutomatorOverview');
+  const prices = useIndexPrices((s) => s.prices);
   const data = useAutomatorStore(
     (state) =>
       props.vault &&
@@ -55,17 +58,31 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                 zhCN: '资产管理规模',
               })}
             >
-              {t({ enUS: 'Pool Size', zhCN: '总资产' })}
+              <span tabIndex={-1}>
+                {t({ enUS: 'Pool Size', zhCN: '总资产' })}
+              </span>
             </Tooltip>
           </div>
           <div className={styles['value']}>
             <AmountDisplay
               amount={Number(data?.amount) / Number(data?.nav)}
-              precision={0}
+              ccy={props.vault?.positionCcy}
             />
             <span className={styles['unit']}>{props.vault?.positionCcy}</span>
             <div className={styles['decorative']}>
-              ≈ <AmountDisplay amount={data?.amount} />
+              ≈{' '}
+              <AmountDisplay
+                amount={
+                  !props.vault
+                    ? ''
+                    : cvtAmountsInCcy(
+                        [[props.vault.vaultDepositCcy, data?.amount]],
+                        prices,
+                        props.vault.depositCcy,
+                      )
+                }
+                ccy={props.vault?.depositCcy}
+              />
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
             </div>
           </div>
@@ -76,7 +93,18 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
               {t({ enUS: `Creator's Lead Assets`, zhCN: '创建者份额' })}
             </div>
             <div className={styles['value']}>
-              <AmountDisplay amount={data?.creatorAmount} precision={0} />
+              <AmountDisplay
+                amount={
+                  !props.vault
+                    ? ''
+                    : cvtAmountsInCcy(
+                        [[props.vault.vaultDepositCcy, data?.creatorAmount]],
+                        prices,
+                        props.vault.vaultDepositCcy,
+                      )
+                }
+                precision={0}
+              />
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
               <span className={styles['percentage']}>
                 {displayPercentage(

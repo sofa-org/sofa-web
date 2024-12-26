@@ -97,7 +97,7 @@ const Index = () => {
 
   return (
     <TopTabs
-      type={'banner-expandable'}
+      type={'banner-expandable-tab'}
       className={styles['container']}
       tabClassName={styles['tabs']}
       banner={
