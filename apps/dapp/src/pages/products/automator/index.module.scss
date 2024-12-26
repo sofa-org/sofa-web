@@ -32,7 +32,6 @@
   flex-wrap: wrap;
   gap: min(40px, 5vw);
   position: relative;
-  padding: 148px 0 0;
   width: 100%;
   margin: 0 auto;
   background: #fff;
@@ -215,11 +214,17 @@
 }
 
 @mixin rewrite-mobile {
+  .modal-form {
+    width: calc(100vw - 20px);
+    display: block;
+  }
+
   .section {
     display: block;
 
     &.section-top {
       margin: 12px auto 0;
+      padding-bottom: 30px;
     }
   }
 
@@ -332,6 +337,10 @@
         }
       }
     }
+  }
+
+  .expand-widget {
+    background-size: cover;
   }
 }
 

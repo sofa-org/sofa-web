@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import ProgressBar from '@/components/ProgressBar';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
@@ -24,6 +25,7 @@ export interface AutomatorCardProps {
 
 export const AutomatorCard = (props: AutomatorCardProps) => {
   const [t] = useTranslation('AutomatorCard');
+  const isMobileUI = useIsMobileUI();
   const prices = useIndexPrices((s) => s.prices);
   const depositCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
@@ -31,7 +33,10 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
   );
   return (
     <div
-      className={styles['card']}
+      className={classNames(
+        styles['card'],
+        isMobileUI ? styles['mobile-ui'] : undefined,
+      )}
       onClick={() =>
         props.modalController.open(props.info.vaultInfo, 'deposit')
       }

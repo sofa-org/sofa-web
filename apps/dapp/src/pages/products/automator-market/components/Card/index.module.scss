@@ -113,3 +113,9 @@
     content: none;
   }
 }
+
+.mobile-ui {
+  &.card {
+    max-width: unset;
+  }
+}

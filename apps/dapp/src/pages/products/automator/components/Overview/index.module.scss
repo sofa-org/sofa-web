@@ -174,7 +174,23 @@
 }
 
 @mixin rewrite-ux-mobile {
+  .left {
+    padding: 10px 0 0;
+
+    .yield {
+      .title {
+        padding-bottom: 10px;
+      }
+    }
+  }
+
+  .right {
+    width: 60px;
+  }
+
   .overview {
+    width: auto !important;
+
     :global(.semi-spin-children) {
       .yield {
         .title {

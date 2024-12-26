@@ -1,9 +1,4 @@
 .user-info-wrapper {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 124px;
   padding: 0 0 min(16px, 3vw);
   border-bottom: 1px dashed rgba(#000, 0.12);
 
@@ -12,6 +7,7 @@
       @include flex-center;
 
       justify-content: space-between;
+      flex-wrap: wrap;
     }
   }
 }
@@ -157,9 +153,31 @@
 // }
 
 @mixin rewrite-ux-mobile {
+  .user-info-wrapper {
+    :global {
+      .semi-spin-children {
+        gap: 18px;
+      }
+    }
+  }
+
+  .vault-info {
+    width: auto;
+  }
+
   .user-info {
     border: none;
-    padding-bottom: 40px;
+    padding-bottom: 0;
+    text-align: left;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+
+    .title {
+      justify-content: flex-start;
+    }
   }
 
   .transaction-history-link {
