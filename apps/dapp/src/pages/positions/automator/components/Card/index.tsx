@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AutomatorUserDetail } from '@sofa/services/automator';
 import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
@@ -24,6 +24,7 @@ export interface AutomatorCardProps {
 
 export const AutomatorPositionCard = (props: AutomatorCardProps) => {
   const [t] = useTranslation('AutomatorCard');
+  const navigate = useNavigate();
   const depositCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
     [props.info.vaultInfo.depositCcy],
@@ -89,7 +90,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
         <div className={styles['value']}>
           <AmountDisplay amount={props.info?.depositTotalPnl} />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.positionCcy}
+            {props.info.vaultInfo.vaultDepositCcy}
           </span>
           <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
@@ -146,13 +147,18 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
         >
           {t({ enUS: 'Redeem', zhCN: '赎回' })}
         </AsyncButton>
-        <Link
-          to={`/transactions?project=${ProjectType.Automator}&automator-vault=${
-            props.info.vaultInfo.vault || ''
-          }`}
+        <AsyncButton
+          className={classNames(styles['btn'], 'btn-ghost')}
+          onClick={() =>
+            navigate(
+              `/transactions?project=${ProjectType.Automator}&automator-vault=${
+                props.info.vaultInfo.vault || ''
+              }`,
+            )
+          }
         >
           {t({ enUS: 'Transaction History', zhCN: '操作历史' })}
-        </Link>
+        </AsyncButton>
       </div>
     </div>
   );

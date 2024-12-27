@@ -127,31 +127,10 @@
   padding: 0 0 24px;
   gap: 28px;
 
-  .btn-deposit {
-    width: 160px;
-    height: 48px;
-    background: #000;
-    color: #fff;
-    border-radius: 24px;
-    opacity: 0.8;
-
-    &:hover {
-      background: #000;
-      opacity: 1;
-    }
-
-    &::before {
-      content: "";
-      width: 21px;
-      height: 21px;
-      margin: 0 6px 0 0;
-      display: inline-block;
-      background: url("../../assets/icon-withdraw.svg");
-    }
-  }
-
+  .btn,
+  .btn-deposit,
   .btn-redeem {
-    width: 160px;
+    padding: 0 24px;
     height: 48px;
     border-radius: 24px;
     opacity: 0.8;
@@ -160,13 +139,33 @@
       opacity: 1;
     }
 
-    &::before {
-      content: "";
-      width: 21px;
-      height: 21px;
-      margin: 0 6px 0 0;
-      display: inline-block;
-      background: url("../../assets/icon-deposit.svg");
+    &.btn-redeem {
+      &::before {
+        content: "";
+        width: 21px;
+        height: 21px;
+        margin: 0 6px 0 0;
+        display: inline-block;
+        background: url("../../assets/icon-deposit.svg");
+      }
+    }
+
+    &.btn-deposit {
+      background: #000;
+      color: #fff;
+
+      &:hover {
+        background: #000;
+      }
+
+      &::before {
+        content: "";
+        width: 21px;
+        height: 21px;
+        margin: 0 6px 0 0;
+        display: inline-block;
+        background: url("../../assets/icon-withdraw.svg");
+      }
     }
   }
 
