@@ -149,14 +149,14 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
       </div>
       <div className={styles['right']}>
-        <div className={styles['item']}>
+        {/* <div className={styles['item']}>
           <div className={styles['title']}>
             {t({ enUS: 'Fee', zhCN: '手续费' })}
           </div>
           <div className={styles['value']}>
             {displayPercentage(props.vault?.creatorFeeRate, 0)}
           </div>
-        </div>
+        </div> */}
         <div className={styles['item']}>
           <div className={styles['title']}>
             <IconCalendar />
