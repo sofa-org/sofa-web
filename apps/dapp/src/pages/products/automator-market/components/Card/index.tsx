@@ -38,7 +38,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         isMobileUI ? styles['mobile-ui'] : undefined,
       )}
       onClick={() =>
-        props.modalController.open(props.info.vaultInfo, 'deposit')
+        props.modalController.open(props.info.vaultInfo, undefined)
       }
     >
       <div className={styles['header']}>

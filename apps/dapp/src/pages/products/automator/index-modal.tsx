@@ -75,11 +75,17 @@ export function useAutomatorModal() {
   return [
     <AutomatorModal value={visible} onChange={(v) => setVisible(!!v)} />,
     {
-      open: (vault: AutomatorVaultInfo, type: 'deposit' | 'redeem') => {
-        updateQuery({
-          'automator-vault': vault.vault,
-          'automator-trade-tab': type,
-        });
+      open: (vault: AutomatorVaultInfo, type?: 'deposit' | 'redeem') => {
+        updateQuery(
+          type
+            ? {
+                'automator-vault': vault.vault,
+                'automator-trade-tab': type,
+              }
+            : {
+                'automator-vault': vault.vault,
+              },
+        );
         setVisible(true);
       },
       close: () => setVisible(false),
