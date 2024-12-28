@@ -50,7 +50,7 @@ export const AutomatorEl = (props: BaseProps) => {
     }
   });
 
-  const [mobileUITab, setMobileUITab] = useState<string>('');
+  const [mobileUITab, setMobileUITab] = useState<string>(tab);
   const onTabClick = useLazyCallback((tab: string) => {
     if (tab) {
       updateQuery({ 'automator-trade-tab': tab });

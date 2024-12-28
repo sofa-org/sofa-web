@@ -11,9 +11,8 @@ import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
-
-import { Comp as IconAirdrop } from '../../assets/icon-airdrop.svg';
 
 import styles from './index.module.scss';
 
@@ -48,8 +47,14 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       props.info.vaultInfo.vaultDepositCcy,
     ],
   );
+  const isMobileUI = useIsMobileUI();
   return (
-    <div className={styles['card']}>
+    <div
+      className={classNames(
+        styles['card'],
+        isMobileUI ? styles['mobile-ui'] : undefined,
+      )}
+    >
       <div className={styles['header']}>
         <img src={depositCcyConfig?.icon} alt="" />
         <div className={styles['name']}>
@@ -95,8 +100,11 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
             <AmountDisplay amount={props.info.rchTotalPnl} />
-            <span className={styles['unit']}>RCH</span>
-            <IconAirdrop className={styles['icon-airdrop']} />
+            <span
+              className={classNames(styles['unit'], styles['icon-airdrop'])}
+            >
+              RCH
+            </span>
           </span>
           <div className={styles['decorative']}>
             <span className={styles['operator']}>≈</span>

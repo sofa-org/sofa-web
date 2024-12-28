@@ -1,14 +1,7 @@
-.icon-airdrop {
-  display: inline-block;
-  width: 0.8em;
-  height: 0.8em;
-  margin: 0 0 0 4px;
-  vertical-align: baseline;
-}
-
 .card {
   @include flex-center;
 
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   position: relative;
@@ -76,6 +69,13 @@
   padding: 0 0 0 0.2em;
   font-size: min(0.8em, 12px);
   opacity: 0.8;
+  &.icon-airdrop {
+    padding-right: 1em;
+    background: url(../../assets/icon-airdrop.svg) no-repeat;
+    background-position: 100% 34%;
+    background-size: 0.9em 0.9em;
+    display: inline-block;
+  }
 }
 
 .operator {
@@ -120,6 +120,7 @@
 .footer {
   @include flex-center;
 
+  flex-wrap: wrap;
   justify-content: flex-start;
   position: absolute;
   left: 270px;
@@ -176,5 +177,23 @@
     &:hover {
       opacity: 1;
     }
+  }
+}
+.card.mobile-ui {
+  padding: 24px 24px 154px 140px;
+  gap: 24px;
+  overflow: hidden;
+  .header {
+    width: 130px;
+    top: 38%;
+  }
+  .footer {
+    left: 14px;
+    gap: 10px;
+    font-size: 12px;
+    width: calc(100vw - 50px);
+    background: #fff;
+    padding-top: 10px;
+    bottom: -10px;
   }
 }
