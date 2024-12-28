@@ -57,6 +57,9 @@ export const AutomatorEl = (props: BaseProps) => {
     }
     if (isMobileUI) {
       setMobileUITab(tab);
+      if (!tab) {
+        updateQuery({ 'automator-trade-tab': undefined });
+      }
     }
   });
 
