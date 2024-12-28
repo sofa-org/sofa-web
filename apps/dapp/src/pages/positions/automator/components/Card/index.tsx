@@ -47,6 +47,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       props.info.vaultInfo.vaultDepositCcy,
     ],
   );
+
   const isMobileUI = useIsMobileUI();
   return (
     <div

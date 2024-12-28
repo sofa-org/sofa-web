@@ -69,6 +69,7 @@
   padding: 0 0 0 0.2em;
   font-size: min(0.8em, 12px);
   opacity: 0.8;
+
   &.icon-airdrop {
     padding-right: 1em;
     background: url(../../assets/icon-airdrop.svg) no-repeat;
@@ -179,6 +180,7 @@
     }
   }
 }
+
 .card.mobile-ui {
   padding: 24px 24px 154px 140px;
   gap: 24px;
