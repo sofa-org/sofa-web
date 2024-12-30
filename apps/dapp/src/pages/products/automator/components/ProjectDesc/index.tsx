@@ -104,20 +104,32 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
     () =>
       list
         ?.slice(0, -1)
-        .map((it, i) => ({
-          sharePnl:
-            +it.totalDepositCcyPnlForShare -
-            +list[i + 1].totalDepositCcyPnlForShare,
-          rchPnl: +it.rch * +it.rchPrice,
-          timestamp: it.dateTime * 1000,
-        }))
+        .map((it, i) => {
+          const tradingPnl =
+            +it.totalTradingPnlByClientDepositCcy -
+            +list[i + 1].totalTradingPnlByClientDepositCcy;
+          const interestPnl =
+            +it.totalInterestPnlByClientDepositCcy -
+            +list[i + 1].totalInterestPnlByClientDepositCcy;
+          const rchPnl =
+            +it.totalRchPnlByClientDepositCcy -
+            +list[i + 1].totalRchPnlByClientDepositCcy;
+          return {
+            tradingPnl,
+            interestPnl,
+            rchPnl,
+            timestamp: it.dateTime * 1000,
+          };
+        })
         .reverse(),
     [list],
   );
 
   const precision = useMemo(() => {
     if (!data?.length) return 0;
-    const max = Math.max(...data.flatMap((it) => [it.sharePnl, it.rchPnl]));
+    const max = Math.max(
+      ...data.flatMap((it) => [it.tradingPnl, it.interestPnl, it.rchPnl]),
+    );
     return max > 1000 ? 0 : 2;
   }, [data]);
 
@@ -201,12 +213,21 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
       },
       series: [
         {
-          name: `PnL Of ${props.vault?.positionCcy ?? 'Share'}`,
+          name: `PnL Of Trading`,
           type: 'bar',
           stack: 'bar',
           data: data.map((it) => ({
-            value: it.sharePnl,
-            itemStyle: { color: it.sharePnl > 0 ? '#50D113' : '#EC5E88' },
+            value: it.tradingPnl,
+            itemStyle: { color: it.tradingPnl > 0 ? '#50D113' : '#EC5E88' },
+          })),
+        },
+        {
+          name: `PnL Of Interest`,
+          type: 'bar',
+          stack: 'bar',
+          data: data.map((it) => ({
+            value: it.interestPnl,
+            itemStyle: { color: '#27a0a0' },
           })),
         },
         {
@@ -226,6 +247,8 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
 
   if (!list?.length || list.length < 2) return <></>;
 
+  console.log(1111, precision, data);
+
   return (
     <div className={classNames(styles['performance'], styles['section'])}>
       <h2 className={styles['title']}>
@@ -243,7 +266,14 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
               className={styles['color']}
               style={{ background: '#EC5E88' }}
             />
-            {t({ enUS: `PnL Of ${props.vault?.positionCcy ?? 'Share'}` })}
+            {t({ enUS: `PnL Of Trading` })}
+          </div>
+          <div className={styles['legend-item']}>
+            <div
+              className={styles['color']}
+              style={{ background: '#27a0a0' }}
+            />
+            {t({ enUS: `PnL Of Interest` })}
           </div>
           <div className={styles['legend-item']}>
             <div

@@ -9,7 +9,6 @@ import classNames from 'classnames';
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
-import ProgressBar from '@/components/ProgressBar';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
@@ -69,7 +68,12 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         <div className={styles['value']}>
           <AmountDisplay
             amount={cvtAmountsInCcy(
-              [[props.info.vaultInfo.vaultDepositCcy, +props.info.amount]],
+              [
+                [
+                  props.info.vaultInfo.vaultDepositCcy,
+                  +props.info.aumInVaultDepositCcy,
+                ],
+              ],
               prices,
               props.info.vaultInfo.depositCcy,
             )}

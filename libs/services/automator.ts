@@ -29,24 +29,76 @@ import { WalletService } from './wallet';
 export interface OriginAutomatorInfo {
   chainId: number; // 链代码
   automatorName: string; // automator名称
-  automatorDescription: string; // automator说明
+  automatorDescription?: string; // automator说明
   automatorVault: string; // Automator vault
   participantNum: number; // 参与者数量
-  amount: number | string; // 当前aum值
-  creatorAmount: number | string; // 基金管理者的aum值
-  nav: number | string; // 净值
-  dateTime: number; // 净值产生的时间（秒级时间戳）
+  aumInVaultDepositCcy: number | string; // aum
+  aumInClientDepositCcy: number | string; // aum
+  creatorAumInVaultDepositCcy: number | string; // creator 份额
+  creatorAumInClientDepositCcy: number | string; // aum
+  nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
+  dateTime: number; // 净值产生的时间 (秒级时间戳)
   yieldPercentage: number | string; // 7D Yield(百分比)
   creator: string; // 创建者
   createTime: number; // automator创建时间
   vaultDepositCcy: string; // Automator 拿到客户的钱之后 用来申购 vault 的币种
   clientDepositCcy: string; // 用户存入的标的物
   sharesToken: string; // Automator 的份额代币
+  redemptionPeriodDay: number | string; // 赎回观察时间
+}
+
+// server 返回的结构
+export interface OriginAutomatorDetail {
+  chainId: number; // 链代码
+  automatorName: string; // automator名称
+  automatorDescription: string; // automator说明 (可空)
+  automatorVault: string; // Automator vault
+  participantNum: number; // 参与者数量
+  amount: number | string; // 当前aum值
+  aumInVaultDepositCcy: number | string; // 当前aum值(vaultDepositCcy)
+  aumInClientDepositCcy: number | string; // 当前aum值(clientDepositCcy)
+  creatorAumInVaultDepositCcy: number | string; // 管理者的aum值(vaultDepositCcy)
+  creatorAumInClientDepositCcy: number | string; // 管理者的aum值(clientDepositCcy)
+  nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
+  dateTime: number; // 净值产生的时间 (秒级时间戳)
+  yieldPercentage: number | string; // 7D Yield (百分比) (基于clientDepositCcy)
+  creator: string; // 创建者
+  createTime: number; // automator创建时间
+  feeRate: number | string; // 抽佣比率 (on vaultDepositCcy)
+  totalTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (clientDepositCcy)
+  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息 (clientDepositCcy)
+  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (clientDepositCcy)
+  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(clientDepositCcy)
+  totalRchAmount: number | string; // Rch的总PNL(RCH)
+  totalPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
+  pnlPercentage: number | string; // Yield (百分比) (基于clientDepositCcy)
+  vaultDepositCcy: string; // 交易币种 (vaultDepositCcy)
+  clientDepositCcy: string; // 用户存入的标的物 (clientDepositCcy)
+  sharesToken: string; // 净值单位 (sharesToken)
+  availableBalance: number | string; // Available Balance (vaultDepositCcy)
+  profits: number | string; // totalTradingPnlByVaultDepositCcy * feeRate (vaultDepositCcy)
+  positionLockedAmount: number | string; // Active Position Locked (vaultDepositCcy)
+  unclaimedAmount: number | string; // Position unclaimed (vaultDepositCcy)
+  redeemedAmount: number | string; // To Be Redeemed (vaultDepositCcy)
+  availableAmount: number | string; // Available Balance (vaultDepositCcy)
+  redemptionPeriodDay: number; // 赎回观察时间 (单位：天)
 }
 
 export interface AutomatorInfo
   extends Omit<
     OriginAutomatorInfo,
+    | 'chainId'
+    | 'automatorVault'
+    | 'vaultDepositCcy'
+    | 'clientDepositCcy'
+    | 'sharesToken'
+  > {
+  vaultInfo: AutomatorVaultInfo;
+}
+
+export interface AutomatorDetail
+  extends Omit<
+    OriginAutomatorDetail,
     | 'chainId'
     | 'automatorVault'
     | 'vaultDepositCcy'
@@ -66,17 +118,20 @@ export interface AutomatorPosition {
   lowerStrike: number | string; // 下方价格
   upperStrike: number | string; // 上方价格
   side: string; // BUY/SELL
-  depositPercentage: number | string; // 投资占比（百分比）
+  depositPercentage: number | string; // 投资占比 (百分比)
   expiry: number; // 到期日对应的秒级时间戳，例如 1672387200
 }
 
 export interface AutomatorPerformance {
-  aum: number | string; // 期初aum
-  rch: number | string; // 空投的rch数量
-  rchPrice: number | string; // rch相对Deposit ccy的币价
   dateTime: number; // 日期（秒级时间戳）
-  totalDepositCcyPnlForShare: number | string;
-  totalDepositCcyPnlForRch: number | string;
+  aumInVaultDepositCcy: number | string; // 期初aum值(scrvUSD)
+  aumInClientDepositCcy: number | string; // 期初aum值(crvUSD)
+  totalRchAmount: number | string; // Rch的总PNL(RCH)
+  totalTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (crvUSD)
+  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
+  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
+  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
+  totalPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
 }
 
 // server 返回的结构
@@ -109,7 +164,7 @@ export interface AutomatorTransaction {
   share: number | string; // 转换的份额
   status: AutomatorTransactionStatus;
   action: string; // DEPOSIT/WITHDRAW/CLAIM/TRANSFER_IN/TRANSFER_OUT
-  dateTime: number; // 日期（秒级时间戳）
+  dateTime: number; // 日期 (秒级时间戳)
 }
 
 export enum AutomatorDepositStatus {
@@ -138,24 +193,28 @@ export class AutomatorService {
           );
           return {
             ...it,
-            name: get(it, 'name') || it.clientDepositCcy,
-            depositMinAmount: getDepositMinAmount(
-              it.clientDepositCcy,
-              ProjectType.Automator,
-            ),
-            depositTickAmount: getDepositTickAmount(
-              it.clientDepositCcy,
-              ProjectType.Automator,
-            ),
-            anchorPricesDecimal: 1e8,
-            collateralDecimal,
-            abis: AutomatorAbis,
-            creatorFeeRate: get(it, 'creatorFeeRate') || 0,
             vaultInfo: {
               ...it,
+              vault: it.automatorVault,
+              name: get(it, 'automatorName') || it.clientDepositCcy,
+              desc: it.automatorDescription,
+              creatorFeeRate: get(it, 'creatorFeeRate') || 0,
               depositCcy: it.clientDepositCcy,
               vaultDepositCcy: it.vaultDepositCcy,
               positionCcy: it.sharesToken,
+              redeemWaitPeriod: +it.redemptionPeriodDay * MsIntervals.day,
+              claimPeriod: MsIntervals.day * 3,
+              abis: AutomatorAbis,
+              collateralDecimal,
+              anchorPricesDecimal: 1e8,
+              depositMinAmount: getDepositMinAmount(
+                it.clientDepositCcy,
+                ProjectType.Automator,
+              ),
+              depositTickAmount: getDepositTickAmount(
+                it.clientDepositCcy,
+                ProjectType.Automator,
+              ),
               ...ContractsService.AutomatorVaults.find(
                 (item) =>
                   item.chainId === it.chainId &&
