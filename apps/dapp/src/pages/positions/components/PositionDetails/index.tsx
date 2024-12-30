@@ -35,7 +35,7 @@ import {
   PositionClaimProgress,
   PositionClaimProgressRef,
 } from '../ClaimProgress';
-import { judgeSettled } from '../PositionCard';
+import { usePositionSettled } from '../PositionCard';
 
 import locale from './locale';
 
@@ -57,10 +57,8 @@ const PositionDetails = (props: PositionDetailsProps) => {
     [product.expiry],
   );
   const hasExpired = leftTime < 0;
-  const hasSettled = useMemo(
-    () => judgeSettled(product.expiry),
-    [product.expiry],
-  );
+
+  const hasSettled = usePositionSettled(position);
 
   const isWin = useMemo(() => {
     if (position.product.vault.riskType === RiskType.RISKY)

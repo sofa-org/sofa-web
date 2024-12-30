@@ -132,10 +132,7 @@ const OrderHistory = () => {
         {
           title: t('Basic PnL'),
           render: (_, record) => {
-            if (
-              !record.amounts.redeemable ||
-              !judgeSettled(record.product.expiry)
-            ) {
+            if (!record.amounts.redeemable || !judgeSettled(record)) {
               return '-';
             }
             const pnl = Number(record.amounts.redeemable) - +record.amounts.own;
@@ -220,7 +217,7 @@ const OrderHistory = () => {
           prices,
           record.product.vault.depositCcy,
         );
-        const hasSettled = judgeSettled(record.product.expiry);
+        const hasSettled = judgeSettled(record);
         return (
           <div className={styles['extra']}>
             <div className={styles['extra-item']}>
