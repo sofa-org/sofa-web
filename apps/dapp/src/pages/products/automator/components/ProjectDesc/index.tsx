@@ -237,8 +237,6 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
 
   if (!list?.length || list.length < 2) return <></>;
 
-  console.log(1111, precision, data);
-
   return (
     <div className={classNames(styles['performance'], styles['section'])}>
       <h2 className={styles['title']}>
