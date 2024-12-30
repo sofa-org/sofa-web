@@ -137,14 +137,24 @@ export interface AutomatorPerformance {
 // server 返回的结构
 export interface OriginAutomatorUserDetail {
   chainId: number; // 链代码
-  automatorName?: string; // Automator vault
+  automatorName: string; // automator名称
   automatorVault: string; // Automator vault
   wallet: string; // 用户钱包地址
-  amount: number | string; // 当前持有的总资产
+  amountInVaultDepositCcy: number | string; // 当前持有的总资产(scrvUSD)
+  amountInClientDepositCcy: number | string; // 当前持有的总资产(crvUSD)
   share: number | string; // 当前持有的份额
-  depositTotalPnl: number | string; // 标的币种的总PNL
-  rchTotalPnl: number | string; // Rch的总PNL
-  pnlPercentage?: number | string;
+  totalTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (crvUSD)
+  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
+  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
+  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
+  rchTotalPnl: number | string; // Rch的总PNL(RCH)
+  totalRchAmount: number | string; // Rch的总PNL(RCH)
+  status: string; // ACTIVE/CLOSED
+  pnlPercentage: number | string; // Yield(百分比)
+  vaultDepositCcy: string; // USDC
+  clientDepositCcy: string; // 用户存入的标的物
+  sharesToken: string; // 净值单位
+  redemptionPeriodDay: number; // 赎回观察时间（单位：天）
 }
 
 export interface AutomatorUserDetail
@@ -160,7 +170,8 @@ export interface AutomatorTransactionsParams {
 }
 
 export interface AutomatorTransaction {
-  amount: number | string; // 转换的资产
+  amountInVaultDepositCcy: number | string; // 转换的资产(scrvUSD)
+  amountInClientDepositCcy: number | string; // 转换的资产(crvUSD)
   share: number | string; // 转换的份额
   status: AutomatorTransactionStatus;
   action: string; // DEPOSIT/WITHDRAW/CLAIM/TRANSFER_IN/TRANSFER_OUT
@@ -292,9 +303,11 @@ export class AutomatorService {
         prices,
         vaultInfo.depositCcy,
       );
-      const totalPnl = Number(it.depositTotalPnl) + rchValueInDepositCcy;
+      const totalPnl =
+        Number(it.totalPnlByClientDepositCcy) + rchValueInDepositCcy;
       const depositTotalPnlPercentage =
-        (Number(it.pnlPercentage) * Number(it.depositTotalPnl)) / totalPnl;
+        (Number(it.pnlPercentage) * Number(it.totalPnlByClientDepositCcy)) /
+        totalPnl;
       const rchTotalPnlPercentage =
         (Number(it.pnlPercentage) * rchValueInDepositCcy) / totalPnl;
       return {

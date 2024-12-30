@@ -34,7 +34,10 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
     () =>
       cvtAmountsInCcy(
         [
-          [props.info.vaultInfo.vaultDepositCcy, props.info.depositTotalPnl],
+          [
+            props.info.vaultInfo.depositCcy,
+            props.info.totalPnlByClientDepositCcy,
+          ],
           ['RCH', props.info.rchTotalPnl],
         ],
         prices,
@@ -42,10 +45,9 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       ),
     [
       prices,
-      props.info.depositTotalPnl,
+      props.info.totalPnlByClientDepositCcy,
       props.info.rchTotalPnl,
       props.info.vaultInfo.depositCcy,
-      props.info.vaultInfo.vaultDepositCcy,
     ],
   );
   return (
@@ -72,7 +74,12 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
             <span className={styles['operator']}>≈</span>
             <AmountDisplay
               amount={cvtAmountsInCcy(
-                [[props.info.vaultInfo.vaultDepositCcy, props.info?.amount]],
+                [
+                  [
+                    props.info.vaultInfo.vaultDepositCcy,
+                    props.info?.amountInVaultDepositCcy,
+                  ],
+                ],
                 prices,
                 props.info.vaultInfo.depositCcy,
               )}
@@ -88,9 +95,9 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           {t({ enUS: 'Cumulative PnL', zhCN: '累计收益' })}
         </div>
         <div className={styles['value']}>
-          <AmountDisplay amount={props.info?.depositTotalPnl} />
+          <AmountDisplay amount={props.info?.totalPnlByClientDepositCcy} />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.vaultDepositCcy}
+            {props.info.vaultInfo.depositCcy}
           </span>
           <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>

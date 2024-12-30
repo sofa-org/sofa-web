@@ -135,7 +135,7 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
                         [
                           [
                             props.vault.vaultDepositCcy,
-                            data?.server?.depositTotalPnl,
+                            data?.server?.totalPnlByClientDepositCcy,
                           ],
                         ],
                         prices,
