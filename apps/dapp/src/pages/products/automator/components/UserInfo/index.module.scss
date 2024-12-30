@@ -178,6 +178,21 @@
     .title {
       justify-content: flex-start;
     }
+
+    .item {
+      .decorative {
+        &::before {
+          content: "";
+          display: block;
+        }
+      }
+      .separator {
+        &::before {
+          content: "";
+          display: block;
+        }
+      }
+    }
   }
 
   .transaction-history-link {
