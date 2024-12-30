@@ -103,11 +103,21 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
   const data = useMemo(
     () =>
       list
-        ?.map((it) => {
+        ?.slice(0, -1)
+        .map((it, i) => {
+          const tradingPnl =
+            +it.totalTradingPnlByClientDepositCcy -
+            +list[i + 1].totalTradingPnlByClientDepositCcy;
+          const interestPnl =
+            +it.totalInterestPnlByClientDepositCcy -
+            +list[i + 1].totalInterestPnlByClientDepositCcy;
+          const rchPnl =
+            +it.totalRchPnlByClientDepositCcy -
+            +list[i + 1].totalRchPnlByClientDepositCcy;
           return {
-            tradingPnl: +it.incrTradingPnlByClientDepositCcy,
-            interestPnl: +it.incrInterestPnlByClientDepositCcy,
-            rchPnl: +it.incrRchPnlByClientDepositCcy,
+            tradingPnl,
+            interestPnl,
+            rchPnl,
             timestamp: it.dateTime * 1000,
           };
         })
@@ -236,6 +246,8 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
   }, [data, props.vault?.depositCcy, precision, props.vault?.positionCcy]);
 
   if (!list?.length || list.length < 2) return <></>;
+
+  console.log(1111, precision, data);
 
   return (
     <div className={classNames(styles['performance'], styles['section'])}>
