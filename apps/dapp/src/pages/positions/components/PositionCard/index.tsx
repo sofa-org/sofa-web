@@ -5,6 +5,7 @@ import { ProductType, RiskType } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
+import { currQuery } from '@sofa/utils/history';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -36,8 +37,22 @@ export interface PositionCardProps {
 }
 
 export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 5;
-export function judgeSettled(expiry: number) {
-  return Date.now() - expiry * 1000 > BUFFER_TIME_FOR_SETTLEMENT;
+export function judgeSettled(position: PositionInfo) {
+  if (currQuery().settled) return true;
+
+  const product = position.product;
+  const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
+    product.vault.productType,
+  );
+  if (isTrend) return !!position.triggerPrice;
+  return (
+    Date.now() - product.expiry * 1000 > BUFFER_TIME_FOR_SETTLEMENT ||
+    !!(position.claimParams.maker && position.triggerTime)
+  );
+}
+
+export function usePositionSettled(position: PositionInfo) {
+  return useMemo(() => judgeSettled(position), [position]);
 }
 
 const ProtectedAmounts = (
@@ -47,12 +62,7 @@ const ProtectedAmounts = (
   const position = props.position;
   const product = position.product;
 
-  const hasSettled = useMemo(
-    () =>
-      judgeSettled(product.expiry) ||
-      !!(position.claimParams.maker && position.triggerTime),
-    [position.claimParams.maker, position.triggerTime, product.expiry],
-  );
+  const hasSettled = usePositionSettled(position);
 
   const pnl = useMemo(
     () => +position.amounts.redeemable! - +position.amounts.own,
@@ -131,12 +141,7 @@ const RiskyAmounts = (
   const position = props.position;
   const product = position.product;
 
-  const hasSettled = useMemo(
-    () =>
-      judgeSettled(product.expiry) ||
-      !!(position.claimParams.maker && position.triggerTime),
-    [position.claimParams.maker, position.triggerTime, product.expiry],
-  );
+  const hasSettled = usePositionSettled(position);
 
   const pnlPrecision = useMemo(
     () => (product.vault.depositCcy.startsWith('USD') ? 2 : 4),
@@ -241,12 +246,7 @@ const PositionCard = (props: PositionCardProps) => {
     [product.expiry],
   );
 
-  const hasSettled = useMemo(
-    () =>
-      judgeSettled(product.expiry) ||
-      !!(position.claimParams.maker && position.triggerTime),
-    [position.claimParams.maker, position.triggerTime, product.expiry],
-  );
+  const hasSettled = usePositionSettled(position);
 
   const leftTime = useMemo(
     () => product.expiry * 1000 - Date.now(),
