@@ -103,21 +103,11 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
   const data = useMemo(
     () =>
       list
-        ?.slice(0, -1)
-        .map((it, i) => {
-          const tradingPnl =
-            +it.totalTradingPnlByClientDepositCcy -
-            +list[i + 1].totalTradingPnlByClientDepositCcy;
-          const interestPnl =
-            +it.totalInterestPnlByClientDepositCcy -
-            +list[i + 1].totalInterestPnlByClientDepositCcy;
-          const rchPnl =
-            +it.totalRchPnlByClientDepositCcy -
-            +list[i + 1].totalRchPnlByClientDepositCcy;
+        ?.map((it) => {
           return {
-            tradingPnl,
-            interestPnl,
-            rchPnl,
+            tradingPnl: +it.incrTradingPnlByClientDepositCcy,
+            interestPnl: +it.incrInterestPnlByClientDepositCcy,
+            rchPnl: +it.incrRchPnlByClientDepositCcy,
             timestamp: it.dateTime * 1000,
           };
         })
