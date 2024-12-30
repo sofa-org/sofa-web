@@ -93,7 +93,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     () =>
       data?.filter((it) => {
         if (!Number(it.amounts.redeemable) || it.claimed) return false;
-        if (judgeSettled(it.product.expiry)) return true;
+        if (judgeSettled(it)) return true;
         if (it.claimParams.maker && it.triggerPrice) return true;
         return false;
       }) || [],
@@ -103,8 +103,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   const loseList = useMemo(
     () =>
       data?.filter(
-        (it) =>
-          judgeSettled(it.product.expiry) && !Number(it.amounts.redeemable),
+        (it) => judgeSettled(it) && !Number(it.amounts.redeemable),
       ) || [],
     [data],
   );
