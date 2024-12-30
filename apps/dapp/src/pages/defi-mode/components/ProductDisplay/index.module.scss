@@ -214,12 +214,15 @@
     z-index: 10;
     padding: 0;
     background: #fff;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 
     .risk-type,
     .product,
     .charts {
       display: flex;
     }
+
     .charts {
       margin-bottom: 40px;
     }
@@ -253,11 +256,15 @@
 @mixin rewrite-portrait {
   .diy-product {
     padding-bottom: 20px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
     .charts {
       margin-bottom: 40px;
     }
   }
 }
+
 @media (orientation: portrait) {
   :global(.is-mobile) {
     @include rewrite-mobile;
