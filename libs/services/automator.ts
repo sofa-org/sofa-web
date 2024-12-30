@@ -126,12 +126,12 @@ export interface AutomatorPerformance {
   dateTime: number; // 日期（秒级时间戳）
   aumInVaultDepositCcy: number | string; // 期初aum值(scrvUSD)
   aumInClientDepositCcy: number | string; // 期初aum值(crvUSD)
-  totalRchAmount: number | string; // Rch的总PNL(RCH)
-  totalTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (crvUSD)
-  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
-  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
-  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
-  totalPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
+  incrRchAmount: number | string; // Rch的总PNL(RCH)
+  incrTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (crvUSD)
+  incrInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
+  incrPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
+  incrRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
+  incrPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
 }
 
 // server 返回的结构
