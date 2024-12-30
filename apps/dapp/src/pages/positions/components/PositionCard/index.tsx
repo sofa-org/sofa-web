@@ -38,10 +38,9 @@ export interface PositionCardProps {
 
 export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 5;
 export function judgeSettled(position: PositionInfo) {
+  if (currQuery().settled) return true;
+
   const product = position.product;
-
-  if (currQuery().settled) return Date.now() - product.expiry * 1000 > 0;
-
   const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
     product.vault.productType,
   );
