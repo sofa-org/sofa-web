@@ -112,7 +112,7 @@ export const AutomatorHistory = () => {
                 '-'
               ) : (
                 <>
-                  {amountFormatter(record.amount, 2)}
+                  {amountFormatter(record.amountInClientDepositCcy, 2)}
                   <span className={styles['unit']}>{vault?.depositCcy}</span>
                 </>
               ),
