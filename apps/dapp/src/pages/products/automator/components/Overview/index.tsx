@@ -7,7 +7,6 @@ import { formatDuration } from '@sofa/utils/time';
 
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
-import ProgressBar from '@/components/ProgressBar';
 
 import { Comp as IconCalendar } from '../../../automator-market/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../../automator-market/assets/icon-people.svg';
@@ -65,7 +64,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay
-              amount={Number(data?.amount) / Number(data?.nav)}
+              amount={Number(data?.aumInVaultDepositCcy) / Number(data?.nav)}
               ccy={props.vault?.positionCcy}
             />
             <span className={styles['unit']}>{props.vault?.positionCcy}</span>
@@ -76,7 +75,12 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                   !props.vault
                     ? ''
                     : cvtAmountsInCcy(
-                        [[props.vault.vaultDepositCcy, data?.amount]],
+                        [
+                          [
+                            props.vault.vaultDepositCcy,
+                            data?.aumInVaultDepositCcy,
+                          ],
+                        ],
                         prices,
                         props.vault.depositCcy,
                       )
