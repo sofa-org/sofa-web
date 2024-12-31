@@ -7,6 +7,7 @@ import {
 } from '@sofa/services/automator';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
@@ -95,6 +96,15 @@ const Index = () => {
 
   const [modal, modalController] = useAutomatorModal();
 
+  const chains = useMemo(
+    () =>
+      [...new Set(ContractsService.AutomatorVaults.map((it) => it.chainId))]
+        .map((it) => ChainMap[it]?.name)
+        .filter(Boolean)
+        .join(', '),
+    [],
+  );
+
   return (
     <TopTabs
       type={'banner-expandable-tab'}
@@ -141,7 +151,18 @@ const Index = () => {
             </div>
           );
         })}
-        {!lists?.length && !loading && <CEmpty className="semi-always-dark" />}
+        {!lists?.length && !loading && (
+          <CEmpty
+            className="semi-always-dark"
+            description={t(
+              {
+                enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
+                zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
+              },
+              { chains },
+            )}
+          />
+        )}
       </Spin>
       {modal}
     </TopTabs>
