@@ -34,7 +34,9 @@ export const AutomatorClaim = (props: {
   const userInfo = useAutomatorStore(
     (state) =>
       vault &&
-      state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`],
+      state.userInfos[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ],
   );
   const redemptionInfo = userInfo?.redemptionInfo;
   const decimals = userInfo?.shareInfo?.shareDecimals ?? 6;

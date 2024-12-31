@@ -359,7 +359,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
                   .slice(0, 2) as ProductQuoteResult[])
             )?.map((it, i) => (
               <RecommendedCardItem
-                key={`${it.vault.vault.toLowerCase()}-${it.vault.vault}-${
+                key={`${it.vault.vault.toLowerCase()}-${it.vault.vault.toLowerCase()}-${
                   it.expiry
                 }-${it.anchorPrices.join('-')}-${it.vault.riskType}-${i}`}
                 it={it}

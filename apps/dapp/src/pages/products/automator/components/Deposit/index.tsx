@@ -42,11 +42,14 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
   const depositData = useAutomatorStore(
     (state) =>
       vault &&
-      state.depositData[`${vault.chainId}-${vault.vault}-${wallet.address}`],
+      state.depositData[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ],
   );
   const overview = useAutomatorStore(
     (state) =>
-      vault && state.vaultOverviews[`${vault.chainId}-${vault.vault}-`],
+      vault &&
+      state.vaultOverviews[`${vault.chainId}-${vault.vault.toLowerCase()}-`],
   );
 
   const convertedShare = Number(depositData?.amount) / Number(overview?.nav);

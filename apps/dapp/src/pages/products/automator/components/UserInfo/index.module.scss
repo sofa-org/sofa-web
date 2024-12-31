@@ -1,4 +1,5 @@
 .user-info-wrapper {
+  width: 100%;
   padding: 0 0 min(16px, 3vw);
   border-bottom: 1px dashed rgba(#000, 0.12);
 
@@ -8,12 +9,14 @@
 
       justify-content: space-between;
       flex-wrap: wrap;
+      width: 100%;
     }
   }
 }
 
 .vault-info {
   position: relative;
+  max-width: 100%;
   width: 70%;
   margin: 0;
   padding: 0 0 0 60px;
@@ -186,6 +189,7 @@
           display: block;
         }
       }
+
       .separator {
         &::before {
           content: "";

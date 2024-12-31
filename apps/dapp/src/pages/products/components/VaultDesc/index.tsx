@@ -23,7 +23,7 @@ export const VaultDesc = (
         <div className={styles['address']}>
           {product.vault && (
             <Address
-              address={product.vault.vault}
+              address={product.vault.vault.toLowerCase()}
               prefix={t('CONTRACT: ')}
               link
             />

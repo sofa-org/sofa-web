@@ -95,7 +95,7 @@ const Index = () => {
         {data?.map((it) => {
           return (
             <AutomatorPositionCard
-              key={it.vaultInfo.vault}
+              key={it.vaultInfo.vault.toLowerCase()}
               info={it}
               modalController={modalController}
             />

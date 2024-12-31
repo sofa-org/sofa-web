@@ -39,8 +39,9 @@ export const AutomatorRedeemApply = (props: {
   const shareInfo = useAutomatorStore(
     (state) =>
       vault &&
-      state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`]
-        ?.shareInfo,
+      state.userInfos[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ]?.shareInfo,
   );
   const shareDecimals = shareInfo?.shareDecimals ?? 6;
   const tick = 1 / 10 ** shareDecimals;
@@ -49,7 +50,9 @@ export const AutomatorRedeemApply = (props: {
   const redeemData = useAutomatorStore(
     (state) =>
       vault &&
-      state.redeemData[`${vault.chainId}-${vault.vault}-${wallet.address}`],
+      state.redeemData[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ],
   );
 
   const hasRedemption =
@@ -161,7 +164,9 @@ export const AutomatorRedeemApply = (props: {
             if (hasRedemption) {
               const pendingSharesWithDecimals =
                 useAutomatorStore.getState().userInfos[
-                  `${vault.chainId}-${vault.vault}-${wallet.address}`
+                  `${vault.chainId}-${vault.vault.toLowerCase()}-${
+                    wallet.address
+                  }`
                 ]?.redemptionInfo?.pendingSharesWithDecimals;
               if (Number(pendingSharesWithDecimals) === +sharesWithDecimals) {
                 throw new Error(

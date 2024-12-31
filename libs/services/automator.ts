@@ -184,6 +184,44 @@ export enum AutomatorDepositStatus {
 }
 
 export class AutomatorService {
+  static cvtAutomatorInfo(it: OriginAutomatorInfo) {
+    const collateralDecimal = getCollateralDecimal(
+      it.chainId,
+      it.clientDepositCcy,
+    );
+    return {
+      ...it,
+      vaultInfo: {
+        ...it,
+        vault: it.automatorVault,
+        name: get(it, 'automatorName') || it.clientDepositCcy,
+        desc: it.automatorDescription,
+        creatorFeeRate: get(it, 'creatorFeeRate') || 0,
+        depositCcy: it.clientDepositCcy,
+        vaultDepositCcy: it.vaultDepositCcy,
+        positionCcy: it.sharesToken,
+        redeemWaitPeriod: +it.redemptionPeriodDay * MsIntervals.day,
+        claimPeriod: MsIntervals.day * 3,
+        abis: AutomatorAbis,
+        collateralDecimal,
+        anchorPricesDecimal: 1e8,
+        depositMinAmount: getDepositMinAmount(
+          it.clientDepositCcy,
+          ProjectType.Automator,
+        ),
+        depositTickAmount: getDepositTickAmount(
+          it.clientDepositCcy,
+          ProjectType.Automator,
+        ),
+        ...ContractsService.AutomatorVaults.find(
+          (item) =>
+            item.chainId === it.chainId &&
+            item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
+        ),
+      },
+    } as AutomatorInfo;
+  }
+
   @asyncCache({
     until: (it, createdAt) =>
       !it || !createdAt || Date.now() - createdAt > MsIntervals.min * 10,
@@ -196,54 +234,15 @@ export class AutomatorService {
       .get<unknown, HttpResponse<OriginAutomatorInfo[]>>(`/automator/list`, {
         params,
       })
-      .then((res) =>
-        res.value.map((it) => {
-          const collateralDecimal = getCollateralDecimal(
-            it.chainId,
-            it.clientDepositCcy,
-          );
-          return {
-            ...it,
-            vaultInfo: {
-              ...it,
-              vault: it.automatorVault,
-              name: get(it, 'automatorName') || it.clientDepositCcy,
-              desc: it.automatorDescription,
-              creatorFeeRate: get(it, 'creatorFeeRate') || 0,
-              depositCcy: it.clientDepositCcy,
-              vaultDepositCcy: it.vaultDepositCcy,
-              positionCcy: it.sharesToken,
-              redeemWaitPeriod: +it.redemptionPeriodDay * MsIntervals.day,
-              claimPeriod: MsIntervals.day * 3,
-              abis: AutomatorAbis,
-              collateralDecimal,
-              anchorPricesDecimal: 1e8,
-              depositMinAmount: getDepositMinAmount(
-                it.clientDepositCcy,
-                ProjectType.Automator,
-              ),
-              depositTickAmount: getDepositTickAmount(
-                it.clientDepositCcy,
-                ProjectType.Automator,
-              ),
-              ...ContractsService.AutomatorVaults.find(
-                (item) =>
-                  item.chainId === it.chainId &&
-                  item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
-              ),
-            },
-          } as AutomatorInfo;
-        }),
-      );
+      .then((res) => res.value.map(AutomatorService.cvtAutomatorInfo));
   }
 
   static async getInfo({ chainId, vault }: AutomatorVaultInfo) {
-    return http.get<unknown, HttpResponse<OriginAutomatorInfo>>(
-      `/automator/info`,
-      {
+    return http
+      .get<unknown, HttpResponse<OriginAutomatorInfo>>(`/automator/info`, {
         params: { chainId, automatorVault: vault },
-      },
-    );
+      })
+      .then((res) => AutomatorService.cvtAutomatorInfo(res.value));
   }
 
   static async positionsSnapshot({ chainId, vault }: AutomatorVaultInfo) {
@@ -264,16 +263,53 @@ export class AutomatorService {
     );
   }
 
+  static cvtUserPnl(
+    it: OriginAutomatorUserDetail,
+    vaults: AutomatorInfo[],
+    prices: Record<string, number | string>,
+  ) {
+    const vaultInfo = vaults.find(
+      (item) =>
+        item.vaultInfo.chainId === it.chainId &&
+        item.vaultInfo.vault.toLowerCase() === it.automatorVault.toLowerCase(),
+    )!.vaultInfo;
+    const rchValueInDepositCcy = cvtAmountsInCcy(
+      [['RCH', it.rchTotalPnl]],
+      prices,
+      vaultInfo.depositCcy,
+    );
+    const totalPnl =
+      Number(it.totalPnlByClientDepositCcy) + rchValueInDepositCcy;
+    const depositTotalPnlPercentage =
+      (Number(it.pnlPercentage) * Number(it.totalPnlByClientDepositCcy)) /
+      totalPnl;
+    const rchTotalPnlPercentage =
+      (Number(it.pnlPercentage) * rchValueInDepositCcy) / totalPnl;
+    return {
+      ...it,
+      depositTotalPnlPercentage,
+      rchTotalPnlPercentage,
+      vaultInfo,
+    } as AutomatorUserDetail;
+  }
+
   static async getUserPnl(
     { chainId, vault }: AutomatorVaultInfo,
     wallet: string,
   ) {
-    return http.get<unknown, HttpResponse<OriginAutomatorUserDetail>>(
-      `/automator/user/detail`,
-      {
-        params: { chainId, automatorVault: vault, wallet },
-      },
-    );
+    const [it, vaults, prices] = await Promise.all([
+      http
+        .get<unknown, HttpResponse<OriginAutomatorUserDetail>>(
+          `/automator/user/detail`,
+          {
+            params: { chainId, automatorVault: vault, wallet },
+          },
+        )
+        .then((res) => res.value),
+      AutomatorService.getAutomatorList({ chainId }),
+      MarketService.fetchIndexPx(),
+    ]);
+    return AutomatorService.cvtUserPnl(it, vaults, prices);
   }
 
   static async getUserPnlList(params: {
@@ -291,32 +327,7 @@ export class AutomatorService {
       AutomatorService.getAutomatorList({ chainId: params.chainId }),
       MarketService.fetchIndexPx(),
     ]);
-    return list.map((it) => {
-      const vaultInfo = vaults.find(
-        (item) =>
-          item.vaultInfo.chainId === it.chainId &&
-          item.vaultInfo.vault.toLowerCase() ===
-            it.automatorVault.toLowerCase(),
-      )!.vaultInfo;
-      const rchValueInDepositCcy = cvtAmountsInCcy(
-        [['RCH', it.rchTotalPnl]],
-        prices,
-        vaultInfo.depositCcy,
-      );
-      const totalPnl =
-        Number(it.totalPnlByClientDepositCcy) + rchValueInDepositCcy;
-      const depositTotalPnlPercentage =
-        (Number(it.pnlPercentage) * Number(it.totalPnlByClientDepositCcy)) /
-        totalPnl;
-      const rchTotalPnlPercentage =
-        (Number(it.pnlPercentage) * rchValueInDepositCcy) / totalPnl;
-      return {
-        ...it,
-        depositTotalPnlPercentage,
-        rchTotalPnlPercentage,
-        vaultInfo,
-      } as AutomatorUserDetail;
-    });
+    return list.map((it) => AutomatorService.cvtUserPnl(it, vaults, prices));
   }
 
   static async transactions(

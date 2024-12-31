@@ -47,7 +47,11 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
             props.info.vaultInfo.name ||
             props.info.vaultInfo.depositCcy}
         </div>
-        <Address address={props.info.vaultInfo.vault} simple linkBtn />
+        <Address
+          address={props.info.vaultInfo.vault.toLowerCase()}
+          simple
+          linkBtn
+        />
       </div>
       <div className={styles['yield']}>
         <div className={styles['label']}>

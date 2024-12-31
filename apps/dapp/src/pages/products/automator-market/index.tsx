@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
 import {
   AutomatorDepositStatus,
   AutomatorInfo,
   AutomatorService,
+  AutomatorUserDetail,
 } from '@sofa/services/automator';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
@@ -21,6 +22,7 @@ import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
 import { useAutomatorModal } from '../automator/index-modal';
+import { useAutomatorStore } from '../automator/store';
 
 import { AutomatorCard } from './components/Card';
 
@@ -40,33 +42,40 @@ const tabOptions = [
 const Index = () => {
   const [t] = useTranslation('AutomatorMarket');
   const wallet = useWalletStore((state) => state);
-  const { data, loading: loading1 } = useRequest(
-    () => AutomatorService.getAutomatorList({ chainId: wallet.chainId }),
-    { pollingInterval: 6000, refreshDeps: [wallet.chainId] },
-  );
+
+  useEffect(() => {
+    return useAutomatorStore.subscribeVaults(wallet.chainId);
+  }, [wallet.chainId]);
+
+  const data = useAutomatorStore((state) => {
+    return state.vaults?.map(
+      (it) => state.vaultOverviews[`${it.chainId}-${it.vault.toLowerCase()}-`],
+    );
+  });
+
   const tab = useQuery((q) => (q['automator-market-tab'] as string) || 'all');
   const options = useMemo(
     () => tabOptions.map((it) => ({ label: it.label(t), value: it.value })),
     [t],
   );
 
-  const { data: holding, loading: loading2 } = useRequest(
-    async () => {
-      if (!wallet.address || tab !== 'holding') return undefined;
-      return (
-        wallet.address &&
-        AutomatorService.getUserPnlList({
-          chainId: wallet.chainId,
-          wallet: wallet.address,
-          status: AutomatorDepositStatus.ACTIVE,
-        })
+  useEffect(() => {
+    if (wallet.address)
+      return useAutomatorStore.subscribeUserInfoList(
+        wallet.chainId,
+        wallet.address,
       );
-    },
-    {
-      pollingInterval: 6000,
-      refreshDeps: [wallet.chainId, tab, wallet.address],
-    },
-  );
+  }, [wallet.address, wallet.chainId]);
+
+  const holding = useAutomatorStore((state) => {
+    const list = Object.values(state.userInfos)
+      .map((it) => it.server)
+      .filter(Boolean);
+    if (!list.length) return undefined;
+    return list.filter((it) =>
+      Number(it?.amountInVaultDepositCcy),
+    ) as AutomatorUserDetail[];
+  });
 
   const lists = useMemo(() => {
     if (!data) return undefined;
@@ -92,7 +101,7 @@ const Index = () => {
     return Object.entries(map);
   }, [data, holding, tab, wallet.chainId]);
 
-  const loading = (tab === 'holding' ? loading2 : loading1) && !lists?.length;
+  const loading = (tab === 'holding' ? !holding : !data) && !lists?.length;
 
   const [modal, modalController] = useAutomatorModal();
 
@@ -143,7 +152,7 @@ const Index = () => {
               )}
               {it[1].map((a) => (
                 <AutomatorCard
-                  key={a.vaultInfo.vault}
+                  key={a.vaultInfo.vault.toLowerCase()}
                   info={a}
                   modalController={modalController}
                 />

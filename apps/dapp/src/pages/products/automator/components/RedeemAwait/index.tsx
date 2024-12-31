@@ -41,8 +41,9 @@ const useAutomatorRedeemAwaitEl = (props: {
   const shareInfo = useAutomatorStore(
     (state) =>
       vault &&
-      state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`]
-        ?.shareInfo,
+      state.userInfos[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ]?.shareInfo,
   );
   const decimals = Number(shareInfo?.shareDecimals) || 6;
   const pricePerShare = shareInfo?.pricePerShare || 1;
@@ -157,8 +158,9 @@ export const AutomatorRedeemAwait = (props: {
   const redemptionInfo = useAutomatorStore(
     (state) =>
       vault &&
-      state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`]
-        ?.redemptionInfo,
+      state.userInfos[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ]?.redemptionInfo,
   );
 
   const [el1, el2, el3] = useAutomatorRedeemAwaitEl({

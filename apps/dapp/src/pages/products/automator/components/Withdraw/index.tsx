@@ -33,8 +33,9 @@ export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
 
   const redemptionInfo = useAutomatorStore((state) =>
     vault && wallet.address
-      ? state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`]
-          ?.redemptionInfo
+      ? state.userInfos[
+          `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+        ]?.redemptionInfo
       : undefined,
   );
   const redeemInfo = useMemo(() => {

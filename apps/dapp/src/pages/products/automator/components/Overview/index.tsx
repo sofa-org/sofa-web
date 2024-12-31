@@ -24,7 +24,9 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
   const data = useAutomatorStore(
     (state) =>
       props.vault &&
-      state.vaultOverviews[`${props.vault.chainId}-${props.vault.vault}-`],
+      state.vaultOverviews[
+        `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-`
+      ],
   );
   useEffect(() => {
     if (props.vault) return useAutomatorStore.subscribeOverview(props.vault);

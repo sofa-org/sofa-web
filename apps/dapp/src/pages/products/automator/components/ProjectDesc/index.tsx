@@ -30,7 +30,9 @@ const Snapshot = (props: { vault?: AutomatorVaultInfo }) => {
   const list = useAutomatorStore(
     (state) =>
       props.vault &&
-      state.snapshots[`${props.vault.chainId}-${props.vault.vault}-`],
+      state.snapshots[
+        `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-`
+      ],
   );
   useEffect(() => {
     if (props.vault) {
@@ -89,7 +91,9 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
   const list = useAutomatorStore(
     (state) =>
       props.vault &&
-      state.performances[`${props.vault.chainId}-${props.vault.vault}-`],
+      state.performances[
+        `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-`
+      ],
   );
   useEffect(() => {
     if (props.vault) {
@@ -347,7 +351,7 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
           <div className={styles['address']}>
             {props.vault && (
               <Address
-                address={props.vault.vault}
+                address={props.vault.vault.toLowerCase()}
                 prefix={t('CONTRACT: ')}
                 link
               />

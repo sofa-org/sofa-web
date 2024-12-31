@@ -8,7 +8,11 @@ export const MsgDisplay = (props: BaseProps) => {
 
   return (
     <p
-      className={classNames(styles['more-info'], { [styles['unfold']]: more })}
+      className={classNames(
+        styles['more-info'],
+        { [styles['unfold']]: more },
+        props.className,
+      )}
       style={props.style}
       onClick={() => setMore((pre) => !pre)}
     >
