@@ -1,0 +1,121 @@
+.card {
+  @include pointer;
+
+  flex: 1;
+  max-width: 258px;
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.header {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 56px;
+
+  img {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    transform: translate(0, -50%);
+  }
+
+  :global {
+    .address {
+      justify-content: flex-start;
+      padding: 0;
+      opacity: 0.65;
+    }
+  }
+}
+
+.name {
+  @include bold;
+
+  margin: 0;
+}
+
+.label {
+  margin: 0;
+  opacity: 0.65;
+}
+
+.value {
+  margin: 0;
+
+  &.apy {
+    @include bold;
+
+    font-size: 18px;
+  }
+}
+
+.progress.progress.progress {
+  height: 10px;
+}
+
+.unit {
+  margin: 0;
+  padding: 0 0 0 0.2em;
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+.yield,
+.size,
+.creator {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: 0 0 6px;
+  line-height: 25px;
+}
+
+.yield {
+  margin: 20px 0 10px;
+}
+
+.footer {
+  @include flex-center;
+
+  justify-content: flex-start;
+  margin: 20px 0 0;
+  gap: 28px;
+}
+
+.runtime,
+.people {
+  @include flex-center;
+
+  position: relative;
+  margin: 0;
+
+  svg {
+    width: 1.2em;
+    height: 1.2em;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    width: 1px;
+    height: 12px;
+    transform: translate(0, -50%);
+    background: rgba(#000, 0.1);
+  }
+
+  &:last-child::after {
+    content: none;
+  }
+}
+
+.mobile-ui {
+  &.card {
+    max-width: unset;
+  }
+}

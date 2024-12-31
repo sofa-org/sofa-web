@@ -74,6 +74,7 @@ const Positions = () => {
 
   return (
     <TopTabs
+      type="banner-expandable-tab"
       tabClassName={styles['tabs']}
       banner={
         <div className={styles['banner']}>
@@ -85,7 +86,6 @@ const Positions = () => {
           <PositionTips project={project} />
         </div>
       }
-      type="banner-expandable"
       value={project}
       onChange={(v) => setProject(v as ProjectType)}
       options={projects}

@@ -1,4 +1,8 @@
 // semi 全局样式替换 - modal
+.semi-modal-body {
+  width: 100%;
+}
+
 .semi-modal-wrap-center {
   .semi-modal-body {
     max-height: calc(100vh - 180px);

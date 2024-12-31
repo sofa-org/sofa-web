@@ -2,10 +2,14 @@ import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { Env } from '@sofa/utils/env';
 import classNames from 'classnames';
 
+const mobileUIWidthThreshold = 500;
+
 export const isMobileUI = (recalc?: boolean) => {
   // align w/ index.mobile.scss
   return (
-    (recalc ? Env.recalcIsMobile() : Env.isMobile) || window.innerWidth <= 500
+    window.innerWidth <= mobileUIWidthThreshold ||
+    (window.innerWidth <= window.innerHeight &&
+      (recalc ? Env.recalcIsMobile() : Env.isMobile))
   );
 };
 export const useIsMobileUI = () => {
@@ -20,6 +24,29 @@ export const useIsMobileUI = () => {
     };
   }, []);
   return _isMobileUI;
+};
+export const useIsPortraitUI = ({
+  widthThreshold = 0,
+}: {
+  widthThreshold: number | undefined;
+}) => {
+  const [_isPortraitUI, _setIsPortraitUI] = useState(
+    window.innerWidth <= widthThreshold ||
+      window.innerWidth <= window.innerHeight,
+  );
+  useEffect(() => {
+    const onResize = function (evt: UIEvent) {
+      _setIsPortraitUI(
+        window.innerWidth <= widthThreshold ||
+          window.innerWidth <= window.innerHeight,
+      );
+    };
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+  return _isPortraitUI;
 };
 export const MobileOnly = (
   props: BaseProps & {

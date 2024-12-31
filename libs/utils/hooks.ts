@@ -19,7 +19,7 @@ import {
 } from 'ahooks';
 import useEffectWithTarget from 'ahooks/es/utils/useEffectWithTarget';
 import { isEqual } from 'lodash-es';
-import { parse } from 'qs';
+import { parse, ParsedQs } from 'qs';
 
 import { toArray } from './object';
 
@@ -471,12 +471,15 @@ export function createSuspenseResource<Args extends unknown[], R>(
   };
 }
 
-export function useQuery() {
+export function useQuery<T = ParsedQs>(
+  map: (q: ParsedQs) => T = (it) => it as T,
+) {
   const location = useLocation();
-  return useMemo(
-    () => parse(location.search, { ignoreQueryPrefix: true }),
-    [location.search],
-  );
+  const mapCall = useLazyCallback(map);
+  return useMemo(() => {
+    const query = parse(location.search, { ignoreQueryPrefix: true });
+    return mapCall(query);
+  }, [location.search, mapCall]);
 }
 
 export function useIsPortrait() {

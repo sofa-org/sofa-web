@@ -10,6 +10,7 @@ import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 import { getErrorMsg } from '@sofa/utils/fns';
+import { useQuery } from '@sofa/utils/hooks';
 import { useInfiniteScroll } from 'ahooks';
 import { uniqBy } from 'lodash-es';
 
@@ -23,12 +24,15 @@ export const AutomatorHistory = () => {
   {
     const wallet = useWalletStore();
     const [t] = useTranslation('AutomatorHistory');
+    const v = useQuery((q) => q['automator-vault'] as string);
     const vault = useMemo(
       () =>
         ContractsService.AutomatorVaults.find(
-          (it) => it.chainId === wallet.chainId,
+          (it) =>
+            it.chainId === wallet.chainId &&
+            (!v || v.toLowerCase() === it.vault.toLowerCase()),
         ),
-      [wallet.chainId],
+      [v, wallet.chainId],
     );
 
     const { data: $data, loading } = useInfiniteScroll<
@@ -94,7 +98,7 @@ export const AutomatorHistory = () => {
             render: (_, record) => (
               <>
                 {amountFormatter(record.share, 6)}
-                <span className={styles['unit']}>{vault?.balanceCcy}</span>
+                <span className={styles['unit']}>{vault?.positionCcy}</span>
               </>
             ),
           },
@@ -108,7 +112,7 @@ export const AutomatorHistory = () => {
                 '-'
               ) : (
                 <>
-                  {amountFormatter(record.amount, 2)}
+                  {amountFormatter(record.amountInClientDepositCcy, 2)}
                   <span className={styles['unit']}>{vault?.depositCcy}</span>
                 </>
               ),

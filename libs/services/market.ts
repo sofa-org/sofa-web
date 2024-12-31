@@ -5,10 +5,13 @@ import { jsonSafeParse } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
+import { Contract, formatUnits } from 'ethers';
+import { includes } from 'lodash-es';
 
 import { defaultChain } from './chains';
-import { ContractsService, VaultInfo } from './contracts';
+import { ContractsService, RiskType, VaultInfo } from './contracts';
 import { ApyDefinition } from './products';
+import { WalletConnect } from './wallet-connect';
 
 export interface AAVERecord {
   id: string;
@@ -119,6 +122,28 @@ export class MarketService {
       .then((res) => +res.value.price);
   }
 
+  @asyncCache({
+    persist: true,
+    until: (it, t) => !it || !t || Date.now() - t > MsIntervals.min * 3,
+  })
+  static async fetchPxFromCoinGecko(ccy: string) {
+    const fallbackUrls: Record<string, string> = {
+      BTC: 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=0',
+      ETH: 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=0',
+      RCH: 'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=usd&days=0',
+      crvUSD:
+        'https://api.coingecko.com/api/v3/coins/crvusd/market_chart?vs_currency=usd&days=0',
+      USDT: 'https://api.coingecko.com/api/v3/coins/tether/market_chart?vs_currency=usd&days=0',
+      USDC: 'https://api.coingecko.com/api/v3/coins/usd-coin/market_chart?vs_currency=usd&days=0',
+    };
+    if (!fallbackUrls[ccy]) return [ccy, undefined];
+    return http
+      .get<unknown, HttpResponse<{ prices: [number, number][] }>>(
+        fallbackUrls[ccy],
+      )
+      .then((res) => res.value.prices[0][1]);
+  }
+
   @asyncRetry()
   @asyncCache({
     persist: true,
@@ -140,56 +165,40 @@ export class MarketService {
       })
       .catch((err) => {
         console.error(err);
-        return http
-          .get<unknown, HttpResponse<{ prices: [number, number][] }>>(
-            'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=usd&days=0',
-          )
-          .then((res) => res.value.prices[0][1]);
+        return MarketService.fetchPxFromCoinGecko('RCH');
       });
   }
 
-  static $fetchIndexPx<T extends 'BTC' | 'ETH' = 'BTC' | 'ETH'>(ccy?: T) {
-    const map = {
-      BTC: ['BTC'],
-      ETH: ['ETH'],
-      '': ['BTC', 'ETH'],
-    } as const;
-    const fallbackUrls = {
-      BTC: 'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=bitcoin&days=0',
-      ETH: 'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=ethereum&days=0',
-    };
+  static $fetchIndexPx() {
     return Promise.all(
-      map[ccy || ''].map(($ccy) =>
+      (['BTC', 'ETH'] as const).map(($ccy) =>
         MarketService.$$fetchIndexPx($ccy)
           .then((price) => [$ccy, price])
-          .catch(() =>
-            http
-              .get<unknown, HttpResponse<{ prices: [number, number][] }>>(
-                fallbackUrls[$ccy],
-              )
-              .then((res) => [$ccy, res.value.prices[0][1]]),
-          ),
+          .catch(() => [$ccy, MarketService.fetchPxFromCoinGecko($ccy)]),
       ),
-    ).then((res) => {
-      return { ...Object.fromEntries(res), USD: 1, USDT: 1, USDC: 1 };
-    });
+    ).then((res) => Object.fromEntries(res));
   }
 
-  static fetchIndexPx<T extends CCY>(
-    ccy?: T,
-  ): Promise<Record<T | USDS, number>> {
+  static fetchIndexPx<T extends CCY>(): Promise<Record<T | USDS, number>> {
     return Promise.all([
-      ccy !== 'RCH'
-        ? MarketService.$fetchIndexPx(
-            ccy ? (ccy.includes('ETH') ? 'ETH' : 'BTC') : undefined,
-          )
-        : undefined,
-      ccy === 'RCH' || !ccy
-        ? MarketService.getRchPriceInUsd().then((price) => ({ RCH: price }))
-        : undefined,
-    ]).then((prices) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const obj = { ...prices[0], ...prices[1] } as any;
+      MarketService.getPPSOfScrv().catch(() => 1),
+      MarketService.$fetchIndexPx(),
+      MarketService.getRchPriceInUsd().then((price) => ({ RCH: price })),
+      MarketService.fetchPxFromCoinGecko('crvUSD')
+        .catch(() => 1)
+        .then((price) => ({ crvUSD: price })),
+      MarketService.fetchPxFromCoinGecko('USDT')
+        .catch(() => 1)
+        .then((price) => ({ USDT: price })),
+      MarketService.fetchPxFromCoinGecko('USDC')
+        .catch(() => 1)
+        .then((price) => ({ USDC: price })),
+    ]).then(([scrvPPS, ...prices]) => {
+      const obj = prices.reduce(
+        (pre, it) => Object.assign(pre, it),
+        {} as Record<string, number>,
+      );
+      obj.scrvUSD = obj.crvUSD * scrvPPS;
       if ('ETH' in obj) {
         obj.WETH = obj.ETH;
         obj.stETH = obj.ETH;
@@ -202,7 +211,6 @@ export class MarketService {
   // https://binance-docs.github.io/apidocs/spot/en/#individual-symbol-ticker-streams
   static subscribeIndexPx<T extends CCY>(
     callback: (px: Record<T | USDS, number>) => void,
-    ccy?: T,
   ): Subscription {
     // const topic = `${ccy}USDT@miniticker`.toLowerCase();
     // return Object.assign(
@@ -212,7 +220,7 @@ export class MarketService {
     //       MarketService.binanceWs.unsubscribe(topic, callback, 'UNSUBSCRIBE'),
     //   },
     // );
-    const fetch = () => MarketService.fetchIndexPx(ccy).then(callback);
+    const fetch = () => MarketService.fetchIndexPx().then(callback);
     const timer = setInterval(() => fetch(), 10000);
     return Object.assign(fetch(), {
       unsubscribe: () => Promise.resolve().then(() => clearInterval(timer)),
@@ -284,7 +292,9 @@ export class MarketService {
   > {
     const ccyList = ContractsService.vaults.reduce(
       (pre, it) =>
-        it.chainId !== chainId || pre.includes(it.depositCcy)
+        it.chainId !== chainId ||
+        it.riskType === RiskType.RISKY ||
+        pre.includes(it.depositCcy)
           ? pre
           : pre.concat(it.depositCcy),
       [] as string[],
@@ -308,5 +318,13 @@ export class MarketService {
       ETH: interestRates['ETH'] ?? interestRates['WETH'],
       BTC: interestRates['BTC'] ?? interestRates['WBTC'],
     }));
+  }
+
+  private static async getPPSOfScrv() {
+    const provider = await WalletConnect.getProvider(1);
+    const contractAddress = '0x0655977FEb2f289A4aB78af67BAB0d17aAb84367';
+    const abi = ['function pricePerShare() public view returns (uint256)'];
+    const contract = new Contract(contractAddress, abi, provider);
+    return +formatUnits(await contract.pricePerShare(), 18);
   }
 }

@@ -1,5 +1,6 @@
 import { Toast } from '@douyinfe/semi-ui';
 import {
+  AutomatorDepositStatus,
   AutomatorInfo,
   AutomatorPerformance,
   AutomatorPosition,
@@ -9,6 +10,7 @@ import { AutomatorService } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
+import { arrToDict } from '@sofa/utils/object';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 type K = `${AutomatorVaultInfo['chainId']}-${AutomatorVaultInfo['vault']}-${
@@ -25,6 +27,7 @@ export interface AutomatorRedeemData {
 
 export const useAutomatorStore = Object.assign(
   createWithEqualityFn(() => ({
+    vaults: null as AutomatorVaultInfo[] | null,
     vaultOverviews: {} as Record<K, AutomatorInfo>,
     snapshots: {} as Record<K, AutomatorPosition[]>,
     performances: {} as Record<K, AutomatorPerformance[]>,
@@ -42,6 +45,28 @@ export const useAutomatorStore = Object.assign(
     redeemData: {} as Record<K, AutomatorRedeemData>,
   })),
   {
+    getAutomatorVaults: async (chainId: number) => {
+      return AutomatorService.getAutomatorList({ chainId }).then((res) => {
+        const vaults = res.map((it) => it.vaultInfo);
+        const vaultOverviews = arrToDict(
+          res,
+          (it) =>
+            `${it.vaultInfo.chainId}-${it.vaultInfo.vault.toLowerCase()}-`,
+        );
+        useAutomatorStore.setState((pre) => ({
+          vaults,
+          vaultOverviews: { ...pre.vaultOverviews, ...vaultOverviews },
+        }));
+      });
+    },
+    subscribeVaults: (chainId: number) => {
+      useAutomatorStore.getAutomatorVaults(chainId);
+      const timer = setInterval(
+        () => useAutomatorStore.getAutomatorVaults(chainId),
+        MsIntervals.min,
+      );
+      return () => clearInterval(timer);
+    },
     subscribeOverview: (vault: AutomatorVaultInfo) => {
       const sync = () =>
         AutomatorService.getInfo(vault)
@@ -49,7 +74,7 @@ export const useAutomatorStore = Object.assign(
             useAutomatorStore.setState((pre) => ({
               vaultOverviews: {
                 ...pre.vaultOverviews,
-                [`${vault.chainId}-${vault.vault}-`]: overview.value,
+                [`${vault.chainId}-${vault.vault.toLowerCase()}-`]: overview,
               },
             })),
           )
@@ -67,7 +92,8 @@ export const useAutomatorStore = Object.assign(
             useAutomatorStore.setState((pre) => ({
               snapshots: {
                 ...pre.snapshots,
-                [`${vault.chainId}-${vault.vault}-`]: snapshots.value,
+                [`${vault.chainId}-${vault.vault.toLowerCase()}-`]:
+                  snapshots.value,
               },
             })),
           )
@@ -85,7 +111,8 @@ export const useAutomatorStore = Object.assign(
             useAutomatorStore.setState((pre) => ({
               performances: {
                 ...pre.performances,
-                [`${vault.chainId}-${vault.vault}-`]: weeklyPnlList.value,
+                [`${vault.chainId}-${vault.vault.toLowerCase()}-`]:
+                  weeklyPnlList.value,
               },
             })),
           )
@@ -96,15 +123,53 @@ export const useAutomatorStore = Object.assign(
       const interval = setInterval(sync, MsIntervals.day);
       return () => clearInterval(interval);
     },
+    getUserInfoList: async (chainId: number, wallet: string) => {
+      return Promise.all([
+        AutomatorService.getUserPnlList({
+          chainId,
+          wallet,
+          status: AutomatorDepositStatus.ACTIVE,
+        }),
+        AutomatorService.getUserPnlList({
+          chainId,
+          wallet,
+          status: AutomatorDepositStatus.CLOSED,
+        }),
+      ]).then((list) => {
+        useAutomatorStore((pre) => {
+          const userInfos = Object.fromEntries(
+            list.flat().map((it) => {
+              const k = `${
+                it.vaultInfo.chainId
+              }-${it.vaultInfo.vault.toLowerCase()}-` as const;
+              return [k, { ...pre.userInfos[k], server: it }];
+            }),
+          );
+          return {
+            userInfos: { ...pre.userInfos, ...userInfos },
+          };
+        });
+      });
+    },
+    subscribeUserInfoList: (chainId: number, wallet: string) => {
+      useAutomatorStore.getUserInfoList(chainId, wallet);
+      const timer = setInterval(
+        () => useAutomatorStore.getUserInfoList(chainId, wallet),
+        MsIntervals.min,
+      );
+      return () => clearInterval(timer);
+    },
     updateUserInfo: (vault: AutomatorVaultInfo, address: string) => {
       AutomatorService.getUserPnl(vault, address)
         .then((userInfo) =>
           useAutomatorStore.setState((pre) => ({
             userInfos: {
               ...pre.userInfos,
-              [`${vault.chainId}-${vault.vault}-${address}`]: {
-                ...pre.userInfos[`${vault.chainId}-${vault.vault}-${address}`],
-                server: userInfo.value,
+              [`${vault.chainId}-${vault.vault.toLowerCase()}-${address}`]: {
+                ...pre.userInfos[
+                  `${vault.chainId}-${vault.vault.toLowerCase()}-${address}`
+                ],
+                server: userInfo,
               },
             },
           })),
@@ -117,8 +182,10 @@ export const useAutomatorStore = Object.assign(
           useAutomatorStore.setState((pre) => ({
             userInfos: {
               ...pre.userInfos,
-              [`${vault.chainId}-${vault.vault}-${address}`]: {
-                ...pre.userInfos[`${vault.chainId}-${vault.vault}-${address}`],
+              [`${vault.chainId}-${vault.vault.toLowerCase()}-${address}`]: {
+                ...pre.userInfos[
+                  `${vault.chainId}-${vault.vault.toLowerCase()}-${address}`
+                ],
                 shareInfo,
               },
             },
@@ -132,8 +199,10 @@ export const useAutomatorStore = Object.assign(
           useAutomatorStore.setState((pre) => ({
             userInfos: {
               ...pre.userInfos,
-              [`${vault.chainId}-${vault.vault}-${address}`]: {
-                ...pre.userInfos[`${vault.chainId}-${vault.vault}-${address}`],
+              [`${vault.chainId}-${vault.vault.toLowerCase()}-${address}`]: {
+                ...pre.userInfos[
+                  `${vault.chainId}-${vault.vault.toLowerCase()}-${address}`
+                ],
                 redemptionInfo,
               },
             },
@@ -159,7 +228,7 @@ export const useAutomatorStore = Object.assign(
       useAutomatorStore.setState((pre) => ({
         depositData: {
           ...pre.depositData,
-          [`${vault.chainId}-${vault.vault}-${address}`]: data,
+          [`${vault.chainId}-${vault.vault.toLowerCase()}-${address}`]: data,
         },
       }));
     },
@@ -171,7 +240,7 @@ export const useAutomatorStore = Object.assign(
       useAutomatorStore.setState((pre) => ({
         redeemData: {
           ...pre.redeemData,
-          [`${vault.chainId}-${vault.vault}-${address}`]: data,
+          [`${vault.chainId}-${vault.vault.toLowerCase()}-${address}`]: data,
         },
       }));
     },

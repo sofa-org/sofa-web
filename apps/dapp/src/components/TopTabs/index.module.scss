@@ -15,7 +15,8 @@
     object-position: top center;
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     height: auto;
   }
 
@@ -95,7 +96,8 @@
     }
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     display: none;
   }
 }
@@ -117,7 +119,8 @@
     padding: 0 0 40px;
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     margin: 0;
   }
 }
@@ -192,7 +195,8 @@
     }
   }
 
-  &.banner-expandable {
+  &.banner-expandable,
+  &.banner-expandable-tab {
     height: auto;
     margin: 0;
     padding: 48px 0;
@@ -213,12 +217,49 @@
       }
     }
   }
+
+  &.banner-expandable-tab {
+    height: min(65px, 12vw);
+    padding: 0;
+    box-shadow: 0 1px 0 rgba(#fff, 0.12);
+    z-index: 2;
+
+    .tabs {
+      justify-content: flex-start;
+    }
+
+    .top-tabs-tab {
+      min-width: 180px;
+      padding: 0 30px;
+      height: min(65px, 12vw);
+      background: transparent !important;
+      border-radius: 0;
+
+      svg,
+      img {
+        width: 2em;
+      }
+
+      &.active {
+        border-bottom: 2px solid #fff;
+      }
+    }
+
+    > div {
+      width: $width-content;
+    }
+  }
 }
 
-@media (orientation: portrait) {
-  .banner {
+.mobile-ui {
+  &.banner {
     margin-top: -$header-ticker-height - $header-menu-height;
     padding-top: $header-ticker-height;
+  }
+}
+
+.portrait-ui {
+  &.banner {
     background: linear-gradient(to right, rgba(#000, 0.3), rgba(#000, 0.3)),
       linear-gradient(
         93deg,
@@ -232,13 +273,13 @@
     }
   }
 
-  .top-tabs-content-decoration {
+  &.top-tabs-content-decoration {
     &::before {
       border-radius: 0;
     }
   }
 
-  .top-tabs {
+  &.top-tabs {
     .tabs {
       width: 100%;
     }
@@ -255,13 +296,9 @@
       }
     }
 
-    &.banner-expandable {
+    &.banner-expandable,
+    &.banner-expandable-tab {
       padding: 0 0 12px;
     }
-  }
-
-  .top-tabs-content {
-    padding-top: 0;
-    margin-top: -110px;
   }
 }

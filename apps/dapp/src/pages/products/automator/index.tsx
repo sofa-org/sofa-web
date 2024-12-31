@@ -4,7 +4,6 @@ import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
-import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
@@ -26,14 +25,117 @@ import { useAutomatorStore } from './store';
 
 import styles from './index.module.scss';
 
-export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
+export const AutomatorEl = (props: BaseProps) => {
   const [t] = useTranslation('Automator');
-  const { tab } = useQuery();
+  const { tab, v } = useQuery((p) => ({
+    tab: p['automator-trade-tab'] as string,
+    v: p['automator-vault'] as string,
+  }));
   const { chainId, address } = useWalletStore((state) => state);
   const isMobileUI = useIsMobileUI();
   const vault = useMemo(
-    () => ContractsService.AutomatorVaults.find((it) => it.chainId === chainId),
-    [chainId],
+    () =>
+      ContractsService.AutomatorVaults.find((it) => {
+        if (it.chainId !== chainId) return false;
+        if (!v) return true;
+        return it.vault.toLowerCase() === v.toLowerCase();
+      }),
+    [chainId, v],
+  );
+
+  const handleSuccess = useLazyCallback(() => {
+    if (vault && address) {
+      useAutomatorStore.updateUserInfo(vault, address);
+      useWalletStore.updateBalanceByAutomatorVault(vault);
+    }
+  });
+
+  const [mobileUITab, setMobileUITab] = useState<string>(tab);
+  const onTabClick = useLazyCallback((tab: string) => {
+    if (tab) {
+      updateQuery({ 'automator-trade-tab': tab });
+    }
+    if (isMobileUI) {
+      setMobileUITab(tab);
+      if (!tab) {
+        updateQuery({ 'automator-trade-tab': undefined });
+      }
+    }
+  });
+
+  return (
+    <>
+      <div
+        className={classNames(
+          styles['section'],
+          styles['section-top'],
+          props.className,
+        )}
+      >
+        <AutomatorUserInfo vault={vault} />
+        <div className={styles['left']}>
+          <AutomatorOverview vault={vault} />
+        </div>
+        <div
+          className={classNames(
+            styles['right'],
+            styles[`mobile-tab-${mobileUITab || 'none'}`],
+          )}
+        >
+          <div
+            className={styles['mobile-tab-bg']}
+            onClick={() => onTabClick('')}
+          />
+          <Tabs
+            type="card"
+            size="small"
+            className={styles['tabs']}
+            activeKey={tab === 'redeem' ? 'redeem' : 'deposit'}
+            onTabClick={onTabClick}
+          >
+            <Tabs.TabPane
+              itemKey="deposit"
+              tab={
+                <span
+                  className={classNames(styles['tab-title'], styles['deposit'])}
+                >
+                  {t({ enUS: 'Mint', zhCN: '铸造' })}
+                </span>
+              }
+            >
+              <AutomatorDeposit vault={vault} onSuccess={handleSuccess} />
+            </Tabs.TabPane>
+            <Tabs.TabPane
+              itemKey="redeem"
+              tab={
+                <span
+                  className={classNames(styles['tab-title'], styles['redeem'])}
+                >
+                  {t({ enUS: 'Redeem', zhCN: '赎回' })}
+                </span>
+              }
+            >
+              <AutomatorWithdraw vault={vault} onSuccess={handleSuccess} />
+            </Tabs.TabPane>
+          </Tabs>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
+  const [t] = useTranslation('Automator');
+  const { v } = useQuery((p) => ({ v: p['automator-vault'] as string }));
+  const { chainId } = useWalletStore((state) => state);
+  const vault = useMemo(
+    () =>
+      ContractsService.AutomatorVaults.find((it) => {
+        if (it.chainId !== chainId) return false;
+        if (!v) return true;
+        return it.vault.toLowerCase() === v.toLowerCase();
+      }),
+    [chainId, v],
   );
 
   const chains = useMemo(
@@ -45,53 +147,32 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
     [],
   );
 
-  const handleSuccess = useLazyCallback(() => {
-    if (vault && address) {
-      useAutomatorStore.updateUserInfo(vault, address);
-      useWalletStore.updateBalanceByAutomatorVault(vault);
-    }
-  });
-
-  const [mobileUITab, setMobileUITab] = useState<string>('');
-  const onTabClick = useLazyCallback((tab: string) => {
-    if (tab) {
-      updateQuery({ tab });
-    }
-    if (isMobileUI) {
-      setMobileUITab(tab);
-    }
-  });
-
   return (
     <TopTabs
       type={'banner-expandable'}
-      className={classNames(
-        { [styles['only-form']]: props.onlyForm },
-        props.className,
-      )}
+      className={props.className}
       banner={
-        !props.onlyForm && (
-          <>
-            <h1 className={styles['head-title']}>
-              {t({ enUS: 'Automator', zhCN: 'Automator' })}
-              {/* <span className={styles['badge']}>
-              {t({ enUS: 'Aggressive', zhCN: '激进的' })}
-            </span> */}
-            </h1>
-            <div className={styles['desc']}>
+        <>
+          <h1 className={styles['head-title']}>
+            {ProjectTypeRefs[ProjectType.Automator].icon}
+            {t({
+              enUS: 'Automator: Follow The Best',
+              zhCN: 'Automator: 跟单',
+            })}
+          </h1>
+          {/* <div className={styles['desc']}>
               {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-            </div>
-          </>
-        )
+            </div> */}
+        </>
       }
       options={[]}
-      dark={!props.onlyForm}
+      dark
       prefix={t({ enUS: 'Product', zhCN: '产品' })}
       sticky
     >
       {!vault ? (
         <CEmpty
-          className={classNames({ 'semi-always-dark': !props.onlyForm })}
+          className="semi-always-dark"
           description={t(
             {
               enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
@@ -102,77 +183,25 @@ export const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
         />
       ) : (
         <>
-          <div className={classNames(styles['section'], styles['section-top'])}>
-            <div className={styles['left']}>
-              <AutomatorOverview vault={vault} />
-              <AutomatorUserInfo vault={vault} />
-            </div>
-            <div
-              className={classNames(
-                styles['right'],
-                styles[`mobile-tab-${mobileUITab || 'none'}`],
-              )}
-            >
-              <div
-                className={styles['mobile-tab-bg']}
-                onClick={() => onTabClick('')}
-              />
-              <Tabs
-                type="card"
-                size="small"
-                className={styles['tabs']}
-                activeKey={tab === 'redeem' ? 'redeem' : 'deposit'}
-                onTabClick={onTabClick}
-              >
-                <Tabs.TabPane
-                  itemKey="deposit"
-                  tab={
-                    <span
-                      className={classNames(
-                        styles['tab-title'],
-                        styles['deposit'],
-                      )}
-                    >
-                      {t({ enUS: 'Mint', zhCN: '铸造' })}
-                    </span>
-                  }
-                >
-                  <AutomatorDeposit vault={vault} onSuccess={handleSuccess} />
-                </Tabs.TabPane>
-                <Tabs.TabPane
-                  itemKey="redeem"
-                  tab={
-                    <span
-                      className={classNames(
-                        styles['tab-title'],
-                        styles['redeem'],
-                      )}
-                    >
-                      {t({ enUS: 'Redeem', zhCN: '赎回' })}
-                    </span>
-                  }
-                >
-                  <AutomatorWithdraw vault={vault} onSuccess={handleSuccess} />
-                </Tabs.TabPane>
-              </Tabs>
-            </div>
+          <div className={styles['form']}>
+            <AutomatorEl />
           </div>
-          {!props.onlyForm && (
-            <ProductDesc
-              noMoreInfo
-              // dark={isMobileUI}
-              className={styles['product-desc-wrapper']}
-              prefixTabs={[
-                {
-                  itemKey: 'more',
-                  tab: t({ enUS: 'More Info', zhCN: '更多信息' }),
-                  element: <AutomatorProjectDesc vault={vault} />,
-                },
-              ]}
-            />
-          )}
+          <ProductDesc
+            noMoreInfo
+            // dark={isMobileUI}
+            className={styles['product-desc-wrapper']}
+            prefixTabs={[
+              {
+                itemKey: 'more',
+                tab: t({ enUS: 'More Info', zhCN: '更多信息' }),
+                element: <AutomatorProjectDesc vault={vault} />,
+              },
+            ]}
+          />
         </>
       )}
     </TopTabs>
   );
 };
+
+export default Automator;

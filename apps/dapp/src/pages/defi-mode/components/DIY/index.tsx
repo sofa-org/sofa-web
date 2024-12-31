@@ -418,7 +418,7 @@ export const DIY = () => {
         <RiskTolerance />
         {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>
-      <MobileOnly>
+      <MobileOnly display="block">
         <a
           className={classNames(styles['mobile-next-step-btn'])}
           onClick={() => setMobileNextStepBtnClicked(true)}

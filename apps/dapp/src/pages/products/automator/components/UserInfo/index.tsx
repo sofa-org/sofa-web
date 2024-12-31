@@ -1,12 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
-import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
+import { AutomatorVaultInfo } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
+import { cvtAmountsInCcy } from '@sofa/utils/amount';
 import { useTime } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
+import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
+import { useIndexPrices } from '@/components/IndexPrices/store';
+import { MsgDisplay } from '@/components/MsgDisplay';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
 import { useAutomatorStore } from '../../store';
@@ -18,12 +22,13 @@ export interface AutomatorUserInfoProps {
 }
 
 export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
-  const [t] = useTranslation('AutomatorUserInfo');
+  const [t, i18n] = useTranslation('AutomatorUserInfo');
+  const prices = useIndexPrices((s) => s.prices);
   const address = useWalletStore((state) => state.address);
   const data = useAutomatorStore((state) =>
     props.vault && address
       ? state.userInfos[
-          `${props.vault.chainId}-${props.vault.vault}-${address}`
+          `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-${address}`
         ]
       : undefined,
   );
@@ -45,34 +50,61 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
           10 ** shareDecimals;
   }, [data, props.vault, time, shareDecimals]);
 
-  const [expand, setExpand] = useState(false);
+  const depositCcyConfig = !props.vault?.depositCcy
+    ? undefined
+    : CCYService.ccyConfigs[props.vault.depositCcy];
 
   return (
-    <Spin spinning={!data && !!address}>
-      <div
-        className={classNames(styles['user-info'], {
-          [styles['expand']]: expand,
-        })}
-        onClick={() => setExpand((pre) => !pre)}
-      >
+    <Spin
+      wrapperClassName={styles['user-info-wrapper']}
+      spinning={!data && !!address}
+    >
+      <div className={styles['vault-info']}>
+        <img src={depositCcyConfig?.icon} alt="" />
+        <div className={styles['name']}>
+          {props.vault?.name || props.vault?.depositCcy}
+        </div>
+        <Address address={props.vault?.vault || ''} simple linkBtn />
+        <MsgDisplay className={styles['desc']}>
+          <span
+            dangerouslySetInnerHTML={{
+              __html:
+                props.vault?.desc ||
+                t({
+                  enUS: 'Our Automator strategies will perform automated execution of our SOFA platform products (eg. Bull Trend & Bear Trend) at model expiration dates and strikes to target an optimized risk-adjusted yield. The strategies are designed to operate systematically via data-driven algorithms, with our data learning models continuously being refined to enhance long term performance. Capital will be continuously deployed to maximize yield compounding benefits, allowing users to deploy volatility monetization strategies with zero hassle. Strategies could include both controlled buying or selling of option exposure to generate returns.',
+                  zhCN: '我们的 Automator 策略将自动执行 SOFA 平台产品（如牛市趋势和熊市趋势），在模型指定的到期日和行权价下，旨在实现优化的风险调整收益。这些策略通过数据驱动的算法系统化运行，并通过数据学习模型的持续优化提升长期表现。资金将持续部署以最大化收益复利效应，让用户轻松实现波动率套利策略。策略可能包括受控买入或卖出期权敞口，以生成收益。',
+                }),
+            }}
+          />
+        </MsgDisplay>
+      </div>
+      <div className={styles['user-info']}>
         <div className={classNames(styles['item'], styles['position'])}>
           <div className={styles['title']}>
-            {t({ enUS: 'My Position', zhCN: '我的持仓' })}
-            <Link
-              className={styles['transaction-history-link']}
-              to={`/positions?project=${ProjectType.Automator}&vault=${
-                props.vault?.vault || ''
-              }`}
-            >
-              {t({ enUS: 'Transaction History', zhCN: '交易记录' })} &gt;
-            </Link>
+            {t({ enUS: 'My Holding', zhCN: '我的持仓' })}
           </div>
           <div className={styles['value']}>
             <AmountDisplay amount={data?.shareInfo?.shares} />{' '}
-            <span className={styles['unit']}>{props.vault?.balanceCcy}</span>
+            <span className={styles['unit']}>{props.vault?.positionCcy}</span>
             <span className={styles['decorative']}>
               {' '}
-              ≈ <AmountDisplay amount={data?.shareInfo?.amount} />{' '}
+              ≈{' '}
+              <AmountDisplay
+                amount={
+                  !props.vault
+                    ? ''
+                    : cvtAmountsInCcy(
+                        [
+                          [
+                            props.vault.vaultDepositCcy,
+                            data?.shareInfo?.amount,
+                          ],
+                        ],
+                        prices,
+                        props.vault.depositCcy,
+                      )
+                }
+              />{' '}
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
             </span>
             {!!+pendingSharesWithDecimals && (
@@ -89,11 +121,26 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
         </div>
         <div className={classNames(styles['item'], styles['total-pnl'])}>
           <div className={styles['title']}>
-            {t({ enUS: 'Total PnL', zhCN: '总盈亏' })}
+            {t({ enUS: 'Cumulative PnL', zhCN: '累计盈亏' })}
           </div>
           <div className={styles['value']}>
             <span className={styles['amount']}>
-              <AmountDisplay amount={data?.server?.depositTotalPnl} />{' '}
+              <AmountDisplay
+                amount={
+                  !props.vault
+                    ? ''
+                    : cvtAmountsInCcy(
+                        [
+                          [
+                            props.vault.vaultDepositCcy,
+                            data?.server?.totalPnlByClientDepositCcy,
+                          ],
+                        ],
+                        prices,
+                        props.vault.depositCcy,
+                      )
+                }
+              />{' '}
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
             </span>
             <span className={styles['separator']}>+</span>

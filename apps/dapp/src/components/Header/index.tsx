@@ -18,13 +18,9 @@ import { Comp as IconDefiMode } from './assets/icon-defimode.svg';
 import { Comp as IconPos } from './assets/icon-pos.svg';
 import { Comp as IconSOFA } from './assets/icon-sofa.svg';
 import { Comp as IconUsers } from './assets/icon-users.svg';
-import {
-  CommonHeader,
-  HomeHeader,
-  markSelectedMenuItems,
-  MenuItem,
-} from './index-home';
+import { CommonHeader, HomeHeader, markSelectedMenuItems } from './index-home';
 import locale from './locale';
+import { MenuItem } from './store';
 
 import styles from './index.module.scss';
 
@@ -125,7 +121,7 @@ const allMenuItems = (
                 enUS: 'Review your active and past performance records.',
                 zhCN: '查看您的当前和历史绩效记录。',
               }),
-            path: '/transactions?project=Automator',
+            path: '/positions/automator',
           },
         ],
       },

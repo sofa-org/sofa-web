@@ -74,7 +74,7 @@ const OrderHistory = () => {
       list: uniqBy(
         $data.list,
         (it: PositionInfo) =>
-          `${it.id}-${it.product.vault.vault}-${it.createdAt}`,
+          `${it.id}-${it.product.vault.vault.toLowerCase()}-${it.createdAt}`,
       ) as PositionInfo[],
     };
   }, [$data]);

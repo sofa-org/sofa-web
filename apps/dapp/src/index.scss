@@ -9,10 +9,12 @@
 @import "@/styles/rewrite/checkbox";
 @import "@/styles/rewrite/input";
 @import "@/styles/rewrite/dropdown";
+@import "@/styles/rewrite/spin";
 @import "locomotive-scroll/dist/locomotive-scroll.css";
 
 :root {
   --header-menu-container-margin-top: 0;
+
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
@@ -34,6 +36,7 @@
   transition:
     width 0.1s ease,
     height 0.1s ease;
+  line-height: calc(1em + 6px);
 }
 
 html {

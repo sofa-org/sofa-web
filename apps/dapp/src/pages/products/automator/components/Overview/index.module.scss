@@ -1,14 +1,17 @@
-.overview {
+.overview.overview {
   :global(.semi-spin-children) {
     @include flex-center;
 
+    align-items: stretch;
     gap: 0;
     flex-wrap: wrap;
     margin: 0;
-    padding: min(40px, 4vw);
     border-radius: 8px;
-    border: 1px solid rgba(#000, 0.12);
-    background: linear-gradient(to right, #f4feed 0%, #fefdec 100%);
+    background: linear-gradient(
+      125deg,
+      rgba(#50d113, 0.25) 0%,
+      rgba(#ffe500, 0.2) 100%
+    );
   }
 }
 
@@ -27,28 +30,26 @@
   font-size: min(12px, 3vw);
 }
 
-.aum {
-  width: 50%;
-  height: 90px;
-  margin: 0;
-  padding: 0 0 0 min(40px, 2vw);
-}
-
 .title {
-  margin: 0 0 min(8px, 1vw);
+  @include medium;
+
+  margin: 0 0 min(4px, 0.5vw);
   opacity: 0.45;
   font-size: min(14px, 3vw);
 }
 
 .unit {
-  height: 90px;
+  @include regular;
+
   padding: 0 0 0 4px;
-  font-size: 14px;
+  font-size: max(12px, 0.8em);
 }
 
 .value {
+  @include bold;
+
   margin: 0;
-  font-size: min(20px, 4vw);
+  font-size: min(18px, 3.8vw);
   white-space: nowrap;
 
   .decorative {
@@ -57,41 +58,144 @@
   }
 
   .unit {
-    font-size: max(10px, 0.6em);
+    font-size: min(14px, 0.7em);
+  }
+
+  .percentage {
+    @include bold;
+
+    padding: 0 12px;
+    font-size: min(14px, 4vw);
+    color: #e88947;
   }
 }
 
-.nav {
-  width: 50%;
-  height: 100px;
-  margin: 0;
-  padding: 0 0 0 min(40px, 3vw);
-  border-left: 1px dashed rgba(#000, 0.12);
+.left {
+  flex: 1;
+  padding: 24px;
+
+  .aum {
+    width: 50%;
+    margin: 0 0 min(24px, 3vw);
+
+    .title {
+      margin: 0;
+    }
+  }
+
+  .nav {
+    width: 50%;
+    margin: 0;
+    border-left: 1px dashed rgba(#000, 0.12);
+
+    .title {
+      margin: 0;
+    }
+  }
+
+  .yield {
+    gap: 0;
+    width: 100%;
+    margin: 0 0 min(24px, 3vw);
+
+    .value {
+      @include bold;
+
+      font-size: min(28px, 6.4vw);
+      color: #50d113;
+    }
+  }
+
+  :global {
+    .progress-wrapper {
+      width: 326px;
+      margin: 10px 0 0;
+    }
+  }
 }
 
-.yield {
+.right {
   @include flex-column-center;
 
-  gap: 0;
-  width: 100%;
-  margin: 0 0 min(32px, 4vw);
+  width: 106px;
+  padding: 20px 0;
+  border-left: 1px solid rgba(#000, 0.1);
 
-  .value {
-    @include bold;
+  .item {
+    @include flex-column-center;
 
-    font-size: min(32px, 7vw);
-    color: #50d113;
+    gap: 4px;
+    height: 33%;
+
+    svg {
+      width: 1.3em;
+      height: 1.3em;
+    }
+
+    .title {
+      margin: 0;
+    }
+
+    .value {
+      @include bold;
+
+      font-size: min(18px, 3.4vw);
+    }
+  }
+}
+
+.tips {
+  opacity: 0.7;
+
+  .tip {
+    position: relative;
+    padding: 0 0 0 min(20px, 5vw);
+    margin: min(16px, 4vw) 0 0;
+    font-size: min(12px, 3vw);
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1.2em;
+      height: 1.2em;
+      background: url("../../assets/icon-wait.svg") no-repeat center center /
+        contain;
+    }
+
+    :global(.highlight) {
+      color: #d89614;
+    }
   }
 }
 
 @mixin rewrite-ux-mobile {
+  .left {
+    padding: 10px 0 0;
+
+    .yield {
+      .title {
+        padding-bottom: 10px;
+      }
+    }
+  }
+
+  .right {
+    width: 60px;
+  }
+
   .overview {
+    width: auto !important;
+
     :global(.semi-spin-children) {
       .yield {
         .title {
           border-bottom: 1px dashed rgba(#000, 0.22);
         }
       }
+
       margin-top: 0;
       padding-top: 0;
       margin-bottom: 0;
@@ -101,6 +205,7 @@
       border-bottom: 1px dashed rgba(#000, 0.12);
     }
   }
+
   .nav {
     border-left: none;
   }
@@ -111,6 +216,7 @@
     @include rewrite-ux-mobile;
   }
 }
+
 @media screen and (width <=500px) {
   :global(.is-pc) {
     @include rewrite-ux-mobile;

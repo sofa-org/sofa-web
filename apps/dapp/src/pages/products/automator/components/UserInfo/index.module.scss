@@ -1,11 +1,61 @@
+.user-info-wrapper {
+  width: 100%;
+  padding: 0 0 min(16px, 3vw);
+  border-bottom: 1px dashed rgba(#000, 0.12);
+
+  :global {
+    .semi-spin-children {
+      @include flex-center;
+
+      justify-content: space-between;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+  }
+}
+
+.vault-info {
+  position: relative;
+  max-width: 100%;
+  width: 70%;
+  margin: 0;
+  padding: 0 0 0 60px;
+
+  img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 48px;
+    height: 48px;
+  }
+
+  .name {
+    @include bold;
+
+    margin: 0 0 4px;
+    font-size: 20px;
+  }
+
+  .desc {
+    margin: 10px 0 0;
+    font-size: 12px;
+    opacity: 0.65;
+  }
+
+  :global {
+    .address {
+      justify-content: flex-start;
+      padding: 0;
+      opacity: 0.65;
+    }
+  }
+}
+
 .user-info {
   @include pointer;
 
   position: relative;
-  margin: min(24px, 4vw) 0 0;
-  padding: min(24px, 4vw);
-  border-radius: 8px;
-  border: 1px solid rgba(#000, 0.12);
+  text-align: right;
 
   // &::after {
   //   content: "";
@@ -30,10 +80,11 @@
 
 .title {
   @include flex-center;
+  @include medium;
 
-  justify-content: space-between;
+  justify-content: flex-end;
   margin: 0;
-  font-size: min(14px, 3.3vw);
+  font-size: min(12px, 3vw);
   color: rgba(#000, 0.45);
 
   a {
@@ -52,9 +103,10 @@
 }
 
 .unit {
+  @include regular;
+
   margin: 0;
-  font-size: min(14px, 3.3vw);
-  opacity: 0.6;
+  font-size: min(14px, 3.3vw, 0.8em);
 }
 
 .separator {
@@ -73,6 +125,7 @@
     flex: none;
     display: block;
     width: 100%;
+
     // margin-left: min(8px, 1vw);
     // padding-left: min(8px, 1vw);
     // border-left: 1px dashed rgba(#000, 0.12);
@@ -80,8 +133,10 @@
 }
 
 .value {
+  @include medium;
+
   margin: 0;
-  font-size: min(18px, 4vw);
+  font-size: min(16px, 3.6vw);
 }
 
 // .expand {
@@ -101,20 +156,60 @@
 // }
 
 @mixin rewrite-ux-mobile {
+  .user-info-wrapper {
+    :global {
+      .semi-spin-children {
+        gap: 18px;
+      }
+    }
+  }
+
+  .vault-info {
+    width: auto;
+  }
+
   .user-info {
     border: none;
-    padding-bottom: 40px;
+    padding-bottom: 0;
+    text-align: left;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+
+    .title {
+      justify-content: flex-start;
+    }
+
+    .item {
+      .decorative {
+        &::before {
+          content: "";
+          display: block;
+        }
+      }
+
+      .separator {
+        &::before {
+          content: "";
+          display: block;
+        }
+      }
+    }
   }
+
   .transaction-history-link {
     position: absolute;
     bottom: 0;
     margin-left: 18px;
+
     &::before {
       content: "";
       margin-left: -18px;
       width: 14px;
       height: 19px;
-      background: url(../../assets/icon-history.svg) no-repeat center;
+      background: url("../../assets/icon-history.svg") no-repeat center;
       position: absolute;
     }
   }
@@ -125,6 +220,7 @@
     @include rewrite-ux-mobile;
   }
 }
+
 @media screen and (width <=500px) {
   :global(.is-pc) {
     @include rewrite-ux-mobile;

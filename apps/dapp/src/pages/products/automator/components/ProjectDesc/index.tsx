@@ -30,7 +30,9 @@ const Snapshot = (props: { vault?: AutomatorVaultInfo }) => {
   const list = useAutomatorStore(
     (state) =>
       props.vault &&
-      state.snapshots[`${props.vault.chainId}-${props.vault.vault}-`],
+      state.snapshots[
+        `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-`
+      ],
   );
   useEffect(() => {
     if (props.vault) {
@@ -89,7 +91,9 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
   const list = useAutomatorStore(
     (state) =>
       props.vault &&
-      state.performances[`${props.vault.chainId}-${props.vault.vault}-`],
+      state.performances[
+        `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-`
+      ],
   );
   useEffect(() => {
     if (props.vault) {
@@ -103,21 +107,23 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
   const data = useMemo(
     () =>
       list
-        ?.slice(0, -1)
-        .map((it, i) => ({
-          sharePnl:
-            +it.totalDepositCcyPnlForShare -
-            +list[i + 1].totalDepositCcyPnlForShare,
-          rchPnl: +it.rch * +it.rchPrice,
-          timestamp: it.dateTime * 1000,
-        }))
+        ?.map((it) => {
+          return {
+            tradingPnl: +it.incrTradingPnlByClientDepositCcy,
+            interestPnl: +it.incrInterestPnlByClientDepositCcy,
+            rchPnl: +it.incrRchPnlByClientDepositCcy,
+            timestamp: it.dateTime * 1000,
+          };
+        })
         .reverse(),
     [list],
   );
 
   const precision = useMemo(() => {
     if (!data?.length) return 0;
-    const max = Math.max(...data.flatMap((it) => [it.sharePnl, it.rchPnl]));
+    const max = Math.max(
+      ...data.flatMap((it) => [it.tradingPnl, it.interestPnl, it.rchPnl]),
+    );
     return max > 1000 ? 0 : 2;
   }, [data]);
 
@@ -201,12 +207,21 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
       },
       series: [
         {
-          name: `PnL Of ${props.vault?.balanceCcy ?? 'Share'}`,
+          name: `PnL Of Trading`,
           type: 'bar',
           stack: 'bar',
           data: data.map((it) => ({
-            value: it.sharePnl,
-            itemStyle: { color: it.sharePnl > 0 ? '#50D113' : '#EC5E88' },
+            value: it.tradingPnl,
+            itemStyle: { color: it.tradingPnl > 0 ? '#50D113' : '#EC5E88' },
+          })),
+        },
+        {
+          name: `PnL Of Interest`,
+          type: 'bar',
+          stack: 'bar',
+          data: data.map((it) => ({
+            value: it.interestPnl,
+            itemStyle: { color: '#27a0a0' },
           })),
         },
         {
@@ -222,7 +237,7 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
     };
 
     myChart.current.setOption(option);
-  }, [data, props.vault?.depositCcy, precision]);
+  }, [data, props.vault?.depositCcy, precision, props.vault?.positionCcy]);
 
   if (!list?.length || list.length < 2) return <></>;
 
@@ -243,7 +258,14 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
               className={styles['color']}
               style={{ background: '#EC5E88' }}
             />
-            {t({ enUS: `PnL Of ${props.vault?.balanceCcy ?? 'Share'}` })}
+            {t({ enUS: `PnL Of Trading` })}
+          </div>
+          <div className={styles['legend-item']}>
+            <div
+              className={styles['color']}
+              style={{ background: '#27a0a0' }}
+            />
+            {t({ enUS: `PnL Of Interest` })}
           </div>
           <div className={styles['legend-item']}>
             <div
@@ -269,10 +291,11 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
           {t({ enUS: 'Suitability', zhCN: '适用场景' })}
         </h2>
         <div className={styles['content']}>
-          {t({
-            enUS: 'Our Automator strategies will perform automated execution of our SOFA platform products (eg. Bull Trend & Bear Trend) at model expiration dates and strikes to target an optimized risk-adjusted yield. The strategies are designed to operate systematically via data-driven algorithms, with our data learning models continuously being refined to enhance long term performance. Capital will be continuously deployed to maximize yield compounding benefits, allowing users to deploy volatility monetization strategies with zero hassle. Strategies could include both controlled buying or selling of option exposure to generate returns.',
-            zhCN: '我们的 Automator 策略将自动执行 SOFA 平台产品（如牛市趋势和熊市趋势），在模型指定的到期日和行权价下，旨在实现优化的风险调整收益。这些策略通过数据驱动的算法系统化运行，并通过数据学习模型的持续优化提升长期表现。资金将持续部署以最大化收益复利效应，让用户轻松实现波动率套利策略。策略可能包括受控买入或卖出期权敞口，以生成收益。',
-          })}
+          {props.vault?.desc ||
+            t({
+              enUS: 'Our Automator strategies will perform automated execution of our SOFA platform products (eg. Bull Trend & Bear Trend) at model expiration dates and strikes to target an optimized risk-adjusted yield. The strategies are designed to operate systematically via data-driven algorithms, with our data learning models continuously being refined to enhance long term performance. Capital will be continuously deployed to maximize yield compounding benefits, allowing users to deploy volatility monetization strategies with zero hassle. Strategies could include both controlled buying or selling of option exposure to generate returns.',
+              zhCN: '我们的 Automator 策略将自动执行 SOFA 平台产品（如牛市趋势和熊市趋势），在模型指定的到期日和行权价下，旨在实现优化的风险调整收益。这些策略通过数据驱动的算法系统化运行，并通过数据学习模型的持续优化提升长期表现。资金将持续部署以最大化收益复利效应，让用户轻松实现波动率套利策略。策略可能包括受控买入或卖出期权敞口，以生成收益。',
+            })}
         </div>
       </section>
       <Snapshot vault={props.vault} />
@@ -293,10 +316,10 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
                 {
                   waitDuration:
                     props.vault?.redeemWaitPeriod &&
-                    formatDuration(props.vault?.redeemWaitPeriod, 1),
+                    formatDuration(props.vault?.redeemWaitPeriod, 1, true),
                   claimDuration:
                     props.vault?.claimPeriod &&
-                    formatDuration(props.vault?.claimPeriod, 1),
+                    formatDuration(props.vault?.claimPeriod, 1, true),
                 },
               ),
             }}
@@ -328,7 +351,7 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
           <div className={styles['address']}>
             {props.vault && (
               <Address
-                address={props.vault.vault}
+                address={props.vault.vault.toLowerCase()}
                 prefix={t('CONTRACT: ')}
                 link
               />

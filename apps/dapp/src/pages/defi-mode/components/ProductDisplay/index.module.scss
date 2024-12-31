@@ -205,7 +205,7 @@
   border-radius: 8px;
 }
 
-@mixin rewrite {
+@mixin rewrite-mobile {
   .diy-product {
     position: fixed;
     bottom: 0;
@@ -214,11 +214,17 @@
     z-index: 10;
     padding: 0;
     background: #fff;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 
     .risk-type,
     .product,
     .charts {
       display: flex;
+    }
+
+    .charts {
+      margin-bottom: 40px;
     }
 
     .title {
@@ -247,12 +253,28 @@
   }
 }
 
+@mixin rewrite-portrait {
+  .diy-product {
+    padding-bottom: 20px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
+    .charts {
+      margin-bottom: 40px;
+    }
+  }
+}
+
 @media (orientation: portrait) {
-  @include rewrite;
+  :global(.is-mobile) {
+    @include rewrite-mobile;
+  }
 }
 
 @media (width <=500px) {
-  :global(.is-pc) {
-    @include rewrite;
-  }
+  @include rewrite-mobile;
+}
+
+@media (width <950px) and (width >500px) {
+  @include rewrite-portrait;
 }

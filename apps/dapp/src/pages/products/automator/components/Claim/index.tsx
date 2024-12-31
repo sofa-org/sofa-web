@@ -2,13 +2,14 @@ import { RefObject, useMemo } from 'react';
 import { AutomatorService } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { amountFormatter } from '@sofa/utils/amount';
+import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 import { formatDuration } from '@sofa/utils/time';
 import { useCountDown } from 'ahooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
 import AsyncButton from '@/components/AsyncButton';
+import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { ProgressRef } from '@/pages/products/components/InvestProgress';
 
@@ -26,12 +27,16 @@ export const AutomatorClaim = (props: {
   const [t] = useTranslation('Automator');
   const vault = props.vault;
 
+  const prices = useIndexPrices((s) => s.prices);
+
   const wallet = useWalletStore();
 
   const userInfo = useAutomatorStore(
     (state) =>
       vault &&
-      state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`],
+      state.userInfos[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ],
   );
   const redemptionInfo = userInfo?.redemptionInfo;
   const decimals = userInfo?.shareInfo?.shareDecimals ?? 6;
@@ -53,15 +58,26 @@ export const AutomatorClaim = (props: {
           <span className={styles['value']}>
             {amountFormatter(redemptionInfo?.pendingSharesWithDecimals, 0)}
           </span>{' '}
-          {vault?.balanceCcy}
+          {vault?.positionCcy}
           <span className={styles['decorative']}>
             ≈
-            {amountFormatter(
-              (Number(redemptionInfo?.pendingSharesWithDecimals) /
-                10 ** decimals) *
-                pricePerShare,
-              2,
-            )}{' '}
+            {!vault
+              ? '-'
+              : amountFormatter(
+                  cvtAmountsInCcy(
+                    [
+                      [
+                        vault.vaultDepositCcy,
+                        (Number(redemptionInfo?.pendingSharesWithDecimals) /
+                          10 ** decimals) *
+                          pricePerShare,
+                      ],
+                    ],
+                    prices,
+                    vault.depositCcy,
+                  ),
+                  2,
+                )}{' '}
             {vault?.depositCcy}
           </span>
         </div>

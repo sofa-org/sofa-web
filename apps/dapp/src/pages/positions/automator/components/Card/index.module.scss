@@ -1,0 +1,201 @@
+.card {
+  @include flex-center;
+
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 24px 24px 100px 270px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.header {
+  @include flex-column-center;
+
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 240px;
+  height: calc(100% - 24px * 2);
+  margin: 0;
+  transform: translate(0, -50%);
+  border-right: 1px dashed rgba(#000, 0.1);
+
+  img {
+    width: 48px;
+    height: 48px;
+  }
+
+  :global {
+    .address {
+      justify-content: flex-start;
+      padding: 0;
+      opacity: 0.65;
+    }
+  }
+}
+
+.name {
+  @include bold;
+
+  margin: 0;
+}
+
+.label {
+  margin: 0;
+  opacity: 0.65;
+}
+
+.value {
+  @include bold;
+
+  margin: 0;
+  font-size: 20px;
+
+  &.apy {
+    @include bold;
+
+    font-size: 18px;
+  }
+}
+
+.unit {
+  @include regular;
+
+  margin: 0;
+  padding: 0 0 0 0.2em;
+  font-size: min(0.8em, 12px);
+  opacity: 0.8;
+
+  &.icon-airdrop {
+    padding-right: 1em;
+    background: url(../../assets/icon-airdrop.svg) no-repeat;
+    background-position: 100% 34%;
+    background-size: 0.9em 0.9em;
+    display: inline-block;
+  }
+}
+
+.operator {
+  @include regular;
+
+  margin: 0;
+  padding: 0 0.2em;
+  opacity: 0.8;
+}
+
+.decorative {
+  @include regular;
+
+  font-size: 16px;
+}
+
+.item {
+  @include flex-column-center;
+
+  align-items: flex-start;
+  flex: none;
+  margin: 0;
+  line-height: 25px;
+
+  &:nth-child(2) {
+    width: 30%;
+  }
+
+  &:nth-child(3) {
+    flex: 1;
+  }
+
+  &:nth-child(4) {
+    width: 22%;
+  }
+}
+
+.yield {
+  margin: 20px 0 10px;
+}
+
+.footer {
+  @include flex-center;
+
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  position: absolute;
+  left: 270px;
+  bottom: 0;
+  padding: 0 0 24px;
+  gap: 28px;
+
+  .btn,
+  .btn-deposit,
+  .btn-redeem {
+    padding: 0 24px;
+    height: 48px;
+    border-radius: 24px;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &.btn-redeem {
+      &::before {
+        content: "";
+        width: 21px;
+        height: 21px;
+        margin: 0 6px 0 0;
+        display: inline-block;
+        background: url("../../assets/icon-deposit.svg");
+      }
+    }
+
+    &.btn-deposit {
+      background: #000;
+      color: #fff;
+
+      &:hover {
+        background: #000;
+      }
+
+      &::before {
+        content: "";
+        width: 21px;
+        height: 21px;
+        margin: 0 6px 0 0;
+        display: inline-block;
+        background: url("../../assets/icon-withdraw.svg");
+      }
+    }
+  }
+
+  a {
+    color: #000;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.card.mobile-ui {
+  padding: 24px 24px 154px 140px;
+  gap: 24px;
+  overflow: hidden;
+  .header {
+    width: 130px;
+    top: 38%;
+  }
+  .footer {
+    left: 14px;
+    gap: 10px;
+    font-size: 12px;
+    width: calc(100vw - 50px);
+    background: #fff;
+    padding-top: 10px;
+    bottom: -10px;
+  }
+}

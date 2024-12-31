@@ -77,7 +77,8 @@ export const ChainMap: Record<
       },
       vaultGraphUrl:
         'https://api.studio.thegraph.com/query/77961/sofa-mainnet/version/latest',
-      automatorTheGraphUrl: '', // TODO
+      automatorTheGraphUrl:
+        'https://api.studio.thegraph.com/query/77961/sofa-automator-mainnet/version/latest',
       usdtAddress: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
       rchAddress: '0x57B96D4aF698605563A4653D882635da59Bf11AF',
       rchAirdropAddress: '0x5a8cDDa6CA37B284b32eF8D513Ef71Ddac553270',
@@ -85,7 +86,7 @@ export const ChainMap: Record<
       rchUniswapVersion: 'v3',
       bonusAirdropAddress: '0x1e833096089Df3F8E8BF15839683c17Ad7694888',
       feeContractAddress: '0x4140AB4AFc36B93270a9659BD8387660cC6509b5',
-      automatorFeeContractAddress: '', // TODO
+      automatorFeeContractAddress: '0x322665298cFa800518D4Ef7919893b59514BA9D1',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/ethereum/{address}',
       hlPriceOracle: {
         BTC: '0x088dBBeEC1489c557f8D4fD6146E0590E303d7d9',

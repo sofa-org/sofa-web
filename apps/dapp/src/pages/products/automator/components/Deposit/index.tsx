@@ -3,9 +3,10 @@ import { wait } from '@livelybone/promise-wait';
 import { AutomatorService } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { amountFormatter } from '@sofa/utils/amount';
+import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 
 import AmountInput from '@/components/AmountInput';
+import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { AutomatorProgress } from '@/pages/products/components/AutomatorProgress';
 import { BaseInvestButton } from '@/pages/products/components/InvestButton';
@@ -23,6 +24,9 @@ export interface AutomatorDepositProps {
 export const AutomatorDeposit = (props: AutomatorDepositProps) => {
   const [t] = useTranslation('Automator');
   const address = useWalletStore((state) => state.address);
+
+  const prices = useIndexPrices((s) => s.prices);
+
   const vault = props.vault;
   const depositCcy = vault?.depositCcy || 'USDT';
 
@@ -38,11 +42,14 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
   const depositData = useAutomatorStore(
     (state) =>
       vault &&
-      state.depositData[`${vault.chainId}-${vault.vault}-${wallet.address}`],
+      state.depositData[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ],
   );
   const overview = useAutomatorStore(
     (state) =>
-      vault && state.vaultOverviews[`${vault.chainId}-${vault.vault}-`],
+      vault &&
+      state.vaultOverviews[`${vault.chainId}-${vault.vault.toLowerCase()}-`],
   );
 
   const convertedShare = Number(depositData?.amount) / Number(overview?.nav);
@@ -73,6 +80,7 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
               )
             }
             suffix={<span className={styles['suffix']}>{depositCcy}</span>}
+            disabledUnlessWalletConnected
           />
         </div>
         <div className={styles['balance']}>
@@ -83,6 +91,19 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
             {amountFormatter(wallet.balance?.[depositCcy], 2)} {depositCcy}
           </span>
         </div>
+      </div>
+      <div className={styles['nav']}>
+        1<span className={styles['unit']}>{vault?.positionCcy}</span> ≈{' '}
+        {!vault
+          ? '-'
+          : amountFormatter(
+              cvtAmountsInCcy(
+                [[vault?.vaultDepositCcy, Number(overview?.nav)]],
+                prices,
+                vault?.depositCcy,
+              ),
+            )}
+        <span className={styles['unit']}>{vault?.depositCcy}</span>
       </div>
       <div className={styles['buttons']}>
         <BaseInvestButton
@@ -106,11 +127,12 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
             );
           }}
         >
-          {t({ enUS: 'Mint', zhCN: '铸造' })} {props.vault?.balanceCcy}
+          {t({ enUS: 'Mint', zhCN: '铸造' })} {props.vault?.positionCcy}
           {!!convertedShare && (
             <span className={styles['converted-share']}>
               (≈ {amountFormatter(convertedShare, 2)}{' '}
-              <span className={styles['unit']}>{props.vault?.balanceCcy}</span>)
+              <span className={styles['unit']}>{props.vault?.positionCcy}</span>
+              )
             </span>
           )}
         </BaseInvestButton>

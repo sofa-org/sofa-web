@@ -2,7 +2,7 @@ import { RefObject, useMemo } from 'react';
 import { Popover } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { amountFormatter } from '@sofa/utils/amount';
+import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
 import { formatDuration } from '@sofa/utils/time';
 import { useCountDown } from 'ahooks';
@@ -10,6 +10,7 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 
 import AsyncButton from '@/components/AsyncButton';
+import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { ProgressRef } from '@/pages/products/components/InvestProgress';
 
@@ -35,13 +36,16 @@ const useAutomatorRedeemAwaitEl = (props: {
   const wallet = useWalletStore();
   const redemptionInfo = props.redemptionInfo;
 
+  const prices = useIndexPrices((s) => s.prices);
+
   const shareInfo = useAutomatorStore(
     (state) =>
       vault &&
-      state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`]
-        ?.shareInfo,
+      state.userInfos[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ]?.shareInfo,
   );
-  const decimals = shareInfo?.shareDecimals || 6;
+  const decimals = Number(shareInfo?.shareDecimals) || 6;
   const pricePerShare = shareInfo?.pricePerShare || 1;
   const pendingShares =
     Number(redemptionInfo?.pendingSharesWithDecimals) / 10 ** decimals;
@@ -66,11 +70,21 @@ const useAutomatorRedeemAwaitEl = (props: {
       </h5>
       <div className={styles['shares']}>
         <span className={styles['value']}>
-          {amountFormatter(pendingShares, decimals)}
+          {amountFormatter(pendingShares, Math.min(decimals, 4))}
         </span>{' '}
-        <span className={styles['unit']}>{vault?.balanceCcy}</span>
+        <span className={styles['unit']}>{vault?.positionCcy}</span>
         <span className={styles['decorative']}>
-          ≈{amountFormatter(pendingShares * pricePerShare, 2)}{' '}
+          ≈
+          {!vault
+            ? '-'
+            : amountFormatter(
+                cvtAmountsInCcy(
+                  [[vault.vaultDepositCcy, pendingShares * pricePerShare]],
+                  prices,
+                  vault.depositCcy,
+                ),
+                2,
+              )}{' '}
           <span className={styles['unit']}>{vault?.depositCcy}</span>
         </span>
       </div>
@@ -95,7 +109,7 @@ const useAutomatorRedeemAwaitEl = (props: {
             {t({ enUS: 'Available For Claim', zhCN: '可领取时间' })}
             {/* {vault?.claimPeriod && (
               <span className={styles['badge']}>
-                {formatDuration(vault.claimPeriod, 1)}
+                {formatDuration(vault.claimPeriod, 1, true)}
               </span>
             )} */}
           </div>
@@ -144,8 +158,9 @@ export const AutomatorRedeemAwait = (props: {
   const redemptionInfo = useAutomatorStore(
     (state) =>
       vault &&
-      state.userInfos[`${vault.chainId}-${vault.vault}-${wallet.address}`]
-        ?.redemptionInfo,
+      state.userInfos[
+        `${vault.chainId}-${vault.vault.toLowerCase()}-${wallet.address}`
+      ]?.redemptionInfo,
   );
 
   const [el1, el2, el3] = useAutomatorRedeemAwaitEl({
@@ -159,7 +174,8 @@ export const AutomatorRedeemAwait = (props: {
         zhCN: '一旦可赎回，您将有 <span class="highlight">{{duration}}</span> 时间赎回。如未及时赎回，您将需要重新申请赎回。',
       },
       {
-        duration: vault?.claimPeriod && formatDuration(vault?.claimPeriod, 1),
+        duration:
+          vault?.claimPeriod && formatDuration(vault?.claimPeriod, 1, true),
       },
     ),
   });
@@ -193,7 +209,7 @@ export const AutomatorRedeemAwait = (props: {
           //               zhCN: '一旦取消赎回，您将需要 <span class="highlight">等待 {{duration}}</span> 才能发起新的赎回。您确认取消赎回吗？',
           //             },
           //             {
-          //               duration: formatDuration(vault.redeemWaitPeriod, 1),
+          //               duration: formatDuration(vault.redeemWaitPeriod, 1, true),
           //             },
           //           ),
           //         }}

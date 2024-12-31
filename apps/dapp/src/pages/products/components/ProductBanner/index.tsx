@@ -4,6 +4,7 @@ import { useTranslation } from '@sofa/services/i18n';
 import { ProductType, RiskType } from '@sofa/services/products';
 import classNames from 'classnames';
 
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
 import {
   ProductTypeRefs,
@@ -31,12 +32,16 @@ export interface ProductBriefProps {
 const ProductBanner = (props: { title: ReactNode }) => {
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
+  const isMobileUI = useIsMobileUI();
   return (
     <div
       className={classNames(
         styles['product-banner-wrapper'],
         'product-banner-wrapper',
-        { [styles['risky']]: riskType === RiskType.RISKY },
+        {
+          [styles['risky']]: riskType === RiskType.RISKY,
+          [styles['mobile-ui']]: isMobileUI,
+        },
       )}
     >
       <div className={styles['content']}>{props.title}</div>

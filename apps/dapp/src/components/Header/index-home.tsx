@@ -23,28 +23,13 @@ import WalletConnector from '../WalletConnector';
 
 import { Comp as IconMenu } from './assets/icon-menu.svg';
 import locale from './locale';
+import { MenuItem, useMobileHeaderState } from './store';
 
 import styles from './index.module.scss';
 
 addI18nResources(locale, 'Header');
 
 declare const winScale: Global['winScale'];
-
-export interface MenuItem {
-  path: string;
-  type?: 1 | 2;
-  target?: string;
-  icon?: ReactNode;
-  children?: MenuItem[];
-
-  label(t: TFunction): ReactNode;
-  desc?(t: TFunction): ReactNode;
-  group?(t: TFunction): string;
-
-  hide?(): boolean;
-
-  active?: boolean;
-}
 
 const allMenuItems = (
   project: ProjectType,
@@ -100,19 +85,6 @@ const allMenuItems = (
     location,
   );
 };
-
-export interface MobileHeaderState {
-  selectedMenuItem?: MenuItem;
-  setSelectedMenuItem: (menuItem?: MenuItem) => void;
-}
-
-export const useMobileHeaderState = createWithEqualityFn<MobileHeaderState>(
-  (set) => ({
-    setSelectedMenuItem(item) {
-      set({ selectedMenuItem: item });
-    },
-  }),
-);
 
 function locationMatches(
   item: MenuItem,
@@ -183,7 +155,6 @@ export function useHeaderOpacity() {
 
   return disableOpacityChange ? 1 : opacity;
 }
-
 export const RenderMenu = (it: MenuItem) => {
   const [t] = useTranslation('Header');
   const [project] = useProjectChange(ProjectType.Surge);
@@ -361,13 +332,15 @@ export const CommonHeader = (props: {
     location: ReturnType<typeof useLocation>,
   ) => MenuItem[];
   moreIcons?: boolean;
+  indexPrices?: boolean;
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [project] = useProjectChange(ProjectType.Surge);
   const more = props.moreIcons;
   const opacity = useHeaderOpacity();
-
+  const isMobile = useIsMobileUI();
+  const { headerHidden } = useMobileHeaderState();
   const menusForRender = useMemo(
     () => props.menus(project, location),
     [project, location],
@@ -386,6 +359,9 @@ export const CommonHeader = (props: {
           ['expanded']: expanded,
         })}
         id="header"
+        style={{
+          visibility: isMobile && headerHidden ? 'hidden' : undefined,
+        }}
       >
         <div className={styles['bg']} style={{ opacity }} />
         <div className={classNames(styles['menu'], 'menu')}>
@@ -416,9 +392,16 @@ export const CommonHeader = (props: {
             {props.aside}
           </aside>
         </div>
-        {more && <IndexPrices className={styles['index-prices']} />}
+        {more && props.indexPrices !== false && (
+          <IndexPrices className={styles['index-prices']} />
+        )}
       </header>
-      <div id="header-menu-container" />
+      <div
+        id="header-menu-container"
+        style={{
+          visibility: isMobile && headerHidden ? 'hidden' : undefined,
+        }}
+      />
     </>
   );
 };

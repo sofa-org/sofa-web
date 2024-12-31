@@ -70,6 +70,7 @@ export function amountFormatter(
 ) {
   if (!isLegalNum(amount)) return '-';
   if (!Number(amount)) return '0';
+  if (!isFinite(+amount)) return +amount > 0 ? 'Infinity' : '-Infinity';
   const exponent = -Number(amount).toExponential().split('e')[1] || 0;
   const precision = forcePrecision
     ? $precision
@@ -130,7 +131,8 @@ export function cvtAmountsInUsd(
   const amounts =
     $amounts instanceof Array ? $amounts : Object.entries($amounts);
   return amounts.reduce((pre, [ccy, amount]) => {
-    const price = ccy.startsWith('USD') ? 1 : prices[ccy];
+    const price =
+      Number(prices[ccy]) || (ccy.includes('USD') ? 1 : Number(prices[ccy]));
     if (!price) return pre;
     return pre + (Number(amount) * Number(price) || 0);
   }, 0);
@@ -144,7 +146,9 @@ export function cvtAmountsInCcy(
   ccy: string,
 ) {
   const inUsd = cvtAmountsInUsd(amounts, prices);
-  return inUsd / Number(prices[ccy]);
+  const price =
+    Number(prices[ccy]) || (ccy.includes('USD') ? 1 : Number(prices[ccy]));
+  return inUsd / price;
 }
 
 export function displayWithFlag(val?: string | number) {

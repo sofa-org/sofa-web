@@ -62,14 +62,20 @@ export interface VaultInfo {
 }
 
 export interface AutomatorVaultInfo {
+  name: string;
+  desc?: string;
   vault: string; // 合约地址
   chainId: number;
   depositCcy: CCY | USDS; // 申购币种
+  vaultDepositCcy: CCY | USDS; // 申购币种存入 automator 时被转化成的币种（也是 trend/dnt 合约的 depositCcy），比如 USDT -> aUSDT, crvUSD -> scrvUSD
   depositMinAmount: number; // 申购币种数量的最小数量
   depositTickAmount: number; // 申购币种数量的步增
   collateralDecimal: number; // 转换为合约入参的倍数
-  balanceCcy: string; // 头寸余额的 ERC20 币种名称
+  positionCcy: string; // 头寸余额的 ERC20 币种名称
   redeemWaitPeriod: number; // 赎回等待期
   claimPeriod: number; // 赎回有效期
   abis: ethers.InterfaceAbi;
+  creator?: string; // 一期 automator 没有
+  creatorFeeRate: number | string; // 默认为 0
+  createTime: number | string; // 创建时间
 }

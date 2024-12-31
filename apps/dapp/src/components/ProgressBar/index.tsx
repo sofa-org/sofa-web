@@ -13,10 +13,11 @@ import classNames from 'classnames';
 import styles from './index.module.scss';
 
 export interface ProgressBarProps extends BaseProps {
-  type?: '1' | '2';
+  type?: '1' | '2' | '3';
   disabled?: boolean;
   percent: number;
   children?: ReactNode;
+  minWidthPercentage?: number;
   onClick?(e: MouseEvent<HTMLDivElement>): void;
   onPercentChange?(percent: number): void;
 }
@@ -48,7 +49,10 @@ const ProgressBar = (props: ProgressBarProps) => {
         styles['progress'],
         'progress-wrapper',
         props.className,
-        { [styles['type-2']]: props.type === '2' },
+        {
+          [styles['type-2']]: props.type === '2',
+          [styles['type-3']]: props.type === '3',
+        },
       )}
       style={props.style}
       onClick={(e) => {
@@ -61,7 +65,11 @@ const ProgressBar = (props: ProgressBarProps) => {
         [...Array(10)].map((_, i) => <div className={styles['dot']} key={i} />)}
       <div
         className={classNames(styles['progress-bar'], 'progress-bar')}
-        style={{ width: `${Math.max(tempVal * 100, 0.1)}%` }}
+        style={{
+          width: !tempVal
+            ? 0
+            : `${Math.max(tempVal * 100, props.minWidthPercentage || 0.1)}%`,
+        }}
       />
       {props.type === '2' && !!wrapperSize?.width && (
         <Draggable

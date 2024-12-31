@@ -490,14 +490,14 @@
     height: 100px;
   }
 }
-
+.customize.mobile-ui {
+  .header {
+    margin-top: -480 + $header-ticker-height;
+  }
+}
 @media (orientation: portrait) {
   :global(.is-mobile) {
     @include rewrite;
-  }
-
-  .header {
-    margin-top: -480 + $header-ticker-height;
   }
 }
 
