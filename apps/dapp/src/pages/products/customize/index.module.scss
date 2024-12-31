@@ -273,7 +273,6 @@
   }
 
   .details {
-    max-height: 35vh;
     overflow: auto;
   }
 }
@@ -447,6 +446,10 @@
     .quote-infos {
       margin: 12px 0 -32px;
 
+      .details {
+        max-height: 35vh;
+      }
+
       &:not(.expanded, .folded) {
         .details {
           display: none;
@@ -490,11 +493,13 @@
     height: 100px;
   }
 }
+
 .customize.mobile-ui {
   .header {
     margin-top: -480 + $header-ticker-height;
   }
 }
+
 @media (orientation: portrait) {
   :global(.is-mobile) {
     @include rewrite;
