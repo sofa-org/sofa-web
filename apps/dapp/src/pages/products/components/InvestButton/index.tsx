@@ -251,6 +251,7 @@ const InvestButton = (props: InvestButtonProps) => {
           }
         });
         if (vault.riskType === RiskType.RISKY) pokerRightsReminder();
+        useWalletStore.updateBalanceByVault(props.vault);
       }
       if (/Success/i.test(progress.status)) {
         if (vault.riskType === RiskType.RISKY)

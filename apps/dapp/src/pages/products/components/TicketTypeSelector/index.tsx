@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 import { SelectProps } from '@douyinfe/semi-ui/lib/es/select';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
@@ -27,6 +27,7 @@ export interface TicketTypeSelectorProps
   extends BaseProps,
     Omit<SelectProps, 'value' | 'onChange' | 'style' | 'children'> {
   forCcy: VaultInfo['forCcy'];
+  dark?: boolean;
 }
 
 export const TicketTypeOptions = ProductsService.TicketTypeOptions;
@@ -78,7 +79,9 @@ const TicketTypeSelector = (props: TicketTypeSelectorProps) => {
   return (
     <CSelect
       {...props}
-      className={classNames(props.className, styles['ticket-type-selector'])}
+      className={classNames(props.className, styles['ticket-type-selector'], {
+        [styles['dark']]: props.dark,
+      })}
       dropdownClassName={classNames(
         props.dropdownClassName,
         styles['ticket-type-dropdown'],

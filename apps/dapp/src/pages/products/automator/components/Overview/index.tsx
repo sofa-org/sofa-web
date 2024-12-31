@@ -165,7 +165,14 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div> */}
         <div className={styles['item']}>
           <div className={styles['title']}>
-            <IconCalendar />
+            <Tooltip
+              content={t({
+                enUS: 'Automator Running Days',
+                zhCN: 'Automator 运行天数',
+              })}
+            >
+              <IconCalendar tabIndex={-1} />
+            </Tooltip>
           </div>
           <div className={styles['value']}>
             {props.vault?.createTime
@@ -175,7 +182,14 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
         <div className={styles['item']}>
           <div className={styles['title']}>
-            <IconPeople />
+            <Tooltip
+              content={t({
+                enUS: 'Participating Wallets',
+                zhCN: '参与钱包数',
+              })}
+            >
+              <IconPeople tabIndex={-1} />
+            </Tooltip>
           </div>
           <div className={styles['value']}>{data?.participantNum || '-'}</div>
         </div>

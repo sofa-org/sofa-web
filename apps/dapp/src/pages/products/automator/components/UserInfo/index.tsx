@@ -4,7 +4,6 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { cvtAmountsInCcy } from '@sofa/utils/amount';
-import { ellipsis } from '@sofa/utils/fns';
 import { useTime } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 

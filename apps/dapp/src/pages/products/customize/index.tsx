@@ -28,6 +28,7 @@ import { nanoid } from 'nanoid';
 import AmountInput from '@/components/AmountInput';
 import {
   CCYSelector,
+  DepositCCYSelector,
   useDepositCcySelect,
   useForCcySelect,
 } from '@/components/CCYSelector';
@@ -263,6 +264,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
         <div className={styles['header']}>
           <ProductTypeSelector />
           <CCYSelector prefix={t('Anchor')} />
+          <DepositCCYSelector />
         </div>
       )}
       <div className={styles['form']}>
@@ -272,6 +274,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
               <div className={styles['header']}>
                 <ProductTypeSelector dark />
                 <CCYSelector prefix={t('Anchor')} dark />
+                <DepositCCYSelector dark />
               </div>
             )}
             {vault?.riskType === RiskType.PROTECTED && (

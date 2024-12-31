@@ -1,11 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
-import {
-  AutomatorDepositStatus,
-  AutomatorInfo,
-  AutomatorService,
-  AutomatorUserDetail,
-} from '@sofa/services/automator';
+import { AutomatorInfo, AutomatorUserDetail } from '@sofa/services/automator';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
@@ -14,7 +9,6 @@ import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
 import { useQuery } from '@sofa/utils/hooks';
 import { arrToDict } from '@sofa/utils/object';
-import { useRequest } from 'ahooks';
 
 import CEmpty from '@/components/Empty';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';

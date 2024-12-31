@@ -3,9 +3,11 @@ import { SelectProps } from '@douyinfe/semi-ui/lib/es/select';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
+import { useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
+import { unionBy } from 'lodash-es';
 
 import { CSelect } from '../CSelect';
 import {
@@ -20,6 +22,12 @@ import styles from './index.module.scss';
 export interface CCYSelectorProps
   extends Omit<SelectProps, 'value' | 'onChange' | 'children'> {
   afterChange?(v: VaultInfo['forCcy']): void;
+  dark?: boolean;
+}
+
+export interface DepositCCYSelectorProps
+  extends Omit<SelectProps, 'value' | 'onChange' | 'children'> {
+  afterChange?(v: VaultInfo['depositCcy']): void;
   dark?: boolean;
 }
 
@@ -94,6 +102,53 @@ export const CCYSelector = (props: CCYSelectorProps) => {
       onChange={(v) => {
         setCcy(v as VaultInfo['forCcy']);
         props.afterChange?.(v as VaultInfo['forCcy']);
+      }}
+    />
+  );
+};
+
+export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
+  const [productType] = useProductSelect();
+  const chainId = useWalletStore((state) => state.chainId);
+  const [ccy, setCcy] = useDepositCcySelect();
+  const [t] = useTranslation();
+  const options = useMemo(
+    () =>
+      unionBy(
+        ContractsService.vaults.filter(
+          (it) =>
+            it.chainId === chainId &&
+            it.productType === productType &&
+            !it.tradeDisable,
+        ),
+        (it) => it.depositCcy,
+      ).map((it) => ({
+        label: (
+          <span className={styles['ccy-item']}>
+            <img src={CCYService.ccyConfigs[it.depositCcy]?.icon} alt="" />
+            {it.depositCcy}
+          </span>
+        ),
+        value: it.depositCcy,
+      })),
+    [chainId, productType],
+  );
+  return (
+    <CSelect
+      {...props}
+      prefix={props.prefix || t({ enUS: 'Deposit Token', zhCN: '申购币种' })}
+      className={classNames(props.className, styles['ccy-selector'], {
+        [styles['dark']]: props.dark,
+      })}
+      dropdownClassName={classNames(
+        props.dropdownClassName,
+        styles['ccy-dropdown'],
+      )}
+      optionList={options}
+      value={ccy}
+      onChange={(v) => {
+        setCcy(v as VaultInfo['depositCcy']);
+        props.afterChange?.(v as VaultInfo['depositCcy']);
       }}
     />
   );

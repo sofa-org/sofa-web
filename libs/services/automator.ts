@@ -224,7 +224,7 @@ export class AutomatorService {
 
   @asyncCache({
     until: (it, createdAt) =>
-      !it || !createdAt || Date.now() - createdAt > MsIntervals.min * 10,
+      !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
   })
   static async getAutomatorList(params: {
     chainId: number;
