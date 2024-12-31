@@ -106,7 +106,7 @@ export const AutomatorHistory = () => {
             title: `${t({
               enUS: 'Amount',
               zhCN: '金额',
-            })} (${vault?.depositCcy})`,
+            })} (${vault?.depositCcy || ''})`,
             render: (_, record) =>
               record.status === AutomatorTransactionStatus.PENDING ? (
                 '-'
