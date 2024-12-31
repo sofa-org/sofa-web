@@ -125,7 +125,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t({ enUS: 'Cumulative PnL %', zhCN: '累计收益年化' })}
+          {t({ enUS: 'Cumulative PnL %', zhCN: '累计收益率' })}
         </div>
         <div className={classNames(styles['value'], styles['apy'])}>
           <span
