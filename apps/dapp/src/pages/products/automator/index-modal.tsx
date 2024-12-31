@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Modal } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
+import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
 import { useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
+import { parse, stringify } from 'qs';
 
 import { useWalletStore } from '@/components/WalletConnector/store';
 
@@ -72,21 +75,31 @@ const AutomatorModal = (props: BaseInputProps<boolean>) => {
 
 export function useAutomatorModal() {
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
   return [
     <AutomatorModal value={visible} onChange={(v) => setVisible(!!v)} />,
     {
       open: (vault: AutomatorVaultInfo, type?: 'deposit' | 'redeem') => {
-        updateQuery(
-          type
-            ? {
-                'automator-vault': vault.vault,
-                'automator-trade-tab': type,
-              }
-            : {
-                'automator-vault': vault.vault,
-              },
-        );
-        setVisible(true);
+        if (!Env.isMobile) {
+          updateQuery(
+            type
+              ? {
+                  'automator-vault': vault.vault,
+                  'automator-trade-tab': type,
+                }
+              : {
+                  'automator-vault': vault.vault,
+                },
+          );
+          setVisible(true);
+        } else {
+          navigate({
+            pathname: '/products/automator',
+            search: stringify({
+              ...parse(location.search, { ignoreQueryPrefix: true }),
+            }),
+          });
+        }
       },
       close: () => setVisible(false),
     },
