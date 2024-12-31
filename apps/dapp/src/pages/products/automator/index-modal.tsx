@@ -80,23 +80,23 @@ export function useAutomatorModal() {
     <AutomatorModal value={visible} onChange={(v) => setVisible(!!v)} />,
     {
       open: (vault: AutomatorVaultInfo, type?: 'deposit' | 'redeem') => {
+        const query = type
+          ? {
+              'automator-vault': vault.vault,
+              'automator-trade-tab': type,
+            }
+          : {
+              'automator-vault': vault.vault,
+            };
         if (!Env.isMobile) {
-          updateQuery(
-            type
-              ? {
-                  'automator-vault': vault.vault,
-                  'automator-trade-tab': type,
-                }
-              : {
-                  'automator-vault': vault.vault,
-                },
-          );
+          updateQuery(query);
           setVisible(true);
         } else {
           navigate({
             pathname: '/products/automator',
             search: stringify({
               ...parse(location.search, { ignoreQueryPrefix: true }),
+              query,
             }),
           });
         }
