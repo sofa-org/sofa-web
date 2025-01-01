@@ -160,7 +160,7 @@ export const AutomatorRedeemApply = (props: {
               );
             const sharesWithDecimals = Big(redeemData.shares)
               .times(10 ** shareDecimals)
-              .toString();
+              .toFixed(0);
             if (hasRedemption) {
               const pendingSharesWithDecimals =
                 useAutomatorStore.getState().userInfos[

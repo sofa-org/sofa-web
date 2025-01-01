@@ -452,7 +452,7 @@ export class AutomatorService {
     ]);
     const amountWithDecimals = Big(amount)
       .times(10 ** Number(decimals))
-      .toString();
+      .toFixed(0);
     await WalletService.$approve(
       collateralAddress,
       amountWithDecimals,

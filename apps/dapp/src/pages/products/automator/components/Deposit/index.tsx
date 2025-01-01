@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { wait } from '@livelybone/promise-wait';
 import { AutomatorService } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
@@ -52,7 +52,16 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
       state.vaultOverviews[`${vault.chainId}-${vault.vault.toLowerCase()}-`],
   );
 
-  const convertedShare = Number(depositData?.amount) / Number(overview?.nav);
+  const convertedShare = useMemo(() => {
+    if (!vault || !depositData?.amount || !overview?.nav) return undefined;
+    return (
+      cvtAmountsInCcy(
+        [[vault.depositCcy, Number(depositData.amount)]],
+        prices,
+        vault.vaultDepositCcy,
+      ) / Number(overview.nav)
+    );
+  }, [depositData?.amount, overview?.nav, prices, vault]);
 
   const progressRef = useRef<ProgressRef>(null);
 

@@ -136,7 +136,7 @@ export const useAutomatorStore = Object.assign(
           status: AutomatorDepositStatus.CLOSED,
         }),
       ]).then((list) => {
-        useAutomatorStore((pre) => {
+        useAutomatorStore.setState((pre) => {
           const userInfos = Object.fromEntries(
             list.flat().map((it) => {
               const k = `${
