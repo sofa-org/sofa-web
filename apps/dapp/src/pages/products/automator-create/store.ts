@@ -39,13 +39,19 @@ export const useAutomatorCreateStore =
     rchBurnedManually: false,
     reset() {
       set({
-        payload: {},
+        payload: {
+          ...get().payload,
+          automatorDesc: '',
+          rchBurnHash: '',
+          automatorName: '',
+          redemptionWaitingPeriod: '7',
+          sharePercent: 5,
+        },
         info: undefined,
         rchBurning: false,
         rchBurned: false,
         automatorCreating: false,
         rchBurnedManually: false,
-        config: undefined,
       });
     },
     updatePayload(v) {

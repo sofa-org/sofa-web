@@ -157,31 +157,6 @@ const StepForm = () => {
         <Row>
           <Col span={24}>
             <Form.Input
-              field="rchBurnHash"
-              label={t({
-                enUS: 'Transaction Hash for Your RCH Burn',
-              })}
-              trigger="blur"
-              rules={[
-                {
-                  required: true,
-                  message: t({
-                    enUS: 'This field is required',
-                  }),
-                },
-                {
-                  validator: (rule, value) => /^0x[0-9a-f]{64}$/i.test(value),
-                  message: t({
-                    enUS: 'Must be a valid ETH Transaction Hash',
-                  }),
-                },
-              ]}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={24}>
-            <Form.Input
               field="automatorName"
               label={t({
                 enUS: 'Automator Name',
@@ -225,8 +200,9 @@ const StepForm = () => {
                 },
               ]}
             >
-              <Form.Select.Option value={'1'}>1</Form.Select.Option>
-              <Form.Select.Option value={'2'}>2</Form.Select.Option>
+              <Form.Select.Option value={'7'}>7D</Form.Select.Option>
+              <Form.Select.Option value={'14'}>14D</Form.Select.Option>
+              <Form.Select.Option value={'30'}>30D</Form.Select.Option>
             </Form.Select>
           </Col>
         </Row>
@@ -248,9 +224,10 @@ const StepForm = () => {
                 },
               ]}
             >
-              <Form.Radio value={'5'}>5%</Form.Radio>
-              <Form.Radio value={'10'}>10%</Form.Radio>
-              <Form.Radio value={'15'}>15%</Form.Radio>
+              <Form.Radio value={0}>0%</Form.Radio>
+              <Form.Radio value={5}>5%</Form.Radio>
+              <Form.Radio value={10}>10%</Form.Radio>
+              <Form.Radio value={15}>15%</Form.Radio>
             </Form.RadioGroup>
           </Col>
         </Row>
