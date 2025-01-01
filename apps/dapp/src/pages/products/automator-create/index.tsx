@@ -1,37 +1,27 @@
-import { useMemo, useState } from 'react';
-import { Spin } from '@douyinfe/semi-ui';
+import { useState } from 'react';
+import { Select, Tooltip } from '@douyinfe/semi-ui';
 import { Button } from '@douyinfe/semi-ui';
-import {
-  AutomatorDepositStatus,
-  AutomatorInfo,
-  AutomatorService,
-} from '@sofa/services/automator';
-import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
-import { CCYService } from '@sofa/services/ccy';
+import { AutomatorService } from '@sofa/services/automator';
+import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
-import { ContractsService } from '@sofa/services/contracts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
-import { updateQuery } from '@sofa/utils/history';
-import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
-import { arrToDict } from '@sofa/utils/object';
-import { formatHighlightedText } from '@sofa/utils/string';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import { useRequest } from 'ahooks';
 import classNames from 'classnames';
+import { uniq } from 'lodash-es';
 
-import CEmpty from '@/components/Empty';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
-import { useWalletStore } from '@/components/WalletConnector/store';
+import {
+  useWalletStore,
+  useWalletUIState,
+} from '@/components/WalletConnector/store';
 
 import { Comp as IconPoints } from './assets/icon-points.svg';
 import { Comp as IconShare } from './assets/icon-share.svg';
 import { Comp as IconZero } from './assets/icon-zero.svg';
 import { AutomatorCreateModel } from './index-model';
-import {
-  automatorCreateConfigs,
-  getNameForChain,
-  useAutomatorCreateStore,
-} from './store';
+import { useAutomatorCreateStore } from './store';
 
 import styles from './index.module.scss';
 
@@ -84,14 +74,21 @@ const FAQ = (t: TFunction) => {
 const AutomatorCreate = () => {
   const [t] = useTranslation('AutomatorCreate');
   const wallet = useWalletStore((state) => state);
+  const { bringUpConnect } = useWalletUIState();
   const [modelVisible, setModelVisible] = useState(false);
-
+  const { payload, updatePayload, updateConfig } = useAutomatorCreateStore();
   const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({
     [0]: true,
   });
   const onFaqTitleClicked = useLazyCallback((idx: number) => {
     setFaqExpanded({ [idx]: true });
   });
+  const { data, loading } = useRequest(
+    async () => AutomatorService.getCreateConfigs(),
+    {
+      refreshDeps: [wallet.address, wallet.chainId],
+    },
+  );
   return (
     <>
       <TopTabs
@@ -112,62 +109,110 @@ const AutomatorCreate = () => {
         options={[]}
       >
         <div className={classNames(styles['form'], styles['intro'])}>
-          <ol className={styles['steps']}>
-            <li>
-              <span className={styles['step']}>
+          <Select
+            className={styles['select-chain']}
+            insetLabel={
+              <span className={styles['select-label']}>
                 {t({
-                  enUS: 'Step 1',
+                  enUS: 'Automator Chain',
                 })}
               </span>
-              <span>
-                {formatHighlightedText(
-                  t(
-                    {
-                      enUS: 'Burn {{amount}} RCH on [[{{chainName}}]]',
-                    },
-                    {
-                      amount: automatorCreateConfigs.rchAmountToBurn,
-                      chainName: getNameForChain(
-                        automatorCreateConfigs.chainIdToBurnRch,
-                        t,
-                      ),
-                    },
-                  ),
-                  {
-                    hightlightedClassName: styles['highlighted'],
-                  },
-                )}
-              </span>
-            </li>
-            <li>
-              <span className={styles['step']}>
-                {t({
-                  enUS: 'Step 2',
-                })}
-              </span>
-              <span>
-                {formatHighlightedText(
-                  t({
-                    enUS: 'Enter Automator Details & Pay Gas Fees to Deploy Automator Contract on [[You Selected Chain]]',
-                  }),
-                  {
-                    hightlightedClassName: styles['highlighted'],
-                  },
-                )}
-              </span>
-            </li>
-          </ol>
+            }
+            loading={loading}
+            onChange={(v) =>
+              updatePayload({
+                chainId: v as number,
+              })
+            }
+          >
+            {data &&
+              uniq(data.configs.map((c) => c.chainId)).map((chainId) => (
+                <Select.Option value={chainId}>
+                  <img
+                    className={styles['logo']}
+                    src={ChainMap[wallet.chainId!].icon}
+                    alt=""
+                  />
+                  <span>{ChainMap[chainId].name}</span>
+                </Select.Option>
+              ))}
+          </Select>
+          <Tooltip
+            key={payload.chainId ? 'chain-selected' : 'chain-not-selected'}
+            trigger={payload.chainId ? 'custom' : undefined}
+            visible={!payload.chainId}
+            content={
+              payload.chainId
+                ? undefined
+                : t({
+                    enUS: 'Please select Automator Chain first',
+                  })
+            }
+          >
+            <Select
+              className={styles['select-deposit-token']}
+              insetLabel={
+                <span className={styles['select-label']}>
+                  {t({
+                    enUS: 'Deposit Token',
+                  })}
+                </span>
+              }
+              loading={loading}
+              disabled={!payload?.chainId}
+              onChange={(v) =>
+                updatePayload({
+                  depositCcy: v as string,
+                })
+              }
+            >
+              {data &&
+                uniq(
+                  data.configs
+                    .filter((c) => c.chainId == payload?.chainId)
+                    .map((c) => c.depositCcy),
+                ).map((depositCcy) => (
+                  <Select.Option value={depositCcy}>
+                    <span>{depositCcy}</span>
+                  </Select.Option>
+                ))}
+            </Select>
+          </Tooltip>
           <Button
             size="large"
             className={classNames(styles['btn-create'], 'btn-primary')}
+            disabled={
+              (wallet.address && !(payload.chainId && payload.depositCcy)) ||
+              false
+            }
             onClick={() => {
+              if (!wallet.address) {
+                bringUpConnect();
+                return;
+              }
+              if (!data) {
+                return;
+              }
+              const config = data.configs.find(
+                (c) =>
+                  c.depositCcy == payload.depositCcy &&
+                  c.chainId == payload.chainId,
+              );
+              if (!config) {
+                return;
+              }
               useAutomatorCreateStore.getState().reset();
+              updateConfig(config);
               setModelVisible(true);
             }}
           >
-            {t({
-              enUS: 'Burn RCH & Create Your Automator',
-            })}
+            {!wallet.address
+              ? t({
+                  enUS: 'Connect Wallet',
+                })
+              : t({
+                  enUS: 'Burn RCH & Create Your Automator',
+                })}
           </Button>
           <ul className={styles['features']}>
             <li>
@@ -197,7 +242,6 @@ const AutomatorCreate = () => {
             </li>
           </ul>
         </div>
-
         <div className={classNames(styles['form'], styles['faq'])}>
           <h2>{t('FAQ')}</h2>
           <ol className={styles['faq-ol']}>

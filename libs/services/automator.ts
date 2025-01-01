@@ -13,8 +13,15 @@ import {
   AutomatorTransactionStatus,
   AutomatorVaultInfo,
   ProjectType,
+  TransactionStatus,
 } from './base-type';
+import { defaultChain } from './chains';
 import { ContractsService } from './contracts';
+import { PositionStatus } from './the-graph';
+import { TransactionProgress } from './positions';
+import { safeRun } from '@sofa/utils/fns';
+import { WalletService } from './wallet';
+import Big from 'big.js';
 
 // server 返回的结构
 export interface OriginAutomatorInfo {
@@ -310,4 +317,142 @@ export class AutomatorService {
         } as PageResult<AutomatorFollower>;
       });
   }
+
+  private static progressWrap<Args extends unknown[]>(
+    transactionCall: (
+      vault: AutomatorVaultInfo,
+      ...args: Args
+    ) => Promise<string>,
+    statusMap: Record<'before' | 'failed' | 'success', PositionStatus>,
+  ) {
+    return (
+      cb: (progress: TransactionProgress) => void,
+      vault: AutomatorVaultInfo,
+      ...args: Args
+    ) => {
+      safeRun(cb, { status: 'Submitting' });
+      const key = `${vault.vault.toLowerCase()}-${vault.chainId}-${
+        vault.depositCcy
+      }`;
+      return transactionCall(vault, ...args)
+        .then(async (hash) => {
+          safeRun(cb, {
+            status: 'QueryResult',
+            details: [
+              [
+                key,
+                {
+                  status: statusMap.before,
+                  hash,
+                  ids: [],
+                },
+              ],
+            ],
+          });
+          const status = await WalletService.transactionResult(
+            hash,
+            vault.chainId,
+          ).then((res) =>
+            res === TransactionStatus.FAILED
+              ? statusMap.failed
+              : statusMap.success,
+          );
+          safeRun(cb, {
+            status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
+            details: [[key, { status, hash, ids: [] }]],
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          safeRun(cb, {
+            status: 'SubmitFailed',
+            details: [
+              [
+                key,
+                {
+                  status: statusMap.failed,
+                  error,
+                  ids: [],
+                },
+              ],
+            ],
+          });
+        });
+    };
+  }
+
+  private static async $deposit(
+    { chainId, vault }: AutomatorVaultInfo,
+    amount: string | number,
+  ) {
+    const { signer } = await WalletService.connect(chainId);
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    const [decimals, collateralAddress] = await Promise.all([
+      Automator.decimals(),
+      Automator.collateral(),
+    ]);
+    const amountWithDecimals = Big(amount)
+      .times(10 ** Number(decimals))
+      .toFixed(0);
+    await WalletService.$approve(
+      collateralAddress,
+      amountWithDecimals,
+      signer,
+      vault,
+    );
+    const genArgs = (gasLimit?: number) => [
+      String(amountWithDecimals),
+      { gasLimit },
+    ];
+    return ContractsService.dirtyCall(Automator, 'deposit', genArgs);
+  }
+
+  static deposit = AutomatorService.progressWrap(AutomatorService.$deposit, {
+    before: PositionStatus.PENDING,
+    failed: PositionStatus.FAILED,
+    success: PositionStatus.MINTED,
+  });
+
+  static async getRedemptionInfo({ chainId, vault }: AutomatorVaultInfo) {
+    const { signer } = await WalletService.connect(chainId);
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    return Automator.getRedemption().then((res) => {
+      return {
+        pendingSharesWithDecimals: Number(res[0]),
+        createTime: Number(res[1]),
+      };
+    });
+  }
+
+  private static async $redeem(
+    { chainId, vault }: AutomatorVaultInfo,
+    sharesWithDecimals: string | number,
+  ) {
+    const { signer } = await WalletService.connect(chainId);
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    const genArgs = (gasLimit?: number) => [
+      String(sharesWithDecimals),
+      { gasLimit },
+    ];
+    return ContractsService.dirtyCall(Automator, 'withdraw', genArgs);
+  }
+
+  static redeem = AutomatorService.progressWrap(AutomatorService.$redeem, {
+    before: PositionStatus.REDEEMING,
+    failed: PositionStatus.MINTED,
+    success: PositionStatus.REDEEMED,
+  });
+
+  private static async $claim({ chainId, vault }: AutomatorVaultInfo) {
+    const { signer } = await WalletService.connect(chainId);
+    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    const genArgs = (gasLimit?: number) => [{ gasLimit }];
+    return ContractsService.dirtyCall(Automator, 'claimRedemptions', genArgs);
+  }
+
+  static claim = AutomatorService.progressWrap(AutomatorService.$claim, {
+    before: PositionStatus.CLAIMING,
+    failed: PositionStatus.REDEEMED,
+    success: PositionStatus.CLAIMED,
+  });
 }

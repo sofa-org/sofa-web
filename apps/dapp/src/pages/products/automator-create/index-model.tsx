@@ -19,7 +19,6 @@ import AsyncButton from '@/components/AsyncButton';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
 import {
-  automatorCreateConfigs,
   AutomatorCreateStoreType,
   getNameForChain,
   useAutomatorCreateStore,
@@ -67,21 +66,22 @@ const steps: {
 const StepStart = () => {
   const [t] = useTranslation('AutomatorCreate');
   const { chainId } = useWalletStore();
-
+  const { config } = useAutomatorCreateStore();
   const burn = useLazyCallback(async () => {
     try {
-      if (chainId != automatorCreateConfigs.chainIdToBurnRch) {
+      if (!config) {
+        throw new Error('AutomatorCreateStore.config is empty');
+      }
+      const c = config;
+      if (chainId != config!.burnRchChainId) {
         // switch chain
-        await useWalletStore.setChain(automatorCreateConfigs.chainIdToBurnRch);
+        await useWalletStore.setChain(c.burnRchChainId);
       }
       useAutomatorCreateStore.setState({
         rchBurning: true,
       });
       // burn
-      const hash = await RCHService.burn(
-        automatorCreateConfigs.chainIdToBurnRch,
-        automatorCreateConfigs.rchAmountToBurn,
-      );
+      const hash = await RCHService.burn(c.burnRchChainId, c.burnRchAmount);
 
       useAutomatorCreateStore.setState({
         rchBurned: true,
@@ -99,13 +99,10 @@ const StepStart = () => {
   return (
     <div className={styles['step-1-start']}>
       <div className={styles['rch-amount']}>
-        <span className={styles['amount']}>
-          {automatorCreateConfigs.rchAmountToBurn}
-        </span>{' '}
-        RCH
+        <span className={styles['amount']}>{config?.burnRchAmount}</span> RCH
       </div>
       <AsyncButton className={'btn-primary'} onClick={() => burn()}>
-        {chainId == automatorCreateConfigs.chainIdToBurnRch
+        {chainId == config!.burnRchChainId
           ? t({
               enUS: 'Confirm to Burn',
             })
@@ -114,10 +111,7 @@ const StepStart = () => {
                 enUS: 'Switch to {{chainName}} to Burn',
               },
               {
-                chainName: getNameForChain(
-                  automatorCreateConfigs.chainIdToBurnRch,
-                  t,
-                ),
+                chainName: getNameForChain(config?.burnRchChainId, t),
               },
             )}
       </AsyncButton>
@@ -134,7 +128,7 @@ const StepStart = () => {
             enUS: 'I’ve Already Burned {{amount}} RCH',
           },
           {
-            amount: automatorCreateConfigs.rchAmountToBurn,
+            amount: config?.burnRchAmount,
           },
         )}
       </Button>
@@ -203,49 +197,6 @@ const StepForm = () => {
                 },
               ]}
             />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={12}>
-            <Form.Select
-              field="chainId"
-              label={t({
-                enUS: 'Deployed Chain',
-              })}
-              trigger="blur"
-              rules={[
-                {
-                  required: true,
-                  message: t({
-                    enUS: 'This field is required',
-                  }),
-                },
-              ]}
-            >
-              <Form.Select.Option value={1}>1</Form.Select.Option>
-              <Form.Select.Option value={2}>2</Form.Select.Option>
-            </Form.Select>
-          </Col>
-
-          <Col span={12}>
-            <Form.Select
-              field="depositCcy"
-              label={t({
-                enUS: 'Deposit Token',
-              })}
-              trigger="blur"
-              rules={[
-                {
-                  required: true,
-                  message: t({
-                    enUS: 'This field is required',
-                  }),
-                },
-              ]}
-            >
-              <Form.Select.Option value={'1'}>1</Form.Select.Option>
-              <Form.Select.Option value={'2'}>2</Form.Select.Option>
-            </Form.Select>
           </Col>
         </Row>
         <Row>
@@ -394,6 +345,7 @@ const StepFinished = () => {
 export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
   const [t] = useTranslation('AutomatorCreate');
   const store = useAutomatorCreateStore();
+  const { config } = useAutomatorCreateStore();
 
   const currentStep = useMemo(() => {
     for (const step of steps) {
@@ -438,7 +390,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
                     enUS: 'Burn {{amount}} RCH',
                   },
                   {
-                    amount: automatorCreateConfigs.rchAmountToBurn,
+                    amount: config?.burnRchAmount,
                   },
                 ),
                 {

@@ -1,17 +1,16 @@
 import {
+  AutomatorCreateConfig,
   AutomatorCreatePayload,
-  AutomatorInfo,
   OriginAutomatorInfo,
 } from '@sofa/services/automator';
-import { ChainMap, defaultChain } from '@sofa/services/chains';
+import { ChainMap } from '@sofa/services/chains';
 import { TFunction } from '@sofa/services/i18n';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-export const automatorCreateConfigs = {
-  rchAmountToBurn: '2',
-  chainIdToBurnRch: defaultChain.chainId,
-};
-export function getNameForChain(chainId: number, t: TFunction) {
+export function getNameForChain(chainId: number | undefined, t: TFunction) {
+  if (!chainId) {
+    return '';
+  }
   if (chainId == 1) {
     return t({
       enUS: 'Ethereum Mainnet',
@@ -21,12 +20,15 @@ export function getNameForChain(chainId: number, t: TFunction) {
 }
 export type AutomatorCreateStoreType = {
   payload: Partial<AutomatorCreatePayload>;
+  config?: AutomatorCreateConfig;
   info?: OriginAutomatorInfo;
   rchBurning: boolean;
   rchBurned: boolean;
   automatorCreating: boolean;
   rchBurnedManually: boolean;
   reset: () => void;
+  updatePayload: (v: Partial<AutomatorCreatePayload>) => void;
+  updateConfig: (v?: AutomatorCreateConfig) => void;
 };
 export const useAutomatorCreateStore =
   createWithEqualityFn<AutomatorCreateStoreType>((set, get) => ({
@@ -43,6 +45,20 @@ export const useAutomatorCreateStore =
         rchBurned: false,
         automatorCreating: false,
         rchBurnedManually: false,
+        config: undefined,
+      });
+    },
+    updatePayload(v) {
+      set({
+        payload: {
+          ...get().payload,
+          ...v,
+        },
+      });
+    },
+    updateConfig(v) {
+      set({
+        config: v,
       });
     },
   }));

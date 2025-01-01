@@ -30,46 +30,6 @@
 }
 
 .intro {
-  .steps {
-    font-size: 16px;
-    text-align: center;
-    margin-block: 0;
-    padding-inline: 0;
-
-    .highlighted {
-      color: #177ddc;
-    }
-
-    li {
-      margin-bottom: 20px;
-      list-style-type: none;
-
-      @include bold;
-
-      .step {
-        position: relative;
-        z-index: 1;
-        height: 28px;
-        border-radius: 14px;
-        display: inline-block;
-        line-height: 28px;
-        padding: 0 14px;
-        text-align: center;
-        background: $color-main-gradient;
-        margin-right: 10px;
-
-        &::before {
-          content: "";
-          position: absolute;
-          z-index: -1;
-          inset: 1px;
-          border-radius: 14px;
-          background: #fff;
-        }
-      }
-    }
-  }
-
   .btn-create {
     font-size: 14px;
     height: min(48px, 10vw);
