@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AutomatorUserDetail } from '@sofa/services/automator';
+import { useNavigate } from 'react-router-dom';
+import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
@@ -17,7 +17,7 @@ import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 import styles from './index.module.scss';
 
 export interface AutomatorCardProps {
-  info: AutomatorUserDetail;
+  info: AutomatorUserPosition;
   modalController: ReturnType<typeof useAutomatorModal>[1];
 }
 
@@ -87,7 +87,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
                 [
                   [
                     props.info.vaultInfo.vaultDepositCcy,
-                    props.info?.amountInVaultDepositCcy,
+                    props.info?.amountByVaultDepositCcy,
                   ],
                 ],
                 prices,

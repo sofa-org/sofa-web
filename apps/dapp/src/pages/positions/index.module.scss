@@ -52,3 +52,11 @@
     }
   }
 }
+
+.tabs.tabs {
+  :global {
+    .tabs {
+      width: min(1160px, calc(100vw - 24px));
+    }
+  }
+}

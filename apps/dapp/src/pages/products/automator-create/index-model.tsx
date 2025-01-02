@@ -9,7 +9,6 @@ import {
   Spin,
   Toast,
 } from '@douyinfe/semi-ui';
-import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import { RCHService } from '@sofa/services/rch';
 import { getErrorMsg } from '@sofa/utils/fns';
@@ -22,6 +21,7 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 import {
   automatorCreateConfigs,
   AutomatorCreateStoreType,
+  getNameForChain,
   useAutomatorCreateStore,
 } from './store';
 

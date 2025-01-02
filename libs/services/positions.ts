@@ -329,7 +329,7 @@ export class PositionsService {
     if (!hash) return PositionStatus.PENDING;
     return WalletService.transactionResult(hash, chainId).then(async (s) => {
       const status = await (async () => {
-        if (s === TransactionStatus.FAILED) return PositionStatus.FAILED;
+        if (s.status === TransactionStatus.FAILED) return PositionStatus.FAILED;
         // await pollingUntil(
         //   () =>
         //     TheGraphService.transactions({ chainId, hash }).catch(console.warn),
@@ -581,7 +581,8 @@ export class PositionsService {
     if (!hash) return PositionStatus.EXPIRED;
     return WalletService.transactionResult(hash, chainId).then(async (s) => {
       const status = await (async () => {
-        if (s === TransactionStatus.FAILED) return PositionStatus.EXPIRED;
+        if (s.status === TransactionStatus.FAILED)
+          return PositionStatus.EXPIRED;
         // await pollingUntil(
         //   () =>
         //     TheGraphService.transactions({ chainId, hash }).catch(console.warn),

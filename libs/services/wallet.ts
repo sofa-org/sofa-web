@@ -184,7 +184,7 @@ export class WalletService {
     const succ = await WalletService.transactionResult(
       hash,
       Number(network.chainId),
-    ).then((res) => res === TransactionStatus.SUCCESS);
+    ).then((res) => res.status === TransactionStatus.SUCCESS);
     if (!succ)
       throw new Error(
         `Please approve ${approveTo} to proceed with the transaction`,
@@ -510,21 +510,38 @@ export class WalletService {
   static async transactionResult(
     hash: string,
     chainId: number,
-  ): Promise<TransactionStatus.SUCCESS | TransactionStatus.FAILED> {
+  ): Promise<
+    | { status: TransactionStatus.FAILED }
+    | {
+        status: TransactionStatus.SUCCESS;
+        logs: ethers.Log[];
+      }
+  > {
     const poll = async () => {
       console.info('Get transaction result of hash', { hash, chainId });
       const provider = await WalletService.readonlyConnect(+chainId);
       const receipt = await provider.getTransactionReceipt(hash);
-      if (!receipt) return TransactionStatus.PENDING;
-      return Number(receipt?.status) === 1
-        ? TransactionStatus.SUCCESS
-        : TransactionStatus.FAILED;
+      if (!receipt) return { status: TransactionStatus.PENDING } as const;
+      if (Number(receipt.status) !== 1)
+        return { status: TransactionStatus.FAILED } as const;
+      return {
+        status: TransactionStatus.SUCCESS,
+        logs: receipt.logs,
+      } as const;
     };
     return pollingUntil(
       () => poll().catch(() => TransactionStatus.PENDING),
       (s) => s !== TransactionStatus.PENDING,
       1000,
-    ).then((res) => res[res.length - 1] as never);
+    ).then(
+      (res) =>
+        res[res.length - 1] as
+          | { status: TransactionStatus.FAILED }
+          | {
+              status: TransactionStatus.SUCCESS;
+              logs: ethers.Log[];
+            },
+    );
   }
 
   private static async $burnBatch(
