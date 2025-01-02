@@ -1,8 +1,36 @@
 .model-content {
   max-width: 580px;
   margin: min(20px, 2vw) auto;
+
+  :global(.semi-spin) {
+    margin: 10px;
+    width: 64px;
+    height: 64px;
+    svg {
+      width: 64px;
+      height: 64px;
+    }
+  }
 }
 
+.logo {
+  width: 20px;
+  height: 20px;
+  margin: 0 4px 2px 10px;
+  vertical-align: middle;
+}
+.chain-and-ccy {
+  @include flex-center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+  font-size: 16px;
+  color: #000 !important;
+  .label {
+    @include regular;
+    opacity: 0.45;
+  }
+}
 .steps {
   @include flex-center;
 
@@ -13,7 +41,7 @@
   text-align: center;
   margin-block: 0;
   padding-inline: 0;
-  margin-bottom: 20px;
+  margin: 30px 0 20px;
 
   .highlighted {
     color: #177ddc;
@@ -100,16 +128,22 @@
     }
   }
 
-  button {
+  .confirm-btn {
     width: min(400px, 80vw);
     display: block;
     text-align: center;
     margin: 20px auto;
+    height: min(48px, 10vw);
+    border-radius: min(24px, 5vw);
 
     :global(.semi-button-content) {
       display: block;
     }
   }
+}
+.step-2-burning {
+  text-align: center;
+  padding-top: 20px;
 }
 
 .step-3-form {
@@ -150,6 +184,25 @@
     .field-desc {
       font-size: 12px;
       color: rgba(#000, 0.45);
+    }
+  }
+}
+
+.mobile-ui {
+  .chain-and-ccy {
+    gap: 10px;
+    .select {
+      font-size: 14px;
+    }
+    :global {
+      .semi-select {
+        width: calc(100vw - 50px);
+        .semi-select-selection {
+          .semi-select-selection-text {
+            font-size: 14px;
+          }
+        }
+      }
     }
   }
 }

@@ -25,7 +25,6 @@ export type AutomatorCreateStoreType = {
   rchBurning: boolean;
   rchBurned: boolean;
   automatorCreating: boolean;
-  rchBurnedManually: boolean;
   reset: () => void;
   updatePayload: (v: Partial<AutomatorCreatePayload>) => void;
   updateConfig: (v?: AutomatorCreateConfig) => void;
@@ -36,7 +35,6 @@ export const useAutomatorCreateStore =
     rchBurning: false,
     rchBurned: false,
     automatorCreating: false,
-    rchBurnedManually: false,
     reset() {
       set({
         payload: {
@@ -51,7 +49,6 @@ export const useAutomatorCreateStore =
         rchBurning: false,
         rchBurned: false,
         automatorCreating: false,
-        rchBurnedManually: false,
       });
     },
     updatePayload(v) {

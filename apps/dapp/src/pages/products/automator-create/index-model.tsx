@@ -9,15 +9,20 @@ import {
   Spin,
   Toast,
 } from '@douyinfe/semi-ui';
+import { CCYService } from '@sofa/services/ccy';
+import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import { RCHService } from '@sofa/services/rch';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
+import classNames from 'classnames';
 
 import AsyncButton from '@/components/AsyncButton';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
+import { Comp as IconLoading } from './assets/icon-loading.svg';
 import {
   AutomatorCreateStoreType,
   getNameForChain,
@@ -47,7 +52,7 @@ const steps: {
     comp: () => <StepCreating />,
   },
   {
-    arrived: (store) => store.rchBurnedManually || store.rchBurned,
+    arrived: (store) => store.rchBurned,
     processPercent: 50,
     step1: true,
     comp: () => <StepForm />,
@@ -101,7 +106,10 @@ const StepStart = () => {
       <div className={styles['rch-amount']}>
         <span className={styles['amount']}>{config?.burnRchAmount}</span> RCH
       </div>
-      <AsyncButton className={'btn-primary'} onClick={() => burn()}>
+      <AsyncButton
+        className={classNames(styles['confirm-btn'], 'btn-primary')}
+        onClick={() => burn()}
+      >
         {chainId == config!.burnRchChainId
           ? t({
               enUS: 'Confirm to Burn',
@@ -115,23 +123,6 @@ const StepStart = () => {
               },
             )}
       </AsyncButton>
-      <Button
-        className={'btn-ghost'}
-        onClick={() => {
-          useAutomatorCreateStore.setState({
-            rchBurnedManually: true,
-          });
-        }}
-      >
-        {t(
-          {
-            enUS: 'I’ve Already Burned {{amount}} RCH',
-          },
-          {
-            amount: config?.burnRchAmount,
-          },
-        )}
-      </Button>
     </div>
   );
 };
@@ -139,7 +130,7 @@ const StepBurning = () => {
   const [t] = useTranslation('AutomatorCreate');
   return (
     <div className={styles['step-2-burning']}>
-      <Spin />
+      <Spin indicator={<IconLoading />} />
       <div className={styles['desc']}>
         {t({
           enUS: 'Processing, Please Do Not Close This Page',
@@ -150,7 +141,7 @@ const StepBurning = () => {
 };
 const StepForm = () => {
   const [t] = useTranslation('AutomatorCreate');
-  const { payload, rchBurnedManually } = useAutomatorCreateStore();
+  const { payload } = useAutomatorCreateStore();
   return (
     <div className={styles['step-3-form']}>
       <Form labelPosition="top" initValues={payload}>
@@ -161,7 +152,6 @@ const StepForm = () => {
               label={t({
                 enUS: 'Automator Name',
               })}
-              disabled={!rchBurnedManually}
               trigger="blur"
               rules={[
                 {
@@ -322,8 +312,8 @@ const StepFinished = () => {
 export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
   const [t] = useTranslation('AutomatorCreate');
   const store = useAutomatorCreateStore();
-  const { config } = useAutomatorCreateStore();
-
+  const { payload, config } = useAutomatorCreateStore();
+  const isMobileUI = useIsMobileUI();
   const currentStep = useMemo(() => {
     for (const step of steps) {
       if (step.arrived(store)) {
@@ -343,7 +333,9 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
       width={660}
       visible={props.value}
       onCancel={() => props.onChange?.(false)}
-      className={styles['automator-create-modal']}
+      className={classNames(styles['automator-create-modal'], {
+        [styles['mobile-ui']]: isMobileUI,
+      })}
       title={
         <div className={styles['title']}>
           {t({
@@ -353,6 +345,41 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
       }
     >
       <div className={styles['model-content']}>
+        <div className={classNames(styles['chain-and-ccy'])}>
+          <div className={styles['chain']}>
+            <span className={styles['label']}>
+              {t({
+                enUS: 'Automator Chain',
+              })}
+            </span>
+            <span className={styles['value']}>
+              <img
+                className={styles['logo']}
+                src={ChainMap[payload.chainId!]?.icon}
+                alt=""
+              />
+              <span>{ChainMap[payload.chainId!]?.name}</span>
+            </span>
+          </div>
+          <div className={styles['token']}>
+            <span className={styles['label']}>
+              {t({
+                enUS: 'Deposit Token',
+              })}
+            </span>
+            <span className={styles['value']}>
+              <img
+                className={styles['logo']}
+                src={CCYService.ccyConfigs[payload.depositCcy!]?.icon}
+                alt=""
+              />
+              <span>
+                {CCYService.ccyConfigs[payload.depositCcy!]?.name ||
+                  payload.depositCcy}
+              </span>
+            </span>
+          </div>
+        </div>
         <ol className={styles['steps']}>
           <li className={currentStep.step1 ? styles['done'] : undefined}>
             <span className={styles['step']}>

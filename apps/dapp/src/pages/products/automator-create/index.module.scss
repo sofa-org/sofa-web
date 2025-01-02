@@ -28,6 +28,45 @@
     margin-top: -84px;
   }
 }
+.logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+.chain-and-ccy {
+  @include flex-center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 40px;
+
+  .select-label {
+    @include regular;
+    color: #000 !important;
+    font-size: 16px;
+  }
+  :global {
+    .semi-select {
+      width: 400px;
+      background: #f0f0f0;
+      border-radius: 24px;
+      height: 48px;
+      padding: 0 8px 0 16px;
+      &:hover {
+        background-color: #f0f0f0;
+        border-color: rgba(#000, 0.4);
+      }
+      .semi-select-prefix {
+        opacity: 1;
+      }
+      .semi-select-selection {
+        justify-content: end;
+        .semi-select-selection-text {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
 
 .intro {
   .btn-create {
@@ -138,6 +177,25 @@
   .form {
     &:first-child {
       margin-top: 0;
+    }
+  }
+}
+
+.mobile-ui {
+  .chain-and-ccy {
+    gap: 10px;
+    .select-label {
+      font-size: 14px;
+    }
+    :global {
+      .semi-select {
+        width: calc(100vw - 50px);
+        .semi-select-selection {
+          .semi-select-selection-text {
+            font-size: 14px;
+          }
+        }
+      }
     }
   }
 }

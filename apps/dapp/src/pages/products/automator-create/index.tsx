@@ -3,6 +3,7 @@ import { Select, Tooltip } from '@douyinfe/semi-ui';
 import { Button } from '@douyinfe/semi-ui';
 import { AutomatorService } from '@sofa/services/automator';
 import { ProjectType } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { useLazyCallback } from '@sofa/utils/hooks';
@@ -10,6 +11,7 @@ import { useRequest } from 'ahooks';
 import classNames from 'classnames';
 import { uniq } from 'lodash-es';
 
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import {
@@ -75,6 +77,7 @@ const AutomatorCreate = () => {
   const [t] = useTranslation('AutomatorCreate');
   const wallet = useWalletStore((state) => state);
   const { bringUpConnect } = useWalletUIState();
+  const isMobileUI = useIsMobileUI();
   const [modelVisible, setModelVisible] = useState(false);
   const { payload, updatePayload, updateConfig } = useAutomatorCreateStore();
   const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({
@@ -108,76 +111,107 @@ const AutomatorCreate = () => {
         dark
         options={[]}
       >
-        <div className={classNames(styles['form'], styles['intro'])}>
-          <Select
-            className={styles['select-chain']}
-            insetLabel={
-              <span className={styles['select-label']}>
-                {t({
-                  enUS: 'Automator Chain',
-                })}
-              </span>
-            }
-            loading={loading}
-            onChange={(v) =>
-              updatePayload({
-                chainId: v as number,
-              })
-            }
-          >
-            {data &&
-              uniq(data.configs.map((c) => c.chainId)).map((chainId) => (
-                <Select.Option value={chainId}>
-                  <img
-                    className={styles['logo']}
-                    src={ChainMap[wallet.chainId!].icon}
-                    alt=""
-                  />
-                  <span>{ChainMap[chainId].name}</span>
-                </Select.Option>
-              ))}
-          </Select>
-          <Tooltip
-            key={payload.chainId ? 'chain-selected' : 'chain-not-selected'}
-            trigger={payload.chainId ? 'custom' : undefined}
-            visible={!payload.chainId}
-            content={
-              payload.chainId
-                ? undefined
-                : t({
-                    enUS: 'Please select Automator Chain first',
-                  })
-            }
-          >
+        <div
+          className={classNames(styles['form'], styles['intro'], {
+            [styles['mobile-ui']]: isMobileUI,
+          })}
+        >
+          <div className={classNames(styles['chain-and-ccy'])}>
             <Select
-              className={styles['select-deposit-token']}
+              className={styles['select-chain']}
               insetLabel={
                 <span className={styles['select-label']}>
                   {t({
-                    enUS: 'Deposit Token',
+                    enUS: 'Automator Chain',
                   })}
                 </span>
               }
+              suffix={
+                payload.chainId ? undefined : (
+                  <span className={styles['select-label']}>
+                    {t({
+                      enUS: 'Select',
+                    })}
+                  </span>
+                )
+              }
               loading={loading}
-              disabled={!payload?.chainId}
               onChange={(v) =>
                 updatePayload({
-                  depositCcy: v as string,
+                  chainId: v as number,
                 })
               }
             >
               {data &&
-                uniq(
-                  data.configs
-                    .filter((c) => c.chainId == payload?.chainId)
-                    .map((c) => c.depositCcy),
-                ).map((depositCcy) => (
-                  <Select.Option value={depositCcy}>
-                    <span>{depositCcy}</span>
+                uniq(data.configs.map((c) => c.chainId)).map((chainId) => (
+                  <Select.Option value={chainId}>
+                    <img
+                      className={styles['logo']}
+                      src={ChainMap[chainId!].icon}
+                      alt=""
+                    />
+                    <span>{ChainMap[chainId].name}</span>
                   </Select.Option>
                 ))}
             </Select>
-          </Tooltip>
+            <Tooltip
+              key={payload.chainId ? 'chain-selected' : 'chain-not-selected'}
+              trigger={payload.chainId ? 'custom' : undefined}
+              visible={!payload.chainId}
+              content={
+                payload.chainId
+                  ? undefined
+                  : t({
+                      enUS: 'Please select Automator Chain first',
+                    })
+              }
+            >
+              <Select
+                className={styles['select-deposit-token']}
+                insetLabel={
+                  <span className={styles['select-label']}>
+                    {t({
+                      enUS: 'Deposit Token',
+                    })}
+                  </span>
+                }
+                suffix={
+                  payload.depositCcy ? undefined : (
+                    <span className={styles['select-label']}>
+                      {t({
+                        enUS: 'Select',
+                      })}
+                    </span>
+                  )
+                }
+                loading={loading}
+                disabled={!payload?.chainId}
+                onChange={(v) =>
+                  updatePayload({
+                    depositCcy: v as string,
+                  })
+                }
+              >
+                {data &&
+                  uniq(
+                    data.configs
+                      .filter((c) => c.chainId == payload?.chainId)
+                      .map((c) => c.depositCcy),
+                  ).map((depositCcy) => (
+                    <Select.Option value={depositCcy}>
+                      <img
+                        className={styles['logo']}
+                        src={CCYService.ccyConfigs[depositCcy]?.icon}
+                        alt=""
+                      />
+                      <span>
+                        {CCYService.ccyConfigs[depositCcy]?.name || depositCcy}
+                      </span>
+                    </Select.Option>
+                  ))}
+              </Select>
+            </Tooltip>
+          </div>
           <Button
             size="large"
             className={classNames(styles['btn-create'], 'btn-primary')}
