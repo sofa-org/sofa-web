@@ -4,7 +4,7 @@ import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import Big from 'big.js';
-import { omit, pick, uniq } from 'lodash-es';
+import { omit, pick, uniq, uniqBy } from 'lodash-es';
 
 import {
   ContractsService,
@@ -318,40 +318,15 @@ export class ProductsService {
       );
   }
 
-  static TicketTypeOptions = [
-    {
-      ccy: 'USDT',
-      value: 'USDT',
-    },
-    {
-      ccy: 'RCH',
-      value: 'RCH',
-    },
-    {
-      ccy: 'BTC',
-      value: 'WBTC',
-    },
-    {
-      ccy: 'ETH',
-      value: 'WETH',
-    },
-    {
-      ccy: 'stETH',
-      value: 'stETH',
-    },
-  ]
-    .map((it) => {
-      const per =
-        ContractsService.vaults.find(
-          (v) => v.riskType === RiskType.RISKY && v.depositCcy === it.value,
-        )?.depositMinAmount || 0;
-      return {
-        ...it,
-        per,
-        precision: getPrecision(per),
-      };
-    })
-    .filter((it) => it.per);
+  static TicketTypeOptions = uniqBy(
+    ContractsService.vaults.filter((v) => v.riskType === RiskType.RISKY),
+    (it) => it.depositCcy,
+  ).map((it) => ({
+    ccy: it.depositCcy,
+    value: it.depositCcy,
+    per: it.depositMinAmount,
+    precision: getPrecision(it.depositMinAmount),
+  }));
 
   @applyMock('productQuote')
   private static async $quote(
