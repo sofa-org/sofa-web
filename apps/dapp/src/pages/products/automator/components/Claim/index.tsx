@@ -1,5 +1,5 @@
 import { RefObject, useMemo } from 'react';
-import { AutomatorService } from '@sofa/services/automator';
+import { AutomatorUserService } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
@@ -86,7 +86,7 @@ export const AutomatorClaim = (props: {
         className={classNames(styles['button'], styles['btn-claim'])}
         onClick={async () => {
           if (!vault) return;
-          return AutomatorService.claim((it) => {
+          return AutomatorUserService.claim((it) => {
             props.progressRef.current?.update(it);
             if (it.status === 'Success') {
               props.onSuccess?.();

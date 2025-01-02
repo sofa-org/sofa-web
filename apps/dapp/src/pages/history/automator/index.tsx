@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 import { Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
-import {
-  AutomatorService,
-  AutomatorTransaction,
-} from '@sofa/services/automator';
+import { AutomatorTransaction } from '@sofa/services/automator';
+import { AutomatorUserService } from '@sofa/services/automator-user';
 import { AutomatorTransactionStatus } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
@@ -36,7 +34,7 @@ export const AutomatorHistory = () => {
     );
 
     const { data: $data, loading } = useInfiniteScroll<
-      PromiseVal<ReturnType<typeof AutomatorService.transactions>>
+      PromiseVal<ReturnType<typeof AutomatorUserService.userTransactions>>
     >(
       async (pre) => {
         if (!wallet.address || !vault) return new Promise(() => {});
@@ -48,7 +46,7 @@ export const AutomatorHistory = () => {
           cursor: pre?.cursor,
           limit,
         };
-        return AutomatorService.transactions(vault, params, page);
+        return AutomatorUserService.userTransactions(vault, params, page);
       },
       {
         target: () => document.querySelector('#root'),
@@ -112,7 +110,7 @@ export const AutomatorHistory = () => {
                 '-'
               ) : (
                 <>
-                  {amountFormatter(record.amountInClientDepositCcy, 2)}
+                  {amountFormatter(record.amountByClientDepositCcy, 2)}
                   <span className={styles['unit']}>{vault?.depositCcy}</span>
                 </>
               ),

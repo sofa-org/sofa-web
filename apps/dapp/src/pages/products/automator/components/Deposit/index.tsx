@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { wait } from '@livelybone/promise-wait';
-import { AutomatorService } from '@sofa/services/automator';
+import { AutomatorUserService } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
@@ -124,7 +124,7 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
             if (!vault) return;
             await wait(100);
             if (!depositData?.amount) throw new Error('Please input amount');
-            return AutomatorService.deposit(
+            return AutomatorUserService.deposit(
               (it) => {
                 progressRef.current?.update(it);
                 if (it.status === 'Success') {
