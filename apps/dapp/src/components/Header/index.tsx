@@ -12,11 +12,14 @@ import { RootDomainPaths } from '@/route-guard';
 
 import { ProjectTypeRefs } from '../ProductSelector/enums';
 
+import { Comp as IconAdd } from './assets/icon-add.svg';
 import { Comp as IconBlog } from './assets/icon-blog.svg';
 import { Comp as IconClock } from './assets/icon-clock.svg';
 import { Comp as IconDefiMode } from './assets/icon-defimode.svg';
+import { Comp as IconOverview } from './assets/icon-overview.svg';
 import { Comp as IconPos } from './assets/icon-pos.svg';
 import { Comp as IconSOFA } from './assets/icon-sofa.svg';
+import { Comp as IconSwap } from './assets/icon-swap.svg';
 import { Comp as IconUsers } from './assets/icon-users.svg';
 import { CommonHeader, HomeHeader, markSelectedMenuItems } from './index-home';
 import locale from './locale';
@@ -57,7 +60,7 @@ const allMenuItems = (
                 enUS: 'Yield earning made easy.  Discover the best solutions for you!',
                 zhCN: '轻松赚取收益，发现最适合您的解决方案！',
               }),
-            path: '/products',
+            path: '/products?project=Earn',
           },
           {
             icon: ProjectTypeRefs[ProjectType.Earn].icon,
@@ -90,7 +93,7 @@ const allMenuItems = (
                 enUS: 'Your Earn & Surge Positions.',
                 zhCN: '你交易的 Earn 和 Surge 的头寸',
               }),
-            path: '/positions',
+            path: '/positions?project=Earn',
           },
         ],
       },
@@ -120,6 +123,48 @@ const allMenuItems = (
                 zhCN: '查看您的当前和历史绩效记录。',
               }),
             path: '/positions/automator',
+          },
+          {
+            icon: <IconOverview />,
+            group: (t: TFunction) =>
+              t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
+            label: (t: TFunction) =>
+              t({ enUS: 'Overview', zhCN: '我的 Automator' }),
+            desc: (t: TFunction) =>
+              t({
+                enUS: 'View your Automators at a glance.',
+                zhCN: '查看你创建的 Automator',
+              }),
+            path: '/products/automator/mine',
+          },
+          {
+            icon: <IconSwap />,
+            group: (t: TFunction) =>
+              t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
+            label: (t: TFunction) =>
+              t({ enUS: 'Trade Your Strategy', zhCN: '交易' }),
+            desc: (t: TFunction) =>
+              t({
+                enUS: 'Make trades to grow investor returns.',
+                zhCN: '为你的 Automator 创收',
+              }),
+            path: '/products/automator/operate',
+          },
+          {
+            icon: <IconAdd />,
+            group: (t: TFunction) =>
+              t({ enUS: 'Become An Optivisor', zhCN: '成为 Optivisor' }),
+            label: (t: TFunction) =>
+              t({
+                enUS: 'Create An Automator Strategy',
+                zhCN: '创建 Automator',
+              }),
+            desc: (t: TFunction) =>
+              t({
+                enUS: 'Earn profit sharing returns from strategy followers.',
+                zhCN: '从 Automator 的管理中赚取收益',
+              }),
+            path: '/positions/automator/create',
           },
         ],
       },

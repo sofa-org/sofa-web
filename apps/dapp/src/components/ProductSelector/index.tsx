@@ -1,4 +1,5 @@
 import { SetStateAction, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts.ts';
 import { useTranslation } from '@sofa/services/i18n';
@@ -28,7 +29,21 @@ export interface ProductSelectorProps extends BaseProps {
 }
 
 export function useProjectChange(defaultVal = ProjectType.Earn) {
-  const val = useQuery().project;
+  const location = useLocation();
+  const $val = useQuery((q) => q.project as string | null);
+  const val = location.pathname.includes('automator')
+    ? ProjectType.Automator
+    : $val || defaultVal;
+
+  useEffect(() => {
+    updateQuery({
+      project:
+        location.pathname.includes('automator') && val === ProjectType.Automator
+          ? undefined
+          : val,
+    });
+  }, [location.pathname, val]);
+
   const project = useMemo(() => {
     if (ProjectType[val as ProjectType]) return val as ProjectType;
 

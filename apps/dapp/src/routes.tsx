@@ -13,6 +13,12 @@ const Advantages = React.lazy(() => import('@/pages/advantages'));
 const OrderHistory = React.lazy(() => import('@/pages/history'));
 const Products = React.lazy(() => import('@/pages/products'));
 const Automator = React.lazy(() => import('@/pages/products/automator'));
+const AutomatorMine = React.lazy(
+  () => import('@/pages/products/automator-mine'),
+);
+const AutomatorOperate = React.lazy(
+  () => import('@/pages/products/automator-operate'),
+);
 const AutomatorPositions = React.lazy(
   () => import('@/pages/positions/automator'),
 );
@@ -68,6 +74,14 @@ export const routes: {
   {
     path: '/products/automator',
     Component: Automator,
+  },
+  {
+    path: '/products/automator/mine',
+    Component: AutomatorMine,
+  },
+  {
+    path: '/products/automator/operate',
+    Component: AutomatorOperate,
   },
   {
     path: '/positions/orders',
