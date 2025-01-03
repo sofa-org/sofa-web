@@ -1,6 +1,9 @@
 import { asyncCache } from '@sofa/utils/decorators';
+import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
+import { safeRun } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
+import Big from 'big.js';
 import { get, pick } from 'lodash-es';
 
 import AutomatorAbis from './abis/Automator.json';
@@ -17,11 +20,9 @@ import {
 } from './base-type';
 import { defaultChain } from './chains';
 import { ContractsService } from './contracts';
-import { PositionStatus } from './the-graph';
 import { TransactionProgress } from './positions';
-import { safeRun } from '@sofa/utils/fns';
+import { PositionStatus } from './the-graph';
 import { WalletService } from './wallet';
-import Big from 'big.js';
 
 // server 返回的结构
 export interface OriginAutomatorInfo {
@@ -151,16 +152,10 @@ export enum AutomatorDepositStatus {
   ACTIVE = 'ACTIVE',
   CLOSED = 'CLOSED',
 }
-
-export interface AutomatorCreatePayload {
-  rchBurnHash: string;
-  automatorName: string;
-  chainId: number;
-  depositCcy: string;
-  redemptionWaitingPeriod: string;
-  sharePercent: number;
-  automatorDesc: string;
-}
+export const automatorCreateConfigs = {
+  burnRchChainId: defaultChain.chainId,
+  burnRchAmount: Env.isDaily ? '2' : '500',
+};
 
 export interface AutomatorCreateParams {
   chainId: number; // 链ID

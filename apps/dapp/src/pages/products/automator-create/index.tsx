@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select, Tooltip } from '@douyinfe/semi-ui';
 import { Button } from '@douyinfe/semi-ui';
 import { AutomatorService } from '@sofa/services/automator';
 import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
-import { ChainMap } from '@sofa/services/chains';
+import { ChainMap, defaultChain } from '@sofa/services/chains';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useRequest } from 'ahooks';
@@ -79,15 +79,30 @@ const AutomatorCreate = () => {
   const { bringUpConnect } = useWalletUIState();
   const isMobileUI = useIsMobileUI();
   const [modelVisible, setModelVisible] = useState(false);
-  const { payload, updatePayload, updateConfig } = useAutomatorCreateStore();
+  const { payload, updatePayload, reset } = useAutomatorCreateStore();
   const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({
     [0]: true,
   });
   const onFaqTitleClicked = useLazyCallback((idx: number) => {
     setFaqExpanded({ [idx]: true });
   });
+  useEffect(() => {
+    if (!wallet.address && modelVisible) {
+      setModelVisible(false);
+    }
+  }, [wallet.address, modelVisible]);
   const { data, loading } = useRequest(
-    async () => AutomatorService.getCreateConfigs(),
+    async () => {
+      // TODO: read from api
+      return [
+        {
+          chainId: 421614,
+          clientDepositCcy: 'USDT',
+          factoryAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+          automatorAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+        },
+      ];
+    },
     {
       refreshDeps: [wallet.address, wallet.chainId],
     },
@@ -143,7 +158,7 @@ const AutomatorCreate = () => {
               }
             >
               {data &&
-                uniq(data.configs.map((c) => c.chainId)).map((chainId) => (
+                uniq(data.map((c) => c.chainId)).map((chainId) => (
                   <Select.Option value={chainId}>
                     <img
                       className={styles['logo']}
@@ -176,7 +191,7 @@ const AutomatorCreate = () => {
                   </span>
                 }
                 suffix={
-                  payload.depositCcy ? undefined : (
+                  payload.clientDepositCcy ? undefined : (
                     <span className={styles['select-label']}>
                       {t({
                         enUS: 'Select',
@@ -188,15 +203,15 @@ const AutomatorCreate = () => {
                 disabled={!payload?.chainId}
                 onChange={(v) =>
                   updatePayload({
-                    depositCcy: v as string,
+                    clientDepositCcy: v as string,
                   })
                 }
               >
                 {data &&
                   uniq(
-                    data.configs
+                    data
                       .filter((c) => c.chainId == payload?.chainId)
-                      .map((c) => c.depositCcy),
+                      .map((c) => c.clientDepositCcy),
                   ).map((depositCcy) => (
                     <Select.Option value={depositCcy}>
                       <img
@@ -216,7 +231,8 @@ const AutomatorCreate = () => {
             size="large"
             className={classNames(styles['btn-create'], 'btn-primary')}
             disabled={
-              (wallet.address && !(payload.chainId && payload.depositCcy)) ||
+              (wallet.address &&
+                !(payload.chainId && payload.clientDepositCcy)) ||
               false
             }
             onClick={() => {
@@ -227,16 +243,19 @@ const AutomatorCreate = () => {
               if (!data) {
                 return;
               }
-              const config = data.configs.find(
+              const config = data.find(
                 (c) =>
-                  c.depositCcy == payload.depositCcy &&
+                  c.clientDepositCcy == payload.clientDepositCcy &&
                   c.chainId == payload.chainId,
               );
               if (!config) {
                 return;
               }
-              useAutomatorCreateStore.getState().reset();
-              updateConfig(config);
+              reset();
+              updatePayload({
+                factoryAddress: config.factoryAddress,
+                automatorAddress: config.automatorAddress,
+              });
               setModelVisible(true);
             }}
           >

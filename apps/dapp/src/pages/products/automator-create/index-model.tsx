@@ -9,6 +9,7 @@ import {
   Spin,
   Toast,
 } from '@douyinfe/semi-ui';
+import { automatorCreateConfigs } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
@@ -71,28 +72,26 @@ const steps: {
 const StepStart = () => {
   const [t] = useTranslation('AutomatorCreate');
   const { chainId } = useWalletStore();
-  const { config } = useAutomatorCreateStore();
   const burn = useLazyCallback(async () => {
     try {
-      if (!config) {
-        throw new Error('AutomatorCreateStore.config is empty');
-      }
-      const c = config;
-      if (chainId != config!.burnRchChainId) {
+      if (chainId != automatorCreateConfigs.burnRchChainId) {
         // switch chain
-        await useWalletStore.setChain(c.burnRchChainId);
+        await useWalletStore.setChain(automatorCreateConfigs.burnRchChainId);
       }
       useAutomatorCreateStore.setState({
         rchBurning: true,
       });
       // burn
-      const hash = await RCHService.burn(c.burnRchChainId, c.burnRchAmount);
+      const hash = await RCHService.burn(
+        automatorCreateConfigs.burnRchChainId,
+        automatorCreateConfigs.burnRchAmount,
+      );
 
       useAutomatorCreateStore.setState({
         rchBurned: true,
         payload: {
           ...useAutomatorCreateStore.getState().payload,
-          rchBurnHash: hash,
+          burnTransactionHash: hash,
         },
       });
     } catch (e) {
@@ -104,13 +103,16 @@ const StepStart = () => {
   return (
     <div className={styles['step-1-start']}>
       <div className={styles['rch-amount']}>
-        <span className={styles['amount']}>{config?.burnRchAmount}</span> RCH
+        <span className={styles['amount']}>
+          {automatorCreateConfigs.burnRchAmount}
+        </span>{' '}
+        RCH
       </div>
       <AsyncButton
         className={classNames(styles['confirm-btn'], 'btn-primary')}
         onClick={() => burn()}
       >
-        {chainId == config!.burnRchChainId
+        {chainId == automatorCreateConfigs.burnRchChainId
           ? t({
               enUS: 'Confirm to Burn',
             })
@@ -119,7 +121,10 @@ const StepStart = () => {
                 enUS: 'Switch to {{chainName}} to Burn',
               },
               {
-                chainName: getNameForChain(config?.burnRchChainId, t),
+                chainName: getNameForChain(
+                  automatorCreateConfigs.burnRchChainId,
+                  t,
+                ),
               },
             )}
       </AsyncButton>
@@ -142,6 +147,7 @@ const StepBurning = () => {
 const StepForm = () => {
   const [t] = useTranslation('AutomatorCreate');
   const { payload } = useAutomatorCreateStore();
+  const { chainId } = useWalletStore();
   return (
     <div className={styles['step-3-form']}>
       <Form labelPosition="top" initValues={payload}>
@@ -242,9 +248,18 @@ const StepForm = () => {
         </Row>
       </Form>
       <Button className="btn-gradient-text">
-        {t({
-          enUS: 'Switch to Arbitrum One to Deploy',
-        })}
+        {payload.chainId != chainId
+          ? t(
+              {
+                enUS: 'Switch to {{chainName}} to Deploy',
+              },
+              {
+                chainName: ChainMap[payload.chainId!]?.name,
+              },
+            )
+          : t({
+              enUS: 'Deploy Automator Vault',
+            })}
       </Button>
     </div>
   );
@@ -312,7 +327,7 @@ const StepFinished = () => {
 export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
   const [t] = useTranslation('AutomatorCreate');
   const store = useAutomatorCreateStore();
-  const { payload, config } = useAutomatorCreateStore();
+  const { payload } = useAutomatorCreateStore();
   const isMobileUI = useIsMobileUI();
   const currentStep = useMemo(() => {
     for (const step of steps) {
@@ -370,12 +385,12 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
             <span className={styles['value']}>
               <img
                 className={styles['logo']}
-                src={CCYService.ccyConfigs[payload.depositCcy!]?.icon}
+                src={CCYService.ccyConfigs[payload.clientDepositCcy!]?.icon}
                 alt=""
               />
               <span>
-                {CCYService.ccyConfigs[payload.depositCcy!]?.name ||
-                  payload.depositCcy}
+                {CCYService.ccyConfigs[payload.clientDepositCcy!]?.name ||
+                  payload.clientDepositCcy}
               </span>
             </span>
           </div>
@@ -394,7 +409,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
                     enUS: 'Burn {{amount}} RCH',
                   },
                   {
-                    amount: config?.burnRchAmount,
+                    amount: automatorCreateConfigs.burnRchAmount,
                   },
                 ),
                 {

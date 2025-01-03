@@ -1,6 +1,5 @@
 import {
-  AutomatorCreateConfig,
-  AutomatorCreatePayload,
+  AutomatorCreateParams,
   OriginAutomatorInfo,
 } from '@sofa/services/automator';
 import { ChainMap } from '@sofa/services/chains';
@@ -19,15 +18,13 @@ export function getNameForChain(chainId: number | undefined, t: TFunction) {
   return ChainMap[chainId].name;
 }
 export type AutomatorCreateStoreType = {
-  payload: Partial<AutomatorCreatePayload>;
-  config?: AutomatorCreateConfig;
+  payload: Partial<AutomatorCreateParams>;
   info?: OriginAutomatorInfo;
   rchBurning: boolean;
   rchBurned: boolean;
   automatorCreating: boolean;
   reset: () => void;
-  updatePayload: (v: Partial<AutomatorCreatePayload>) => void;
-  updateConfig: (v?: AutomatorCreateConfig) => void;
+  updatePayload: (v: Partial<AutomatorCreateParams>) => void;
 };
 export const useAutomatorCreateStore =
   createWithEqualityFn<AutomatorCreateStoreType>((set, get) => ({
@@ -39,11 +36,11 @@ export const useAutomatorCreateStore =
       set({
         payload: {
           ...get().payload,
-          automatorDesc: '',
-          rchBurnHash: '',
+          description: '',
+          burnTransactionHash: '',
           automatorName: '',
-          redemptionWaitingPeriod: '7',
-          sharePercent: 5,
+          redemptionPeriodDay: 7,
+          feeRate: 5,
         },
         info: undefined,
         rchBurning: false,
@@ -57,11 +54,6 @@ export const useAutomatorCreateStore =
           ...get().payload,
           ...v,
         },
-      });
-    },
-    updateConfig(v) {
-      set({
-        config: v,
       });
     },
   }));

@@ -6,16 +6,6 @@ import { TransactionProgress } from './positions';
 import { ProductQuoteResult } from './products';
 import { BurnProductParams, WalletService } from './wallet';
 
-export interface AutomatorCreatePayload {
-  rchBurnHash: string;
-  automatorName: string;
-  chainId: number;
-  depositCcy: string;
-  redemptionWaitingPeriod: string;
-  sharePercent: number;
-  automatorDesc: string;
-}
-
 export interface AutomatorCreateParams {
   chainId: number; // 链ID
   automatorAddress: string;
@@ -36,9 +26,10 @@ export interface AutomatorBurnRCHParams {
 export class AutomatorCreatorService {
   static async automatorFactories() {
     return http
-      .get<unknown, HttpResponse<AutomatorFactory[]>>(
-        `/optivisors/automator/factories`,
-      )
+      .get<
+        unknown,
+        HttpResponse<AutomatorFactory[]>
+      >(`/optivisors/automator/factories`)
       .then((res) => res.value);
   }
 
