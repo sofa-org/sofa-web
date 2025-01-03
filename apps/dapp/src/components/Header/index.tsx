@@ -164,7 +164,7 @@ const allMenuItems = (
                 enUS: 'Earn profit sharing returns from strategy followers.',
                 zhCN: '从 Automator 的管理中赚取收益',
               }),
-            path: '/positions/automator/create',
+            path: '/products/automator/create',
           },
         ],
       },
