@@ -119,10 +119,10 @@ export class AutomatorUserService {
   }) {
     const [list, vaults, prices] = await Promise.all([
       http
-        .get<unknown, HttpResponse<OriginAutomatorUserPosition[]>>(
-          `/automator/user/list`,
-          { params },
-        )
+        .get<
+          unknown,
+          HttpResponse<OriginAutomatorUserPosition[]>
+        >(`/automator/user/list`, { params })
         .then((res) => res.value),
       AutomatorService.automatorList({ chainId: params.chainId }),
       MarketService.fetchIndexPx(),
@@ -242,7 +242,7 @@ export class AutomatorUserService {
             hash,
             vault.chainId,
           ).then((res) =>
-            res === TransactionStatus.FAILED
+            res.status === TransactionStatus.FAILED
               ? statusMap.failed
               : statusMap.success,
           );
