@@ -8,12 +8,11 @@ import {
   Row,
   Spin,
   Toast,
+  Tooltip,
 } from '@douyinfe/semi-ui';
-import { automatorCreateConfigs } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
-import { RCHService } from '@sofa/services/rch';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
@@ -24,13 +23,16 @@ import { useIsMobileUI } from '@/components/MobileOnly';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
 import { Comp as IconLoading } from './assets/icon-loading.svg';
+import { Comp as IconInfo } from './assets/icon-info.svg';
 import {
   AutomatorCreateStoreType,
   getNameForChain,
+  isMockAPI,
   useAutomatorCreateStore,
 } from './store';
 
 import styles from './index-model.module.scss';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 
 const steps: {
   arrived: (store: AutomatorCreateStoreType) => boolean;
@@ -72,19 +74,24 @@ const steps: {
 const StepStart = () => {
   const [t] = useTranslation('AutomatorCreate');
   const { chainId } = useWalletStore();
+  const { payload } = useAutomatorCreateStore();
   const burn = useLazyCallback(async () => {
+    const factory = payload.factory;
+    if (!factory) {
+      return;
+    }
     try {
-      if (chainId != automatorCreateConfigs.burnRchChainId) {
+      if (chainId != AutomatorCreatorService.rchAmountForBurning) {
         // switch chain
-        await useWalletStore.setChain(automatorCreateConfigs.burnRchChainId);
+        await useWalletStore.setChain(AutomatorCreatorService.rchBurnContract.chainId);
       }
       useAutomatorCreateStore.setState({
         rchBurning: true,
       });
       // burn
-      const hash = await RCHService.burn(
-        automatorCreateConfigs.burnRchChainId,
-        automatorCreateConfigs.burnRchAmount,
+      const hash = await AutomatorCreatorService.burnRCHBeforeCreate(
+        () => {},
+        factory
       );
 
       useAutomatorCreateStore.setState({
@@ -95,6 +102,16 @@ const StepStart = () => {
         },
       });
     } catch (e) {
+      if (isMockAPI) {
+        useAutomatorCreateStore.setState({
+          rchBurned: true,
+          payload: {
+            ...useAutomatorCreateStore.getState().payload,
+            burnTransactionHash: '0xMockHash',
+          },
+        });
+        return;
+      }
       useAutomatorCreateStore.getState().reset();
       console.error('error burn rch for automator creation', e);
       Toast.error(getErrorMsg(e));
@@ -104,7 +121,7 @@ const StepStart = () => {
     <div className={styles['step-1-start']}>
       <div className={styles['rch-amount']}>
         <span className={styles['amount']}>
-          {automatorCreateConfigs.burnRchAmount}
+          {AutomatorCreatorService.rchAmountForBurning}
         </span>{' '}
         RCH
       </div>
@@ -112,7 +129,7 @@ const StepStart = () => {
         className={classNames(styles['confirm-btn'], 'btn-primary')}
         onClick={() => burn()}
       >
-        {chainId == automatorCreateConfigs.burnRchChainId
+        {chainId == AutomatorCreatorService.rchBurnContract.chainId
           ? t({
               enUS: 'Confirm to Burn',
             })
@@ -122,7 +139,7 @@ const StepStart = () => {
               },
               {
                 chainName: getNameForChain(
-                  automatorCreateConfigs.burnRchChainId,
+                  AutomatorCreatorService.rchBurnContract.chainId,
                   t,
                 ),
               },
@@ -148,6 +165,41 @@ const StepForm = () => {
   const [t] = useTranslation('AutomatorCreate');
   const { payload } = useAutomatorCreateStore();
   const { chainId } = useWalletStore();
+  const isMobileUI = useIsMobileUI();
+  const deploy = useLazyCallback(async () => {
+    const _payload = payload;
+    const factory = _payload.factory;
+    if (!_payload || !factory) {
+      return;
+    }
+    try {
+
+      if (chainId != factory.chainId) {
+        // switch chain
+        await useWalletStore.setChain(factory.chainId);
+      }
+      useAutomatorCreateStore.setState({
+        automatorCreating: true,
+      });
+      const result = await AutomatorCreatorService.createAutomator(() => {}, _payload!);
+
+      useAutomatorCreateStore.setState({
+        automatorCreating: false,
+        automatorCreateResult: result as any,
+      });
+    } catch (e) {
+      if (isMockAPI) {
+        
+        useAutomatorCreateStore.setState({
+          automatorCreating: false,
+          automatorCreateResult: '0xMockResult',
+        });
+        return;
+      }
+      console.error(e);
+      Toast.error(getErrorMsg(e));
+    }
+  });
   return (
     <div className={styles['step-3-form']}>
       <Form labelPosition="top" initValues={payload}>
@@ -179,6 +231,17 @@ const StepForm = () => {
                   {t({
                     enUS: 'Redemption Waiting Period',
                   })}
+                  <Tooltip
+                    style={{
+                      maxWidth: isMobileUI ? '80vw' : '500px'
+                    }}
+                    content={<div dangerouslySetInnerHTML={{
+                    __html: t({
+                      enUS: `The Redemption Waiting Period refers to the time users must wait after submitting a redemption request for their funds to become claimable. Additionally, this period determines the maximum expiration date range for options tradable by the Automator manager.`
+                    }).replace(/\n/g, '<br />')
+                  }} />}>
+                  <IconInfo className={styles['icon-info']}/>
+                  </Tooltip>
                   <div className={styles['field-desc']}>
                     {t({
                       enUS: 'You can only trade products with expiration dates within the selected waiting period.',
@@ -206,9 +269,22 @@ const StepForm = () => {
           <Col span={24}>
             <Form.RadioGroup
               field="sharePercent"
-              label={t({
-                enUS: 'Share Precent',
-              })}
+              label={<>
+                {t({
+                  enUS: 'Profits Share Ratio',
+                })}
+                <Tooltip
+                  style={{
+                    maxWidth: isMobileUI ? '80vw' : '500px'
+                  }}
+                  content={<div dangerouslySetInnerHTML={{
+                  __html: t({
+                    enUS: `The Profits Share Ratio defines the percentage of user profits that the Automator manager can share as their performance fee. If the Automator generates losses, the shared profits are recorded as negative until the account balance turns positive again. Only then can the manager resume withdrawing profit shares.`
+                  }).replace(/\n/g, '<br />')
+                }} />}>
+                <IconInfo className={styles['icon-info']}/>
+                </Tooltip>
+              </>}
               type="pureCard"
               trigger="blur"
               rules={[
@@ -247,20 +323,27 @@ const StepForm = () => {
           </Col>
         </Row>
       </Form>
-      <Button className="btn-gradient-text">
-        {payload.chainId != chainId
+      <AsyncButton className={classNames('btn-gradient-text', 'btn-primary', styles['btn-deploy'])} onClick={() => deploy()}>
+        {payload.factory && payload.factory.chainId != chainId
           ? t(
               {
                 enUS: 'Switch to {{chainName}} to Deploy',
               },
               {
-                chainName: ChainMap[payload.chainId!]?.name,
+                chainName: ChainMap[payload.factory.chainId!]?.name,
               },
             )
           : t({
               enUS: 'Deploy Automator Vault',
             })}
-      </Button>
+      </AsyncButton>
+      <div className={styles['tips']}>
+        <p className={styles['tip']}>
+          {t({
+            enUS: 'Note: Automator information cannot be edited after vault created.'
+          })}
+        </p>
+      </div>
     </div>
   );
 };
@@ -370,10 +453,10 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
             <span className={styles['value']}>
               <img
                 className={styles['logo']}
-                src={ChainMap[payload.chainId!]?.icon}
+                src={ChainMap[payload.factory?.chainId || 0]?.icon}
                 alt=""
               />
-              <span>{ChainMap[payload.chainId!]?.name}</span>
+              <span>{ChainMap[payload.factory?.chainId || 0]?.name}</span>
             </span>
           </div>
           <div className={styles['token']}>
@@ -385,12 +468,12 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
             <span className={styles['value']}>
               <img
                 className={styles['logo']}
-                src={CCYService.ccyConfigs[payload.clientDepositCcy!]?.icon}
+                src={CCYService.ccyConfigs[payload.factory?.clientDepositCcy || '']?.icon}
                 alt=""
               />
               <span>
-                {CCYService.ccyConfigs[payload.clientDepositCcy!]?.name ||
-                  payload.clientDepositCcy}
+                {CCYService.ccyConfigs[payload.factory?.clientDepositCcy || '']?.name ||
+                  payload.factory?.clientDepositCcy}
               </span>
             </span>
           </div>
@@ -409,7 +492,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
                     enUS: 'Burn {{amount}} RCH',
                   },
                   {
-                    amount: automatorCreateConfigs.burnRchAmount,
+                    amount: AutomatorCreatorService.rchAmountForBurning,
                   },
                 ),
                 {

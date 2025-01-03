@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Select, Tooltip } from '@douyinfe/semi-ui';
+import { Select, Toast, Tooltip } from '@douyinfe/semi-ui';
 import { Button } from '@douyinfe/semi-ui';
-import { AutomatorService } from '@sofa/services/automator';
-import { ProjectType } from '@sofa/services/base-type';
+import { AutomatorFactory, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
-import { ChainMap, defaultChain } from '@sofa/services/chains';
+import { ChainMap } from '@sofa/services/chains';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useRequest } from 'ahooks';
@@ -23,9 +22,12 @@ import { Comp as IconPoints } from './assets/icon-points.svg';
 import { Comp as IconShare } from './assets/icon-share.svg';
 import { Comp as IconZero } from './assets/icon-zero.svg';
 import { AutomatorCreateModel } from './index-model';
-import { useAutomatorCreateStore } from './store';
+import { isMockAPI, useAutomatorCreateStore } from './store';
 
 import styles from './index.module.scss';
+import { Env } from '@sofa/utils/env';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
+import { getErrorMsg } from '@sofa/utils/fns';
 
 const FAQ = (t: TFunction) => {
   return [
@@ -79,7 +81,10 @@ const AutomatorCreate = () => {
   const { bringUpConnect } = useWalletUIState();
   const isMobileUI = useIsMobileUI();
   const [modelVisible, setModelVisible] = useState(false);
-  const { payload, updatePayload, reset } = useAutomatorCreateStore();
+  const { updatePayload, reset } = useAutomatorCreateStore();
+  const [chainId, setChainId] = useState(0);
+  const [token, setToken] = useState('');
+  
   const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({
     [0]: true,
   });
@@ -93,18 +98,30 @@ const AutomatorCreate = () => {
   }, [wallet.address, modelVisible]);
   const { data, loading } = useRequest(
     async () => {
-      // TODO: read from api
-      return [
-        {
-          chainId: 421614,
-          clientDepositCcy: 'USDT',
-          factoryAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
-          automatorAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
-        },
-      ];
+      const result = AutomatorCreatorService.automatorFactories();
+      if (isMockAPI) {
+        return result.catch(r => {
+          return [
+            {
+              chainId: 421614,
+              chainName: 'Test chain',
+              clientDepositCcy: 'USDT',
+              vaultDepositCcy: 'USDC',
+              factoryAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+              vaultDepositCcyAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+              clientDepositCcyAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+            },
+          ]
+        })
+      }
+      return result;
     },
     {
       refreshDeps: [wallet.address, wallet.chainId],
+      onError: e => {
+        console.error(e);
+        Toast.error(getErrorMsg(e));
+      }
     },
   );
   return (
@@ -142,7 +159,7 @@ const AutomatorCreate = () => {
                 </span>
               }
               suffix={
-                payload.chainId ? undefined : (
+                chainId ? undefined : (
                   <span className={styles['select-label']}>
                     {t({
                       enUS: 'Select',
@@ -152,9 +169,7 @@ const AutomatorCreate = () => {
               }
               loading={loading}
               onChange={(v) =>
-                updatePayload({
-                  chainId: v as number,
-                })
+                setChainId(v as number)
               }
             >
               {data &&
@@ -170,11 +185,11 @@ const AutomatorCreate = () => {
                 ))}
             </Select>
             <Tooltip
-              key={payload.chainId ? 'chain-selected' : 'chain-not-selected'}
-              trigger={payload.chainId ? 'custom' : undefined}
-              visible={!payload.chainId}
+              key={chainId ? 'chain-selected' : 'chain-not-selected'}
+              trigger={chainId ? 'custom' : undefined}
+              visible={!chainId}
               content={
-                payload.chainId
+                chainId
                   ? undefined
                   : t({
                       enUS: 'Please select Automator Chain first',
@@ -191,7 +206,7 @@ const AutomatorCreate = () => {
                   </span>
                 }
                 suffix={
-                  payload.clientDepositCcy ? undefined : (
+                  token ? undefined : (
                     <span className={styles['select-label']}>
                       {t({
                         enUS: 'Select',
@@ -200,17 +215,15 @@ const AutomatorCreate = () => {
                   )
                 }
                 loading={loading}
-                disabled={!payload?.chainId}
+                disabled={!chainId}
                 onChange={(v) =>
-                  updatePayload({
-                    clientDepositCcy: v as string,
-                  })
+                  setToken(v as string)
                 }
               >
                 {data &&
                   uniq(
                     data
-                      .filter((c) => c.chainId == payload?.chainId)
+                      .filter((c) => c.chainId == chainId)
                       .map((c) => c.clientDepositCcy),
                   ).map((depositCcy) => (
                     <Select.Option value={depositCcy}>
@@ -232,7 +245,7 @@ const AutomatorCreate = () => {
             className={classNames(styles['btn-create'], 'btn-primary')}
             disabled={
               (wallet.address &&
-                !(payload.chainId && payload.clientDepositCcy)) ||
+                !(chainId && token)) ||
               false
             }
             onClick={() => {
@@ -243,18 +256,17 @@ const AutomatorCreate = () => {
               if (!data) {
                 return;
               }
-              const config = data.find(
+              const factory = data.find(
                 (c) =>
-                  c.clientDepositCcy == payload.clientDepositCcy &&
-                  c.chainId == payload.chainId,
+                  c.clientDepositCcy == token &&
+                  c.chainId == chainId,
               );
-              if (!config) {
+              if (!factory) {
                 return;
               }
               reset();
               updatePayload({
-                factoryAddress: config.factoryAddress,
-                automatorAddress: config.automatorAddress,
+                factory,
               });
               setModelVisible(true);
             }}

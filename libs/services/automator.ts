@@ -150,22 +150,7 @@ export enum AutomatorDepositStatus {
   ACTIVE = 'ACTIVE',
   CLOSED = 'CLOSED',
 }
-export const automatorCreateConfigs = {
-  burnRchChainId: defaultChain.chainId,
-  burnRchAmount: Env.isDaily ? '2' : '500',
-};
 
-export interface AutomatorCreateParams {
-  chainId: number; // 链ID
-  automatorAddress: string;
-  burnTransactionHash: string; // burn的transaction hash
-  automatorName: string; // automator名称
-  redemptionPeriodDay: number; // 赎回观察时间（单位：天）
-  feeRate: number | string; // 抽佣比率
-  description: string; // Automator描述
-  factoryAddress: string; // Factory地址
-  clientDepositCcy: string; // 用户存入的标的物
-}
 
 export interface AutomatorFollower {
   wallet: string; // wallet
@@ -178,18 +163,6 @@ export interface AutomatorFollower {
   totalRchAmount: number | string; // Rch的总PNL(RCH)
   followDay: number; // 加入天数
   pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
-}
-
-export interface AutomatorCreateParams {
-  chainId: number; // 链ID
-  automatorAddress: string;
-  burnTransactionHash: string; // burn的transaction hash
-  automatorName: string; // automator名称
-  redemptionPeriodDay: number; // 赎回观察时间（单位：天）
-  feeRate: number | string; // 抽佣比率
-  description: string; // Automator描述
-  factoryAddress: string; // Factory地址
-  clientDepositCcy: string; // 用户存入的标的物
 }
 
 export interface AutomatorFollower {

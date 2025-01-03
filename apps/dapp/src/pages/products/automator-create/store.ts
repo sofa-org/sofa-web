@@ -1,10 +1,13 @@
 import {
-  AutomatorCreateParams,
   OriginAutomatorInfo,
 } from '@sofa/services/automator';
+import {
+  AutomatorCreateParams,
+} from '@sofa/services/automator-creator';
 import { ChainMap } from '@sofa/services/chains';
 import { TFunction } from '@sofa/services/i18n';
 import { createWithEqualityFn } from 'zustand/traditional';
+export const isMockAPI = true;
 
 export function getNameForChain(chainId: number | undefined, t: TFunction) {
   if (!chainId) {
@@ -19,7 +22,7 @@ export function getNameForChain(chainId: number | undefined, t: TFunction) {
 }
 export type AutomatorCreateStoreType = {
   payload: Partial<AutomatorCreateParams>;
-  info?: OriginAutomatorInfo;
+  automatorCreateResult?: string;
   rchBurning: boolean;
   rchBurned: boolean;
   automatorCreating: boolean;
@@ -42,7 +45,7 @@ export const useAutomatorCreateStore =
           redemptionPeriodDay: 7,
           feeRate: 5,
         },
-        info: undefined,
+        automatorCreateResult: undefined,
         rchBurning: false,
         rchBurned: false,
         automatorCreating: false,

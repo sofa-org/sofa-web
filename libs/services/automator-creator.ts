@@ -20,16 +20,6 @@ import { TransactionProgress } from './positions';
 import { PositionStatus } from './the-graph';
 import { WalletService } from './wallet';
 
-export interface AutomatorCreatePayload {
-  rchBurnHash: string;
-  automatorName: string;
-  chainId: number;
-  depositCcy: string;
-  redemptionWaitingPeriod: string;
-  sharePercent: number;
-  automatorDesc: string;
-}
-
 export interface OriginAutomatorCreateParams {
   chainId: number; // 链ID
   automatorAddress: string;
