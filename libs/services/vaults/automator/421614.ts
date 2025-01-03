@@ -10,6 +10,7 @@ const Vaults = [
     redeemWaitPeriod: MsIntervals.min * 20,
     claimPeriod: MsIntervals.min * 10,
     createTime: new Date('2024-11-24T08:00Z').getTime(),
+    creator: '0xA4A0425Bac7b53ECC4283A3b34A2308283CDbbd8',
   },
 ];
 

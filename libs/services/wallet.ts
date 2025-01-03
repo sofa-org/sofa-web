@@ -169,7 +169,7 @@ export class WalletService {
     signer: ethers.JsonRpcSigner,
     collateralContract: ethers.Contract,
     approveTo = PERMIT2_ADDRESS,
-    allowAmount?: string | number,
+    allowAmount?: string | number | bigint,
   ) {
     const hash = await ContractsService.dirtyCall(
       collateralContract,
@@ -193,7 +193,7 @@ export class WalletService {
 
   static async $approve(
     collateralAddress: string,
-    amount: string | number, // 交易金额，用于判断 allowance 是否够用（应该已经乘以了系数，比如实际为 1,000ETH，应该变成 1,000,000,000）
+    amount: string | number | bigint, // 交易金额，用于判断 allowance 是否够用（应该已经乘以了系数，比如实际为 1,000ETH，应该变成 1,000,000,000）
     signer: ethers.JsonRpcSigner,
     approveTo = PERMIT2_ADDRESS,
   ) {

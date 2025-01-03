@@ -2,12 +2,14 @@ import { waitUntil } from '@livelybone/promise-wait';
 import { asyncCache } from '@sofa/utils/decorators';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
+import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
-import Big from 'big.js';
-import { ethers } from 'ethers';
+import { AbstractSigner, ethers } from 'ethers';
+import { omitBy } from 'lodash-es';
 
 import burnAbis from './abis/AutomatorBurner.json';
 import factoryAbis from './abis/AutomatorFactory.json';
+import { CommonAbis } from './abis/common-abis';
 import { AutomatorService, OriginAutomatorInfo } from './automator';
 import {
   AutomatorFactory,
@@ -47,10 +49,9 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories() {
     return http
-      .get<
-        unknown,
-        HttpResponse<AutomatorFactory[]>
-      >(`/optivisors/automator/factories`)
+      .get<unknown, HttpResponse<AutomatorFactory[]>>(
+        `/optivisors/automator/factories`,
+      )
       .then((res) => res.value);
   }
 
@@ -108,7 +109,7 @@ export class AutomatorCreatorService {
         AutomatorCreatorService.rchBurnContract.chainId,
       );
       if (succ.status === TransactionStatus.FAILED)
-        throw new Error(`Burn failed`);
+        throw new Error(`Burn failed(tx: ${tx})`);
       cb({
         status: 'QueryResult',
         details: [
@@ -153,12 +154,108 @@ export class AutomatorCreatorService {
     });
   }
 
+  static async signSignatures(
+    products: Parameters<typeof WalletService.mint>[0][],
+    signer: AbstractSigner,
+  ) {
+    const signatures = products.reduce((acc, product) => {
+      const signature = ethers.keccak256(
+        ethers.solidityPacked(
+          ['address', 'bytes'],
+          [product.quote.makerWallet, product.quote.signature],
+        ),
+      );
+      const xorResult = ethers.toBigInt(acc) ^ ethers.toBigInt(signature);
+      return ethers.hexlify(ethers.zeroPadValue(ethers.toBeHex(xorResult), 32));
+    }, ethers.ZeroHash);
+
+    const signature = await signer.signMessage(ethers.getBytes(signatures));
+    return signature;
+  }
+
   static async mintProducts(
     cb: (progress: TransactionProgress) => void,
     vault: AutomatorVaultInfo,
     products: Parameters<typeof WalletService.mint>[0][],
   ) {
-    // TODO
+    cb({ status: 'Submitting' });
+    try {
+      const { signer } = await WalletService.connect(vault.chainId);
+      if (vault.creator.toLowerCase() !== signer.address.toLowerCase())
+        throw new Error('Only owner can mint products');
+      const contract = new ethers.Contract(vault.vault, vault.abis, signer);
+
+      const signature = await AutomatorCreatorService.signSignatures(
+        products,
+        signer,
+      );
+      const productList = products.map((it) => {
+        return {
+          vault: it.vault.vault,
+          totalCollateral: it.quote.totalCollateral,
+          mintParams: omitBy(
+            {
+              expiry: it.expiry,
+              anchorPrices: it.quote.anchorPrices,
+              collateralAtRisk: it.quote.collateralAtRisk,
+              makerCollateral: it.quote.makerCollateral,
+              deadline: it.quote.deadline,
+              maker: it.quote.makerWallet!,
+              makerSignature: it.quote.signature!,
+            },
+            (it) => isNullLike(it),
+          ),
+        };
+      });
+      const tx = await ContractsService.dirtyCall(
+        contract,
+        'mintProducts',
+        (gasLimit) => [productList, signature, { gasLimit }],
+      );
+
+      const vaultQuotes = products.reduce(
+        (pre, it) => {
+          const key = `${it.vault.vault.toLowerCase()}-${it.vault.chainId}-${
+            it.vault.depositCcy
+          }`;
+          if (!pre[key]) pre[key] = [];
+          pre[key].push(it.quote.quoteId);
+          return pre;
+        },
+        {} as Record<
+          string /* `${vault.toLowerCase()}-${chainId}-${depositCcy}` */,
+          (string | number)[]
+        >,
+      );
+      cb({
+        status: 'QueryResult',
+        details: Object.entries(vaultQuotes).map((v) => [
+          v[0],
+          { ids: v[1], status: PositionStatus.PENDING, hash: tx },
+        ]),
+      });
+
+      const res = await WalletService.transactionResult(tx, vault.chainId);
+      if (res.status === TransactionStatus.FAILED)
+        throw new Error(`Mint Failed(tx: ${tx})`);
+      cb({
+        status: 'Success',
+        details: Object.entries(vaultQuotes).map((v) => [
+          v[0],
+          { ids: v[1], status: PositionStatus.MINTED, hash: tx },
+        ]),
+      });
+    } catch (e) {
+      cb({
+        status: 'SubmitFailed',
+        details: [
+          [
+            `${vault.vault}-${vault.chainId}-${vault.depositCcy}`,
+            { ids: [], status: PositionStatus.FAILED, error: e },
+          ],
+        ],
+      });
+    }
   }
 
   static async claimPositions(
@@ -166,14 +263,125 @@ export class AutomatorCreatorService {
     vault: AutomatorVaultInfo,
     positions: Parameters<typeof WalletService.burn>[0][],
   ) {
-    // TODO
+    cb({ status: 'Submitting' });
+    try {
+      const { signer } = await WalletService.connect(vault.chainId);
+      const contract = new ethers.Contract(vault.vault, vault.abis, signer);
+      const positionList = {
+        vault: vault.vault,
+        products: positions.map((it) => ({
+          expiry: it.expiry,
+          anchorPrices: it.anchorPrices,
+        })),
+      };
+      const vaultQuotes = positions.reduce(
+        (pre, it) => {
+          const key = `${it.vault.toLowerCase()}-${it.chainId}-${it.claimCcy}`;
+          if (!pre[key]) pre[key] = [];
+          pre[key].push(it.positionId);
+          return pre;
+        },
+        {} as Record<
+          string /* `${vault.toLowerCase()}-${chainId}-${depositCcy}` */,
+          (string | number)[]
+        >,
+      );
+      const tx = await ContractsService.dirtyCall(
+        contract,
+        'burnProducts',
+        (gasLimit) => [positionList, { gasLimit }],
+      );
+
+      cb({
+        status: 'QueryResult',
+        details: Object.entries(vaultQuotes).map((v) => [
+          v[0],
+          { ids: v[1], status: PositionStatus.CLAIMING, hash: tx },
+        ]),
+      });
+      const res = await WalletService.transactionResult(tx, vault.chainId);
+      if (res.status === TransactionStatus.FAILED)
+        throw new Error(`Burn Failed(tx: ${tx})`);
+      cb({
+        status: 'Success',
+        details: Object.entries(vaultQuotes).map((v) => [
+          v[0],
+          { ids: v[1], status: PositionStatus.CLAIMED, hash: tx },
+        ]),
+      });
+    } catch (e) {
+      cb({
+        status: 'SubmitFailed',
+        details: [
+          [
+            `${vault.vault}-${vault.chainId}-${vault.depositCcy}`,
+            { ids: [], status: PositionStatus.FAILED, error: e },
+          ],
+        ],
+      });
+    }
   }
 
-  static async claimProfits(
+  static async profitsCanBeHarvested(vault: AutomatorVaultInfo) {
+    const provider = await WalletService.readonlyConnect(vault.chainId);
+    const contract = new ethers.Contract(vault.vault, vault.abis, provider);
+    const vaultDepositCcy = new ethers.Contract(
+      vault.vaultDepositCcy,
+      [CommonAbis.decimals],
+      provider,
+    );
+    try {
+      return Promise.all([
+        contract.totalFee(),
+        vaultDepositCcy.decimals(),
+      ]).then(([res, decimals]) => ethers.formatUnits(res, decimals));
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  static async harvestProfits(
     cb: (progress: TransactionProgress) => void,
     vault: AutomatorVaultInfo,
   ) {
-    // TODO
+    cb({ status: 'Submitting' });
+    try {
+      const { signer } = await WalletService.connect(vault.chainId);
+      if (vault.creator.toLowerCase() !== signer.address.toLowerCase())
+        throw new Error('Only owner can harvest');
+      const contract = new ethers.Contract(vault.vault, vault.abis, signer);
+      const tx = await ContractsService.dirtyCall(
+        contract,
+        'harvest',
+        (gasLimit) => [{ gasLimit }],
+      );
+
+      cb({
+        status: 'QueryResult',
+        details: [
+          ['--', { ids: [], status: PositionStatus.CLAIMING, hash: tx }],
+        ],
+      });
+      const res = await WalletService.transactionResult(tx, vault.chainId);
+      if (res.status === TransactionStatus.FAILED)
+        throw new Error(`Burn Failed(tx: ${tx})`);
+      cb({
+        status: 'Success',
+        details: [
+          ['--', { ids: [], status: PositionStatus.CLAIMED, hash: tx }],
+        ],
+      });
+    } catch (e) {
+      cb({
+        status: 'SubmitFailed',
+        details: [
+          [
+            `${vault.vault}-${vault.chainId}-${vault.depositCcy}`,
+            { ids: [], status: PositionStatus.FAILED, error: e },
+          ],
+        ],
+      });
+    }
   }
 
   private static async $createAutomatorByFactory(
@@ -194,9 +402,7 @@ export class AutomatorCreatorService {
         factory,
         'createAutomator',
         (gasLimit) => [
-          Big(data.feeRate)
-            .times(10 ** 18)
-            .toFixed(0), // 乘以 1e18
+          ethers.parseUnits(String(data.feeRate), 18), // 乘以 1e18
           (data.redemptionPeriodDay * MsIntervals.day) / 1000, // s
           data.factory.clientDepositCcyAddress,
           { gasLimit },
@@ -216,7 +422,7 @@ export class AutomatorCreatorService {
         data.factory.chainId,
       );
       if (res.status === TransactionStatus.FAILED)
-        throw new Error('Failed to create automator');
+        throw new Error(`Failed to create automator(tx: ${tx})`);
       cb({
         status: 'Success',
         details: [[`--`, { ids: [], status: PositionStatus.MINTED, hash: tx }]],
@@ -246,6 +452,8 @@ export class AutomatorCreatorService {
   }
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
-    return http.post<unknown, boolean>('/optivisors/automator/create', data);
+    return http
+      .post<unknown, boolean>('/optivisors/automator/create', data)
+      .then(() => data.automatorAddress);
   }
 }

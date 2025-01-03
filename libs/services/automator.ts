@@ -2,7 +2,6 @@ import { asyncCache } from '@sofa/utils/decorators';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { http } from '@sofa/utils/http';
-import Big from 'big.js';
 import { get, pick } from 'lodash-es';
 
 import AutomatorAbis from './abis/Automator.json';
@@ -18,9 +17,6 @@ import {
 } from './base-type';
 import { defaultChain } from './chains';
 import { ContractsService } from './contracts';
-import { TransactionProgress } from './positions';
-import { PositionStatus } from './the-graph';
-import { WalletService } from './wallet';
 
 // server 返回的结构
 export interface OriginAutomatorInfo {
@@ -163,6 +159,31 @@ export interface AutomatorFollower {
   totalRchAmount: number | string; // Rch的总PNL(RCH)
   followDay: number; // 加入天数
   pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
+}
+
+export interface AutomatorFollower {
+  wallet: string; // wallet
+  amountByVaultDepositCcy: number | string; // 当前持有的总资产(scrvUSD)
+  amountByClientDepositCcy: number | string; // 当前持有的总资产(crvUSD)
+  share: number | string; // 转换的份额
+  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
+  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
+  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
+  totalRchAmount: number | string; // Rch的总PNL(RCH)
+  followDay: number; // 加入天数
+  pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
+}
+
+export interface AutomatorCreateParams {
+  chainId: number; // 链ID
+  automatorAddress: string;
+  burnTransactionHash: string; // burn的transaction hash
+  automatorName: string; // automator名称
+  redemptionPeriodDay: number; // 赎回观察时间（单位：天）
+  feeRate: number | string; // 抽佣比率
+  description: string; // Automator描述
+  factoryAddress: string; // Factory地址
+  clientDepositCcy: string; // 用户存入的标的物
 }
 
 export interface AutomatorFollower {

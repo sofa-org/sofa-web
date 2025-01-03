@@ -42,7 +42,7 @@ const steps: {
   comp: () => JSX.Element[] | JSX.Element;
 }[] = [
   {
-    arrived: (store) => !!store.info,
+    arrived: (store) => !!store.automatorCreateResult,
     processPercent: 100,
     step1: true,
     step2: true,
@@ -378,7 +378,7 @@ const StepCreating = () => {
 };
 const StepFinished = () => {
   const [t] = useTranslation('AutomatorCreate');
-  const { info } = useAutomatorCreateStore();
+  const { automatorCreateResult, payload } = useAutomatorCreateStore();
   return (
     <div className={styles['step-5-finished']}>
       <div className={styles['icon-congrats']} />
@@ -389,7 +389,7 @@ const StepFinished = () => {
               enUS: 'Automator [[{{name}}]] is created!',
             },
             {
-              name: info?.automatorName,
+              name: payload.automatorName,
             },
           ),
           {
@@ -397,7 +397,7 @@ const StepFinished = () => {
           },
         )}
       </div>
-      <div className={styles['desc']}>{info?.automatorVault}</div>
+      <div className={styles['desc']}>{automatorCreateResult}</div>
       <Button>
         {t({
           enUS: 'Go to Automator Management',

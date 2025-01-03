@@ -1,7 +1,6 @@
 import { cvtAmountsInCcy } from '@sofa/utils/amount';
 import { safeRun } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
-import Big from 'big.js';
 import { ethers } from 'ethers';
 
 import {
@@ -119,10 +118,10 @@ export class AutomatorUserService {
   }) {
     const [list, vaults, prices] = await Promise.all([
       http
-        .get<
-          unknown,
-          HttpResponse<OriginAutomatorUserPosition[]>
-        >(`/automator/user/list`, { params })
+        .get<unknown, HttpResponse<OriginAutomatorUserPosition[]>>(
+          `/automator/user/list`,
+          { params },
+        )
         .then((res) => res.value),
       AutomatorService.automatorList({ chainId: params.chainId }),
       MarketService.fetchIndexPx(),
@@ -280,9 +279,7 @@ export class AutomatorUserService {
       Automator.decimals(),
       Automator.collateral(),
     ]);
-    const amountWithDecimals = Big(amount)
-      .times(10 ** Number(decimals))
-      .toFixed(0);
+    const amountWithDecimals = ethers.parseUnits(String(amount), decimals);
     await WalletService.$approve(
       collateralAddress,
       amountWithDecimals,
