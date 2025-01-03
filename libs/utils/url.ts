@@ -26,7 +26,7 @@ export function joinUrl(...urls: string[]) {
     },
     { origin: '', pathname: '', search: {}, hash: '' },
   );
-  return `${url.origin}${url.pathname}${stringify(url.search, {
+  return `${url.origin}${url.pathname || '/'}${stringify(url.search, {
     addQueryPrefix: true,
   })}${url.hash}`;
 }

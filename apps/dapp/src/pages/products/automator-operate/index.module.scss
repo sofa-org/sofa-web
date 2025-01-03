@@ -1,0 +1,23 @@
+.head-title {
+  @include flex-center;
+
+  margin: 0;
+  padding: 75px 0 30px;
+  font-size: min(24px, 5vw);
+  text-align: center;
+  color: #fff;
+}
+
+.container.container.container {
+  margin: 0 auto;
+  width: $width-content;
+  background: transparent;
+
+  :global {
+    .semi-empty {
+      @include flex-column-center;
+
+      height: 50vh;
+    }
+  }
+}

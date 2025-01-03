@@ -68,17 +68,20 @@ const allMenuItems = (
         label: (t: TFunction) => t('Docs'),
         path: 'https://docs.sofa.org',
         type: 1,
+        target: '_blank',
       },
       {
         label: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
         path: 'https://blog.sofa.org/',
         type: 1,
+        target: '_blank',
       },
       {
         label: (t: TFunction) =>
           t({ enUS: 'Ambassador Program', zhCN: '宣传大使项目' }),
         path: 'https://blog.sofa.org/ambassador/',
         type: 1,
+        target: '_blank',
       },
     ],
     location,
@@ -89,32 +92,42 @@ function locationMatches(
   item: MenuItem,
   location: ReturnType<typeof useLocation>,
 ) {
-  let itemPath =
-    (item.path && item.path.replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
-    '';
-  if (!/^\w+:/.test(itemPath)) {
-    if (itemPath) {
-      itemPath = window.location.origin + '/' + itemPath;
-    } else {
-      itemPath = window.location.origin;
-    }
-  }
-  const itemSearch =
-    (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
-  const locationPath = (window.location.origin + location.pathname).replace(
-    /\/+$/g,
-    '',
-  );
-  return !!(
-    itemPath == locationPath &&
-    (!itemSearch || location.search.includes(itemSearch)) &&
-    (itemSearch ||
-      // this is to differentiate:
-      // Automator: /products?project=Automator
-      // Trade - Core Mode: /products
-      !/project=/.test(location.search))
-  );
+  if (!item.path.replace(/^\/+/, '') && location.pathname !== '/') return false;
+  const [, origin = '', path = '', search = '', hash = ''] =
+    item.path.match(/^(https?:\/\/[^/]+)?([^#?]+)?([^#]+)?(.*)?$/) || [];
+
+  if (origin && window.location.origin !== origin) return false;
+  if (!location.pathname.includes(path)) return false;
+  if (search.split(/[?&]/).some((it) => !location.search.includes(it)))
+    return false;
+  return location.hash === hash;
+  // let itemPath =
+  //   (item.path && item.path.replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
+  //   '';
+  // if (!/^\w+:/.test(itemPath)) {
+  //   if (itemPath) {
+  //     itemPath = window.location.origin + '/' + itemPath;
+  //   } else {
+  //     itemPath = window.location.origin;
+  //   }
+  // }
+  // const itemSearch =
+  //   (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
+  // const locationPath = (window.location.origin + location.pathname).replace(
+  //   /\/+$/g,
+  //   '',
+  // );
+  // return !!(
+  //   itemPath == locationPath &&
+  //   (!itemSearch || location.search.includes(itemSearch)) &&
+  //   (itemSearch ||
+  //     // this is to differentiate:
+  //     // Automator: /products?project=Automator
+  //     // Trade - Core Mode: /products
+  //     !/project=/.test(location.search))
+  // );
 }
+
 export function markSelectedMenuItems(
   items: MenuItem[],
   location: ReturnType<typeof useLocation>,
@@ -156,7 +169,6 @@ export function useHeaderOpacity() {
 }
 export const RenderMenu = (it: MenuItem) => {
   const [t] = useTranslation('Header');
-  const [project] = useProjectChange(ProjectType.Surge);
   const isMobileUI = useIsMobileUI();
   const { selectedMenuItem, setSelectedMenuItem } = useMobileHeaderState();
   if (it.hide?.()) return <Fragment />;
@@ -177,7 +189,7 @@ export const RenderMenu = (it: MenuItem) => {
   if (!it.children?.length) {
     return (
       <a
-        href={joinUrl(it.path, `?project=${project}`)}
+        href={joinUrl(it.path, location.search)}
         className={classNames(styles['link'], 'link', {
           [styles['active']]: it.active,
           ['active']: it.active,
@@ -262,7 +274,8 @@ export const RenderMenu = (it: MenuItem) => {
                         },
                       )}
                       onClick={() => {
-                        window.location.href = m.path;
+                        const path = joinUrl(location.search, m.path);
+                        window.location.href = path;
                       }}
                     >
                       <span className="semi-select-option-text">
@@ -406,6 +419,7 @@ export const CommonHeader = (props: {
 };
 
 export const HomeHeader = () => {
+  const location = useLocation();
   const more = useMemo(
     () => /rch|points/.test(location.pathname),
     [location.pathname],
