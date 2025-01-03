@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import {
   Button,
   Col,
@@ -10,6 +10,11 @@ import {
   Toast,
   Tooltip,
 } from '@douyinfe/semi-ui';
+import { FormApi } from '@douyinfe/semi-ui/lib/es/form';
+import {
+  AutomatorCreateParams,
+  AutomatorCreatorService,
+} from '@sofa/services/automator-creator';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
@@ -17,13 +22,14 @@ import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
 import classNames from 'classnames';
+import { copy } from 'clipboard';
 
 import AsyncButton from '@/components/AsyncButton';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
-import { Comp as IconLoading } from './assets/icon-loading.svg';
 import { Comp as IconInfo } from './assets/icon-info.svg';
+import { Comp as IconLoading } from './assets/icon-loading.svg';
 import {
   AutomatorCreateStoreType,
   getNameForChain,
@@ -32,7 +38,6 @@ import {
 } from './store';
 
 import styles from './index-model.module.scss';
-import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 
 const steps: {
   arrived: (store: AutomatorCreateStoreType) => boolean;
@@ -83,7 +88,9 @@ const StepStart = () => {
     try {
       if (chainId != AutomatorCreatorService.rchAmountForBurning) {
         // switch chain
-        await useWalletStore.setChain(AutomatorCreatorService.rchBurnContract.chainId);
+        await useWalletStore.setChain(
+          AutomatorCreatorService.rchBurnContract.chainId,
+        );
       }
       useAutomatorCreateStore.setState({
         rchBurning: true,
@@ -91,7 +98,7 @@ const StepStart = () => {
       // burn
       const hash = await AutomatorCreatorService.burnRCHBeforeCreate(
         () => {},
-        factory
+        factory,
       );
 
       useAutomatorCreateStore.setState({
@@ -162,18 +169,26 @@ const StepBurning = () => {
   );
 };
 const StepForm = () => {
+  const api = useRef<FormApi>();
   const [t] = useTranslation('AutomatorCreate');
-  const { payload } = useAutomatorCreateStore();
+  const { payload, updatePayload } = useAutomatorCreateStore();
   const { chainId } = useWalletStore();
   const isMobileUI = useIsMobileUI();
   const deploy = useLazyCallback(async () => {
+    const values = (await api.current
+      ?.validate()
+      .catch((r) => undefined)) as unknown as AutomatorCreateParams | undefined;
+    if (!values) {
+      return;
+    }
+    updatePayload(values);
+
     const _payload = payload;
     const factory = _payload.factory;
     if (!_payload || !factory) {
       return;
     }
     try {
-
       if (chainId != factory.chainId) {
         // switch chain
         await useWalletStore.setChain(factory.chainId);
@@ -181,15 +196,17 @@ const StepForm = () => {
       useAutomatorCreateStore.setState({
         automatorCreating: true,
       });
-      const result = await AutomatorCreatorService.createAutomator(() => {}, _payload!);
+      const result = await AutomatorCreatorService.createAutomator(
+        () => {},
+        _payload as AutomatorCreateParams,
+      );
 
       useAutomatorCreateStore.setState({
         automatorCreating: false,
-        automatorCreateResult: result as any,
+        automatorCreateResult: result,
       });
     } catch (e) {
       if (isMockAPI) {
-        
         useAutomatorCreateStore.setState({
           automatorCreating: false,
           automatorCreateResult: '0xMockResult',
@@ -202,7 +219,11 @@ const StepForm = () => {
   });
   return (
     <div className={styles['step-3-form']}>
-      <Form labelPosition="top" initValues={payload}>
+      <Form
+        labelPosition="top"
+        initValues={payload}
+        getFormApi={(formApi) => (api.current = formApi)}
+      >
         <Row>
           <Col span={24}>
             <Form.Input
@@ -233,14 +254,19 @@ const StepForm = () => {
                   })}
                   <Tooltip
                     style={{
-                      maxWidth: isMobileUI ? '80vw' : '500px'
+                      maxWidth: isMobileUI ? '80vw' : '500px',
                     }}
-                    content={<div dangerouslySetInnerHTML={{
-                    __html: t({
-                      enUS: `The Redemption Waiting Period refers to the time users must wait after submitting a redemption request for their funds to become claimable. Additionally, this period determines the maximum expiration date range for options tradable by the Automator manager.`
-                    }).replace(/\n/g, '<br />')
-                  }} />}>
-                  <IconInfo className={styles['icon-info']}/>
+                    content={
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: t({
+                            enUS: `The Redemption Waiting Period refers to the time users must wait after submitting a redemption request for their funds to become claimable. Additionally, this period determines the maximum expiration date range for options tradable by the Automator manager.`,
+                          }).replace(/\n/g, '<br />'),
+                        }}
+                      />
+                    }
+                  >
+                    <IconInfo className={styles['icon-info']} />
                   </Tooltip>
                   <div className={styles['field-desc']}>
                     {t({
@@ -269,22 +295,29 @@ const StepForm = () => {
           <Col span={24}>
             <Form.RadioGroup
               field="sharePercent"
-              label={<>
-                {t({
-                  enUS: 'Profits Share Ratio',
-                })}
-                <Tooltip
-                  style={{
-                    maxWidth: isMobileUI ? '80vw' : '500px'
-                  }}
-                  content={<div dangerouslySetInnerHTML={{
-                  __html: t({
-                    enUS: `The Profits Share Ratio defines the percentage of user profits that the Automator manager can share as their performance fee. If the Automator generates losses, the shared profits are recorded as negative until the account balance turns positive again. Only then can the manager resume withdrawing profit shares.`
-                  }).replace(/\n/g, '<br />')
-                }} />}>
-                <IconInfo className={styles['icon-info']}/>
-                </Tooltip>
-              </>}
+              label={
+                <>
+                  {t({
+                    enUS: 'Profits Share Ratio',
+                  })}
+                  <Tooltip
+                    style={{
+                      maxWidth: isMobileUI ? '80vw' : '500px',
+                    }}
+                    content={
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: t({
+                            enUS: `The Profits Share Ratio defines the percentage of user profits that the Automator manager can share as their performance fee. If the Automator generates losses, the shared profits are recorded as negative until the account balance turns positive again. Only then can the manager resume withdrawing profit shares.`,
+                          }).replace(/\n/g, '<br />'),
+                        }}
+                      />
+                    }
+                  >
+                    <IconInfo className={styles['icon-info']} />
+                  </Tooltip>
+                </>
+              }
               type="pureCard"
               trigger="blur"
               rules={[
@@ -323,7 +356,14 @@ const StepForm = () => {
           </Col>
         </Row>
       </Form>
-      <AsyncButton className={classNames('btn-gradient-text', 'btn-primary', styles['btn-deploy'])} onClick={() => deploy()}>
+      <AsyncButton
+        className={classNames(
+          'btn-gradient-text',
+          'btn-primary',
+          styles['btn-deploy'],
+        )}
+        onClick={() => deploy()}
+      >
         {payload.factory && payload.factory.chainId != chainId
           ? t(
               {
@@ -340,7 +380,7 @@ const StepForm = () => {
       <div className={styles['tips']}>
         <p className={styles['tip']}>
           {t({
-            enUS: 'Note: Automator information cannot be edited after vault created.'
+            enUS: 'Note: Automator information cannot be edited after vault created.',
           })}
         </p>
       </div>
@@ -352,7 +392,7 @@ const StepCreating = () => {
   const { payload } = useAutomatorCreateStore();
   return (
     <div className={styles['step-4-creating']}>
-      <Spin />
+      <Spin indicator={<IconLoading />} />
       <div className={styles['title']}>
         {formatHighlightedText(
           t(
@@ -379,6 +419,18 @@ const StepCreating = () => {
 const StepFinished = () => {
   const [t] = useTranslation('AutomatorCreate');
   const { automatorCreateResult, payload } = useAutomatorCreateStore();
+  const handleCopy = useLazyCallback(() => {
+    Promise.resolve()
+      .then(() => copy(automatorCreateResult!))
+      .then(() =>
+        Toast.success(
+          t({
+            enUS: 'Copy successful',
+            zhCN: '复制成功',
+          }),
+        ),
+      );
+  });
   return (
     <div className={styles['step-5-finished']}>
       <div className={styles['icon-congrats']} />
@@ -397,8 +449,17 @@ const StepFinished = () => {
           },
         )}
       </div>
-      <div className={styles['desc']}>{automatorCreateResult}</div>
-      <Button>
+      <div className={styles['desc']} onClick={handleCopy}>
+        {automatorCreateResult}
+      </div>
+      <div />
+      <Button
+        className={classNames(
+          'btn-gradient-text',
+          'btn-primary',
+          styles['btn-finish'],
+        )}
+      >
         {t({
           enUS: 'Go to Automator Management',
         })}
@@ -468,12 +529,15 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
             <span className={styles['value']}>
               <img
                 className={styles['logo']}
-                src={CCYService.ccyConfigs[payload.factory?.clientDepositCcy || '']?.icon}
+                src={
+                  CCYService.ccyConfigs[payload.factory?.clientDepositCcy || '']
+                    ?.icon
+                }
                 alt=""
               />
               <span>
-                {CCYService.ccyConfigs[payload.factory?.clientDepositCcy || '']?.name ||
-                  payload.factory?.clientDepositCcy}
+                {CCYService.ccyConfigs[payload.factory?.clientDepositCcy || '']
+                  ?.name || payload.factory?.clientDepositCcy}
               </span>
             </span>
           </div>
