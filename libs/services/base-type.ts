@@ -75,7 +75,17 @@ export interface AutomatorVaultInfo {
   redeemWaitPeriod: number; // 赎回等待期
   claimPeriod: number; // 赎回有效期
   abis: ethers.InterfaceAbi;
-  creator?: string; // 一期 automator 没有
+  creator: string;
   creatorFeeRate: number | string; // 默认为 0
   createTime: number | string; // 创建时间
+}
+
+export interface AutomatorFactory {
+  chainId: number; // 链代码
+  chainName: string; // 链名称
+  factoryAddress: string; // Factory地址
+  vaultDepositCcy: string; // USDC
+  clientDepositCcy: string; // 用户存入的标的物
+  vaultDepositCcyAddress: string; // 地址
+  clientDepositCcyAddress: string; // 地址
 }

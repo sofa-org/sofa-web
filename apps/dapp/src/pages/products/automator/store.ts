@@ -4,9 +4,12 @@ import {
   AutomatorInfo,
   AutomatorPerformance,
   AutomatorPosition,
-  AutomatorUserDetail,
 } from '@sofa/services/automator';
 import { AutomatorService } from '@sofa/services/automator';
+import {
+  AutomatorUserPosition,
+  AutomatorUserService,
+} from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
@@ -34,10 +37,12 @@ export const useAutomatorStore = Object.assign(
     userInfos: {} as Record<
       K,
       {
-        server?: AutomatorUserDetail;
-        shareInfo?: PromiseVal<ReturnType<typeof AutomatorService.getShares>>;
+        server?: AutomatorUserPosition;
+        shareInfo?: PromiseVal<
+          ReturnType<typeof AutomatorUserService.userShares>
+        >;
         redemptionInfo?: PromiseVal<
-          ReturnType<typeof AutomatorService.getRedemptionInfo>
+          ReturnType<typeof AutomatorUserService.userRedemptionInfo>
         >;
       }
     >,
@@ -46,7 +51,7 @@ export const useAutomatorStore = Object.assign(
   })),
   {
     getAutomatorVaults: async (chainId: number) => {
-      return AutomatorService.getAutomatorList({ chainId }).then((res) => {
+      return AutomatorService.automatorList({ chainId }).then((res) => {
         const vaults = res.map((it) => it.vaultInfo);
         const vaultOverviews = arrToDict(
           res,
@@ -69,7 +74,7 @@ export const useAutomatorStore = Object.assign(
     },
     subscribeOverview: (vault: AutomatorVaultInfo) => {
       const sync = () =>
-        AutomatorService.getInfo(vault)
+        AutomatorService.info(vault)
           .then((overview) =>
             useAutomatorStore.setState((pre) => ({
               vaultOverviews: {
@@ -125,12 +130,12 @@ export const useAutomatorStore = Object.assign(
     },
     getUserInfoList: async (chainId: number, wallet: string) => {
       return Promise.all([
-        AutomatorService.getUserPnlList({
+        AutomatorUserService.userPositionList({
           chainId,
           wallet,
           status: AutomatorDepositStatus.ACTIVE,
         }),
-        AutomatorService.getUserPnlList({
+        AutomatorUserService.userPositionList({
           chainId,
           wallet,
           status: AutomatorDepositStatus.CLOSED,
@@ -160,7 +165,7 @@ export const useAutomatorStore = Object.assign(
       return () => clearInterval(timer);
     },
     updateUserInfo: (vault: AutomatorVaultInfo, address: string) => {
-      AutomatorService.getUserPnl(vault, address)
+      AutomatorUserService.userPosition(vault, address)
         .then((userInfo) =>
           useAutomatorStore.setState((pre) => ({
             userInfos: {
@@ -177,7 +182,7 @@ export const useAutomatorStore = Object.assign(
         .catch((err) =>
           Toast.error(`Failed to fetch user pnl: ${getErrorMsg(err)}`),
         );
-      AutomatorService.getShares(vault)
+      AutomatorUserService.userShares(vault)
         .then((shareInfo) =>
           useAutomatorStore.setState((pre) => ({
             userInfos: {
@@ -194,7 +199,7 @@ export const useAutomatorStore = Object.assign(
         .catch((err) =>
           Toast.error(`Failed to fetch share info: ${getErrorMsg(err)}`),
         );
-      AutomatorService.getRedemptionInfo(vault)
+      AutomatorUserService.userRedemptionInfo(vault)
         .then((redemptionInfo) =>
           useAutomatorStore.setState((pre) => ({
             userInfos: {

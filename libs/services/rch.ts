@@ -195,7 +195,7 @@ export class RCHService {
       ],
     );
     return WalletService.transactionResult(hash, chainId).then((res) => {
-      return res === TransactionStatus.FAILED
+      return res.status === TransactionStatus.FAILED
         ? Promise.reject(new Error('Burn failed on chain'))
         : Promise.resolve(hash);
     });
@@ -231,7 +231,7 @@ export class RCHService {
       return ContractsService.dirtyCall(airdropContract, 'claimMultiple', args);
     })();
     return WalletService.transactionResult(hash, chainId).then((res) => {
-      return res === TransactionStatus.FAILED
+      return res.status === TransactionStatus.FAILED
         ? Promise.reject(new Error('Claim failed on chain'))
         : Promise.resolve();
     });
