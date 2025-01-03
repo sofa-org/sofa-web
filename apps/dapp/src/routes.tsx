@@ -16,6 +16,9 @@ const Automator = React.lazy(() => import('@/pages/products/automator'));
 const AutomatorPositions = React.lazy(
   () => import('@/pages/positions/automator'),
 );
+const AutomatorCreate = React.lazy(
+  () => import('@/pages/products/automator-create'),
+);
 
 export const routes: {
   path: string;
@@ -73,6 +76,10 @@ export const routes: {
   {
     path: '/positions/automator',
     Component: AutomatorPositions,
+  },
+  {
+    path: '/products/automator/create',
+    Component: AutomatorCreate,
   },
   {
     path: '/transactions',
