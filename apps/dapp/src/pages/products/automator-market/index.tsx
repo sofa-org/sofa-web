@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
-import { AutomatorInfo, AutomatorUserDetail } from '@sofa/services/automator';
+import { AutomatorInfo } from '@sofa/services/automator';
+import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
@@ -67,8 +68,8 @@ const Index = () => {
       .filter(Boolean);
     if (!list.length) return undefined;
     return list.filter((it) =>
-      Number(it?.amountInVaultDepositCcy),
-    ) as AutomatorUserDetail[];
+      Number(it?.amountByVaultDepositCcy),
+    ) as AutomatorUserPosition[];
   });
 
   const lists = useMemo(() => {

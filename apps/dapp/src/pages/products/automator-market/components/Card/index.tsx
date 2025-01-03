@@ -10,6 +10,7 @@ import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
+import ProgressBar from '@/components/ProgressBar';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
@@ -80,7 +81,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
               [
                 [
                   props.info.vaultInfo.vaultDepositCcy,
-                  +props.info.aumInVaultDepositCcy,
+                  +props.info.aumByVaultDepositCcy,
                 ],
               ],
               prices,
@@ -93,7 +94,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
           </span>
         </div>
       </div>
-      {/* {props.info.creator && (
+      {props.info.creator && (
         <>
           <div className={styles['creator']}>
             <div className={styles['label']}>
@@ -105,7 +106,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
                   [
                     [
                       props.info.vaultInfo.vaultDepositCcy,
-                      Number(props.info.creatorAmount),
+                      Number(props.info.creatorAumByVaultDepositCcy),
                     ],
                   ],
                   prices,
@@ -122,12 +123,13 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
             type="3"
             className={styles['progress']}
             percent={
-              Number(props.info?.creatorAmount) / Number(props.info?.amount)
+              Number(props.info?.creatorAumByVaultDepositCcy) /
+              Number(props.info?.aumByVaultDepositCcy)
             }
             minWidthPercentage={0.05}
           />
         </>
-      )} */}
+      )}
       <div className={styles['footer']}>
         <div className={styles['runtime']}>
           <IconCalendar />

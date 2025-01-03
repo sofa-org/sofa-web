@@ -1,6 +1,6 @@
 import { get } from 'lodash-es';
 
-import AutomatorAbis from '../../abis/Automator.json';
+import AutomatorAbis from '../../abis/AAVEAutomatorBase.json';
 import { AutomatorVaultInfo, ProjectType } from '../../base-type';
 import {
   getCollateralDecimal,

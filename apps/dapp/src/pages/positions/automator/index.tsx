@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
-import {
-  AutomatorDepositStatus,
-  AutomatorService,
-} from '@sofa/services/automator';
+import { AutomatorDepositStatus } from '@sofa/services/automator';
+import { AutomatorUserService } from '@sofa/services/automator-user';
 import { ProjectType } from '@sofa/services/base-type';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
@@ -46,7 +44,7 @@ const Index = () => {
   const { data, loading: loading1 } = useRequest(
     async () => {
       if (!wallet.address) return;
-      return AutomatorService.getUserPnlList({
+      return AutomatorUserService.userPositionList({
         chainId: wallet.chainId,
         wallet: wallet.address,
         status:

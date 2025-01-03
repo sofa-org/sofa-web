@@ -7,6 +7,7 @@ import { formatDuration } from '@sofa/utils/time';
 
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import ProgressBar from '@/components/ProgressBar';
 
 import { Comp as IconCalendar } from '../../../automator-market/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../../automator-market/assets/icon-people.svg';
@@ -66,7 +67,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay
-              amount={Number(data?.aumInVaultDepositCcy) / Number(data?.nav)}
+              amount={Number(data?.aumByVaultDepositCcy) / Number(data?.nav)}
               ccy={props.vault?.positionCcy}
             />
             <span className={styles['unit']}>{props.vault?.positionCcy}</span>
@@ -80,7 +81,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                         [
                           [
                             props.vault.vaultDepositCcy,
-                            data?.aumInVaultDepositCcy,
+                            data?.aumByVaultDepositCcy,
                           ],
                         ],
                         prices,
@@ -93,7 +94,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
             </div>
           </div>
         </div>
-        {/* {data?.creator && (
+        {data?.creator && (
           <div className={styles['aum']}>
             <div className={styles['title']}>
               {t({ enUS: `Creator's Lead Assets`, zhCN: '创建者份额' })}
@@ -104,7 +105,12 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                   !props.vault
                     ? ''
                     : cvtAmountsInCcy(
-                        [[props.vault.vaultDepositCcy, data?.creatorAmount]],
+                        [
+                          [
+                            props.vault.vaultDepositCcy,
+                            data?.creatorAumByVaultDepositCcy,
+                          ],
+                        ],
                         prices,
                         props.vault.vaultDepositCcy,
                       )
@@ -114,17 +120,21 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
               <span className={styles['percentage']}>
                 {displayPercentage(
-                  Number(data?.creatorAmount) / Number(data?.amount),
+                  Number(data?.creatorAumByVaultDepositCcy) /
+                    Number(data?.aumByVaultDepositCcy),
                 )}
               </span>
               <ProgressBar
                 type="3"
-                percent={Number(data?.creatorAmount) / Number(data?.amount)}
+                percent={
+                  Number(data?.creatorAumByVaultDepositCcy) /
+                  Number(data?.aumByVaultDepositCcy)
+                }
                 minWidthPercentage={0.05}
               />
             </div>
           </div>
-        )} */}
+        )}
         {/* <div className={styles['nav']}>
         <div className={styles['title']}>
           1 {props.vault?.positionCcy} (

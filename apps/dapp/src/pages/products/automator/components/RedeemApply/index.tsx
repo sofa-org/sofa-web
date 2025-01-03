@@ -1,7 +1,7 @@
 import { RefObject, useEffect } from 'react';
 import { Modal } from '@douyinfe/semi-ui';
 import { wait } from '@livelybone/promise-wait';
-import { AutomatorService } from '@sofa/services/automator';
+import { AutomatorUserService } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
@@ -217,7 +217,7 @@ export const AutomatorRedeemApply = (props: {
                 onCancel: () => reject(),
               }),
             );
-            return AutomatorService.redeem(
+            return AutomatorUserService.redeem(
               (it) => {
                 props.progressRef.current?.update(it);
                 if (it.status === 'Success') {
