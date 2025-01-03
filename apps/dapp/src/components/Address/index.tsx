@@ -2,7 +2,8 @@ import { CSSProperties, memo, ReactNode, useMemo } from 'react';
 import { Toast } from '@douyinfe/semi-ui';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
-import { useLazyCallback } from '@sofa/utils/hooks';
+import { WalletService } from '@sofa/services/wallet';
+import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import { copy } from 'clipboard';
 
@@ -26,15 +27,23 @@ const Address = memo<{
   simple?: boolean;
   link?: string | boolean | { chainId: number };
   linkBtn?: string | boolean | { chainId: number };
+  noWeb3Name?: boolean;
 }>((props) => {
   const [t] = useTranslation('Address');
-  const [, str, last4Words] = useMemo(
-    () =>
+
+  const web3name = useAsyncMemo(async () => {
+    if (props.noWeb3Name) return undefined;
+    return WalletService.web3name(props.address);
+  }, []);
+
+  const [, str, last4Words] = useMemo(() => {
+    if (web3name) return ['', web3name, ''];
+    return (
       props.address?.match(
         props.simple ? /^(\w{6})\w+(\w{4})$/ : /^(\w{10})\w+(\w{4})$/,
-      ) || [],
-    [props.address, props.simple],
-  );
+      ) || []
+    );
+  }, [props.address, props.simple, web3name]);
 
   const handleLink = useLazyCallback(() => {
     const url = (() => {
@@ -58,6 +67,7 @@ const Address = memo<{
     <div
       className={classNames(styles['address'], 'address', props.className, {
         [styles['link']]: props.link,
+        [styles['web3name']]: web3name,
         link: props.link,
       })}
       style={props.style}
@@ -72,7 +82,8 @@ const Address = memo<{
       }}
     >
       {props.prefix}
-      {str}...
+      {str}
+      {last4Words && '...'}
       {last4Words}
       {!props.simple && !props.link && !props.linkBtn && (
         <IconCopy

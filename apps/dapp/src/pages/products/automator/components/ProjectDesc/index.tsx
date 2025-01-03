@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
+import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry } from '@sofa/utils/expiry';
@@ -88,6 +89,17 @@ echarts.use([
 
 const Performance = (props: { vault?: AutomatorVaultInfo }) => {
   const [t] = useTranslation('AutomatorProjectDesc');
+
+  const isSpecial = useMemo(
+    () =>
+      ContractsService.AutomatorVaults.some(
+        (it) =>
+          it.chainId === props.vault?.chainId &&
+          it.vault.toLowerCase() === props.vault?.vault.toLowerCase(),
+      ),
+    [props.vault],
+  );
+
   const list = useAutomatorStore(
     (state) =>
       props.vault &&
@@ -108,15 +120,16 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
     () =>
       list
         ?.map((it) => {
+          const cvt = (v: number) => (!isSpecial || v >= 0 ? v : v / 10);
           return {
-            tradingPnl: +it.incrTradingPnlByClientDepositCcy,
-            interestPnl: +it.incrInterestPnlByClientDepositCcy,
-            rchPnl: +it.incrRchPnlByClientDepositCcy,
+            tradingPnl: cvt(+it.incrTradingPnlByClientDepositCcy),
+            interestPnl: cvt(+it.incrInterestPnlByClientDepositCcy),
+            rchPnl: cvt(+it.incrRchPnlByClientDepositCcy),
             timestamp: it.dateTime * 1000,
           };
         })
         .reverse(),
-    [list],
+    [list, isSpecial],
   );
 
   const precision = useMemo(() => {
@@ -133,7 +146,7 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
     const option = {
       grid: {
         top: 80,
-        left: 100,
+        left: isSpecial ? 40 : 100,
         right: 40,
       },
       tooltip: {
@@ -159,8 +172,10 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
               ';"></span>';
             result += item.seriesName;
             result += '</span>';
-            result += `${amountFormatter(item.value, 2)} ${props.vault
-              ?.depositCcy}`;
+            result += `${amountFormatter(
+              !isSpecial || item.value >= 0 ? item.value : item.value * 10,
+              2,
+            )} ${props.vault?.depositCcy}`;
             result += '</div>';
           });
           return result; // 返回最终的内容字符串
@@ -186,6 +201,7 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
         },
       },
       yAxis: {
+        show: !isSpecial,
         type: 'value',
         axisLine: {
           show: true,
@@ -237,7 +253,13 @@ const Performance = (props: { vault?: AutomatorVaultInfo }) => {
     };
 
     myChart.current.setOption(option);
-  }, [data, props.vault?.depositCcy, precision, props.vault?.positionCcy]);
+  }, [
+    data,
+    props.vault?.depositCcy,
+    precision,
+    props.vault?.positionCcy,
+    isSpecial,
+  ]);
 
   if (!list?.length || list.length < 2) return <></>;
 

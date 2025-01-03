@@ -74,7 +74,11 @@ const WalletConnector = (
         title={t('title')}
         footer={null}
       >
-        <Address address={wallet.address!} className={styles['address']} />
+        <Address
+          address={wallet.address!}
+          className={styles['address']}
+          noWeb3Name
+        />
         <AsyncButton
           size={'large'}
           block

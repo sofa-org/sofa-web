@@ -4,6 +4,7 @@ import { pollingUntil } from '@sofa/utils/http';
 import { reMsgError } from '@sofa/utils/object';
 import { sentry } from '@sofa/utils/sentry';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
+import { createWeb3Name } from '@web3-name-sdk/core';
 import Big from 'big.js';
 import { AbstractProvider, ethers } from 'ethers';
 import { pick } from 'lodash-es';
@@ -663,5 +664,12 @@ export class WalletService {
       decimal,
     );
     return { [symbol]: Number(balance) };
+  }
+
+  private static web3NameInstance: ReturnType<typeof createWeb3Name>;
+  static async web3name(address: string) {
+    WalletService.web3NameInstance =
+      WalletService.web3NameInstance || createWeb3Name();
+    return WalletService.web3NameInstance.getDomainName({ address });
   }
 }

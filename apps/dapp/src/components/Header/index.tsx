@@ -50,10 +50,8 @@ const allMenuItems = (
         children: [
           {
             icon: <IconDefiMode />,
-            group: (t: TFunction) =>
-              t({ enUS: 'DeFi Mode', zhCN: 'DeFi Mode' }),
-            label: (t: TFunction) =>
-              t({ enUS: 'DeFi Mode', zhCN: 'DeFi Mode' }),
+            group: (t: TFunction) => t({ enUS: 'Core Mode', zhCN: '标准模式' }),
+            label: (t: TFunction) => t({ enUS: 'Core Mode', zhCN: '标准模式' }),
             desc: (t: TFunction) =>
               t({
                 enUS: 'Yield earning made easy.  Discover the best solutions for you!',

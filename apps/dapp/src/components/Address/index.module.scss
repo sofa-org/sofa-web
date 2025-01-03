@@ -24,4 +24,9 @@
       display: none;
     }
   }
+
+  &.web3name {
+    // @include gradient-txt;
+    margin: 0;
+  }
 }

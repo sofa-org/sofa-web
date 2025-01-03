@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type.ts';
@@ -7,7 +7,6 @@ import { Env } from '@sofa/utils/env';
 import { joinUrl } from '@sofa/utils/url';
 import { useScroll } from 'ahooks';
 import classNames from 'classnames';
-import { createWithEqualityFn } from 'zustand/traditional';
 
 import { Comp as Logo } from '@/assets/logo';
 import { EnvLinks } from '@/env-links';
@@ -112,7 +111,7 @@ function locationMatches(
     (itemSearch ||
       // this is to differentiate:
       // Automator: /products?project=Automator
-      // Trade - Defi Mode: /products
+      // Trade - Core Mode: /products
       !/project=/.test(location.search))
   );
 }

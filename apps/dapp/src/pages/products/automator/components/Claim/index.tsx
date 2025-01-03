@@ -41,6 +41,8 @@ export const AutomatorClaim = (props: {
   const redemptionInfo = userInfo?.redemptionInfo;
   const decimals = userInfo?.shareInfo?.shareDecimals ?? 6;
   const pricePerShare = userInfo?.shareInfo?.pricePerShare || 1;
+  const pendingShares =
+    Number(redemptionInfo?.pendingSharesWithDecimals) / 10 ** decimals;
 
   const leftTime = useMemo(
     () => (!props.claimableEndAt ? 0 : props.claimableEndAt - Date.now()),
@@ -56,7 +58,7 @@ export const AutomatorClaim = (props: {
         </h5>
         <div className={styles['shares']}>
           <span className={styles['value']}>
-            {amountFormatter(redemptionInfo?.pendingSharesWithDecimals, 0)}
+            {amountFormatter(pendingShares, 0)}
           </span>{' '}
           {vault?.positionCcy}
           <span className={styles['decorative']}>
@@ -65,14 +67,7 @@ export const AutomatorClaim = (props: {
               ? '-'
               : amountFormatter(
                   cvtAmountsInCcy(
-                    [
-                      [
-                        vault.vaultDepositCcy,
-                        (Number(redemptionInfo?.pendingSharesWithDecimals) /
-                          10 ** decimals) *
-                          pricePerShare,
-                      ],
-                    ],
+                    [[vault.vaultDepositCcy, pendingShares * pricePerShare]],
                     prices,
                     vault.depositCcy,
                   ),
