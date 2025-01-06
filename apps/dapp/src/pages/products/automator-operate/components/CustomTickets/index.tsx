@@ -45,11 +45,14 @@ const defaultForCCY: VaultInfo['forCcy'] = 'BTC';
 const CustomTicket = (props: CustomTicketProps) => {
   const [t] = useTranslation('CustomTicket');
 
-  const [productType, setProductType] =
-    useState<ProductType>(defaultProductType);
+  const [productType, setProductType] = useState<ProductType>(
+    props.product.vault.productType || defaultProductType,
+  );
   const customDev = useMemo(() => currQuery()['custom-dev'] === '1', []);
 
-  const [forCcy, setForCcy] = useState<VaultInfo['forCcy']>(defaultForCCY);
+  const [forCcy, setForCcy] = useState<VaultInfo['forCcy']>(
+    props.product.vault.forCcy || defaultForCCY,
+  );
   const [riskType] = [RiskType.RISKY];
 
   const vault = useMemo(
