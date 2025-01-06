@@ -43,7 +43,7 @@ const Index = () => {
   }, [wallet.chainId]);
 
   const data = useAutomatorStore((state) => {
-    return state.vaults?.map(
+    return state.vaults[wallet.chainId]?.map(
       (it) => state.vaultOverviews[`${it.chainId}-${it.vault.toLowerCase()}-`],
     );
   });

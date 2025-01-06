@@ -39,22 +39,7 @@ export interface OriginAutomatorInfo {
 }
 
 // server 返回的结构
-export interface OriginAutomatorDetail {
-  chainId: number; // 链代码
-  automatorName: string; // automator名称
-  automatorDescription: string; // automator说明 (可空)
-  automatorVault: string; // Automator vault
-  participantNum: number; // 参与者数量
-  amount: number | string; // 当前aum值
-  aumByVaultDepositCcy: number | string; // 当前aum值(vaultDepositCcy)
-  aumByClientDepositCcy: number | string; // 当前aum值(clientDepositCcy)
-  creatorAumByVaultDepositCcy: number | string; // 管理者的aum值(vaultDepositCcy)
-  creatorAumByClientDepositCcy: number | string; // 管理者的aum值(clientDepositCcy)
-  nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
-  dateTime: number; // 净值产生的时间 (秒级时间戳)
-  yieldPercentage: number | string; // 7D Yield (百分比) (基于clientDepositCcy)
-  creator: string; // 创建者
-  createTime: number; // automator创建时间
+export interface OriginAutomatorDetail extends OriginAutomatorInfo {
   feeRate: number | string; // 抽佣比率 (on vaultDepositCcy)
   totalTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (clientDepositCcy)
   totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息 (clientDepositCcy)
@@ -63,8 +48,6 @@ export interface OriginAutomatorDetail {
   totalRchAmount: number | string; // Rch的总PNL(RCH)
   totalPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
   pnlPercentage: number | string; // Yield (百分比) (基于clientDepositCcy)
-  vaultDepositCcy: string; // 交易币种 (vaultDepositCcy)
-  clientDepositCcy: string; // 用户存入的标的物 (clientDepositCcy)
   sharesToken: string; // 净值单位 (sharesToken)
   availableBalance: number | string; // Available Balance (vaultDepositCcy)
   profits: number | string; // totalTradingPnlByVaultDepositCcy * feeRate (vaultDepositCcy)
@@ -73,6 +56,7 @@ export interface OriginAutomatorDetail {
   redeemedAmount: number | string; // To Be Redeemed (vaultDepositCcy)
   availableAmount: number | string; // Available Balance (vaultDepositCcy)
   redemptionPeriodDay: number; // 赎回观察时间 (单位：天)
+  positionSize?: number | string;
 }
 
 export interface AutomatorInfo
@@ -80,6 +64,12 @@ export interface AutomatorInfo
     OriginAutomatorInfo,
     | 'chainId'
     | 'automatorVault'
+    | 'automatorName'
+    | 'automatorDescription'
+    | 'feeRate'
+    | 'redemptionPeriodDay'
+    | 'creator'
+    | 'createTime'
     | 'vaultDepositCcy'
     | 'clientDepositCcy'
     | 'sharesToken'
@@ -92,6 +82,12 @@ export interface AutomatorDetail
     OriginAutomatorDetail,
     | 'chainId'
     | 'automatorVault'
+    | 'automatorName'
+    | 'automatorDescription'
+    | 'feeRate'
+    | 'redemptionPeriodDay'
+    | 'creator'
+    | 'createTime'
     | 'vaultDepositCcy'
     | 'clientDepositCcy'
     | 'sharesToken'
@@ -197,19 +193,27 @@ export interface AutomatorFollower {
 }
 
 export class AutomatorService {
-  static cvtAutomatorInfo(it: OriginAutomatorInfo) {
+  static cvtAutomatorInfo<T extends OriginAutomatorInfo>(
+    it: T,
+  ): T extends OriginAutomatorDetail ? AutomatorDetail : AutomatorInfo {
     const collateralDecimal = getCollateralDecimal(
       it.chainId,
       it.clientDepositCcy,
+    );
+    const vault = ContractsService.AutomatorVaults.find(
+      (item) =>
+        item.chainId === it.chainId &&
+        item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
     );
     return {
       ...it,
       vaultInfo: {
         ...it,
+        ...vault,
         vault: it.automatorVault,
-        name: get(it, 'automatorName') || it.clientDepositCcy,
-        desc: it.automatorDescription,
-        creatorFeeRate: get(it, 'creatorFeeRate') || 0,
+        name: get(it, 'automatorName') || vault?.name || it.clientDepositCcy,
+        desc: it.automatorDescription || vault?.desc,
+        creatorFeeRate: get(it, 'creatorFeeRate') || vault?.creatorFeeRate || 0,
         depositCcy: it.clientDepositCcy,
         vaultDepositCcy: it.vaultDepositCcy,
         positionCcy: it.sharesToken,
@@ -226,13 +230,8 @@ export class AutomatorService {
           it.clientDepositCcy,
           ProjectType.Automator,
         ),
-        ...ContractsService.AutomatorVaults.find(
-          (item) =>
-            item.chainId === it.chainId &&
-            item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
-        ),
       },
-    } as AutomatorInfo;
+    } as never;
   }
 
   @asyncCache({
@@ -249,7 +248,7 @@ export class AutomatorService {
 
   static async info({ chainId, vault }: AutomatorVaultInfo) {
     return http
-      .get<unknown, HttpResponse<OriginAutomatorInfo>>(`/automator/info`, {
+      .get<unknown, HttpResponse<OriginAutomatorDetail>>(`/automator/info`, {
         params: { chainId, automatorVault: vault },
       })
       .then((res) => AutomatorService.cvtAutomatorInfo(res.value));

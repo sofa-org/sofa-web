@@ -2,16 +2,20 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductsService } from '@sofa/services/products';
 import { amountFormatter, cvtAmountsInUsd } from '@sofa/utils/amount';
-import { useLazyCallback } from '@sofa/utils/hooks';
+import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
 import { Comp as IconCart } from '@/assets/icon-cart.svg';
 import { Comp as IconDel } from '@/assets/icon-del.svg';
+import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useWalletStore } from '@/components/WalletConnector/store';
+import { useAutomatorStore } from '@/pages/products/automator/store';
 
 import { useHoverTicket, useProductsState } from '../../../automator-store';
 import { useTicketType } from '../../../components/TicketTypeSelector';
+import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 import CustomTickets from '../CustomTickets';
 import InvestButton from '../InvestButton';
 
@@ -163,7 +167,39 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
 };
 
 const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
-  return <ProductLottery {...props} />;
+  const { chainId, address } = useWalletStore((state) => state);
+  const { vaults } = useAutomatorStore();
+  const [t] = useTranslation('AutomatorOperate');
+  const tab = useQuery(
+    (q) => (q['automator-operate-tab'] || 'performance') as string,
+  );
+  const { automator } = useCreatorAutomatorSelector();
+
+  useEffect(() => {
+    return useAutomatorStore.subscribeVaults(chainId);
+  }, [chainId]);
+  useEffect(() => {
+    const vault = vaults?.[chainId]?.find((it) => {
+      if (it.chainId !== chainId) return false;
+      return (
+        it.vault.toLowerCase() === automator?.vaultInfo.vault.toLowerCase()
+      );
+    });
+    useProductsState.updateAutomatorVault(vault);
+  }, [vaults, automator]);
+  const { automatorVault } = useProductsState();
+
+  return !automatorVault ? (
+    <CEmpty
+      className="semi-always-dark"
+      description={t({
+        enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain',
+        zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链',
+      })}
+    />
+  ) : (
+    <ProductLottery {...props} />
+  );
 };
 
 export default AutomatorTrade;

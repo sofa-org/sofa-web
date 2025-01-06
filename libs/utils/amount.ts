@@ -113,13 +113,18 @@ export function roundWith<T extends number | string | undefined>(
   return Big(num).minus(remainder).toNumber();
 }
 
-export function displayPercentage(val?: string | number, precision = 2) {
+export function displayPercentage(
+  val?: string | number,
+  precision = 2,
+  addSignal = false,
+) {
   if (!isLegalNum(val)) return '-%';
+  const signal = +val <= 0 ? '' : addSignal ? '+' : '';
   if (+val > 100) return '>10000%';
   const v = +val * 100;
-  if (v > 1) return `${v.toFixed(precision)}%`;
+  if (v > 1) return `${signal}${v.toFixed(precision)}%`;
   const exponent = -Number(v).toExponential().split('e')[1] || 0;
-  return `${v.toFixed(Math.max(precision, exponent))}%`;
+  return `${signal}${v.toFixed(Math.max(precision, exponent))}%`;
 }
 
 export function cvtAmountsInUsd(

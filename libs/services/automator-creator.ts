@@ -1,5 +1,5 @@
 import { waitUntil } from '@livelybone/promise-wait';
-import { asyncCache } from '@sofa/utils/decorators';
+import { applyMock, asyncCache, asyncShare } from '@sofa/utils/decorators';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
@@ -10,7 +10,7 @@ import { omitBy } from 'lodash-es';
 import burnAbis from './abis/AutomatorBurner.json';
 import factoryAbis from './abis/AutomatorFactory.json';
 import { CommonAbis } from './abis/common-abis';
-import { AutomatorService, OriginAutomatorInfo } from './automator';
+import { AutomatorService, OriginAutomatorDetail } from './automator';
 import {
   AutomatorFactory,
   AutomatorVaultInfo,
@@ -49,27 +49,33 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories() {
     return http
-      .get<unknown, HttpResponse<AutomatorFactory[]>>(
-        `/optivisors/automator/factories`,
-      )
+      .get<
+        unknown,
+        HttpResponse<AutomatorFactory[]>
+      >(`/optivisors/automator/factories`)
       .then((res) => res.value);
   }
 
-  static async creatorAutomatorList(params: {
-    chainId: number;
-    wallet: string;
-  }) {
+  @applyMock('creatorAutomatorList')
+  @asyncShare()
+  static async automatorList(params: { chainId: number; wallet: string }) {
     return http
-      .get<unknown, HttpResponse<OriginAutomatorInfo[]>>(`/automator/list`, {
-        params,
-      })
+      .get<unknown, HttpResponse<OriginAutomatorDetail[]>>(
+        `/optivisors/automator/list`,
+        {
+          params,
+        },
+      )
       .then((res) => res.value.map(AutomatorService.cvtAutomatorInfo));
   }
 
   static rchAmountForBurning = 500; // TODO 待定
   static rchBurnContract = {
     chainId: defaultChain.chainId,
-    address: Env.isProd || Env.isPre ? '' : '', // TODO
+    address:
+      Env.isProd || Env.isPre
+        ? ''
+        : '0xab3344989e7e4357d4db494ac53c189956ddf0fb', // TODO
   };
   static async burnRCHBeforeCreate(
     cb: (progress: TransactionProgress) => void,

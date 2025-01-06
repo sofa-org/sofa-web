@@ -1,11 +1,59 @@
 .head-title {
-  @include flex-center;
-
-  margin: 0;
+  width: $width-content;
+  margin: 0 auto;
   padding: 75px 0 30px;
   font-size: min(24px, 5vw);
-  text-align: center;
   color: #fff;
+
+  .infos {
+    @include flex-center;
+
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 16px 40px;
+    margin: 16px 0 0;
+    font-size: 16px;
+
+    .label {
+      @include regular;
+
+      margin: 0 4px 0 0;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+
+    img.label,
+    svg.label {
+      flex: none;
+      width: 1.2em;
+      height: 1.2em;
+    }
+
+    .item {
+      @include flex-center;
+
+      gap: 4px;
+    }
+
+    .desc {
+      @include regular;
+
+      flex: none;
+      width: 100%;
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    :global {
+      .address {
+        padding: 0;
+      }
+    }
+  }
+
+  .selector {
+    width: 300px;
+  }
 }
 
 .container.container.container {
