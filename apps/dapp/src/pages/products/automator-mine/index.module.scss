@@ -21,8 +21,16 @@
   }
 }
 
+.tabs {
+  display: none;
+}
+
 .cards-wrapper {
-  margin: 10px 0 0;
+  margin: 25vh 0;
+
+  &:global(.semi-spin-hidden) {
+    margin: 10px 0 0;
+  }
 }
 
 .cards {
@@ -30,7 +38,7 @@
 
   justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 24px;
   margin: 0 0 40px;
 }
 

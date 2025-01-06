@@ -2,34 +2,10 @@
   @include pointer;
 
   flex: 1;
-  max-width: 258px;
   margin: 0;
-  padding: 16px;
+  padding: 16px 24px;
   border-radius: 16px;
   background: #fff;
-}
-
-.header {
-  position: relative;
-  margin: 0;
-  padding: 0 0 0 56px;
-
-  img {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 40px;
-    height: 40px;
-    transform: translate(0, -50%);
-  }
-
-  :global {
-    .address {
-      justify-content: flex-start;
-      padding: 0;
-      opacity: 0.65;
-    }
-  }
 }
 
 .name {
@@ -39,12 +15,17 @@
 }
 
 .label {
+  width: 140px;
   margin: 0;
+  font-size: 14px;
   opacity: 0.65;
 }
 
 .value {
+  @include bold;
+
   margin: 0;
+  font-size: 18px;
 
   &.apy {
     @include bold;
@@ -53,37 +34,143 @@
   }
 }
 
-.progress.progress.progress {
-  height: 10px;
-}
-
 .unit {
+  @include regular;
+
   margin: 0;
   padding: 0 0 0 0.2em;
   font-size: 0.8em;
   opacity: 0.8;
 }
 
-.yield,
-.size,
-.creator {
+.separator {
+  @include regular;
+
+  padding: 0 6px;
+  font-size: 14px;
+  opacity: 0.8;
+  vertical-align: text-top;
+}
+
+.item {
+  @include flex-center;
+
+  justify-content: flex-start;
+  margin: 0 0 16px;
+}
+
+.header {
   @include flex-center;
 
   justify-content: space-between;
-  margin: 0 0 6px;
-  line-height: 25px;
+  padding-bottom: 16px;
+  margin: 0 0 16px;
+  border-bottom: 1px dashed #e0e0e0;
+
+  .left {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 56px;
+
+    img {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 40px;
+      height: 40px;
+      transform: translate(0, -50%);
+    }
+
+    :global {
+      .address {
+        justify-content: flex-start;
+        padding: 0;
+        opacity: 0.65;
+      }
+    }
+
+    .infos {
+      @include flex-center;
+
+      gap: 40px;
+    }
+  }
+
+  .right {
+    @include flex-center;
+
+    gap: 40px;
+
+    .item {
+      display: block;
+
+      .label {
+        width: auto;
+        text-align: right;
+      }
+
+      .value {
+        @include bold;
+
+        margin: 4px 0 0;
+        font-size: 24px;
+      }
+    }
+  }
 }
 
-.yield {
-  margin: 20px 0 10px;
+.progress.progress.progress {
+  height: 10px;
 }
 
 .footer {
   @include flex-center;
 
-  justify-content: flex-start;
-  margin: 20px 0 0;
-  gap: 28px;
+  justify-content: flex-end;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  gap: 16px;
+  border-top: 1px dashed #e0e0e0;
+
+  .btn,
+  .btn-deposit,
+  .btn-redeem {
+    padding: 0 24px;
+    height: 48px;
+    border-radius: 24px;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &.btn-deposit {
+      background: #000;
+      color: #fff;
+
+      &:hover {
+        background: #000;
+      }
+    }
+  }
+
+  a {
+    color: #000;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .position-size {
+    @include bold;
+
+    padding: 0 0 0 4px;
+    margin: 0 0 0 4px;
+    line-height: 0.8em;
+    border-left: 1px dashed #e0e0e0;
+  }
 }
 
 .runtime,

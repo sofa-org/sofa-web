@@ -30,7 +30,10 @@ export interface AutomatorRedeemData {
 
 export const useAutomatorStore = Object.assign(
   createWithEqualityFn(() => ({
-    vaults: null as AutomatorVaultInfo[] | null,
+    vaults: {} as Record<
+      AutomatorVaultInfo['chainId'],
+      AutomatorVaultInfo[] | null
+    >,
     vaultOverviews: {} as Record<K, AutomatorInfo>,
     snapshots: {} as Record<K, AutomatorPosition[]>,
     performances: {} as Record<K, AutomatorPerformance[]>,
@@ -59,7 +62,7 @@ export const useAutomatorStore = Object.assign(
             `${it.vaultInfo.chainId}-${it.vaultInfo.vault.toLowerCase()}-`,
         );
         useAutomatorStore.setState((pre) => ({
-          vaults,
+          vaults: { ...pre.vaults, [chainId]: vaults },
           vaultOverviews: { ...pre.vaultOverviews, ...vaultOverviews },
         }));
       });

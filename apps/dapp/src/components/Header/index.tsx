@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
@@ -8,9 +8,11 @@ import classNames from 'classnames';
 
 import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
+import { useAutomatorCreatorStore } from '@/pages/products/automator-mine/store';
 import { RootDomainPaths } from '@/route-guard';
 
 import { ProjectTypeRefs } from '../ProductSelector/enums';
+import { useWalletStore } from '../WalletConnector/store';
 
 import { Comp as IconAdd } from './assets/icon-add.svg';
 import { Comp as IconBlog } from './assets/icon-blog.svg';
@@ -30,6 +32,7 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'Header');
 
 const allMenuItems = (
+  options: { hasCreateAutomator: boolean },
   project: ProjectType,
   location: ReturnType<typeof useLocation>,
 ): MenuItem[] => {
@@ -124,32 +127,36 @@ const allMenuItems = (
               }),
             path: '/positions/automator',
           },
-          {
-            icon: <IconOverview />,
-            group: (t: TFunction) =>
-              t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
-            label: (t: TFunction) =>
-              t({ enUS: 'Overview', zhCN: '我的 Automator' }),
-            desc: (t: TFunction) =>
-              t({
-                enUS: 'View your Automators at a glance.',
-                zhCN: '查看你创建的 Automator',
-              }),
-            path: '/products/automator/mine',
-          },
-          {
-            icon: <IconSwap />,
-            group: (t: TFunction) =>
-              t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
-            label: (t: TFunction) =>
-              t({ enUS: 'Trade Your Strategy', zhCN: '交易' }),
-            desc: (t: TFunction) =>
-              t({
-                enUS: 'Make trades to grow investor returns.',
-                zhCN: '为你的 Automator 创收',
-              }),
-            path: '/products/automator/operate',
-          },
+          ...(options.hasCreateAutomator
+            ? [
+                {
+                  icon: <IconOverview />,
+                  group: (t: TFunction) =>
+                    t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
+                  label: (t: TFunction) =>
+                    t({ enUS: 'Overview', zhCN: '我的 Automator' }),
+                  desc: (t: TFunction) =>
+                    t({
+                      enUS: 'View your Automators at a glance.',
+                      zhCN: '查看你创建的 Automator',
+                    }),
+                  path: '/products/automator/mine',
+                },
+                {
+                  icon: <IconSwap />,
+                  group: (t: TFunction) =>
+                    t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
+                  label: (t: TFunction) =>
+                    t({ enUS: 'Trade Your Strategy', zhCN: '交易' }),
+                  desc: (t: TFunction) =>
+                    t({
+                      enUS: 'Make trades to grow investor returns.',
+                      zhCN: '为你的 Automator 创收',
+                    }),
+                  path: '/products/automator/operate',
+                },
+              ]
+            : []),
           {
             icon: <IconAdd />,
             group: (t: TFunction) =>
@@ -207,6 +214,17 @@ const DappHeader = () => {
   const location = useLocation();
   const more = useMemo(() => true, []);
 
+  const wallet = useWalletStore();
+
+  useEffect(() => {
+    if (wallet.address)
+      useAutomatorCreatorStore.list(wallet.chainId, wallet.address);
+  }, [wallet.address, wallet.chainId]);
+  const myAutomators = useAutomatorCreatorStore(
+    (state) =>
+      state.vaults[`${wallet.chainId}-${wallet.address?.toLowerCase()}`],
+  );
+
   return (
     <CommonHeader
       aside={
@@ -229,7 +247,9 @@ const DappHeader = () => {
           )}
         </>
       }
-      menus={allMenuItems}
+      menus={(...args) =>
+        allMenuItems({ hasCreateAutomator: !!myAutomators?.length }, ...args)
+      }
       moreIcons={more}
     />
   );
