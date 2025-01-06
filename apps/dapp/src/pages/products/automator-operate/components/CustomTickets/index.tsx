@@ -36,17 +36,20 @@ export interface CustomTicketProps {
   active?: boolean;
   product: PartialRequired<ProductQuoteParams, 'vault' | 'id'>;
   setActive?(active: boolean): void;
+  automatorVault: Pick<AutomatorVaultInfo, 'vault' | 'chainId' | 'depositCcy'>;
 }
+
+const defaultProductType = ProductType.BullSpread;
+const defaultForCCY: VaultInfo['forCcy'] = 'BTC';
 
 const CustomTicket = (props: CustomTicketProps) => {
   const [t] = useTranslation('CustomTicket');
 
-  const [productType, setProductType] = useState<ProductType>(
-    ProductType.BullSpread,
-  );
+  const [productType, setProductType] =
+    useState<ProductType>(defaultProductType);
   const customDev = useMemo(() => currQuery()['custom-dev'] === '1', []);
 
-  const [forCcy, setForCcy] = useState<VaultInfo['forCcy']>('BTC');
+  const [forCcy, setForCcy] = useState<VaultInfo['forCcy']>(defaultForCCY);
   const [riskType] = [RiskType.RISKY];
 
   const vault = useMemo(
@@ -68,8 +71,20 @@ const CustomTicket = (props: CustomTicketProps) => {
   );
 
   const onChange = useLazyCallback((val: Partial<ProductQuoteParams>) => {
-    useProductsState.updateCart({ ...props.product, ...val });
+    useProductsState.updateCart(props.automatorVault, {
+      ...props.product,
+      ...val,
+    });
   });
+
+  useEffect(() => {
+    if (vault && vault != props.product.vault) {
+      useProductsState.updateCart(props.automatorVault, {
+        ...props.product,
+        vault,
+      });
+    }
+  }, [vault]);
 
   const ticketMeta = useMemo(
     () => TicketTypeOptions.find((it) => it.value === vault?.depositCcy),
@@ -316,7 +331,7 @@ const CustomTicket = (props: CustomTicketProps) => {
             <div
               className={styles['icon-del']}
               onClick={() =>
-                useProductsState.updateCart({
+                useProductsState.updateCart(props.automatorVault, {
                   ...props.product,
                   depositAmount: 0,
                 })
@@ -347,7 +362,13 @@ const CustomTickets = (props: {
     () =>
       ({
         id: nanoid(),
-        vault: props.vault,
+        vault: {
+          vault: '',
+          forCcy: defaultForCCY,
+          productType: defaultProductType,
+          chainId: props.vault.chainId,
+          depositCcy: props.vault.depositCcy,
+        },
         depositAmount: ticketMeta.per,
       }) as PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
   );
@@ -374,7 +395,7 @@ const CustomTickets = (props: {
   useEffect(() => {
     if (!products.length) {
       const product = init();
-      useProductsState.updateCart(product);
+      useProductsState.updateCart(props.vault, product);
       setHoverTicket(product.id);
     }
   }, [init, products.length, setHoverTicket]);
@@ -384,6 +405,7 @@ const CustomTickets = (props: {
       {products?.map((it) => (
         <CustomTicket
           key={it.id}
+          automatorVault={props.vault}
           product={it}
           active={hoverTicket?.ticket.id === it.id}
           setActive={(v) => setHoverTicket(v ? it.id : undefined)}
@@ -393,7 +415,7 @@ const CustomTickets = (props: {
         block
         size="large"
         className={classNames('btn-ghost', styles['btn-add'])}
-        onClick={() => useProductsState.updateCart(init())}
+        onClick={() => useProductsState.updateCart(props.vault, init())}
       >
         <IconPlus />
       </Button>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Button, Toast } from '@douyinfe/semi-ui';
 import { wait, waitUntil } from '@livelybone/promise-wait';
-import { ContractsService } from '@sofa/services/contracts';
+import { ContractsService, VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionsService,
@@ -90,18 +90,26 @@ export const BaseInvestButton = (props: BaseInvestButtonProps) => {
     </AsyncButton>
   );
 };
-
-export interface InvestButtonProps extends BaseProps {
+type ProductsStateType = Pick<
+  typeof useProductsState,
+  'delQuote' | 'getState' | 'quote' | 'updateRecommendedList' | 'clearCart'
+>;
+export interface ProductInvestButtonProps extends BaseProps {
   vault: string;
   chainId: number;
   autoQuote?: boolean;
   afterInvest?(): void;
+  vaultInfo?: Pick<VaultInfo, 'depositCcy' | 'riskType' | 'productType'>;
+  useProductsState: ProductsStateType;
+  products: PartialRequired<ProductQuoteParams, 'id' | 'vault'>[];
+  quoteInfos: (ProductQuoteResult | undefined)[];
 }
 
 function useShouldQuote(
   wallet: { address?: string },
   products: PartialRequired<ProductQuoteParams, 'vault' | 'id'>[],
   quoteInfos: (ProductQuoteResult | undefined)[],
+  _useProductsState: ProductsStateType,
 ) {
   // 每三秒触发一次检查，如果性能差可以再放宽些
   const time = useTime({ interval: 3000 });
@@ -117,14 +125,14 @@ function useShouldQuote(
         (wallet.address && !quoteInfo.quote.signature) ||
         quoteInfo.quote.deadline * 1000 - 0.5 * MsIntervals.min <= time || // 提前
         (it && quoteInfo.amounts.own != it.depositAmount);
-      if (shouldQuote && quoteInfo) useProductsState.delQuote(quoteInfo);
+      if (shouldQuote && quoteInfo) _useProductsState.delQuote(quoteInfo);
       return shouldQuote;
     });
     return !!shouldQuoteList.length;
   }, [products, quoteInfos, time, wallet.address]);
 }
 
-const InvestButton = (props: InvestButtonProps) => {
+export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   const [t] = useTranslation('InvestButton');
   const progressRef = useRef<ProgressRef>(null);
   const wallet = useWalletStore();
@@ -132,27 +140,22 @@ const InvestButton = (props: InvestButtonProps) => {
     useWalletStore.updateBalanceByVault(props.vault);
   }, [props.vault, wallet.address]);
 
+  const { useProductsState, products, quoteInfos, vaultInfo } = props;
   const vault = useMemo(
     () =>
-      ProductsService.findVault(ContractsService.vaults, {
-        chainId: props.chainId,
+      vaultInfo && {
         vault: props.vault,
-      }),
-    [props.chainId, props.vault],
+        chainId: props.chainId,
+        ...vaultInfo,
+      },
+    [vaultInfo],
   );
-
-  const $products = useProductsState(
-    (state) =>
-      state.cart[`${props.vault.toLowerCase()}-${props.chainId}`] || [],
+  const shouldQuote = useShouldQuote(
+    wallet,
+    products,
+    quoteInfos,
+    useProductsState,
   );
-  const products = useMemo(
-    () => $products.filter((it) => !useProductsState.productValidator(it)),
-    [$products],
-  );
-  const quoteInfos = useProductsState((state) =>
-    products.map((it) => state.quoteInfos[ProductsService.productKey(it)]),
-  );
-  const shouldQuote = useShouldQuote(wallet, products, quoteInfos);
   const insufficient = useMemo(() => {
     if (!vault?.depositCcy) return false;
     const balance = wallet.balance?.[vault.depositCcy];
@@ -302,5 +305,40 @@ const InvestButton = (props: InvestButtonProps) => {
     </>
   );
 };
+const InvestButton = (
+  props: Omit<
+    ProductInvestButtonProps,
+    'useProductsState' | 'products' | 'quoteInfos'
+  >,
+) => {
+  const $products = useProductsState(
+    (state) =>
+      state.cart[`${props.vault.toLowerCase()}-${props.chainId}`] || [],
+  );
+  const products = useMemo(
+    () => $products.filter((it) => !useProductsState.productValidator(it)),
+    [$products],
+  );
+  const quoteInfos = useProductsState((state) =>
+    products.map((it) => state.quoteInfos[ProductsService.productKey(it)]),
+  );
 
+  const vault = useMemo(
+    () =>
+      ProductsService.findVault(ContractsService.vaults, {
+        chainId: props.chainId,
+        vault: props.vault,
+      }),
+    [props.chainId, props.vault],
+  );
+  return (
+    <ProductInvestButton
+      products={products}
+      quoteInfos={quoteInfos}
+      useProductsState={useProductsState}
+      vaultInfo={vault}
+      {...props}
+    />
+  );
+};
 export default InvestButton;

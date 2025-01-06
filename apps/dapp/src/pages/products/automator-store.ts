@@ -17,6 +17,10 @@ export const useProductsState = Object.assign(
   createWithEqualityFn(
     persist(
       () => ({
+        recommendedList: {} as Record<
+          `${AutomatorVaultInfo['vault']}-${AutomatorVaultInfo['chainId']}`,
+          ProductQuoteResult[]
+        >,
         cart: {} as PartialRecord<
           `${AutomatorVaultInfo['vault']}-${AutomatorVaultInfo['chainId']}`, // 按照 vault+chainId 来区分购物车
           PartialRequired<ProductQuoteParams, 'id' | 'vault'>[]
@@ -38,6 +42,11 @@ export const useProductsState = Object.assign(
     ),
   ),
   {
+    updateRecommendedList: async (
+      vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType'>,
+    ) => {
+      // automator don't support recommended list yet
+    },
     updateAutomatorVault: (vault?: AutomatorVaultInfo) => {
       if (!vault && debugProductStateWithSepolia) {
         useProductsState.setState({
@@ -61,11 +70,12 @@ export const useProductsState = Object.assign(
     },
     // 彩票产品的 depositAmount 为 undefined 或者 0 时，表示删除
     updateCart: (
+      automatorVault: Pick<AutomatorVaultInfo, 'vault' | 'chainId'>,
       params: PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
     ) => {
-      // debugger;
+      const key =
+        `${automatorVault.vault.toLowerCase()}-${automatorVault.chainId}` as const;
       const vault = params.vault;
-      const key = `${vault.vault.toLowerCase()}-${vault.chainId}` as const;
       if ([RiskType.PROTECTED, RiskType.LEVERAGE].includes(vault.riskType)) {
         useProductsState.setState((pre) => {
           return {
@@ -141,7 +151,9 @@ export const useProductsState = Object.assign(
       const vault = params.vault;
       return ProductsService.quote(vault.productType, {
         ...params,
-        takerWallet: useProductsState.getState().automatorVault?.vault,
+        takerWallet: debugProductStateWithSepolia
+          ? useWalletStore.getState().address
+          : useProductsState.getState().automatorVault?.vault,
       } as ProductQuoteParams).then((res) => {
         useProductsState.updateQuotes(res);
         return res;

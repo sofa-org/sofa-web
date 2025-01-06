@@ -40,7 +40,9 @@ export const useProductsState = Object.assign(
     ),
   ),
   {
-    updateRecommendedList: async (vault: VaultInfo) => {
+    updateRecommendedList: async (
+      vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType'>,
+    ) => {
       const list = await ProductsService.listRecommended(
         vault.productType,
         vault,
@@ -52,7 +54,7 @@ export const useProductsState = Object.assign(
         },
       }));
     },
-    clearCart: (vault: VaultInfo) => {
+    clearCart: (vault: Pick<VaultInfo, 'vault' | 'chainId'>) => {
       useProductsState.setState((pre) => ({
         cart: {
           ...pre.cart,

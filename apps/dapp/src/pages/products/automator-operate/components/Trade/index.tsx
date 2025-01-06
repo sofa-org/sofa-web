@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductsService } from '@sofa/services/products';
 import { amountFormatter, cvtAmountsInUsd } from '@sofa/utils/amount';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
@@ -21,7 +22,7 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
   const prices = useIndexPrices((state) => state.prices);
   const [ticket] = useTicketType();
 
-  const { automatorVault: vault } = useProductsState();
+  const { automatorVault: vault, cart } = useProductsState();
   const products = useProductsState(
     (state) =>
       (vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]) ||
@@ -63,14 +64,6 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
   }, [prices, quoteInfos, vault]);
 
   const [hover, setHover] = useHoverTicket(vault);
-
-  useEffect(() => {
-    if (
-      hover?.ticket?.vault?.vault.toLowerCase() !== vault?.vault?.toLowerCase()
-    ) {
-      setHover(undefined);
-    }
-  }, [hover, setHover, vault]);
 
   const position = useMemo(() => {
     if (!hover?.ticket.id) return undefined;
@@ -158,6 +151,7 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
               <InvestButton
                 vault={vault.vault.toLowerCase()}
                 chainId={vault.chainId}
+                depositCcy={vault.depositCcy}
                 autoQuote
               />
             </div>
