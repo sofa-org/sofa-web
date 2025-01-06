@@ -173,6 +173,7 @@
   }
 }
 
+.fee,
 .runtime,
 .people {
   @include flex-center;
@@ -180,9 +181,14 @@
   position: relative;
   margin: 0;
 
+  > span {
+    opacity: 0.4;
+  }
+
   svg {
     width: 1.2em;
     height: 1.2em;
+    opacity: 0.4;
   }
 
   &::after {

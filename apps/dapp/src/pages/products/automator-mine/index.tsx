@@ -64,10 +64,7 @@ const Index = () => {
       onChange={(v) => updateQuery({ 'automator-market-tab': v })}
     >
       <Spin
-        wrapperClassName={classNames(
-          styles['cards-wrapper'],
-          'semi-always-dark',
-        )}
+        wrapperClassName={classNames(styles['cards-wrapper'])}
         spinning={loading}
       >
         {list?.map((a) => (

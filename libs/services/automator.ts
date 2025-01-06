@@ -64,6 +64,12 @@ export interface AutomatorInfo
     OriginAutomatorInfo,
     | 'chainId'
     | 'automatorVault'
+    | 'automatorName'
+    | 'automatorDescription'
+    | 'feeRate'
+    | 'redemptionPeriodDay'
+    | 'creator'
+    | 'createTime'
     | 'vaultDepositCcy'
     | 'clientDepositCcy'
     | 'sharesToken'
@@ -76,6 +82,12 @@ export interface AutomatorDetail
     OriginAutomatorDetail,
     | 'chainId'
     | 'automatorVault'
+    | 'automatorName'
+    | 'automatorDescription'
+    | 'feeRate'
+    | 'redemptionPeriodDay'
+    | 'creator'
+    | 'createTime'
     | 'vaultDepositCcy'
     | 'clientDepositCcy'
     | 'sharesToken'
@@ -188,14 +200,20 @@ export class AutomatorService {
       it.chainId,
       it.clientDepositCcy,
     );
+    const vault = ContractsService.AutomatorVaults.find(
+      (item) =>
+        item.chainId === it.chainId &&
+        item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
+    );
     return {
       ...it,
       vaultInfo: {
         ...it,
+        ...vault,
         vault: it.automatorVault,
-        name: get(it, 'automatorName') || it.clientDepositCcy,
-        desc: it.automatorDescription,
-        creatorFeeRate: get(it, 'creatorFeeRate') || 0,
+        name: get(it, 'automatorName') || vault?.name || it.clientDepositCcy,
+        desc: it.automatorDescription || vault?.desc,
+        creatorFeeRate: get(it, 'creatorFeeRate') || vault?.creatorFeeRate || 0,
         depositCcy: it.clientDepositCcy,
         vaultDepositCcy: it.vaultDepositCcy,
         positionCcy: it.sharesToken,
@@ -211,11 +229,6 @@ export class AutomatorService {
         depositTickAmount: getDepositTickAmount(
           it.clientDepositCcy,
           ProjectType.Automator,
-        ),
-        ...ContractsService.AutomatorVaults.find(
-          (item) =>
-            item.chainId === it.chainId &&
-            item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
         ),
       },
     } as never;

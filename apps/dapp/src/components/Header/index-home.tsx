@@ -355,7 +355,8 @@ export const CommonHeader = (props: {
   const { headerHidden } = useMobileHeaderState();
   const menusForRender = useMemo(
     () => props.menus(project, location),
-    [project, location],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [project, location, props.menus],
   );
 
   const [expanded, setExpanded] = useState(false);

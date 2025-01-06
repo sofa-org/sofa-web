@@ -1,5 +1,5 @@
 import { waitUntil } from '@livelybone/promise-wait';
-import { asyncCache, asyncShare } from '@sofa/utils/decorators';
+import { applyMock, asyncCache, asyncShare } from '@sofa/utils/decorators';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
@@ -55,6 +55,7 @@ export class AutomatorCreatorService {
       .then((res) => res.value);
   }
 
+  @applyMock('creatorAutomatorList')
   @asyncShare()
   static async automatorList(params: { chainId: number; wallet: string }) {
     return http

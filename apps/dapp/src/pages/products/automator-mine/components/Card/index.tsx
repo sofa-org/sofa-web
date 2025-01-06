@@ -46,9 +46,7 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
         <div className={styles['left']}>
           <img src={depositCcyConfig?.icon} alt="" />
           <div className={styles['name']}>
-            {props.info.automatorName ||
-              props.info.vaultInfo.name ||
-              props.info.vaultInfo.depositCcy}
+            {props.info.vaultInfo.name || props.info.vaultInfo.depositCcy}
           </div>
           <div className={styles['infos']}>
             <Address
