@@ -32,7 +32,7 @@ export interface TicketTypeSelectorProps
 
 export const TicketTypeOptions = ProductsService.TicketTypeOptions;
 
-export function useTicketType(forCcy: VaultInfo['forCcy']) {
+export function useTicketType(forCcy?: VaultInfo['forCcy']) {
   const query = useQuery();
   const depositCcy = query?.['deposit-ccy'];
   const chainId = useWalletStore((state) => state.chainId);

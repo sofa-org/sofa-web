@@ -1,0 +1,356 @@
+.header {
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: relative;
+  width: $width-content;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.product-desc {
+  @include regular;
+
+  margin: 8px 0 0;
+  font-size: 23px;
+  text-transform: none;
+}
+
+.header-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  line-height: 36px;
+}
+
+.form {
+  width: $width-content;
+  margin: 24px auto 40px;
+  padding-bottom: 1px;
+  background: #fff;
+  border-radius: 24px;
+}
+
+.quote-infos {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 12px;
+  opacity: 0.94;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(#000, 0.25);
+}
+
+.quote-info-item {
+  @include flex-center;
+
+  justify-content: flex-start;
+  margin: 0;
+  font-size: 12px;
+  color: rgba(#000, 0.3);
+
+  > span {
+    @include bold;
+
+    font-size: 14px;
+    color: #000;
+  }
+}
+
+.content {
+  @include flex-center;
+
+  flex-flow: row-reverse wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  gap: min(20px, 2vw);
+  margin: min(20px, 2vw);
+
+  > div:first-child {
+    flex: 3;
+  }
+
+  .kline {
+    position: sticky;
+    top: 68px;
+    left: 0;
+    flex: 1;
+    min-width: min(100%, 420px);
+  }
+
+  :global(#kline-2) {
+    width: 100%;
+    max-height: calc(100vh - 48px - 80px - 40px);
+  }
+}
+
+.win-rch {
+  color: var(--color-rch) !important;
+
+  &::before {
+    @include regular;
+
+    content: "+";
+    padding: 0 8px 0 0;
+    font-size: 12px;
+    color: rgba(#000, 0.3);
+  }
+}
+
+.unit {
+  > span {
+    display: inline-block;
+    width: 24px;
+    margin: 0 0 0 -3px;
+    padding: 0 0 0 8px;
+    transform: scale(0.7);
+    transform-origin: left center;
+    white-space: nowrap;
+  }
+}
+
+.amount {
+  flex: 1;
+  padding: 12px;
+  line-height: 14px;
+  color: rgba(#000, 0.65);
+  white-space: nowrap;
+
+  .label {
+    @include bold;
+
+    padding: 0 4px;
+    font-size: 14px;
+    color: #000;
+  }
+
+  .win,
+  .win-rch {
+    @include bold;
+
+    padding: 0 4px 0 0;
+    font-size: 20px;
+    color: var(--color-rise);
+  }
+
+  .win-usdt {
+    display: block;
+    padding: 10px 0 0 1em;
+    font-size: 14px;
+  }
+
+  .unit {
+    @include regular;
+
+    font-size: 12px;
+    padding: 0 0 0 2px;
+  }
+
+  .dec {
+    padding: 0 0 0 6px;
+    font-size: 12px;
+    color: rgba(#000, 0.3);
+  }
+
+  &:last-child {
+    border: none;
+  }
+}
+
+.footer {
+  @include flex-center;
+
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  min-height: 80px;
+  padding: 12px 20px;
+  justify-content: space-between;
+  background: #f3f3f3;
+  border-radius: 0 0 24px 24px;
+
+  .cart-brief {
+    @include flex-center;
+
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-width: fit-content;
+    flex: 2;
+
+    .left {
+      @include flex-center;
+
+      place-content: center flex-start;
+      flex-wrap: wrap;
+      gap: 10px 8px;
+      flex: 1;
+      width: fit-content;
+      min-width: 230px;
+
+      > svg {
+        width: 20px;
+      }
+
+      .amount {
+        padding: 0 0 0 28px;
+      }
+    }
+
+    .profits {
+      @include flex-center;
+
+      justify-content: space-between;
+      flex: 3;
+
+      .amount {
+        padding: 0;
+      }
+    }
+  }
+
+  .btn-deposit {
+    @include flex-center;
+
+    flex: 1;
+
+    > div:last-child,
+    button {
+      width: 100%;
+      padding: 0 20px;
+    }
+
+    .icon-del {
+      @include flex-center;
+
+      flex: none;
+      padding: 0 12px;
+
+      > svg {
+        @include pointer;
+
+        width: 1.2em;
+      }
+    }
+  }
+}
+
+.ticket {
+  @include flex-center;
+
+  justify-content: flex-start;
+  width: fit-content;
+  position: relative;
+  height: 24px;
+  margin: 0;
+  padding: 0 2px;
+  font-size: 10px;
+  color: #fff;
+  border-width: 4px 12px 4px 4px;
+  border-style: solid;
+  border-image: url("./assets/ticket-bg.svg") 4 12 4 4 round;
+  background: #000;
+  background-clip: padding-box;
+
+  > span {
+    @include bold;
+    @include gradient-txt;
+
+    z-index: 1;
+    line-height: 20px;
+    font-size: 14px;
+  }
+}
+
+.count {
+  font-size: 12px;
+  color: rgba(#000, 0.65);
+
+  span {
+    @include bold;
+
+    padding: 0 8px;
+    font-size: 16px;
+    color: #000;
+  }
+}
+
+.product-desc-wrapper {
+  width: $width-content;
+  margin: 40px auto;
+}
+
+@media (orientation: portrait) {
+  .header-right {
+    display: none;
+  }
+
+  .content {
+    gap: 12px;
+    margin: 12px;
+  }
+
+  .form {
+    .recommended-list {
+      padding: 12px 12px 0;
+    }
+  }
+
+  .product-desc-wrapper {
+    margin: 12px auto;
+  }
+
+  .footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+
+    .cart-brief {
+      .win-usdt {
+        display: none;
+      }
+    }
+
+    .btn-deposit {
+      flex-direction: row-reverse;
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .header {
+    width: 100vw;
+    gap: 0;
+    border-radius: 4vw 4vw 0 0;
+    overflow: hidden;
+  }
+
+  .form {
+    margin-top: 12px;
+  }
+
+  :global(.is-mobile) {
+    .quote-infos {
+      display: none;
+    }
+  }
+
+  .amount {
+    .win,
+    .win-rch {
+      font-size: 14px;
+    }
+  }
+}

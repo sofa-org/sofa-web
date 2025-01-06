@@ -33,8 +33,8 @@ export interface DepositCCYSelectorProps
 
 export function useForCcySelect() {
   const query = useQuery();
-  const setForCcy = useLazyCallback(
-    (v: VaultInfo['forCcy']) => updateQuery?.({ 'for-ccy': v }),
+  const setForCcy = useLazyCallback((v: VaultInfo['forCcy']) =>
+    updateQuery?.({ 'for-ccy': v }),
   );
   return [
     (query['for-ccy'] as VaultInfo['forCcy']) || 'WETH',
@@ -48,8 +48,8 @@ export function useDepositCcySelect() {
   const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const chainId = useWalletStore((state) => state.chainId);
-  const setDepositCcy = useLazyCallback(
-    (v: VaultInfo['depositCcy']) => updateQuery?.({ 'deposit-ccy': v }),
+  const setDepositCcy = useLazyCallback((v: VaultInfo['depositCcy']) =>
+    updateQuery?.({ 'deposit-ccy': v }),
   );
   const $ccy = (query['deposit-ccy'] as VaultInfo['depositCcy']) || 'USDT';
   const ccy = useMemo(
@@ -69,8 +69,13 @@ export function useDepositCcySelect() {
   return [ccy, setDepositCcy] as const;
 }
 
-export const CCYSelector = (props: CCYSelectorProps) => {
-  const [ccy, setCcy] = useForCcySelect();
+export const CCYSelector = (
+  props: CCYSelectorProps & {
+    localState?: ReturnType<typeof useForCcySelect>;
+  },
+) => {
+  const globalState = useForCcySelect();
+  const [ccy, setCcy] = props.localState || globalState;
   const options = useMemo(
     () =>
       [

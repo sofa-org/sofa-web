@@ -147,11 +147,13 @@ export const ProductTypeSelector = (
   props: BaseProps & {
     dropdownClassName?: string;
     dark?: boolean;
+    localState?: ReturnType<typeof useProductSelect>;
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
   const chainId = useWalletStore((state) => state.chainId);
-  const [product, setProduct] = useProductSelect();
+  const globalState = useProductSelect();
+  const [product, setProduct] = props.localState || globalState;
   const options = useMemo(() => {
     const vaults = ContractsService.vaults.filter(
       (it) => it.chainId === chainId && !it.tradeDisable,
