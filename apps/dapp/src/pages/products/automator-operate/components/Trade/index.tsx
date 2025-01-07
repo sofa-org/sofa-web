@@ -1,32 +1,40 @@
 import { useEffect, useMemo } from 'react';
+import { Tooltip } from '@douyinfe/semi-ui';
+import { calc_yield } from '@sofa/alg';
+import { AutomatorDetail } from '@sofa/services/automator';
+import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductsService } from '@sofa/services/products';
 import { amountFormatter, cvtAmountsInUsd } from '@sofa/utils/amount';
+import { MsIntervals, next8h } from '@sofa/utils/expiry';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
-import { Comp as IconCart } from '@/assets/icon-cart.svg';
-import { Comp as IconDel } from '@/assets/icon-del.svg';
 import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { useAutomatorStore } from '@/pages/products/automator/store';
+import { useGlobalState } from '@/store';
 
-import { useHoverTicket, useProductsState } from '../../../automator-store';
+import { useProductsState } from '../../../automator-store';
 import { useTicketType } from '../../../components/TicketTypeSelector';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 import CustomTickets from '../CustomTickets';
 import InvestButton from '../InvestButton';
 
+import { Comp as IconDetail } from './assets/icon-detail.svg';
+
 import styles from './index.module.scss';
 
-const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
+const ProductLottery = (
+  props: BaseProps & { onlyForm?: boolean; automator: AutomatorDetail },
+) => {
   const [t] = useTranslation('ProductLottery');
   const prices = useIndexPrices((state) => state.prices);
   const [ticket] = useTicketType();
 
-  const { automatorVault: vault, cart } = useProductsState();
+  const { automatorVault: vault } = useProductsState();
   const products = useProductsState(
     (state) =>
       (vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]) ||
@@ -67,64 +75,37 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
     return { amount, rchAmount, usdtAmount };
   }, [prices, quoteInfos, vault]);
 
-  const [hover, setHover] = useHoverTicket(vault);
-
-  const position = useMemo(() => {
-    if (!hover?.ticket.id) return undefined;
-    const el = document.querySelector(`#custom-ticket-${hover.ticket.id}`);
-    if (!el) return undefined;
-    const kline = document.querySelector(`#kline-2`);
-    if (!kline) return undefined;
-    const klineRect = kline.getBoundingClientRect();
-    const klineRightTop = { x: klineRect.x + klineRect.width, y: klineRect.y };
-    const elRect = el.getBoundingClientRect();
-    const elLeftTop = { x: elRect.x + 4, y: elRect.y + 4 };
-    const elLeftBottom = { x: elRect.x + 4, y: elRect.y + elRect.height + 4 };
-    return [
-      {
-        left: elLeftTop.x - klineRightTop.x,
-        top: elLeftTop.y - klineRightTop.y,
-      },
-      {
-        left: elLeftBottom.x - klineRightTop.x,
-        top: elLeftBottom.y - klineRightTop.y,
-      },
-    ];
-  }, [hover?.ticket.id]);
-
   return (
     <>
-      <div className={styles['form']}>
+      <div className={classNames(styles['form'], styles['body'])}>
         <div className={styles['content']}>
-          {vault && <CustomTickets vault={vault} />}
+          {vault && <CustomTickets vault={vault} automator={props.automator} />}
         </div>
         <div className={styles['footer']}>
           <div className={styles['cart-brief']}>
-            <div className={styles['left']}>
-              <IconCart />
-              <div className={styles['ticket']}>
-                <span>
-                  {ticket?.per} {ticket?.ccy}
-                </span>
-                {t('Per Ticket')}
-              </div>
-              <div className={styles['count']}>
-                X<span>{ticket?.per && totalCost / ticket?.per}</span>
-              </div>
-              <div className={styles['amount']}>
-                {t('Cost')}
-                <span className={styles['label']}>
+            <div className={styles['amount']}>
+              <span className={styles['label']}>
+                {t({
+                  enUS: 'Total Cost',
+                })}
+              </span>
+              <span className={styles['total-cost']}>
+                <span className={styles['digi']}>
                   {amountFormatter(totalCost, ticket?.precision)}
                 </span>
-                {ticket?.ccy}
-              </div>
+              </span>
             </div>
             <div className={styles['profits']}>
               <div className={styles['amount']}>
-                🎯{t('Target')}
-                <span className={styles['label']}>{t('Max Win')} </span>
+                <span className={styles['label']}>
+                  {t({
+                    enUS: 'Target Max Return',
+                  })}
+                </span>
                 <span className={styles['win']}>
-                  {amountFormatter(totalWin.amount, 2)}
+                  <span className={styles['digi']}>
+                    {amountFormatter(totalWin.amount, 2)}
+                  </span>
                   <span className={styles['unit']}>{ticket?.ccy}</span>
                 </span>
                 <span className={styles['win-rch']}>
@@ -137,21 +118,12 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
                 <span className={styles['win-usdt']}>
                   ≈ {amountFormatter(totalWin.usdtAmount, 2)}
                   <span className={styles['unit']}>USDT</span>
-                  <span className={styles['dec']}>| Estimated</span>
                 </span>
               </div>
             </div>
           </div>
           {vault && (
             <div className={styles['btn-deposit']}>
-              {!!products.length && vault && (
-                <div
-                  className={classNames(styles['icon-del'])}
-                  onClick={() => useProductsState.clearCart(vault)}
-                >
-                  <IconDel />
-                </div>
-              )}
               <InvestButton
                 vault={vault.vault.toLowerCase()}
                 chainId={vault.chainId}
@@ -174,10 +146,18 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     (q) => (q['automator-operate-tab'] || 'performance') as string,
   );
   const { automator } = useCreatorAutomatorSelector();
-
+  const { automatorVault } = useProductsState();
   useEffect(() => {
     return useAutomatorStore.subscribeVaults(chainId);
   }, [chainId]);
+
+  const apy = useGlobalState(
+    (state) =>
+      automator &&
+      state.interestRate[automator.vaultInfo.chainId]?.[
+        automator.vaultInfo.vaultDepositCcy
+      ],
+  );
   useEffect(() => {
     const vault = vaults?.[chainId]?.find((it) => {
       if (it.chainId !== chainId) return false;
@@ -187,7 +167,6 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     });
     useProductsState.updateAutomatorVault(vault);
   }, [vaults, automator]);
-  const { automatorVault } = useProductsState();
 
   return !automatorVault ? (
     <CEmpty
@@ -198,7 +177,201 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
       })}
     />
   ) : (
-    <ProductLottery {...props} />
+    <>
+      <div className={classNames(styles['form'], styles['header'])}>
+        <div className={styles['content']}>
+          <div className={styles['amount']}>
+            <span className={styles['label']}>
+              {t({
+                enUS: 'Automator Total Available Balance',
+              })}
+            </span>
+            <span className={styles['value']}>
+              {automator ? (
+                <>
+                  <span className={styles['digi']}>
+                    {amountFormatter(
+                      automator.availableBalance,
+                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                        ?.precision || undefined,
+                    )}
+                  </span>
+
+                  <span className={styles['unit']}>
+                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                      ?.name || automator.vaultInfo.vaultDepositCcy}
+                  </span>
+                </>
+              ) : (
+                '-'
+              )}
+            </span>
+          </div>
+          <div className={styles['amount']}>
+            <span className={styles['label']}>
+              {t({
+                enUS: 'Available Balance Excluding Principal',
+              })}
+            </span>
+            <span className={styles['value']}>
+              {automator ? (
+                <>
+                  <span className={styles['digi']}>
+                    {amountFormatter(
+                      automator.availableBalance,
+                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                        ?.precision || undefined,
+                    )}
+                  </span>
+
+                  <span className={styles['unit']}>
+                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                      ?.name || automator.vaultInfo.vaultDepositCcy}
+                  </span>
+                </>
+              ) : (
+                '-'
+              )}
+            </span>
+          </div>
+
+          <div className={styles['amount']} style={{ flex: 0 }}>
+            <span className={styles['label']}>&nbsp;</span>
+            <span className={styles['value']}>+</span>
+          </div>
+          <div className={styles['amount']}>
+            <span className={styles['label']}>
+              {t({
+                enUS: 'Estimated 7-Day Interest',
+              })}
+            </span>
+            <span className={styles['value']}>
+              {automator && apy ? (
+                <>
+                  <span className={styles['digi']}>
+                    {amountFormatter(
+                      calc_yield(
+                        apy.apyUsed,
+                        +automator.aumByVaultDepositCcy,
+                        Date.now(),
+                        Date.now() + MsIntervals.day * 7,
+                      ),
+                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                        ?.precision || undefined,
+                    )}
+                  </span>
+
+                  <span className={styles['unit']}>
+                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                      ?.name || automator.vaultInfo.vaultDepositCcy}
+                  </span>
+                </>
+              ) : (
+                '-'
+              )}
+            </span>
+          </div>
+          <div className={styles['amount']}>
+            <span className={styles['label']}>&nbsp;</span>
+            <span className={styles['value']}>
+              {automator ? (
+                <>
+                  <span className={styles['digi']}>
+                    =&nbsp;
+                    {amountFormatter(
+                      Number(automator.totalInterestPnlByClientDepositCcy) +
+                        Number(automator.availableBalance),
+                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                        ?.precision || undefined,
+                    )}
+                  </span>
+
+                  <span className={styles['unit']}>
+                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
+                      ?.name || automator.vaultInfo.vaultDepositCcy}
+                  </span>
+                  <Tooltip
+                    content={
+                      <div className={styles['automator-details']}>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({
+                              enUS: 'Pool Size',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {/* TODO */}
+                            {amountFormatter(
+                              1000,
+                              CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.precision || undefined,
+                            )}
+                            <span className={styles['unit']}>
+                              {CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.name || automator.vaultInfo.positionCcy}
+                            </span>
+                            ≈
+                            {amountFormatter(
+                              900,
+                              CCYService.ccyConfigs[
+                                automator.vaultInfo.vaultDepositCcy
+                              ]?.precision || undefined,
+                            )}
+                            <span className={styles['unit']}>
+                              {CCYService.ccyConfigs[
+                                automator.vaultInfo.vaultDepositCcy
+                              ]?.name || automator.vaultInfo.vaultDepositCcy}
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({
+                              enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {amountFormatter(automator.yieldPercentage, 2)}%
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: `Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)`,
+                              })}
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({
+                              enUS: 'Estimated Aave/Lido/Sofa/Curve Return',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: `(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)`,
+                              })}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <IconDetail className={styles['icon-detail']} />
+                  </Tooltip>
+                </>
+              ) : (
+                '-'
+              )}
+            </span>
+          </div>
+        </div>
+      </div>
+      {automator ? (
+        <ProductLottery {...props} automator={automator} />
+      ) : undefined}
+    </>
   );
 };
 

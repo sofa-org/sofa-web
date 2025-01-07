@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { Button, DatePicker } from '@douyinfe/semi-ui';
+import { Button, DatePicker, Table } from '@douyinfe/semi-ui';
+import { AutomatorDetail } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService, RiskType } from '@sofa/services/contracts';
@@ -33,17 +34,17 @@ import { TicketTypeOptions } from '../../../components/TicketTypeSelector';
 import styles from './index.module.scss';
 
 export interface CustomTicketProps {
-  active?: boolean;
   product: PartialRequired<ProductQuoteParams, 'vault' | 'id'>;
   setActive?(active: boolean): void;
   automatorVault: Pick<AutomatorVaultInfo, 'vault' | 'chainId' | 'depositCcy'>;
+  automator: AutomatorDetail;
 }
 
 const defaultProductType = ProductType.BullSpread;
 const defaultForCCY: VaultInfo['forCcy'] = 'BTC';
 
-const CustomTicket = (props: CustomTicketProps) => {
-  const [t] = useTranslation('CustomTicket');
+const TicketEditor = (props: CustomTicketProps) => {
+  const [t] = useTranslation('AutomatorTrade');
 
   const [productType, setProductType] = useState<ProductType>(
     props.product.vault.productType || defaultProductType,
@@ -83,7 +84,7 @@ const CustomTicket = (props: CustomTicketProps) => {
   useEffect(() => {
     if (vault && vault != props.product.vault) {
       useProductsState.updateCart(props.automatorVault, {
-        ...props.product,
+        id: props.product.id,
         vault,
       });
     }
@@ -121,228 +122,266 @@ const CustomTicket = (props: CustomTicketProps) => {
       console.warn(`cannot find ticketMeta: ${vault.depositCcy}`);
     }
   }, [vault, ticketMeta]);
+
+  const percentOfPool = useMemo(() => {
+    return Math.round(
+      (Number(props.product.depositAmount) /
+        Number(props.automator.aumByVaultDepositCcy)) *
+        100,
+    );
+  }, [props.product.depositAmount]);
   if (!vault || !ticketMeta) return <></>;
 
   return (
     <div
-      className={classNames(styles['custom-ticket'], {
-        [styles['active']]: props.active,
-      })}
-      onMouseEnter={() => {
-        props.setActive?.(true);
-      }}
+      className={classNames(styles['custom-ticket'], styles['active'])}
+      // onClick={() => {
+      //   props.setActive?.(false);
+      // }}
       id={`custom-ticket-${props.product.id}`}
     >
       <div className={styles['left']}>
         <div className={styles['form-item']}>
-          {props.active ? (
-            <div className={styles['value']}>
-              <CCYSelector
-                prefix={t({
-                  enUS: 'Anchor',
-                })}
-                localState={[forCcy, setForCcy]}
-              />
-            </div>
-          ) : (
-            <div className={styles['value']}>
-              {CCYService.ccyConfigs[forCcy]?.name || '-'}
-            </div>
-          )}
-          <div className={styles['label']}>
-            {t({
-              enUS: 'Anchor',
-            })}
+          <div className={styles['value']}>
+            <CCYSelector
+              prefix={t({
+                enUS: 'Anchor',
+              })}
+              localState={[forCcy, setForCcy]}
+              afterChange={() => {
+                onChange({
+                  anchorPrices: undefined,
+                });
+              }}
+            />
           </div>
         </div>
-        <div className={styles['form-item']}>
-          {props.active ? (
-            <div className={styles['value']}>
-              <ProductTypeSelector localState={[productType, setProductType]} />
-            </div>
-          ) : (
-            <div className={styles['value']}>
-              {ProductTypeRefs[productType]?.label(t) || '-'}
-            </div>
-          )}
+        <div className={classNames(styles['form-item'], styles['side'])}>
           <div className={styles['label']}>
             {t({
-              enUS: 'Product',
+              enUS: 'Side',
             })}
           </div>
+          <div className={styles['value']}>
+            <ProductTypeSelector
+              useRadioCard
+              localState={[productType, setProductType]}
+            />
+            <span className={styles['current-icon']}>
+              {ProductTypeRefs[productType]?.img}
+            </span>
+          </div>
         </div>
-        <div className={styles['form-item']}>
-          {props.active ? (
-            <div className={styles['value']}>
-              <PriceRangeInput
-                forCcy={vault.forCcy}
-                value={props.product.anchorPrices}
-                prefixes={
-                  vault.productType !== ProductType.DNT
-                    ? undefined
-                    : [t('B1'), t('B2')]
-                }
-                onChange={(v) =>
-                  v?.every(Boolean) &&
-                  onChange({ anchorPrices: v as (string | number)[] })
-                }
-                mustIncludeAtm={vault.productType === ProductType.DNT}
-              />
-            </div>
-          ) : (
-            <div className={styles['value']}>
-              {props.product.anchorPrices?.map((it, i) => (
-                <Fragment key={it}>
-                  {i !== 0 && <span style={{ padding: '0 4px' }}>-</span>}
-                  {it}
-                </Fragment>
-              )) || ' - '}
-            </div>
-          )}
-          <div className={styles['label']}>{t('Price Range')}</div>
-        </div>
-        <div className={styles['form-item']}>
-          {props.active ? (
-            <div
-              className={classNames(
-                styles['value'],
-                styles['date-picker-wrapper'],
-              )}
-            >
-              <DatePicker
-                key={props.product?.expiry}
-                className={styles['date-picker']}
-                dropdownClassName={styles['date-picker-dropdown']}
-                type="date"
-                // presets={[
-                //   { text: '7d', value: next8h(undefined, 8) },
-                //   { text: '14d', value: next8h(undefined, 15) },
-                //   { text: '21d', value: next8h(undefined, 22) },
-                //   { text: '30d', value: next8h(undefined, 31) },
-                // ].map((it) => ({ ...it, start: it.value, end: it.value }))}
-                disabledDate={(d) => {
-                  if (!d) return true;
-                  const curr8h = next8h(d.getTime());
-                  return curr8h < min || curr8h > max;
-                }}
-                presetPosition="top"
-                defaultValue={
-                  props.product?.expiry
-                    ? props.product.expiry * 1000
-                    : undefined
-                }
-                onChange={(v) => onChange({ expiry: day8h(Number(v)) / 1000 })}
-              />
-              {!!props.product?.expiry && (
-                <span className={styles['term']}>
-                  {Math.abs(dayjs().diff(props.product.expiry * 1000, 'day'))}d
-                </span>
-              )}
-            </div>
-          ) : (
-            <div className={styles['value']}>
-              {props.product.expiry ? (
-                <>
-                  <Time
-                    time={props.product.expiry * 1000}
-                    format="YYYY-MM-DD HH:mm"
-                  />
-
-                  <span className={styles['term']}>
-                    {Math.abs(dayjs().diff(props.product.expiry * 1000, 'day'))}
-                    d
-                  </span>
-                </>
-              ) : (
-                '-'
-              )}
-            </div>
-          )}
+        <div className={classNames(styles['form-item'], styles['expiry'])}>
           <div className={styles['label']}>
             {vault.productType === ProductType.DNT ? t('Before') : t('Expiry')}
+          </div>
+          <div
+            className={classNames(
+              styles['value'],
+              styles['date-picker-wrapper'],
+            )}
+          >
+            <DatePicker
+              key={props.product?.expiry}
+              className={styles['date-picker']}
+              dropdownClassName={styles['date-picker-dropdown']}
+              type="date"
+              // presets={[
+              //   { text: '3d', value: next8h(undefined, 3) },
+              //   { text: '7d', value: next8h(undefined, 8) },
+              //   { text: '10d', value: next8h(undefined, 10) },
+              //   { text: '14d', value: next8h(undefined, 14) },
+              // ].map((it) => ({ ...it, start: it.value, end: it.value }))}
+              disabledDate={(d) => {
+                if (!d) return true;
+                const curr8h = next8h(d.getTime());
+                return curr8h < min || curr8h > max;
+              }}
+              presetPosition="top"
+              defaultValue={
+                props.product?.expiry ? props.product.expiry * 1000 : undefined
+              }
+              onChange={(v) => onChange({ expiry: day8h(Number(v)) / 1000 })}
+            />
+            {!!props.product?.expiry && (
+              <span className={styles['term']}>
+                {Math.abs(dayjs().diff(props.product.expiry * 1000, 'day'))}d
+              </span>
+            )}
+          </div>
+          {[3, 7, 10, 14].map((day) => (
+            <span
+              className={styles['preset']}
+              onClick={() =>
+                onChange({ expiry: next8h(undefined, day + 1) / 1000 })
+              }
+            >
+              {day}d
+            </span>
+          ))}
+        </div>
+        <div className={classNames(styles['form-item'], styles['strikes'])}>
+          <div className={styles['label']}>{t('Strikes')}</div>
+          <div className={styles['value']}>
+            <PriceRangeInput
+              forCcy={vault.forCcy}
+              value={props.product.anchorPrices}
+              prefixes={
+                vault.productType !== ProductType.DNT
+                  ? undefined
+                  : [t('B1'), t('B2')]
+              }
+              onChange={(v) =>
+                v?.every(Boolean) &&
+                onChange({ anchorPrices: v as (string | number)[] })
+              }
+              mustIncludeAtm={vault.productType === ProductType.DNT}
+            />
+          </div>
+        </div>
+
+        <div className={styles['form-item']}>
+          <div className={styles['label']}>
+            {t({
+              enUS: 'Max Acceptable Loss',
+            })}
+          </div>
+          <div className={styles['value']}>
+            <AmountInput
+              className={styles['amount-input']}
+              value={
+                props.product.depositAmount
+                  ? +props.product.depositAmount
+                  : undefined
+              }
+              onChange={(v) => onChange({ depositAmount: v })}
+              onBlur={(e) => {
+                const val = (e.target as HTMLInputElement)?.value;
+                if (!val) onChange({ depositAmount: 0 });
+              }}
+              suffix={
+                <span className={styles['unit-in-input']}>
+                  {props.product.vault.depositCcy}
+                </span>
+              }
+            />
           </div>
         </div>
       </div>
       <div className={styles['right']}>
-        <div className={styles['form-item']}>
-          <div className={styles['label']}>
-            <span
-              className={styles['return']}
-              style={{
-                color:
-                  Number(quoteInfo?.amounts.maxRedeemable) -
-                  Number(quoteInfo?.amounts.minRedeemable)
-                    ? 'var(--color-rise)'
-                    : 'rgba(0,0,0,0.2)',
-              }}
-            >
-              <span className={styles['icon']}>{t('Win')}</span>
-              <span className={styles['amount']}>
-                {amountFormatter(
-                  Number(quoteInfo?.amounts.maxRedeemable) -
-                    Number(quoteInfo?.amounts.minRedeemable),
-                  2,
-                )}
-              </span>
-              <span className={styles['unit']}>{vault.depositCcy}</span>
+        <div className={styles['title']}>
+          <span className={styles['side']}>
+            {ProductTypeRefs[vault.productType]?.label(t)}
+          </span>
+          <span className={styles['expiry']}>
+            {props.product?.expiry ? (
+              <Time time={props.product?.expiry * 1000} format="YYYY-MM-DD" />
+            ) : undefined}
+          </span>
+          <span className={styles['strikes']}>
+            {props.product?.anchorPrices
+              ? props.product?.anchorPrices.map((it, i) => (
+                  <Fragment key={it}>
+                    {i !== 0 && <span style={{ padding: '0 2px' }}>-</span>}
+                    {it}
+                  </Fragment>
+                ))
+              : undefined}
+          </span>
+          {props.product.expiry ? (
+            <span className={styles['term']}>
+              {t(
+                {
+                  enUS: '{{days}} Days',
+                },
+                {
+                  days: Math.abs(
+                    dayjs().diff(props.product.expiry * 1000, 'day'),
+                  ),
+                },
+              )}
             </span>
-            <span className={styles['rch-return']}>
-              <span className={styles['amount']}>
-                <span>+</span>{' '}
-                {amountFormatter(quoteInfo?.amounts.rchAirdrop, 2)}
+          ) : undefined}
+        </div>
+        <div className={styles['scenarios']}>
+          <div className={styles['ccy']}>
+            <div className={styles['win']}>
+              {ProductTypeRefs[productType]?.img}
+              <span className={styles['price']}>
+                {props.product.anchorPrices?.[1]}
               </span>
-              <span className={styles['unit']}>
-                RCH
-                <span>| {t('Est.')}</span>
+              <div className={styles['calc']}>
+                <div className={styles['title']}>
+                  {t({
+                    enUS: 'Max Win',
+                  })}
+                </div>
+                <span className={styles['digi']}>
+                  {(quoteInfo &&
+                    amountFormatter(quoteInfo.amounts.maxRedeemable, 2)) ||
+                    undefined}
+                </span>
+                <span className={styles['unit']}>{vault.depositCcy}</span>
+              </div>
+            </div>
+            <div className={styles['or']}>
+              <span>
+                {t({
+                  enUS: 'Or',
+                })}
               </span>
-            </span>
-          </div>
-          <div className={styles['value']}>
-            {props.active ? (
-              <AmountInput
-                className={styles['amount-input']}
-                type="internal"
-                tick={1}
-                min={1}
-                max={999}
-                value={
-                  props.product.depositAmount
-                    ? +props.product.depositAmount / ticketMeta.per
-                    : undefined
-                }
-                onChange={(v) =>
-                  onChange({ depositAmount: ticketMeta.per * (Number(v) || 1) })
-                }
-                onBlur={(e) => {
-                  const val = (e.target as HTMLInputElement)?.value;
-                  if (!val) onChange({ depositAmount: 0 });
-                }}
-                suffix={
-                  <span className={styles['unit-in-input']}>
-                    {t('Tickets')}
-                  </span>
-                }
-              />
-            ) : (
-              <>
-                {props.product.depositAmount
-                  ? +props.product.depositAmount / ticketMeta.per
-                  : '-'}{' '}
-                {t('Tickets')}
-              </>
-            )}
-            <div
-              className={styles['icon-del']}
-              onClick={() =>
-                useProductsState.updateCart(props.automatorVault, {
-                  ...props.product,
-                  depositAmount: 0,
-                })
-              }
-            >
-              <IconDel />
+            </div>
+            <div className={styles['lose']}>
+              {ProductTypeRefs[productType]?.img}
+              <span className={styles['price']}>
+                {props.product.anchorPrices?.[0]}
+              </span>
+              <div className={styles['calc']}>
+                <div className={styles['title']}>
+                  {t({
+                    enUS: 'Max Loss',
+                  })}
+                </div>
+                <span className={styles['digi']}>
+                  {(props.product.depositAmount &&
+                    amountFormatter(props.product.depositAmount, 2)) ||
+                    undefined}
+                </span>
+                <span className={styles['unit']}>{vault.depositCcy}</span>
+                <div className={styles['desc']}>
+                  {t(
+                    {
+                      enUS: '{{percent}}% of Pool Size',
+                    },
+                    {
+                      percent: percentOfPool < 1 ? '<1' : percentOfPool,
+                    },
+                  )}
+                </div>
+              </div>
             </div>
           </div>
+          <div className={styles['plus']}>+</div>
+          <div className={styles['rch']}>
+            <span className={styles['digi']}>
+              {amountFormatter(quoteInfo?.amounts.rchAirdrop, 2)}
+            </span>
+            <span className={styles['unit']}>RCH</span>
+            <span className={styles['desc']}>{t('Est.')}</span>
+          </div>
+        </div>
+
+        <div
+          className={styles['icon-del']}
+          onClick={() =>
+            useProductsState.updateCart(props.automatorVault, {
+              ...props.product,
+              depositAmount: 0,
+            })
+          }
+        >
+          <IconDel />
         </div>
       </div>
     </div>
@@ -351,15 +390,17 @@ const CustomTicket = (props: CustomTicketProps) => {
 
 const CustomTickets = (props: {
   vault: Pick<AutomatorVaultInfo, 'vault' | 'chainId' | 'depositCcy'>;
+  automator: AutomatorDetail;
 }) => {
+  const [t] = useTranslation('AutomatorTrade');
   const ticketMeta = useMemo(
     () => TicketTypeOptions.find((it) => it.value === props.vault.depositCcy)!,
     [props.vault.depositCcy],
   );
   useEffect(() => {
-    if (!ticketMeta) {
-      throw new Error(`cannot find ticketMeta: ${[props.vault.depositCcy]}`);
-    }
+    // if (!ticketMeta) {
+    //   throw new Error(`cannot find ticketMeta: ${[props.vault.depositCcy]}`);
+    // }
   }, [ticketMeta]);
   const init = useLazyCallback(
     () =>
@@ -393,8 +434,11 @@ const CustomTickets = (props: {
     // const recommendedListMap = arrToDict(recommendedList, key);
     // return list.filter((it) => !recommendedListMap[key(it)]);
   });
+  const quoteInfos = useProductsState((state) => state.quoteInfos);
   const [hoverTicket, setHoverTicket] = useHoverTicket(props.vault);
-
+  useEffect(() => {
+    console.log('hoverTicket', hoverTicket);
+  }, [hoverTicket]);
   useEffect(() => {
     if (!products.length) {
       const product = init();
@@ -405,23 +449,167 @@ const CustomTickets = (props: {
 
   return (
     <div className={styles['custom-tickets']}>
-      {products?.map((it) => (
-        <CustomTicket
-          key={it.id}
-          automatorVault={props.vault}
-          product={it}
-          active={hoverTicket?.ticket.id === it.id}
-          setActive={(v) => setHoverTicket(v ? it.id : undefined)}
-        />
-      ))}
-      <Button
-        block
-        size="large"
-        className={classNames('btn-ghost', styles['btn-add'])}
-        onClick={() => useProductsState.updateCart(props.vault, init())}
-      >
-        <IconPlus />
-      </Button>
+      <Table<PartialRequired<ProductQuoteParams, 'vault' | 'id'>>
+        columns={[
+          // {
+          //   title: t({
+          //     enUS: 'Product',
+          //   }),
+          //   // TODO
+          //   render: (_, it) => undefined,
+          // },
+          {
+            title: t({
+              enUS: 'Side',
+            }),
+            render: (_, it) => (
+              <b>{ProductTypeRefs[it.vault.productType]?.label(t)}</b>
+            ),
+          },
+          {
+            title: t({
+              enUS: 'Anchor',
+            }),
+            render: (_, it) => (
+              <b>
+                <img
+                  src={CCYService.ccyConfigs[it.vault.forCcy]?.icon}
+                  alt=""
+                />
+                {t(
+                  {
+                    enUS: '{{ccy}} Price',
+                  },
+                  {
+                    ccy: CCYService.ccyConfigs[it.vault.forCcy]?.name,
+                  },
+                )}
+              </b>
+            ),
+          },
+          {
+            title: t({
+              enUS: 'Expiry',
+            }),
+            render: (_, it) =>
+              it.expiry ? (
+                <span>
+                  <b>
+                    <Time time={it.expiry * 1000} format="YYYY-MM-DD" />
+                  </b>
+                  <span className={styles['term']}>
+                    {Math.abs(dayjs().diff(it.expiry * 1000, 'day'))}d
+                  </span>
+                </span>
+              ) : (
+                <span>-</span>
+              ),
+          },
+          {
+            title: t({
+              enUS: 'Strikes',
+            }),
+            render: (_, it) =>
+              it.anchorPrices ? (
+                <span>
+                  {it.anchorPrices.map((it, i) => (
+                    <Fragment key={it}>
+                      {i !== 0 && <span style={{ padding: '0 4px' }}>-</span>}
+                      <b>{it}</b>
+                    </Fragment>
+                  ))}
+                </span>
+              ) : (
+                <span>-</span>
+              ),
+          },
+          {
+            title: t({
+              enUS: 'Max Acceptable Loss',
+            }),
+            render: (_, it) => {
+              const q = quoteInfos[ProductsService.productKey(it)];
+              return q ? (
+                <>
+                  <b>{amountFormatter(it.depositAmount, 2)}</b>
+                  <span className={styles['unit']}>
+                    {CCYService.ccyConfigs[it.vault.depositCcy]?.name ||
+                      it.vault.depositCcy}
+                  </span>
+                </>
+              ) : undefined;
+            },
+          },
+          {
+            title: t({
+              enUS: 'Max Return',
+            }),
+            render: (_, it) => {
+              const q = quoteInfos[ProductsService.productKey(it)];
+              return q ? (
+                <>
+                  <b>
+                    {amountFormatter(
+                      Number(q.amounts.maxRedeemable) -
+                        Number(q.amounts.minRedeemable),
+                      2,
+                    )}
+                  </b>
+                  <span className={styles['unit']}>
+                    {CCYService.ccyConfigs[it.vault.depositCcy]?.name ||
+                      it.vault.depositCcy}
+                  </span>
+                </>
+              ) : undefined;
+            },
+          },
+          {
+            title: '',
+            render: (_, it) => (
+              <div
+                className={styles['icon-del']}
+                onClick={() =>
+                  useProductsState.updateCart(props.vault, {
+                    ...it,
+                    depositAmount: 0,
+                  })
+                }
+              >
+                <IconDel />
+              </div>
+            ),
+          },
+        ]}
+        dataSource={products}
+        expandedRowKeys={hoverTicket ? [hoverTicket.ticket.id] : []}
+        expandedRowRender={(it, idx) =>
+          (it && (
+            <TicketEditor
+              key={it.id}
+              automatorVault={props.vault}
+              product={it}
+              setActive={(v) => setHoverTicket(v ? it.id : undefined)}
+              automator={props.automator}
+            />
+          )) ||
+          undefined
+        }
+        rowKey={(it) => it?.id || ''}
+        onRow={(it) => ({
+          onClick: () => setHoverTicket(it?.id),
+        })}
+        pagination={false}
+      />
+      <div className={styles['btn-add-container']}>
+        <Button
+          block
+          size="large"
+          className={classNames('btn-ghost', styles['btn-add'])}
+          onClick={() => useProductsState.updateCart(props.vault, init())}
+        >
+          <IconPlus />
+        </Button>
+      </div>
     </div>
   );
 };

@@ -565,7 +565,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
               )}
             </span>
           </li>
-          <li className={currentStep.step2 ? styles['selected'] : undefined}>
+          <li className={currentStep.step2 ? styles['done'] : undefined}>
             <span className={styles['step']}>
               {t({
                 enUS: 'Step 2',

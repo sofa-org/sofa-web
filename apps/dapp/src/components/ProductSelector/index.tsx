@@ -1,5 +1,6 @@
 import { SetStateAction, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Radio, RadioGroup } from '@douyinfe/semi-ui';
 import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts.ts';
 import { useTranslation } from '@sofa/services/i18n';
@@ -148,6 +149,8 @@ export const ProductTypeSelector = (
     dropdownClassName?: string;
     dark?: boolean;
     localState?: ReturnType<typeof useProductSelect>;
+    useRadioCard?: boolean;
+    radioClassName?: string;
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
@@ -177,6 +180,22 @@ export const ProductTypeSelector = (
       setProduct(options[0].value);
     }
   }, [options, product, setProduct]);
+  if (props.useRadioCard) {
+    return (
+      <>
+        <RadioGroup
+          type="pureCard"
+          value={product}
+          direction="horizontal"
+          onChange={(v) => setProduct(v.target.value as ProductType)}
+        >
+          {options.map((o) => (
+            <Radio value={o.value}>{o.label}</Radio>
+          ))}
+        </RadioGroup>
+      </>
+    );
+  }
 
   return (
     <CSelect

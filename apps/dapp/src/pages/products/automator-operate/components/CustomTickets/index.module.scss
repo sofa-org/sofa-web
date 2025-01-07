@@ -25,94 +25,344 @@
   }
 }
 
-.form-item {
+.icon-del {
+  @include flex-center;
+  @include pointer;
+
+  position: absolute;
+  right: min(20px + 10px, 2vw + 10px);
+  top: 50%;
+  margin-top: -16px;
+  width: 32px;
+  height: 32px;
+  border: 8px 0 8px 0;
+
+  > svg {
+    width: 12px;
+  }
+
+  &:hover {
+    background: rgba(#000, 0.05);
+  }
+}
+
+.btn-add-container {
+  padding: min(20px, 2vw) min(20px + 12px, 2vw + 12px);
+  .btn-add {
+    height: min(40px, 8vw);
+    border-radius: 8px;
+    border-color: #e0e0e0;
+    svg {
+      width: 1em;
+    }
+  }
+}
+
+.custom-tickets {
+  flex: 1;
+  margin: 0;
+
+  :global(.semi-table-expand-icon),
+  :global(.semi-table-row-expanded) {
+    display: none;
+  }
+  b {
+    @include bold;
+
+    font-size: 14px;
+    img {
+      height: 20px;
+      vertical-align: middle;
+      margin: -2px 3px 0 0;
+    }
+  }
+
+  .term,
+  .unit {
+    padding: 0 0 0 4px;
+    font-size: 11px;
+  }
+}
+.right {
   @include flex-column-center;
 
-  flex-direction: column-reverse;
+  flex: 1;
+  min-width: 196px;
+  padding: 0 0 0 min(20px, 2.2vw);
+  margin: min(20px, 2.2vw) min(20px, 2.2vw) min(20px, 2.2vw) 0;
+  border-left: dotted rgba(#000, 0.12) 1px;
   align-items: flex-start;
+  gap: 20px;
+  > .title {
+    font-size: 16px;
+    > span {
+      margin-right: 6px;
+    }
+    .term {
+      background: #f0f0f0;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 14px;
+      position: absolute;
+      margin-top: -2px;
+    }
+  }
+  .win,
+  .lose,
+  .rch {
+    border: 1px solid rgba(#000, 0.12);
+    border-radius: 8px;
+  }
+  .scenarios {
+    width: 100%;
+    @include flex-center;
+    justify-content: space-between;
+    .desc {
+      color: #b1b1b1;
+      font-size: 12px;
+    }
+    .digi {
+      @include bold;
+      font-size: 18px;
+    }
+    > .rch {
+      @include flex-column-center;
+      flex: 1;
+      gap: 1px;
+      height: 100%;
+      .unit,
+      .digi {
+        @include bold;
+        color: var(--color-rch);
+      }
+    }
+    > .ccy {
+      @include flex-column-center;
+      flex: 4;
+      gap: 0;
+      svg {
+        max-width: 36px;
+        max-width: 36px;
+      }
+      .calc {
+        width: 100px;
+        > .title {
+          @include bold;
+          font-size: 14px;
+        }
+      }
+      .win,
+      .lose {
+        @include flex-center;
+
+        padding: 0 15%;
+        justify-content: space-between;
+        width: 100%;
+        height: 87px;
+      }
+      .price {
+        @include bold;
+
+        font-size: 18px;
+      }
+      .win {
+        .title,
+        .digi,
+        .unit {
+          color: var(--color-rise);
+        }
+      }
+      .lose {
+        .title,
+        .digi,
+        .unit {
+          color: var(--color-fall);
+        }
+      }
+      > .or {
+        height: 10px;
+        position: relative;
+        color: rgba(#b1b1b1, 0.85);
+        > span {
+          position: relative;
+          z-index: 1;
+          margin-top: -4px;
+          font-size: 18px;
+          line-height: 18px;
+          display: block;
+        }
+        &::before {
+          content: "";
+          background: #fff;
+          position: absolute;
+          z-index: 0;
+          top: -4px;
+          left: -6px;
+          right: -6px;
+          bottom: -4px;
+        }
+      }
+    }
+    > .plus {
+      flex: 0;
+    }
+  }
+}
+
+.form-item {
+  @include flex-center;
+
+  justify-content: flex-start;
   gap: 18px;
   flex: 1;
   margin: 0;
   padding: 0 0 10px;
+
+  :global {
+    .semi-select.semi-select {
+      background: #f0f0f0 !important;
+      .semi-select-prefix {
+        @include bold;
+        color: rgba($color: #000000, $alpha: 0.65);
+      }
+      .semi-select-selection,
+      .semi-select-arrow {
+        color: #000;
+      }
+    }
+    .semi-input {
+      @include bold;
+    }
+
+    .semi-radioGroup-horizontal {
+      // stylelint-disable-line selector-class-pattern
+      gap: 6px;
+
+      .semi-radio {
+        background: #f0f0f0;
+        border: none;
+        font-size: 14px;
+        border-radius: 4px;
+        height: 32px;
+        padding: 0 6px;
+        min-width: 100px;
+        justify-content: center;
+        .semi-radio-content {
+          display: inline-block;
+          line-height: 32px;
+          .semi-radio-addon {
+            @include regular;
+          }
+        }
+
+        &.semi-radio-checked {
+          .semi-radio-content {
+            .semi-radio-addon {
+              @include bold;
+              color: #50d113;
+            }
+          }
+        }
+      }
+    }
+  }
+  &.side {
+    .current-icon {
+      display: inline-block;
+      width: 36px;
+      height: 32px;
+      padding: 4px 0 0 6px;
+      svg {
+        width: 36px;
+        height: 24px;
+      }
+    }
+    :global {
+      .semi-radio {
+        svg {
+          display: none;
+        }
+      }
+    }
+  }
+  &.expiry {
+    .date-picker {
+      width: 152px;
+    }
+
+    .date-picker-dropdown {
+      :global {
+        .semi-datepicker-quick-control-top-content {
+          @include flex-center;
+
+          justify-content: flex-start;
+          flex-wrap: wrap;
+
+          .semi-button {
+            border: 1px solid rgba(#000, 0.12);
+            background: transparent;
+
+            &:hover {
+              border: 1px solid rgba(#000, 0.5);
+              background: transparent;
+            }
+          }
+
+          .semi-datepicker-quick-control-top-content-item-ellipsis,
+          .semi-datepicker-quick-control-bottom-content-item-ellipsis {
+            width: auto;
+          }
+        }
+      }
+    }
+
+    .date-picker-wrapper {
+      @include flex-center;
+
+      position: relative;
+
+      .term {
+        @include bold;
+        position: absolute;
+        right: 34px;
+        top: 50%;
+        transform: translate(0, -50%);
+        font-size: 14px;
+      }
+    }
+    .preset {
+      @include pointer;
+
+      min-width: 24px;
+      text-align: center;
+      font-size: 14px;
+      display: inline-block;
+    }
+  }
+  &.strikes {
+    .value {
+      @include bold;
+    }
+  }
 }
 
 .label {
-  height: 26px;
   line-height: 18px;
   color: rgba(#000, 0.65);
 
   .return {
     white-space: nowrap;
   }
-
-  .rch-return {
-    display: block;
-    font-size: 12px;
-    color: var(--color-rch);
-
-    .amount,
-    .unit {
-      @include regular;
-
-      font-size: inherit;
-      color: inherit;
-    }
-  }
-}
-
-.value {
-  @include flex-center;
-
-  gap: 0;
-  justify-content: flex-start;
-  min-width: 130px;
-  height: 32px;
-  margin: 0;
-
-  :global {
-    .semi-datepicker {
-      .semi-input-wrapper {
-        border-radius: 16px;
-      }
-    }
-  }
 }
 
 .left {
-  @include flex-center;
-
-  align-items: flex-start;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 20px;
-  flex: 3;
   position: relative;
-  z-index: 1;
-  margin: 0;
-  padding: min(20px, 2.2vw);
-  box-shadow: 1px 1px 0 0 rgba(#000, 0.05);
-
-  .label {
-    padding: 12px 0 0;
-  }
-}
-
-.right {
+  text-align: left;
   flex: 1;
-  min-width: 196px;
   padding: min(20px, 2.2vw);
-
   .form-item {
-    flex-flow: row wrap;
-    align-items: center;
-    justify-content: flex-start;
-
     .label {
-      @include flex-center;
-
-      gap: 0 6px;
-      justify-content: flex-start;
-      flex-wrap: wrap;
+      min-width: 48px;
     }
   }
 }
@@ -133,7 +383,7 @@
 
   .unit-in-input {
     position: absolute;
-    right: 62px;
+    right: 8px;
     top: 8px;
     height: 14px;
     font-size: 12px;
@@ -151,114 +401,26 @@
   padding: 0 4px 0 0;
 }
 
-.icon-del {
-  @include flex-center;
-  @include pointer;
-
-  display: none;
-  flex: none;
-  position: absolute;
-  right: 1px;
-  bottom: 1px;
-  width: 32px;
-  height: 32px;
-  border: 8px 0 8px 0;
-
-  > svg {
-    width: 12px;
-  }
-
-  &:hover {
-    background: rgba(#000, 0.05);
-  }
-}
-
-.btn-add.btn-add {
-  height: min(40px, 8vw);
-  border-radius: 8px;
-  border-color: #e0e0e0;
-
-  svg {
-    width: 1em;
+:global(.semi-table-row-expand) {
+  .icon-del {
+    display: none;
   }
 }
 
 .custom-ticket {
   @include flex-center;
-  @include pointer;
 
   justify-content: stretch;
   align-items: stretch;
   flex-wrap: wrap;
   gap: 1px;
   position: relative;
-  margin: 0 0 min(20px, 2.2vw);
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   background: #fff;
 
   &.active {
     @include gradient-border(1px, #fff, 8px);
-  }
-
-  &:hover {
-    .icon-del {
-      display: flex;
-    }
-  }
-}
-
-.custom-tickets {
-  flex: 1;
-  margin: 0;
-}
-
-.date-picker {
-  min-width: 128px;
-}
-
-.date-picker-dropdown {
-  :global {
-    .semi-datepicker-quick-control-top-content {
-      @include flex-center;
-
-      justify-content: flex-start;
-      flex-wrap: wrap;
-
-      .semi-button {
-        border: 1px solid rgba(#000, 0.12);
-        background: transparent;
-
-        &:hover {
-          border: 1px solid rgba(#000, 0.5);
-          background: transparent;
-        }
-      }
-
-      .semi-datepicker-quick-control-top-content-item-ellipsis,
-      .semi-datepicker-quick-control-bottom-content-item-ellipsis {
-        width: auto;
-      }
-    }
-  }
-}
-
-.term {
-  padding: 0 0 0 8px;
-  font-size: 12px;
-  opacity: 0.5;
-}
-
-.date-picker-wrapper {
-  @include flex-center;
-
-  position: relative;
-
-  .term {
-    position: absolute;
-    right: 34px;
-    top: 50%;
-    transform: translate(0, -50%);
   }
 }
 
@@ -281,10 +443,6 @@
             font-size: 12px;
           }
         }
-
-        .rch-return {
-          display: inline-block;
-        }
       }
     }
   }
@@ -295,11 +453,6 @@
 
     .form-item {
       gap: 8px;
-
-      .label {
-        height: auto;
-        font-size: 12px;
-      }
     }
   }
 

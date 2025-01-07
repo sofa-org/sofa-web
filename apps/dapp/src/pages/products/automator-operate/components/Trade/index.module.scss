@@ -1,30 +1,3 @@
-.header {
-  @include flex-center;
-
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 12px;
-  position: relative;
-  width: $width-content;
-  margin: 0 auto;
-  color: #fff;
-}
-
-.product-desc {
-  @include regular;
-
-  margin: 8px 0 0;
-  font-size: 23px;
-  text-transform: none;
-}
-
-.header-right {
-  position: absolute;
-  top: 0;
-  right: 0;
-  line-height: 36px;
-}
-
 .form {
   width: $width-content;
   margin: 24px auto 40px;
@@ -33,38 +6,10 @@
   border-radius: 24px;
 }
 
-.quote-infos {
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin: 0;
-  padding: 12px;
-  opacity: 0.94;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(#000, 0.25);
-}
-
-.quote-info-item {
-  @include flex-center;
-
-  justify-content: flex-start;
-  margin: 0;
-  font-size: 12px;
-  color: rgba(#000, 0.3);
-
-  > span {
-    @include bold;
-
-    font-size: 14px;
-    color: #000;
-  }
-}
-
 .content {
   @include flex-center;
 
-  flex-flow: row-reverse wrap;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   position: relative;
@@ -88,20 +33,6 @@
     max-height: calc(100vh - 48px - 80px - 40px);
   }
 }
-
-.win-rch {
-  color: var(--color-rch) !important;
-
-  &::before {
-    @include regular;
-
-    content: "+";
-    padding: 0 8px 0 0;
-    font-size: 12px;
-    color: rgba(#000, 0.3);
-  }
-}
-
 .unit {
   > span {
     display: inline-block;
@@ -114,6 +45,19 @@
   }
 }
 
+.win-rch {
+  color: var(--color-rch) !important;
+
+  &::before {
+    @include regular;
+
+    content: "+";
+    padding: 0 8px 0 4px;
+    font-size: 16px;
+    color: rgba(#fff, 0.65);
+  }
+}
+
 .amount {
   flex: 1;
   padding: 12px;
@@ -121,27 +65,17 @@
   color: rgba(#000, 0.65);
   white-space: nowrap;
 
+  .digi {
+    @include bold;
+
+    line-height: 21px;
+    font-size: 18px;
+  }
   .label {
-    @include bold;
-
-    padding: 0 4px;
     font-size: 14px;
-    color: #000;
-  }
-
-  .win,
-  .win-rch {
-    @include bold;
-
-    padding: 0 4px 0 0;
-    font-size: 20px;
-    color: var(--color-rise);
-  }
-
-  .win-usdt {
+    line-height: 17px;
+    color: rgba(#000, 0.45);
     display: block;
-    padding: 10px 0 0 1em;
-    font-size: 14px;
   }
 
   .unit {
@@ -162,113 +96,82 @@
   }
 }
 
-.footer {
-  @include flex-center;
-
-  align-items: stretch;
-  flex-wrap: wrap;
-  gap: 12px 16px;
-  position: sticky;
-  left: 0;
-  bottom: 0;
-  z-index: 3;
-  min-height: 80px;
-  padding: 12px 20px;
-  justify-content: space-between;
-  background: #f3f3f3;
-  border-radius: 0 0 24px 24px;
-
-  .cart-brief {
-    @include flex-center;
-
-    justify-content: space-between;
-    align-items: stretch;
-    flex-wrap: wrap;
-    gap: 12px;
-    min-width: fit-content;
-    flex: 2;
-
-    .left {
-      @include flex-center;
-
-      place-content: center flex-start;
-      flex-wrap: wrap;
-      gap: 10px 8px;
-      flex: 1;
-      width: fit-content;
-      min-width: 230px;
-
-      > svg {
-        width: 20px;
+.header {
+  .content {
+    padding-top: min(20rem, 2vw);
+    margin-top: 0;
+    .amount {
+      padding-bottom: 0;
+      padding-top: 0;
+      position: relative;
+      &:first-child {
+        max-width: 270px;
+        border-right: 0.5px solid rgba($color: #000000, $alpha: 0.1);
       }
-
-      .amount {
-        padding: 0 0 0 28px;
-      }
-    }
-
-    .profits {
-      @include flex-center;
-
-      justify-content: space-between;
-      flex: 3;
-
-      .amount {
-        padding: 0;
+      .unit {
+        font-size: 12px;
+        margin-left: 2px;
       }
     }
   }
-
-  .btn-deposit {
-    @include flex-center;
-
-    flex: 1;
-
-    > div:last-child,
-    button {
-      width: 100%;
-      padding: 0 20px;
-    }
-
-    .icon-del {
-      @include flex-center;
-
-      flex: none;
-      padding: 0 12px;
-
-      > svg {
-        @include pointer;
-
-        width: 1.2em;
-      }
-    }
+  .icon-detail {
+    display: none;
+    width: 16px;
+    height: 16px;
   }
 }
+.body {
+  padding-bottom: 0;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  .content {
+    margin: 0;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    overflow: hidden;
+    :global {
+      .semi-table-thead {
+        height: 50px;
+        th {
+          @include regular;
 
-.ticket {
-  @include flex-center;
-
-  justify-content: flex-start;
-  width: fit-content;
-  position: relative;
-  height: 24px;
-  margin: 0;
-  padding: 0 2px;
-  font-size: 10px;
-  color: #fff;
-  border-width: 4px 12px 4px 4px;
-  border-style: solid;
-  border-image: url("./assets/ticket-bg.svg") 4 12 4 4 round;
-  background: #000;
-  background-clip: padding-box;
-
-  > span {
-    @include bold;
-    @include gradient-txt;
-
-    z-index: 1;
-    line-height: 20px;
-    font-size: 14px;
+          border-bottom: 1px rgba(#000, 0.08) solid;
+        }
+        th:first-child {
+          padding-left: min(20px + 12px, 2vw + 12px);
+        }
+        th:last-child {
+          padding-right: min(20px + 12px, 2vw + 12px);
+        }
+      }
+      .semi-table-tbody {
+        tr {
+          height: 50px;
+          td {
+            background: transparent !important;
+            border-bottom: none;
+            &:first-child {
+              padding-left: min(20px + 12px, 2vw + 12px);
+            }
+            &:last-child {
+              padding-right: min(20px + 12px, 2vw + 12px);
+              position: relative;
+            }
+          }
+          &:hover > td {
+            background: rgba(#000, 0.08) !important;
+          }
+        }
+        tr.semi-table-row-expand {
+          td {
+            padding: min(20px, 2vw) min(20px + 12px, 2vw + 12px);
+          }
+          &:hover > td {
+            background: transparent !important;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -285,16 +188,115 @@
   }
 }
 
-.product-desc-wrapper {
-  width: $width-content;
-  margin: 40px auto;
+.footer {
+  @include flex-center;
+
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  min-height: 80px;
+  padding: 6px 20px;
+  justify-content: space-between;
+  background: #000;
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+  &::after {
+    content: "";
+    background: #2c2f34;
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+  }
+  .total-cost {
+    @include bold;
+
+    font-size: 24px;
+    color: #fff;
+  }
+  .win,
+  .win-rch {
+    @include bold;
+
+    padding: 0 4px 0 0;
+    font-size: 24px;
+    color: var(--color-rise);
+  }
+
+  .win-usdt {
+    @include regular;
+
+    padding: 10px 0 0 1em;
+    font-size: 16px;
+    color: rgba(#fff, 0.65);
+  }
+  .label {
+    color: rgba(#fff, 0.45);
+  }
+  .digi {
+    @include bold;
+
+    font-size: 24px;
+  }
+  .cart-brief {
+    @include flex-center;
+
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-width: fit-content;
+    flex: 2;
+
+    .profits {
+      @include flex-center;
+
+      justify-content: space-between;
+      flex: 3;
+    }
+  }
+
+  .btn-deposit {
+    @include flex-center;
+
+    flex: 1;
+
+    > div:last-child {
+      overflow: hidden;
+    }
+    button {
+      width: 100%;
+      padding: 0 20px;
+      background: $color-main-gradient;
+      &:hover {
+        background: $color-main-gradient !important;
+        opacity: 0.75;
+      }
+      &:global(.semi-button-primary-disabled) {
+        background: $color-main-gradient !important;
+        opacity: 0.55;
+      }
+      > span {
+        color: #000;
+        background: transparent;
+        background-clip: initial !important;
+        -webkit-text-fill-color: #000;
+      }
+    }
+  }
 }
 
 @media (orientation: portrait) {
-  .header-right {
-    display: none;
-  }
-
   .content {
     gap: 12px;
     margin: 12px;
@@ -304,10 +306,6 @@
     .recommended-list {
       padding: 12px 12px 0;
     }
-  }
-
-  .product-desc-wrapper {
-    margin: 12px auto;
   }
 
   .footer {
@@ -330,21 +328,8 @@
 }
 
 @media (orientation: portrait) {
-  .header {
-    width: 100vw;
-    gap: 0;
-    border-radius: 4vw 4vw 0 0;
-    overflow: hidden;
-  }
-
   .form {
     margin-top: 12px;
-  }
-
-  :global(.is-mobile) {
-    .quote-infos {
-      display: none;
-    }
   }
 
   .amount {

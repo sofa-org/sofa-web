@@ -4,7 +4,7 @@ import { calc_yield } from '@sofa/alg';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { useTranslation } from '@sofa/services/i18n';
 import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
-import { next8h } from '@sofa/utils/expiry';
+import { MsIntervals, next8h } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { simplePlus } from '@sofa/utils/object';
 import { useRequest } from 'ahooks';
@@ -44,7 +44,7 @@ const PoolSize = () => {
         apy.apyUsed,
         +automator.aumByVaultDepositCcy,
         Date.now(),
-        next8h(undefined, 8),
+        Date.now() + MsIntervals.day * 7,
       ),
     [apy, automator],
   );
