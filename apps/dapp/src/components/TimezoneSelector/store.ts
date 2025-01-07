@@ -76,7 +76,8 @@ export const useTimezone = Object.assign(
   },
 );
 
-export function formatTime(ms: number, format: string) {
+export function formatTime(ms: number | undefined, format: string) {
+  if (!ms) return '-';
   const utcOffset = useTimezone.getState().timezone * 60;
   return dayjs(ms).utcOffset(utcOffset).format(format); // utcOffset 方法接收的是 UTC 时间减去本地时间的分钟数
 }

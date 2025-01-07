@@ -1,5 +1,7 @@
 import { MsIntervals } from '@sofa/utils/expiry';
 
+import { InterestType } from '../../base-type';
+
 const vaults = [
   // bull BTC
   {
@@ -13,6 +15,7 @@ const vaults = [
     claimPeriod: MsIntervals.day * 3,
     createTime: new Date('2024-12-24T08:00Z').getTime(),
     creator: '0xCc19E60c86C396929E76a6a488848C9596de22bd',
+    interestType: InterestType.CURVE,
   },
   // bull ETH
   {
@@ -26,6 +29,7 @@ const vaults = [
     claimPeriod: MsIntervals.day * 3,
     createTime: new Date('2024-12-24T08:00Z').getTime(),
     creator: '0xCc19E60c86C396929E76a6a488848C9596de22bd',
+    interestType: InterestType.CURVE,
   },
 ];
 

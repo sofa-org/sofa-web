@@ -26,10 +26,13 @@
 }
 
 .cards-wrapper {
-  margin: 25vh 0;
+  min-height: 50vh;
+  margin: 10px 0 0;
 
-  &:global(.semi-spin-hidden) {
-    margin: 10px 0 0;
+  :global {
+    .semi-spin-wrapper {
+      color: #fff;
+    }
   }
 }
 

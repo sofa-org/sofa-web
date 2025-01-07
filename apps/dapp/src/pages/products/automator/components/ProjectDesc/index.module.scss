@@ -12,30 +12,6 @@
   padding: min(40px, 3vw) !important;
 }
 
-.legend {
-  @include flex-center;
-
-  gap: 20px;
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  .legend-item {
-    @include flex-center;
-
-    width: fit-content;
-    white-space: nowrap;
-    font-size: min(14px, 3vw);
-
-    .color {
-      width: 20px;
-      height: 10px;
-      border-radius: 2px;
-    }
-  }
-}
-
 .snapshot {
   :global(.semi-spin-children) {
     @include flex-center;
@@ -70,18 +46,6 @@
         color: $color-fall;
       }
     }
-  }
-}
-
-.performance {
-  :global(.semi-spin-children) {
-    width: 100%;
-  }
-
-  .chart {
-    width: calc(100% + 80px);
-    height: 360px;
-    margin: -40px;
   }
 }
 

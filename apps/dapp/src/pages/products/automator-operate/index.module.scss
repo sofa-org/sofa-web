@@ -1,3 +1,11 @@
+.position-size {
+  display: inline-block;
+  padding: 0 0 0 6px;
+  margin: 0 0 0 6px;
+  line-height: 0.8em;
+  border-left: 1px dashed rgba(#fff, 0.2);
+}
+
 .head-title {
   width: $width-content;
   margin: 0 auto;

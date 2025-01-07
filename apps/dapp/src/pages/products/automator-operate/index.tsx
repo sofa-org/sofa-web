@@ -16,9 +16,28 @@ import {
   CreatorAutomatorSelector,
   useCreatorAutomatorSelector,
 } from './components/AutomatorSelector';
+import { AutomatorFollowers } from './components/Followers';
+import { AutomatorPerformance } from './components/Performance';
+import { AutomatorPositions } from './components/Positions';
 import AutomatorTrade from './components/Trade';
+import { AutomatorTransactions } from './components/Transactions';
 
 import styles from './index.module.scss';
+
+const PositionTab = () => {
+  const [t] = useTranslation('AutomatorOperate');
+  const { automator } = useCreatorAutomatorSelector();
+  return (
+    <span>
+      {t({ enUS: 'Positions', zhCN: '头寸' })}
+      {/* {automator?.positionSize && ( */}
+      <span className={styles['position-size']}>
+        {automator?.positionSize || '1'}
+      </span>
+      {/* )} */}
+    </span>
+  );
+};
 
 const $options: {
   label(t: TFunction): ReactNode;
@@ -28,31 +47,27 @@ const $options: {
   {
     label: (t) => t({ enUS: 'Performance', zhCN: '历史表现' }),
     value: 'performance',
-    content: () => <></>,
+    content: () => <AutomatorPerformance />,
   },
   {
     label: (t) => t({ enUS: 'Trade', zhCN: '交易' }),
     value: 'trade',
-    content: () => (
-      <>
-        <AutomatorTrade />
-      </>
-    ),
+    content: () => <AutomatorTrade />,
   },
   {
-    label: (t) => t({ enUS: 'Positions', zhCN: '头寸' }),
+    label: (t) => <PositionTab />,
     value: 'positions',
-    content: () => <></>,
+    content: () => <AutomatorPositions />,
   },
   {
     label: (t) => t({ enUS: 'Followers', zhCN: '参与钱包' }),
     value: 'followers',
-    content: () => <></>,
+    content: () => <AutomatorFollowers />,
   },
   {
     label: (t) => t({ enUS: 'Subscription History', zhCN: '交易记录' }),
     value: 'transactions',
-    content: () => <></>,
+    content: () => <AutomatorTransactions />,
   },
 ];
 

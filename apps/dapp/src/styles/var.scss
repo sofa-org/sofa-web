@@ -75,7 +75,12 @@ $color-mobile-header-gradient: linear-gradient(
   }
 }
 
-@mixin gradient-border($border-width, $bg, $border-radius) {
+@mixin gradient-border(
+  $border-width,
+  $bg,
+  $border-radius,
+  $gradient-color: $color-main-gradient
+) {
   position: relative;
 
   &::before {
@@ -93,7 +98,7 @@ $color-mobile-header-gradient: linear-gradient(
     inset: -$border-width;
     z-index: 0;
     border-radius: $border-radius;
-    background: $color-main-gradient;
+    background: $gradient-color;
   }
 
   > * {
@@ -110,20 +115,16 @@ $color-mobile-header-gradient: linear-gradient(
   }
 }
 
-@mixin gradient-txt() {
-  background: $color-main-gradient;
+@mixin gradient-txt($color: $color-main-gradient) {
+  background: $color;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 @mixin gradient-txt-1() {
-  background: $color-gradient-1;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  @include gradient-txt($color-gradient-1);
 }
 
 @mixin gradient-txt-2() {
-  background: $color-gradient-2;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  @include gradient-txt($color-gradient-2);
 }

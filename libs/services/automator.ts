@@ -12,6 +12,7 @@ import {
 import {
   AutomatorTransactionStatus,
   AutomatorVaultInfo,
+  InterestType,
   ProjectType,
 } from './base-type';
 import { ContractsService } from './contracts';
@@ -230,6 +231,15 @@ export class AutomatorService {
           it.clientDepositCcy,
           ProjectType.Automator,
         ),
+        interestType:
+          vault?.interestType ??
+          (() => {
+            if (it.vaultDepositCcy === 'scrvUSD') return InterestType.CURVE;
+            if (it.vaultDepositCcy === 'stRCH') return InterestType.SOFA;
+            if (it.vaultDepositCcy.startsWith('st')) return InterestType.LIDO;
+            if (it.vaultDepositCcy.startsWith('a')) return InterestType.AAVE;
+            return undefined;
+          })(),
       },
     } as never;
   }

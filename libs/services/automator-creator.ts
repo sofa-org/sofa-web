@@ -49,10 +49,9 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories() {
     return http
-      .get<
-        unknown,
-        HttpResponse<AutomatorFactory[]>
-      >(`/optivisors/automator/factories`)
+      .get<unknown, HttpResponse<AutomatorFactory[]>>(
+        `/optivisors/automator/factories`,
+      )
       .then((res) => res.value);
   }
 
@@ -340,7 +339,7 @@ export class AutomatorCreatorService {
       return Promise.all([
         contract.totalFee(),
         vaultDepositCcy.decimals(),
-      ]).then(([res, decimals]) => ethers.formatUnits(res, decimals));
+      ]).then(([res, decimals]) => +ethers.formatUnits(res, decimals));
     } catch (e) {
       return 0;
     }

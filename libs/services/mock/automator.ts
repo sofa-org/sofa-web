@@ -75,6 +75,7 @@ function creatorAutomatorList(params: { chainId: number; wallet: string }) {
         positionCcy: 'atUSDT',
         redeemWaitPeriod: 604800000,
         claimPeriod: 259200000,
+        interestType: 'Aave',
         abis: [
           {
             inputs: [

@@ -26,8 +26,10 @@ export enum TransactionStatus {
 }
 
 export enum InterestType {
-  AAVE = 'AAVE',
-  LIDO = 'LIDO',
+  AAVE = 'Aave',
+  LIDO = 'Lido',
+  SOFA = 'Sofa',
+  CURVE = 'Curve',
 }
 
 export enum AutomatorTransactionStatus {
@@ -78,6 +80,7 @@ export interface AutomatorVaultInfo {
   creator: string;
   creatorFeeRate: number | string; // 默认为 0
   createTime: number | string; // 创建时间
+  interestType?: InterestType; // 生息方式，一期的没有
 }
 
 export interface AutomatorFactory {
