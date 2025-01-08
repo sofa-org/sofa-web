@@ -1,4 +1,4 @@
-import { asyncCache } from '@sofa/utils/decorators';
+import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { http } from '@sofa/utils/http';
 import { get, pick } from 'lodash-es';
@@ -9,9 +9,9 @@ import {
   getDepositMinAmount,
   getDepositTickAmount,
 } from './vaults/utils';
+import type { AutomatorVaultInfo } from './base-type';
 import {
   AutomatorTransactionStatus,
-  AutomatorVaultInfo,
   InterestType,
   ProjectType,
 } from './base-type';
@@ -142,32 +142,6 @@ export enum AutomatorDepositStatus {
   CLOSED = 'CLOSED',
 }
 
-export interface AutomatorFollower {
-  wallet: string; // wallet
-  amountByVaultDepositCcy: number | string; // 当前持有的总资产(scrvUSD)
-  amountByClientDepositCcy: number | string; // 当前持有的总资产(crvUSD)
-  share: number | string; // 转换的份额
-  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
-  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
-  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
-  totalRchAmount: number | string; // Rch的总PNL(RCH)
-  followDay: number; // 加入天数
-  pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
-}
-
-export interface AutomatorFollower {
-  wallet: string; // wallet
-  amountByVaultDepositCcy: number | string; // 当前持有的总资产(scrvUSD)
-  amountByClientDepositCcy: number | string; // 当前持有的总资产(crvUSD)
-  share: number | string; // 转换的份额
-  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
-  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
-  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
-  totalRchAmount: number | string; // Rch的总PNL(RCH)
-  followDay: number; // 加入天数
-  pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
-}
-
 export interface AutomatorCreateParams {
   chainId: number; // 链ID
   automatorAddress: string;
@@ -289,7 +263,7 @@ export class AutomatorService {
   ): Promise<PageResult<AutomatorTransaction, { hasMore: boolean }, 'cursor'>> {
     const limit = extraParams?.limit ?? 20;
     const res = await http.get<unknown, HttpResponse<AutomatorTransaction[]>>(
-      `/automator/user/transaction/list`,
+      `/optivisors/automator/transaction/list`,
       {
         params: {
           chainId,
@@ -308,6 +282,7 @@ export class AutomatorService {
     };
   }
 
+  @applyMock('automatorFollowers')
   static async followers(vault: AutomatorVaultInfo, params: PageParams) {
     const pageSize = params.limit || 40;
     const currentPage = Math.floor((params.offset || 0) / pageSize);

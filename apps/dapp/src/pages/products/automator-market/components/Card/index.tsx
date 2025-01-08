@@ -10,7 +10,6 @@ import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
-import ProgressBar from '@/components/ProgressBar';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
@@ -44,9 +43,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
       <div className={styles['header']}>
         <img src={depositCcyConfig?.icon} alt="" />
         <div className={styles['name']}>
-          {props.info.automatorName ||
-            props.info.vaultInfo.name ||
-            props.info.vaultInfo.depositCcy}
+          {props.info.vaultInfo.name || props.info.vaultInfo.depositCcy}
         </div>
         <Address
           address={props.info.vaultInfo.vault.toLowerCase()}
@@ -94,7 +91,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
           </span>
         </div>
       </div>
-      {props.info.creator && (
+      {props.info.vaultInfo.creator && (
         <>
           <div className={styles['creator']}>
             <div className={styles['label']}>
@@ -117,17 +114,14 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
               <span className={styles['unit']}>
                 {props.info.vaultInfo.positionCcy}
               </span>
+              <span className={styles['percent']}>
+                {displayPercentage(
+                  Number(props.info?.creatorAumByVaultDepositCcy) /
+                    Number(props.info?.aumByVaultDepositCcy),
+                )}
+              </span>
             </div>
           </div>
-          <ProgressBar
-            type="3"
-            className={styles['progress']}
-            percent={
-              Number(props.info?.creatorAumByVaultDepositCcy) /
-              Number(props.info?.aumByVaultDepositCcy)
-            }
-            minWidthPercentage={0.05}
-          />
         </>
       )}
       <div className={styles['footer']}>

@@ -94,7 +94,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
             </div>
           </div>
         </div>
-        {data?.creator && (
+        {data?.vaultInfo.creator && (
           <div className={styles['aum']}>
             <div className={styles['title']}>
               {t({ enUS: `Creator's Lead Assets`, zhCN: '创建者份额' })}
@@ -165,14 +165,14 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
       </div>
       <div className={styles['right']}>
-        {/* <div className={styles['item']}>
+        <div className={styles['item']}>
           <div className={styles['title']}>
-            {t({ enUS: 'Fee', zhCN: '手续费' })}
+            {t({ enUS: 'Fee', zhCN: '盈利抽成' })}
           </div>
           <div className={styles['value']}>
             {displayPercentage(props.vault?.creatorFeeRate, 0)}
           </div>
-        </div> */}
+        </div>
         <div className={styles['item']}>
           <div className={styles['title']}>
             <Tooltip

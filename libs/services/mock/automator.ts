@@ -1,3 +1,5 @@
+import { AutomatorVaultInfo } from '../base-type';
+
 function creatorAutomatorList(params: { chainId: number; wallet: string }) {
   if (params.chainId !== 42161) return [];
   return [
@@ -1117,6 +1119,29 @@ function creatorAutomatorList(params: { chainId: number; wallet: string }) {
   ];
 }
 
+function automatorFollowers(params: AutomatorVaultInfo) {
+  return {
+    offset: 0,
+    limit: 20,
+    total: 1,
+    list: [
+      {
+        wallet: '0xe1F64E17223F6D8D0F62d9d42dB694eb2dF90e40',
+        amountByVaultDepositCcy: '1000',
+        amountByClientDepositCcy: '1000',
+        share: '1001',
+        totalInterestPnlByClientDepositCcy: '10',
+        totalPnlByClientDepositCcy: '10',
+        totalRchPnlByClientDepositCcy: '10',
+        totalRchAmount: '3.4',
+        followDay: '23',
+        pnlPercentage: '0.1',
+      },
+    ],
+  };
+}
+
 if (!window.mockData) window.mockData = {};
 
 window.mockData.creatorAutomatorList = creatorAutomatorList;
+window.mockData.automatorFollowers = automatorFollowers;

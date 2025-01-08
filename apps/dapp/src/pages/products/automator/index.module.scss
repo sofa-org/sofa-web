@@ -44,6 +44,7 @@
 .left {
   flex: 1;
   background: #fff;
+
   // works together w/ flex-wrap: wrap in .section
   min-width: min(450px, 60vw);
 }
@@ -183,7 +184,7 @@
   justify-content: space-between;
   gap: 40px;
   position: relative;
-  padding: min(40px, 5vw);
+  padding: min(40px, 5vw) min(40px, 5vw) min(60px, 6vw);
   background: #fff;
   border-radius: 24px;
   overflow: hidden;

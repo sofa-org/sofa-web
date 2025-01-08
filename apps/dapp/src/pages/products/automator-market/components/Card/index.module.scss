@@ -64,6 +64,13 @@
   opacity: 0.8;
 }
 
+.percent {
+  @include bold;
+  @include gradient-txt(linear-gradient(to right, #e88947, #ffdec3));
+
+  padding: 0 0 0 6px;
+}
+
 .yield,
 .size,
 .creator {
