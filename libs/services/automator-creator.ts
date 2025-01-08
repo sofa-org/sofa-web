@@ -260,6 +260,7 @@ export class AutomatorCreatorService {
           ],
         ],
       });
+      throw e;
     }
   }
 
@@ -324,6 +325,7 @@ export class AutomatorCreatorService {
           ],
         ],
       });
+      throw e;
     }
   }
 
@@ -386,6 +388,7 @@ export class AutomatorCreatorService {
           ],
         ],
       });
+      throw e;
     }
   }
 

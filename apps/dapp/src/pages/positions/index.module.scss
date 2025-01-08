@@ -13,7 +13,7 @@
 
 .content {
   position: relative;
-  width: min(1160px, calc(100vw - 24px));
+  width: $width-content;
   min-height: calc(100vh - 200px);
   padding: 80px 0 0;
   margin: 0 auto;
@@ -56,7 +56,7 @@
 .tabs.tabs {
   :global {
     .tabs {
-      width: min(1160px, calc(100vw - 24px));
+      width: $width-content;
     }
   }
 }

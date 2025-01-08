@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ProjectType } from '@sofa/services/base-type';
+import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
 import { useQuery } from '@sofa/utils/hooks';
@@ -22,24 +22,8 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'Positions');
 
-const Positions = () => {
+export const PositionsEl = (props: { automator?: AutomatorVaultInfo }) => {
   const [t] = useTranslation('Positions');
-  const navigate = useNavigate();
-  const [project, setProject] = useProjectChange();
-  const projects = useMemo(
-    () =>
-      [ProjectType.Earn, ProjectType.Surge].map((it) => ({
-        label: (
-          <>
-            {ProjectTypeRefs[it].icon}
-            {ProjectTypeRefs[it].label(t)}
-          </>
-        ),
-        value: it,
-      })),
-    [t],
-  );
-
   const query = useQuery();
   const tab = (query.tab as string) || '1';
   const tabs = [
@@ -62,6 +46,41 @@ const Positions = () => {
       value: '2',
     },
   ];
+
+  return (
+    <div className={styles['content']}>
+      <RadioBtnGroup
+        className={styles['btn-group']}
+        options={tabs}
+        value={tab}
+        onChange={(v) => updateQuery({ tab: v })}
+      />
+      {tab === '1' ? (
+        <PositionList {...props} />
+      ) : (
+        <WonderfulMoments {...props} />
+      )}
+    </div>
+  );
+};
+
+const Positions = () => {
+  const [t] = useTranslation('Positions');
+  const navigate = useNavigate();
+  const [project, setProject] = useProjectChange();
+  const projects = useMemo(
+    () =>
+      [ProjectType.Earn, ProjectType.Surge].map((it) => ({
+        label: (
+          <>
+            {ProjectTypeRefs[it].icon}
+            {ProjectTypeRefs[it].label(t)}
+          </>
+        ),
+        value: it,
+      })),
+    [t],
+  );
 
   useEffect(() => {
     if (project === ProjectType.Automator) {
@@ -91,15 +110,7 @@ const Positions = () => {
       options={projects}
       dark
     >
-      <div className={styles['content']}>
-        <RadioBtnGroup
-          className={styles['btn-group']}
-          options={tabs}
-          value={tab}
-          onChange={(v) => updateQuery({ tab: v })}
-        />
-        {tab === '1' ? <PositionList /> : <WonderfulMoments />}
-      </div>
+      <PositionsEl />
     </TopTabs>
   );
 };

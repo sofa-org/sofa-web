@@ -1,5 +1,6 @@
 import { Fragment, useMemo, useRef, useState } from 'react';
 import { Button, Modal, Spin, Toast } from '@douyinfe/semi-ui';
+import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import {
@@ -33,9 +34,14 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'PositionList');
 
-const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
+const List = (props: {
+  riskType?: RiskType;
+  productType?: ProductType;
+  automator?: AutomatorVaultInfo;
+}) => {
   const [t] = useTranslation('PositionList');
   const wallet = useWalletStore();
+  const address = props.automator?.vault || wallet.address;
 
   const {
     data: $data,
@@ -44,40 +50,35 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     reload: refresh,
   } = useInfiniteScroll(
     async (d) => {
-      if (!wallet.address) return { list: [], hasMore: false, limit: 300 };
+      if (!address) return { list: [], hasMore: false, limit: 300 };
       return PositionsService.history(
         {
           chainId: wallet.chainId,
-          owner: wallet.address,
+          owner: address,
           claimed: false,
           concealed: false,
-          riskType: props.riskType,
-          productType: props.productType,
+          riskType: props.automator ? undefined : props.riskType,
+          productType: props.automator ? undefined : props.productType,
         },
         { limit: 300, cursor: d?.cursor },
       ).then((res) => ({
         ...res,
         chainId: wallet.chainId,
-        owner: wallet.address,
+        owner: address,
       }));
     },
     {
       target: () => document.querySelector('#root'),
       isNoMore: (d) => !d?.hasMore,
       onError: (err) => Toast.error(getErrorMsg(err)),
-      reloadDeps: [
-        wallet.chainId,
-        wallet.address,
-        props.riskType,
-        props.productType,
-      ],
+      reloadDeps: [wallet.chainId, address, props.riskType, props.productType],
     },
   );
 
   const data = useMemo(() => {
     if (!$data) return undefined;
     if ($data?.chainId !== wallet.chainId) return undefined;
-    if ($data?.owner !== wallet.address) return undefined;
+    if ($data?.owner !== address) return undefined;
     const list = uniqBy(
       $data?.list,
       (it: PositionInfo) =>
@@ -85,7 +86,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     );
     console.info('Positions', list);
     return list as PositionInfo[];
-  }, [$data, wallet.chainId, wallet.address]);
+  }, [$data, wallet.chainId, address]);
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
 
@@ -110,7 +111,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
 
   const [claimAllList, setClaimAllList] = useState(unClaimedList);
   const claimAll = useLazyCallback(() => {
-    if (!wallet.address) return;
+    if (!address) return;
     setClaimAllList(unClaimedList);
     return PositionsService.claimBatch(
       (it) => {
@@ -174,7 +175,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     <>
       <Spin
         wrapperClassName={styles['list']}
-        spinning={loading || (!data && !!wallet.address)}
+        spinning={loading || (!data && !!address)}
       >
         {data?.map((it) =>
           it.claimed ? (
@@ -279,12 +280,12 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   );
 };
 
-const PositionList = () => {
+const PositionList = (props: { automator?: AutomatorVaultInfo }) => {
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
   return (
     <div className={styles['position-list']}>
-      <List riskType={riskType} />
+      <List riskType={riskType} {...props} />
     </div>
   );
 };
