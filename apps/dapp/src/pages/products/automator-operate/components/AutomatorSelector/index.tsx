@@ -32,7 +32,7 @@ export function useCreatorAutomatorSelector() {
     () =>
       automators?.find(
         (it) => it.vaultInfo.vault.toLowerCase() === vault?.toLowerCase(),
-      ),
+      ) || automators?.[0],
     [automators, vault],
   );
 
