@@ -44,14 +44,16 @@ export interface AutomatorCreateParams {
 }
 
 export class AutomatorCreatorService {
+  @applyMock('creatorAutomatorFactories')
   @asyncCache({
     until: (i, t) => !i || !t || Date.now() - t > MsIntervals.min,
   })
   static async automatorFactories() {
     return http
-      .get<unknown, HttpResponse<AutomatorFactory[]>>(
-        `/optivisors/automator/factories`,
-      )
+      .get<
+        unknown,
+        HttpResponse<AutomatorFactory[]>
+      >(`/optivisors/automator/factories`)
       .then((res) => res.value);
   }
 

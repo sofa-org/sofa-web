@@ -158,6 +158,22 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
         automator.vaultInfo.vaultDepositCcy
       ],
   );
+  const interest7d = useMemo(
+    () =>
+      apy && automator
+        ? calc_yield(
+            apy.apyUsed,
+            +automator.aumByVaultDepositCcy,
+            Date.now(),
+            Date.now() + MsIntervals.day * 7,
+          )
+        : 0,
+    [apy?.apyUsed, automator?.aumByVaultDepositCcy],
+  );
+  const availableBalanceExcludingPrincipal = useMemo(
+    () => (automator && Number(automator.availableBalance)) || 0,
+    [automator?.availableBalance],
+  );
   useEffect(() => {
     const vault = vaults?.[chainId]?.find((it) => {
       if (it.chainId !== chainId) return false;
@@ -218,7 +234,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                 <>
                   <span className={styles['digi']}>
                     {amountFormatter(
-                      automator.availableBalance,
+                      availableBalanceExcludingPrincipal,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}
@@ -250,12 +266,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                 <>
                   <span className={styles['digi']}>
                     {amountFormatter(
-                      calc_yield(
-                        apy.apyUsed,
-                        +automator.aumByVaultDepositCcy,
-                        Date.now(),
-                        Date.now() + MsIntervals.day * 7,
-                      ),
+                      interest7d,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}
@@ -279,8 +290,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                   <span className={styles['digi']}>
                     =&nbsp;
                     {amountFormatter(
-                      Number(automator.totalInterestPnlByClientDepositCcy) +
-                        Number(automator.availableBalance),
+                      availableBalanceExcludingPrincipal + interest7d,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}

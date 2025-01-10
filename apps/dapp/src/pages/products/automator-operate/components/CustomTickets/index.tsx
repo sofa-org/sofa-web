@@ -548,13 +548,7 @@ const CustomTickets = (props: {
               const q = quoteInfos[ProductsService.productKey(it)];
               return q ? (
                 <>
-                  <b>
-                    {amountFormatter(
-                      Number(q.amounts.maxRedeemable) -
-                        Number(q.amounts.minRedeemable),
-                      2,
-                    )}
-                  </b>
+                  <b>{amountFormatter(q.amounts.maxRedeemable, 2)}</b>
                   <span className={styles['unit']}>
                     {CCYService.ccyConfigs[it.vault.depositCcy]?.name ||
                       it.vault.depositCcy}

@@ -1,5 +1,18 @@
 import { AutomatorVaultInfo } from '../base-type';
-
+import { defaultChain } from '../chains';
+function creatorAutomatorFactories() {
+  return [
+    {
+      chainId: defaultChain.chainId,
+      chainName: 'Test chain',
+      clientDepositCcy: 'USDT',
+      vaultDepositCcy: 'USDC',
+      factoryAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+      vaultDepositCcyAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+      clientDepositCcyAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
+    },
+  ];
+}
 function creatorAutomatorList(params: { chainId: number; wallet: string }) {
   if (params.chainId !== 42161) return [];
   return [
@@ -1145,3 +1158,4 @@ if (!window.mockData) window.mockData = {};
 
 window.mockData.creatorAutomatorList = creatorAutomatorList;
 window.mockData.automatorFollowers = automatorFollowers;
+window.mockData.creatorAutomatorFactories = creatorAutomatorFactories;

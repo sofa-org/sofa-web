@@ -97,27 +97,7 @@ const AutomatorCreate = () => {
     }
   }, [wallet.address, modelVisible]);
   const { data, loading } = useRequest(
-    async () => {
-      const result = AutomatorCreatorService.automatorFactories();
-      if (isMockAPI) {
-        return result.catch((r) => {
-          return [
-            {
-              chainId: 421614,
-              chainName: 'Test chain',
-              clientDepositCcy: 'USDT',
-              vaultDepositCcy: 'USDC',
-              factoryAddress: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
-              vaultDepositCcyAddress:
-                '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
-              clientDepositCcyAddress:
-                '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0',
-            },
-          ];
-        });
-      }
-      return result;
-    },
+    async () => AutomatorCreatorService.automatorFactories(),
     {
       refreshDeps: [wallet.address, wallet.chainId],
       onError: (e) => {
@@ -135,7 +115,7 @@ const AutomatorCreate = () => {
         banner={
           <>
             <h1 className={styles['head-title']}>
-              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {ProjectTypeRefs[ProjectType.Automator]?.icon}
               {t({
                 enUS: 'Create A Automator, Showcase Your Strategy',
               })}
@@ -177,10 +157,10 @@ const AutomatorCreate = () => {
                   <Select.Option value={chainId}>
                     <img
                       className={styles['logo']}
-                      src={ChainMap[chainId!].icon}
+                      src={ChainMap[chainId]?.icon}
                       alt=""
                     />
-                    <span>{ChainMap[chainId].name}</span>
+                    <span>{ChainMap[chainId]?.name}</span>
                   </Select.Option>
                 ))}
             </Select>
