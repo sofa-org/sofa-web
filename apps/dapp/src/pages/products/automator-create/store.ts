@@ -3,7 +3,6 @@ import { AutomatorCreateParams } from '@sofa/services/automator-creator';
 import { ChainMap } from '@sofa/services/chains';
 import { TFunction } from '@sofa/services/i18n';
 import { createWithEqualityFn } from 'zustand/traditional';
-export const isMockAPI = true;
 
 export function getNameForChain(chainId: number | undefined, t: TFunction) {
   if (!chainId) {

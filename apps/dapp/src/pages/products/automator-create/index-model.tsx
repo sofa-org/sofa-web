@@ -18,6 +18,7 @@ import {
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
+import { isMockEnabled } from '@sofa/services/mock';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
@@ -33,7 +34,6 @@ import { Comp as IconLoading } from './assets/icon-loading.svg';
 import {
   AutomatorCreateStoreType,
   getNameForChain,
-  isMockAPI,
   useAutomatorCreateStore,
 } from './store';
 
@@ -109,16 +109,6 @@ const StepStart = () => {
         },
       });
     } catch (e) {
-      if (isMockAPI) {
-        useAutomatorCreateStore.setState({
-          rchBurned: true,
-          payload: {
-            ...useAutomatorCreateStore.getState().payload,
-            burnTransactionHash: '0xMockHash',
-          },
-        });
-        return;
-      }
       useAutomatorCreateStore.getState().reset();
       console.error('error burn rch for automator creation', e);
       Toast.error(getErrorMsg(e));
@@ -206,7 +196,7 @@ const StepForm = () => {
         automatorCreateResult: result,
       });
     } catch (e) {
-      if (isMockAPI) {
+      if (isMockEnabled()) {
         useAutomatorCreateStore.setState({
           automatorCreating: false,
           automatorCreateResult: '0xMockResult',

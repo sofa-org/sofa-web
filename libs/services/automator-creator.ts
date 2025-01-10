@@ -48,7 +48,7 @@ export class AutomatorCreatorService {
   @asyncCache({
     until: (i, t) => !i || !t || Date.now() - t > MsIntervals.min,
   })
-  static async automatorFactories() {
+  static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
       .get<
         unknown,

@@ -1,9 +1,13 @@
 import { AutomatorVaultInfo } from '../base-type';
-import { defaultChain } from '../chains';
-function creatorAutomatorFactories() {
+
+function creatorAutomatorFactories(params: {
+  chainId: number;
+  wallet: string;
+}) {
+  if (![421614, 42161, 11155111].includes(params.chainId)) return [];
   return [
     {
-      chainId: defaultChain.chainId,
+      chainId: params.chainId,
       chainName: 'Test chain',
       clientDepositCcy: 'USDT',
       vaultDepositCcy: 'USDC',
@@ -13,11 +17,889 @@ function creatorAutomatorFactories() {
     },
   ];
 }
-function creatorAutomatorList(params: { chainId: number; wallet: string }) {
-  if (params.chainId !== 42161) return [];
+function automatorList(params: { chainId: number }) {
+  if (![421614, 42161, 11155111].includes(params.chainId)) return [];
   return [
     {
-      chainId: 42161,
+      chainId: params.chainId,
+      automatorName: 'Pilot',
+      automatorDescription: 'usdt bull',
+      automatorVault: '0x4c241483b4a85e44c59bcecfe17a4e7d0a073cdb',
+      participantNum: 163,
+      amount: '749253.768460114841584995004',
+      aumInVaultDepositCcy: '749253.768460114841584995004',
+      aumInClientDepositCcy: '749253.768460114841584995004',
+      aumByVaultDepositCcy: '749253.768460114841584995004',
+      aumByClientDepositCcy: '749253.768460114841584995004',
+      creatorAmount: '0',
+      creatorAumInVaultDepositCcy: '0',
+      creatorAumInClientDepositCcy: '0',
+      creatorAumByVaultDepositCcy: '0',
+      creatorAumByClientDepositCcy: '0',
+      nav: '0.9958851936491708',
+      dateTime: '1736495956',
+      yieldPercentage: '-28.36',
+      creator: '0xc59023d3fdd79fcee662d1f06eba0b1bfd49b8f3',
+      createTime: '1730269711',
+      feeRate: '0',
+      totalTradingPnlByClientDepositCcy: '-3426.958621885158415004996',
+      totalInterestPnlByClientDepositCcy: '0',
+      totalPnlByClientDepositCcy: '-3426.958621885158415004996',
+      totalRchPnlByClientDepositCcy: '4319.1536467123489674137285674',
+      totalRchAmount: '10805.205265646',
+      totalPnlWithRchByClientDepositCcy: '892.1950248271905524087325674',
+      pnlPercentage: '0.1',
+      vaultDepositCcy: 'USDT',
+      clientDepositCcy: 'USDT',
+      sharesToken: 'atUSDT',
+      profits: '0',
+      vaultInfo: {
+        chainId: params.chainId,
+        automatorName: 'Pilot',
+        automatorDescription: 'usdt bull',
+        automatorVault: '0x4c241483b4a85e44c59bcecfe17a4e7d0a073cdb',
+        participantNum: 163,
+        amount: '749253.768460114841584995004',
+        aumInVaultDepositCcy: '749253.768460114841584995004',
+        aumInClientDepositCcy: '749253.768460114841584995004',
+        aumByVaultDepositCcy: '749253.768460114841584995004',
+        aumByClientDepositCcy: '749253.768460114841584995004',
+        creatorAmount: '0',
+        creatorAumInVaultDepositCcy: '0',
+        creatorAumInClientDepositCcy: '0',
+        creatorAumByVaultDepositCcy: '0',
+        creatorAumByClientDepositCcy: '0',
+        nav: '0.9958851936491708',
+        dateTime: '1736495956',
+        yieldPercentage: '-28.36',
+        creator: '0xCc19E60c86C396929E76a6a488848C9596de22bd',
+        createTime: 1732435200000,
+        feeRate: '0',
+        totalTradingPnlByClientDepositCcy: '-3426.958621885158415004996',
+        totalInterestPnlByClientDepositCcy: '0',
+        totalPnlByClientDepositCcy: '-3426.958621885158415004996',
+        totalRchPnlByClientDepositCcy: '4319.1536467123489674137285674',
+        totalRchAmount: '10805.205265646',
+        totalPnlWithRchByClientDepositCcy: '892.1950248271905524087325674',
+        pnlPercentage: '0.1',
+        vaultDepositCcy: 'USDT',
+        clientDepositCcy: 'USDT',
+        sharesToken: 'atUSDT',
+        profits: '0',
+        vault: '0x4c241483b4a85e44c59bcecfe17a4e7d0a073cdb',
+        depositCcy: 'USDT',
+        positionCcy: 'atUSDT',
+        redeemWaitPeriod: null,
+        claimPeriod: 259200000,
+        name: 'Pilot',
+        depositMinAmount: 100,
+        depositTickAmount: 1,
+        anchorPricesDecimal: 100000000,
+        collateralDecimal: 1000000,
+        abis: [
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'owner',
+                type: 'address',
+              },
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'spender',
+                type: 'address',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'value',
+                type: 'uint256',
+              },
+            ],
+            name: 'Approval',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'account',
+                type: 'address',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'amount',
+                type: 'uint256',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'shares',
+                type: 'uint256',
+              },
+            ],
+            name: 'Deposited',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: 'address',
+                name: 'account',
+                type: 'address',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'amount',
+                type: 'uint256',
+              },
+            ],
+            name: 'FeeCollected',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: 'uint8',
+                name: 'version',
+                type: 'uint8',
+              },
+            ],
+            name: 'Initialized',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: 'address[]',
+                name: 'makers',
+                type: 'address[]',
+              },
+            ],
+            name: 'MakersDisabled',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: 'address[]',
+                name: 'makers',
+                type: 'address[]',
+              },
+            ],
+            name: 'MakersEnabled',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'previousOwner',
+                type: 'address',
+              },
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'newOwner',
+                type: 'address',
+              },
+            ],
+            name: 'OwnershipTransferred',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                components: [
+                  { internalType: 'address', name: 'vault', type: 'address' },
+                  {
+                    components: [
+                      {
+                        internalType: 'uint256',
+                        name: 'expiry',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256[2]',
+                        name: 'anchorPrices',
+                        type: 'uint256[2]',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'collateralAtRiskPercentage',
+                        type: 'uint256',
+                      },
+                    ],
+                    internalType: 'struct Product[]',
+                    name: 'products',
+                    type: 'tuple[]',
+                  },
+                ],
+                indexed: false,
+                internalType: 'struct Automator.ProductBurn[]',
+                name: 'products',
+                type: 'tuple[]',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'totalCollateral',
+                type: 'uint256',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'fee',
+                type: 'uint256',
+              },
+            ],
+            name: 'ProductsBurned',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                components: [
+                  { internalType: 'address', name: 'vault', type: 'address' },
+                  {
+                    internalType: 'uint256',
+                    name: 'totalCollateral',
+                    type: 'uint256',
+                  },
+                  {
+                    components: [
+                      {
+                        internalType: 'uint256',
+                        name: 'expiry',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256[2]',
+                        name: 'anchorPrices',
+                        type: 'uint256[2]',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'collateralAtRisk',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'makerCollateral',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'deadline',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'address',
+                        name: 'maker',
+                        type: 'address',
+                      },
+                      {
+                        internalType: 'bytes',
+                        name: 'makerSignature',
+                        type: 'bytes',
+                      },
+                    ],
+                    internalType: 'struct MintParams',
+                    name: 'mintParams',
+                    type: 'tuple',
+                  },
+                ],
+                indexed: false,
+                internalType: 'struct Automator.ProductMint[]',
+                name: 'products',
+                type: 'tuple[]',
+              },
+            ],
+            name: 'ProductsMinted',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'account',
+                type: 'address',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'amount',
+                type: 'uint256',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'shares',
+                type: 'uint256',
+              },
+            ],
+            name: 'RedemptionsClaimed',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: 'address',
+                name: 'referral',
+                type: 'address',
+              },
+            ],
+            name: 'ReferralUpdated',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'from',
+                type: 'address',
+              },
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'to',
+                type: 'address',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'value',
+                type: 'uint256',
+              },
+            ],
+            name: 'Transfer',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: 'address[]',
+                name: 'vaults',
+                type: 'address[]',
+              },
+            ],
+            name: 'VaultsDisabled',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: 'address[]',
+                name: 'vaults',
+                type: 'address[]',
+              },
+            ],
+            name: 'VaultsEnabled',
+            type: 'event',
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: 'address',
+                name: 'account',
+                type: 'address',
+              },
+              {
+                indexed: false,
+                internalType: 'uint256',
+                name: 'shares',
+                type: 'uint256',
+              },
+            ],
+            name: 'Withdrawn',
+            type: 'event',
+          },
+          {
+            inputs: [],
+            name: 'MINIMUM_SHARES',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'owner', type: 'address' },
+              { internalType: 'address', name: 'spender', type: 'address' },
+            ],
+            name: 'allowance',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'spender', type: 'address' },
+              { internalType: 'uint256', name: 'amount', type: 'uint256' },
+            ],
+            name: 'approve',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'account', type: 'address' },
+            ],
+            name: 'balanceOf',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              {
+                components: [
+                  { internalType: 'address', name: 'vault', type: 'address' },
+                  {
+                    components: [
+                      {
+                        internalType: 'uint256',
+                        name: 'expiry',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256[2]',
+                        name: 'anchorPrices',
+                        type: 'uint256[2]',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'collateralAtRiskPercentage',
+                        type: 'uint256',
+                      },
+                    ],
+                    internalType: 'struct Product[]',
+                    name: 'products',
+                    type: 'tuple[]',
+                  },
+                ],
+                internalType: 'struct Automator.ProductBurn[]',
+                name: 'products',
+                type: 'tuple[]',
+              },
+            ],
+            name: 'burnProducts',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'claimRedemptions',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'collateral',
+            outputs: [
+              { internalType: 'contract IERC20', name: '', type: 'address' },
+            ],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'decimals',
+            outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'spender', type: 'address' },
+              {
+                internalType: 'uint256',
+                name: 'subtractedValue',
+                type: 'uint256',
+              },
+            ],
+            name: 'decreaseAllowance',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'uint256', name: 'amount', type: 'uint256' },
+            ],
+            name: 'deposit',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address[]', name: 'makers_', type: 'address[]' },
+            ],
+            name: 'disableMakers',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address[]', name: 'vaults_', type: 'address[]' },
+            ],
+            name: 'disableVaults',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address[]', name: 'makers_', type: 'address[]' },
+            ],
+            name: 'enableMakers',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address[]', name: 'vaults_', type: 'address[]' },
+            ],
+            name: 'enableVaults',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'feeCollector',
+            outputs: [{ internalType: 'address', name: '', type: 'address' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'getPricePerShare',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'getRedemption',
+            outputs: [
+              { internalType: 'uint256', name: '', type: 'uint256' },
+              { internalType: 'uint256', name: '', type: 'uint256' },
+            ],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'getUnredeemedCollateral',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'harvest',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'spender', type: 'address' },
+              { internalType: 'uint256', name: 'addedValue', type: 'uint256' },
+            ],
+            name: 'increaseAllowance',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'collateral_', type: 'address' },
+              { internalType: 'address', name: 'referral_', type: 'address' },
+              {
+                internalType: 'address',
+                name: 'feeCollector_',
+                type: 'address',
+              },
+            ],
+            name: 'initialize',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [{ internalType: 'address', name: '', type: 'address' }],
+            name: 'makers',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              {
+                components: [
+                  { internalType: 'address', name: 'vault', type: 'address' },
+                  {
+                    internalType: 'uint256',
+                    name: 'totalCollateral',
+                    type: 'uint256',
+                  },
+                  {
+                    components: [
+                      {
+                        internalType: 'uint256',
+                        name: 'expiry',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256[2]',
+                        name: 'anchorPrices',
+                        type: 'uint256[2]',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'collateralAtRisk',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'makerCollateral',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'deadline',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'address',
+                        name: 'maker',
+                        type: 'address',
+                      },
+                      {
+                        internalType: 'bytes',
+                        name: 'makerSignature',
+                        type: 'bytes',
+                      },
+                    ],
+                    internalType: 'struct MintParams',
+                    name: 'mintParams',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct Automator.ProductMint[]',
+                name: 'products',
+                type: 'tuple[]',
+              },
+              { internalType: 'bytes', name: 'signature', type: 'bytes' },
+            ],
+            name: 'mintProducts',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'name',
+            outputs: [{ internalType: 'string', name: '', type: 'string' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: '', type: 'address' },
+              { internalType: 'address', name: '', type: 'address' },
+              { internalType: 'uint256[]', name: '', type: 'uint256[]' },
+              { internalType: 'uint256[]', name: '', type: 'uint256[]' },
+              { internalType: 'bytes', name: '', type: 'bytes' },
+            ],
+            name: 'onERC1155BatchReceived',
+            outputs: [{ internalType: 'bytes4', name: '', type: 'bytes4' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: '', type: 'address' },
+              { internalType: 'address', name: '', type: 'address' },
+              { internalType: 'uint256', name: '', type: 'uint256' },
+              { internalType: 'uint256', name: '', type: 'uint256' },
+              { internalType: 'bytes', name: '', type: 'bytes' },
+            ],
+            name: 'onERC1155Received',
+            outputs: [{ internalType: 'bytes4', name: '', type: 'bytes4' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'owner',
+            outputs: [{ internalType: 'address', name: '', type: 'address' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'referral',
+            outputs: [{ internalType: 'address', name: '', type: 'address' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'renounceOwnership',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'bytes4', name: 'interfaceId', type: 'bytes4' },
+            ],
+            name: 'supportsInterface',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'symbol',
+            outputs: [{ internalType: 'string', name: '', type: 'string' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'totalCollateral',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'totalFee',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'totalPendingRedemptions',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [],
+            name: 'totalSupply',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'to', type: 'address' },
+              { internalType: 'uint256', name: 'amount', type: 'uint256' },
+            ],
+            name: 'transfer',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'from', type: 'address' },
+              { internalType: 'address', name: 'to', type: 'address' },
+              { internalType: 'uint256', name: 'amount', type: 'uint256' },
+            ],
+            name: 'transferFrom',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'newOwner', type: 'address' },
+            ],
+            name: 'transferOwnership',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'address', name: 'referral_', type: 'address' },
+            ],
+            name: 'updateReferral',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+          {
+            inputs: [{ internalType: 'address', name: '', type: 'address' }],
+            name: 'vaults',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+          {
+            inputs: [
+              { internalType: 'uint256', name: 'shares', type: 'uint256' },
+            ],
+            name: 'withdraw',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+        ],
+        creatorFeeRate: 0,
+        desc: 'usdt bull',
+      },
+    },
+  ];
+}
+function creatorAutomatorList(params: { chainId: number; wallet: string }) {
+  if (![421614, 42161, 11155111].includes(params.chainId)) return [];
+  return [
+    {
+      chainId: params.chainId,
       automatorName: 'Pilot',
       automatorDescription: 'usdt bull',
       automatorVault: '0x4c241483b4a85e44c59bcecfe17a4e7d0a073cdb',
@@ -50,7 +932,7 @@ function creatorAutomatorList(params: { chainId: number; wallet: string }) {
       sharesToken: 'atUSDT',
       profits: '0',
       vaultInfo: {
-        chainId: 42161,
+        chainId: params.chainId,
         automatorName: 'Pilot',
         automatorDescription: 'usdt bull',
         automatorVault: '0x4c241483b4a85e44c59bcecfe17a4e7d0a073cdb',
@@ -1159,3 +2041,4 @@ if (!window.mockData) window.mockData = {};
 window.mockData.creatorAutomatorList = creatorAutomatorList;
 window.mockData.automatorFollowers = automatorFollowers;
 window.mockData.creatorAutomatorFactories = creatorAutomatorFactories;
+window.mockData.automatorList = automatorList;

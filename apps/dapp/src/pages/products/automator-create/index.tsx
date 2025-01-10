@@ -25,7 +25,7 @@ import { Comp as IconPoints } from './assets/icon-points.svg';
 import { Comp as IconShare } from './assets/icon-share.svg';
 import { Comp as IconZero } from './assets/icon-zero.svg';
 import { AutomatorCreateModel } from './index-model';
-import { isMockAPI, useAutomatorCreateStore } from './store';
+import { useAutomatorCreateStore } from './store';
 
 import styles from './index.module.scss';
 
@@ -97,7 +97,11 @@ const AutomatorCreate = () => {
     }
   }, [wallet.address, modelVisible]);
   const { data, loading } = useRequest(
-    async () => AutomatorCreatorService.automatorFactories(),
+    async () =>
+      AutomatorCreatorService.automatorFactories({
+        chainId: wallet.chainId,
+        wallet: wallet.address!,
+      }),
     {
       refreshDeps: [wallet.address, wallet.chainId],
       onError: (e) => {
@@ -106,6 +110,26 @@ const AutomatorCreate = () => {
       },
     },
   );
+  const onStartClick = useLazyCallback(() => {
+    if (!wallet.address) {
+      bringUpConnect();
+      return;
+    }
+    if (!data) {
+      return;
+    }
+    const factory = data.find(
+      (c) => c.clientDepositCcy == token && c.chainId == chainId,
+    );
+    if (!factory) {
+      return;
+    }
+    reset();
+    updatePayload({
+      factory,
+    });
+    setModelVisible(true);
+  });
   return (
     <>
       <TopTabs
@@ -222,26 +246,7 @@ const AutomatorCreate = () => {
             size="large"
             className={classNames(styles['btn-create'], 'btn-primary')}
             disabled={(wallet.address && !(chainId && token)) || false}
-            onClick={() => {
-              if (!wallet.address) {
-                bringUpConnect();
-                return;
-              }
-              if (!data) {
-                return;
-              }
-              const factory = data.find(
-                (c) => c.clientDepositCcy == token && c.chainId == chainId,
-              );
-              if (!factory) {
-                return;
-              }
-              reset();
-              updatePayload({
-                factory,
-              });
-              setModelVisible(true);
-            }}
+            onClick={onStartClick}
           >
             {!wallet.address
               ? t({

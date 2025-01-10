@@ -218,6 +218,7 @@ export class AutomatorService {
     } as never;
   }
 
+  @applyMock('automatorList')
   @asyncCache({
     until: (it, createdAt) =>
       !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
