@@ -8,6 +8,16 @@
   &.unfold {
     white-space: initial;
   }
+
+  &:not(.unfold) {
+    * {
+      display: inline !important;
+    }
+
+    br {
+      display: none !important;
+    }
+  }
 }
 
 .more {

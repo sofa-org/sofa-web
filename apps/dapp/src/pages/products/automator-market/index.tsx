@@ -66,14 +66,14 @@ const Index = () => {
     const list = Object.values(state.userInfos)
       .map((it) => it.server)
       .filter(Boolean);
-    if (!list.length) return undefined;
+    if (!list) return undefined;
     return list.filter((it) =>
       Number(it?.amountByVaultDepositCcy),
     ) as AutomatorUserPosition[];
   });
 
   const lists = useMemo(() => {
-    if (!data) return undefined;
+    if (!data || (tab === 'holding' && !holding)) return undefined;
     const bool = arrToDict(holding || [], (it) =>
       it.vaultInfo.vault.toLowerCase(),
     );

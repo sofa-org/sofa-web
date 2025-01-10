@@ -31,7 +31,7 @@ import './global-var';
 
 import { CampaignEntry } from './components/CampaignEntry';
 import { GlobalModal } from './components/GlobalModal';
-import { GlobalTips } from './components/GlobalTips';
+import { useHeaderHeight } from './components/Header/index-home';
 import { EnvLinks } from './env-links';
 import { RootDomainPaths, RouteGuard } from './route-guard';
 import { routes } from './routes';
@@ -64,6 +64,8 @@ const Root = WasmSuspenseHoc(
       if (referralCode) ReferralCode.set(referralCode);
     }, [query]);
 
+    const headerHeight = useHeaderHeight();
+
     return (
       <ConfigProvider
         locale={i18n.getResourceBundle(i18n.language, 'global')}
@@ -79,6 +81,7 @@ const Root = WasmSuspenseHoc(
                 ? 'main-home'
                 : undefined,
             )}
+            style={{ marginTop: headerHeight }}
           >
             <Suspense>
               <Outlet />
@@ -87,7 +90,6 @@ const Root = WasmSuspenseHoc(
           <Footer />
           {/* <CursorTail /> */}
           <GlobalModal />
-          <GlobalTips />
           <CampaignEntry />
         </ErrorBoundary>
       </ConfigProvider>

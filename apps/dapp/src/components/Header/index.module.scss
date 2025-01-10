@@ -30,12 +30,6 @@
   }
 }
 
-:global {
-  .main-content.main-content {
-    margin-top: $header-menu-height;
-  }
-}
-
 .bg {
   position: absolute;
   inset: 0;
@@ -298,10 +292,6 @@
 }
 
 @mixin rewrite-header-menu-mobile {
-  .main-content.main-content {
-    margin-top: $header-menu-height + $header-ticker-height;
-  }
-
   :global {
     #header-menu-container {
       .semi-portal {
@@ -392,11 +382,6 @@
   :global {
     .is-mobile {
       @include rewrite-header-menu-mobile;
-    }
-
-    .main-content.main-home {
-      // no ticker in home header
-      margin-top: $header-menu-height;
     }
   }
 
