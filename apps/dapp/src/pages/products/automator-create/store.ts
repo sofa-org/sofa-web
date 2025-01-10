@@ -1,4 +1,3 @@
-import { OriginAutomatorInfo } from '@sofa/services/automator';
 import { AutomatorCreateParams } from '@sofa/services/automator-creator';
 import { ChainMap } from '@sofa/services/chains';
 import { TFunction } from '@sofa/services/i18n';
