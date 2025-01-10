@@ -109,6 +109,16 @@ const StepStart = () => {
         },
       });
     } catch (e) {
+      if (isMockEnabled()) {
+        useAutomatorCreateStore.setState({
+          rchBurned: true,
+          payload: {
+            ...useAutomatorCreateStore.getState().payload,
+            burnTransactionHash: '0xMockHash',
+          },
+        });
+        return;
+      }
       useAutomatorCreateStore.getState().reset();
       console.error('error burn rch for automator creation', e);
       Toast.error(getErrorMsg(e));
