@@ -474,9 +474,13 @@ export class ContractsService {
     method: string,
     genArgs: (gasLimit?: number) => T,
   ) {
-    const gasEstimate = await contract[method].estimateGas(
-      ...genArgs(undefined),
-    );
+    const argsEst = genArgs(undefined);
+    console.info(`Est. gas for ${method}`, {
+      contract,
+      method,
+      argsEst,
+    });
+    const gasEstimate = await contract[method].estimateGas(...argsEst);
     const gasLimit =
       +Number(gasEstimate) +
       Math.min(Math.floor(+Number(gasEstimate) * 0.1), 40000); // 防止失败
