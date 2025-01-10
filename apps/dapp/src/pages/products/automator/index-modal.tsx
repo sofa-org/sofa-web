@@ -94,10 +94,13 @@ export function useAutomatorModal() {
         } else {
           navigate({
             pathname: '/products/automator',
-            search: stringify({
-              ...parse(location.search, { ignoreQueryPrefix: true }),
-              query,
-            }),
+            search: stringify(
+              {
+                ...parse(location.search, { ignoreQueryPrefix: true }),
+                ...query,
+              },
+              { addQueryPrefix: true },
+            ),
           });
         }
       },

@@ -313,11 +313,16 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
           {t({ enUS: 'Suitability', zhCN: '适用场景' })}
         </h2>
         <div className={styles['content']}>
-          {props.vault?.desc ||
-            t({
-              enUS: 'Our Automator strategies will perform automated execution of our SOFA platform products (eg. Bull Trend & Bear Trend) at model expiration dates and strikes to target an optimized risk-adjusted yield. The strategies are designed to operate systematically via data-driven algorithms, with our data learning models continuously being refined to enhance long term performance. Capital will be continuously deployed to maximize yield compounding benefits, allowing users to deploy volatility monetization strategies with zero hassle. Strategies could include both controlled buying or selling of option exposure to generate returns.',
-              zhCN: '我们的 Automator 策略将自动执行 SOFA 平台产品（如牛市趋势和熊市趋势），在模型指定的到期日和行权价下，旨在实现优化的风险调整收益。这些策略通过数据驱动的算法系统化运行，并通过数据学习模型的持续优化提升长期表现。资金将持续部署以最大化收益复利效应，让用户轻松实现波动率套利策略。策略可能包括受控买入或卖出期权敞口，以生成收益。',
-            })}
+          <div
+            dangerouslySetInnerHTML={{
+              __html:
+                props.vault?.desc ||
+                t({
+                  enUS: 'Our Automator strategies will perform automated execution of our SOFA platform products (eg. Bull Trend & Bear Trend) at model expiration dates and strikes to target an optimized risk-adjusted yield. The strategies are designed to operate systematically via data-driven algorithms, with our data learning models continuously being refined to enhance long term performance. Capital will be continuously deployed to maximize yield compounding benefits, allowing users to deploy volatility monetization strategies with zero hassle. Strategies could include both controlled buying or selling of option exposure to generate returns.',
+                  zhCN: '我们的 Automator 策略将自动执行 SOFA 平台产品（如牛市趋势和熊市趋势），在模型指定的到期日和行权价下，旨在实现优化的风险调整收益。这些策略通过数据驱动的算法系统化运行，并通过数据学习模型的持续优化提升长期表现。资金将持续部署以最大化收益复利效应，让用户轻松实现波动率套利策略。策略可能包括受控买入或卖出期权敞口，以生成收益。',
+                }),
+            }}
+          />
         </div>
       </section>
       <Snapshot vault={props.vault} />
@@ -332,8 +337,8 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
             dangerouslySetInnerHTML={{
               __html: t(
                 {
-                  enUS: '· Users can mint atUSDT by converting USDT at the current atUSDT price. Minting allocates shares proportionally based on the size of the current pool. <br/>· To redeem, users will burn atUSDT to receive USDT, with a {{waitDuration}} waiting period. <br/>· Redemptions must be claimed within {{claimDuration}} following the waiting period, otherwise the request will expire and a new redemption process must be re-submitted.',
-                  zhCN: '	•	用户可以通过当前的 atUSDT 价格将 USDT 转换为 atUSDT，从而进行铸造。铸造的份额将根据当前资金池的规模按比例分配。<br/>•	赎回时，用户需销毁 atUSDT 以换取 USDT，并需经历 7 天的等待期。<br/>•	在等待期结束后的 3 天内必须完成领取，否则请求将过期，需重新提交新的赎回流程。',
+                  enUS: '· Users can mint {{positionCcy}} by converting {{depositCcy}} at the current {{positionCcy}} price. Minting allocates shares proportionally based on the size of the current pool. <br/>· To redeem, users will burn {{positionCcy}} to receive {{depositCcy}}, with a {{waitDuration}} waiting period. <br/>· Redemptions must be claimed within {{claimDuration}} following the waiting period, otherwise the request will expire and a new redemption process must be re-submitted.',
+                  zhCN: '	•	用户可以通过当前的 {{positionCcy}} 价格将 {{depositCcy}} 转换为 {{positionCcy}}，从而进行铸造。铸造的份额将根据当前资金池的规模按比例分配。<br/>•	赎回时，用户需销毁 {{positionCcy}} 以换取 {{depositCcy}}，并需经历 7 天的等待期。<br/>•	在等待期结束后的 3 天内必须完成领取，否则请求将过期，需重新提交新的赎回流程。',
                 },
                 {
                   waitDuration:
@@ -342,6 +347,7 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
                   claimDuration:
                     props.vault?.claimPeriod &&
                     formatDuration(props.vault?.claimPeriod, 1, true),
+                  ...props.vault,
                 },
               ),
             }}

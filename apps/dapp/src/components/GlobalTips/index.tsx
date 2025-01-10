@@ -1,52 +1,60 @@
 import { useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
 import { useTranslation } from '@sofa/services/i18n';
 import { next8h } from '@sofa/utils/expiry';
-import { useTime } from '@sofa/utils/hooks';
 import { useLocalStorageState } from 'ahooks';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
+
+import { Comp as Icon } from './assets/icon.svg';
+import { Comp as IconClose } from './assets/icon-close.svg';
 
 import styles from './index.module.scss';
 
 export const GlobalTips = () => {
   const [t] = useTranslation('GlobalTips');
 
-  const [data, setData] = useLocalStorageState('global-tips', {
+  const [data, setData] = useLocalStorageState('global-tips-1', {
     defaultValue: { closedAt: 0 },
   });
 
-  const time = useTime({ interval: 1000 });
-  const container = useMemo(() => {
-    if (!time) return null;
-    return document.querySelector('#global-tips-container');
-  }, [time]);
-
   const visible = useMemo(() => {
-    if (Date.now() < dayjs('2024-11-08T10:00Z').valueOf()) return false;
-    if (Date.now() >= dayjs('2024-12-08T08:00Z').valueOf()) return false;
+    if (!/products|positions|transactions/.test(window.location.pathname))
+      return false;
+    // if (Date.now() < dayjs('2024-11-08T10:00Z').valueOf()) return false;
+    if (Date.now() >= dayjs('2025-01-11T03:00Z').valueOf()) return false;
     // 如果 closedAt 对应的下一个 UTC8:00 小于当前时间对应下一个的 UTC8:00，则显示
     return !data?.closedAt || next8h(data?.closedAt) < next8h();
   }, [data]);
 
-  if (!visible || !container) return <></>;
+  if (!visible) return <></>;
 
-  return createPortal(
+  return (
     <div className={styles['global-tips-wrapper']}>
       <div className={styles['global-tips']}>
-        <div className={styles['tips-content']} style={{ textAlign: 'center' }}>
+        <div
+          className={classNames(
+            styles['tips-content'],
+            styles['has-icon'],
+            styles['closable'],
+          )}
+        >
+          <Icon className={styles['icon']} />
           <p className={styles['tips-text']}>
             {t({
-              enUS: 'From now until December 8th 8:00 UTC, visit the OKX Web3 x SOFA.org event area and purchase Earn to qualify for more $RCH airdrops!',
-              zhCN: '现在至12月8日 16:00 (UTC+8)，前往 OKX Web3 x SOFA 活动专区 购买 Earn 将获得更多 $RCH 空投！',
+              enUS: 'We’ll be undergoing maintenance on January 11, at 03:00 UTC for about 1-2 hours. During this time, subscriptions for Earn, Surge, and Automator products will be on pause, but you can still claim matured products and process Automator redemptions as usual. Thank you for your understanding!',
+              zhCN: '我们将于 1 月 11 日 03:00 UTC 进行维护，预计持续 1-2 小时。在此期间，Earn、Surge 和 Automator 产品的订阅功能将暂停，但您仍可以照常领取到期产品并处理 Automator 的赎回请求。感谢您的理解！',
             })}
-            <Link
+            {/* <Link
               to={'https://www.okx.com/web3/defi/activity/33'}
               className={styles['tips-link']}
             >
               {t({ enUS: 'Get started now', zhCN: '立即前往' })} &gt;
-            </Link>
+            </Link> */}
           </p>
+          <IconClose
+            className={styles['icon-close']}
+            onClick={() => setData({ closedAt: Date.now() })}
+          />
         </div>
         {/* <div className={styles['tips-actions']}>
           <svg
@@ -67,7 +75,6 @@ export const GlobalTips = () => {
           </svg>
         </div> */}
       </div>
-    </div>,
-    container,
+    </div>
   );
 };

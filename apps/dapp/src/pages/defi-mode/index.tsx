@@ -18,7 +18,7 @@ import styles from './index.module.scss';
 
 const tabs = [
   {
-    label: (t: TFunction) => t({ enUS: 'Core mode', zhCN: '标准模式' }),
+    label: (t: TFunction) => t({ enUS: 'Core Mode', zhCN: '标准模式' }),
     value: 'diy',
     comp: () => <DIY />,
   },

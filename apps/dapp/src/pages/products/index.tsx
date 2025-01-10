@@ -99,10 +99,6 @@ const Index = () => {
       prefix={t('Product')}
       extraTopContent={
         <>
-          <div
-            id="global-tips-container"
-            className={styles['global-tips-container']}
-          />
           {depositCcyList.length > 0 && (
             <div className={styles['title']}>
               {ProjectTypeRefs[project].icon}

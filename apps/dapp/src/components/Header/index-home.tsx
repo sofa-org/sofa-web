@@ -5,13 +5,14 @@ import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { joinUrl } from '@sofa/utils/url';
-import { useScroll } from 'ahooks';
+import { useScroll, useSize } from 'ahooks';
 import classNames from 'classnames';
 
 import { Comp as Logo } from '@/assets/logo';
 import { EnvLinks } from '@/env-links';
 import { addI18nResources, LangSelector } from '@/locales';
 
+import { GlobalTips } from '../GlobalTips';
 import IndexPrices from '../IndexPrices';
 import LaunchApp from '../LaunchApp';
 import { useIsMobileUI } from '../MobileOnly';
@@ -324,6 +325,11 @@ export const RenderMenu = (it: MenuItem) => {
   );
 };
 
+export function useHeaderHeight() {
+  const size = useSize(() => document.getElementById('header'));
+  return size?.height || 48;
+}
+
 export const CommonHeader = (props: {
   aside?: React.ReactNode;
   menus: (
@@ -362,6 +368,7 @@ export const CommonHeader = (props: {
           visibility: isMobile && headerHidden ? 'hidden' : undefined,
         }}
       >
+        <GlobalTips />
         <div className={styles['bg']} style={{ opacity }} />
         <div className={classNames(styles['menu'], 'menu')}>
           <div className={styles['expanded-bg']} />

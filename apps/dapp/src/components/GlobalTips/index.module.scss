@@ -7,7 +7,7 @@
 }
 
 .tips-text {
-  font-size: 14px;
+  @include flex-center;
   line-height: 20px;
 }
 
@@ -19,9 +19,11 @@
 }
 
 .tips-content {
+  @include flex-center;
   gap: 12px;
   flex: 1;
   width: 1px;
+  font-size: 13px;
 
   .tips-link {
     @include pointer;
@@ -30,6 +32,19 @@
     display: inline-block;
     padding: 0 0 0 12px;
   }
+
+  .icon {
+    flex: none;
+    width: 36px;
+    height: 36px;
+  }
+
+  .icon-close {
+    @include pointer;
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .global-tips {
@@ -37,7 +52,7 @@
 
   width: $width-content;
   min-height: 48px;
-  padding: 16px 0;
+  padding: 12px 0;
   gap: 24px;
   color: rgba(#fff, 0.85);
 }
@@ -46,7 +61,9 @@
   @include flex-center;
 
   width: 100vw;
-  background: #1a1b20;
+  background:
+    url("./assets/bg.svg") repeat,
+    #1a1b20;
   pointer-events: initial;
 }
 
