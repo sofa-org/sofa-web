@@ -1,4 +1,5 @@
 import { useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Button,
   Col,
@@ -418,6 +419,7 @@ const StepCreating = () => {
 };
 const StepFinished = () => {
   const [t] = useTranslation('AutomatorCreate');
+  const navigate = useNavigate();
   const { automatorCreateResult, payload } = useAutomatorCreateStore();
   const handleCopy = useLazyCallback(() => {
     Promise.resolve()
@@ -454,6 +456,11 @@ const StepFinished = () => {
       </div>
       <div />
       <Button
+        onClick={() =>
+          navigate(
+            `/products/automator/operate?automator-vault=${automatorCreateResult || ''}`,
+          )
+        }
         className={classNames(
           'btn-gradient-text',
           'btn-primary',
