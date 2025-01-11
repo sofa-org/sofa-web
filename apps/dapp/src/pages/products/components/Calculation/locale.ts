@@ -377,7 +377,7 @@ export default {
     'Estimated Upside APY Return(after Fee)':
       '预估增强型年化收益（扣除费用后）',
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
-      '((存款+基础回报+RCH回报+增强额-提前解除费)/存款)^(365/期限)-1',
+      '((存款+基础回报+RCH回报+增强额-结算手续费)/存款)^(365/期限)-1',
     'Deposit Notional': '存入本金',
     'Estimated Aave/Lido/Sofa/Curve Yield':
       '预计 Aave/Lido/Sofa/Curve 年化收益率',
@@ -490,7 +490,7 @@ export default {
       '((存款+基礎回報+RCH回報)/存款)^(365/期限)-1',
     'Estimated Upside APY Return(after Fee)': '預估增強型年化收益(扣除費用後)',
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
-      '((存款+基礎回報+RCH回報+增強額-提前解除費)/存款)^(365/期限)-1',
+      '((存款+基礎回報+RCH回報+增強額-結算手續費)/存款)^(365/期限)-1',
     'Estimated Aave/Lido/Sofa/Curve Yield':
       '預計Aave/Lido/Sofa/Curve年化收益率',
     'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)':

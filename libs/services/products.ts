@@ -349,7 +349,10 @@ export class ProductsService {
     until: (_, createdAt) => !createdAt || Date.now() - createdAt >= 30000,
   })
   static async quote(type: ProductType, data: ProductQuoteParams) {
-    if (data.vault.riskType === RiskType.LEVERAGE) delete data.fundingApy;
+    if (data.vault.riskType === RiskType.LEVERAGE) {
+      delete data.fundingApy;
+      delete data.protectedApy;
+    }
     return ProductsService.$quote(type, {
       ...pick(data, [
         'expiry',
