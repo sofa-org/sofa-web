@@ -30,7 +30,7 @@ import styles from './index.module.scss';
 const ProductLottery = (
   props: BaseProps & { onlyForm?: boolean; automator: AutomatorDetail },
 ) => {
-  const [t] = useTranslation('ProductLottery');
+  const [t] = useTranslation('AutomatorOperate');
   const prices = useIndexPrices((state) => state.prices);
   const [ticket] = useTicketType();
 
