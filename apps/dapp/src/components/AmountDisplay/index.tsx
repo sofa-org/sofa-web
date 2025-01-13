@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { CCYService } from '@sofa/services/ccy';
 import { amountFormatter } from '@sofa/utils/amount';
+import classNames from 'classnames';
 
 import styles from './index.module.scss';
 
-export interface AmountDisplayProps {
+export interface AmountDisplayProps extends BaseProps {
   amount: string | number | undefined;
   thresholdCount?: number; // default: 5
   precision?: number;
@@ -30,7 +31,10 @@ const AmountDisplay = (props: AmountDisplayProps) => {
   }, [props.ccy, props.precision]);
 
   return (
-    <span className={styles['amount-display']}>
+    <span
+      className={classNames(styles['amount-display'], props.className)}
+      style={props.style}
+    >
       {sign && <span className={styles['sign']}>{sign}</span>}
       {zeroCount >= 5 ? (
         <>

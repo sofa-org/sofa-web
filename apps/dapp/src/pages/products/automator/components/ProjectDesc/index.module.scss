@@ -49,6 +49,18 @@
   }
 }
 
+.performance {
+  :global(.semi-spin-children) {
+    width: 100%;
+  }
+
+  .chart {
+    width: calc(100% + 80px);
+    height: 360px;
+    margin: -40px;
+  }
+}
+
 @media (orientation: portrait) {
   .snapshot {
     .it-item {

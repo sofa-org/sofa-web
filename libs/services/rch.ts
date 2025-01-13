@@ -18,7 +18,7 @@ export enum AirdropStatus {
 export const AirdropStatusRefs = {
   [AirdropStatus.Unclaimed]: {
     label: (t: TFunction) => t('Unclaimed'),
-    color: '#50D113',
+    color: '#44C476',
   },
   [AirdropStatus.Claiming]: {
     label: (t: TFunction) => t('Claiming'),

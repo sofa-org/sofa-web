@@ -30,6 +30,8 @@ import AsyncButton from '@/components/AsyncButton';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
+import { useAutomatorCreatorStore } from '../automator-mine/store';
+
 import { Comp as IconInfo } from './assets/icon-info.svg';
 import { Comp as IconLoading } from './assets/icon-loading.svg';
 import {
@@ -39,7 +41,6 @@ import {
 } from './store';
 
 import styles from './index-model.module.scss';
-import { useAutomatorCreatorStore } from '../automator-mine/store';
 
 const steps: {
   arrived: (store: AutomatorCreateStoreType) => boolean;
@@ -83,8 +84,7 @@ const StepStart = () => {
   const { chainId, address } = useWalletStore();
   const { payload } = useAutomatorCreateStore();
   const myAutomators = useAutomatorCreatorStore(
-    (state) =>
-      state.vaults[`${chainId}-${address?.toLowerCase()}`],
+    (state) => state.vaults[`${chainId}-${address?.toLowerCase()}`],
   );
   const burn = useLazyCallback(async () => {
     const factory = payload.factory;
@@ -92,9 +92,11 @@ const StepStart = () => {
       return;
     }
     if (myAutomators?.length) {
-      Toast.error(t({
-        enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',
-      }));
+      Toast.error(
+        t({
+          enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',
+        }),
+      );
       return;
     }
     try {
@@ -469,7 +471,9 @@ const StepFinished = () => {
       <Button
         onClick={() =>
           navigate(
-            `/products/automator/operate?automator-vault=${automatorCreateResult || ''}`,
+            `/products/automator/operate?automator-vault=${
+              automatorCreateResult || ''
+            }`,
           )
         }
         className={classNames(
@@ -604,7 +608,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
         <Progress
           percent={currentStep.processPercent}
           size="large"
-          stroke={'linear-gradient(96deg, #50d113 0.36%, #ffe500 100%)'}
+          stroke={'linear-gradient(96deg, #44C476 0.36%, #ffe500 100%)'}
           strokeGradient
           className={styles['progress']}
         />

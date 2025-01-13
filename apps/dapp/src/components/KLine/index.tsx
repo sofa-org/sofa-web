@@ -208,13 +208,13 @@ const KLine = (props: KLineProps) => {
               ...(props.anchorPrices?.map((it) => ({
                 yAxis: +it,
                 lineStyle: {
-                  color: '#50D113',
+                  color: '#44C476',
                 },
                 label: {
                   padding: 4,
                   width: 70,
                   color: '#000',
-                  backgroundColor: '#50D113',
+                  backgroundColor: '#44C476',
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter: (v: any) => amountFormatter(v.data.yAxis, 2),
                 },
@@ -231,7 +231,7 @@ const KLine = (props: KLineProps) => {
                   })),
                 ],
                 itemStyle: {
-                  color: '#50D1131e',
+                  color: '#44C4761e',
                 },
               }
             : undefined,
@@ -314,7 +314,7 @@ const KLine = (props: KLineProps) => {
           key={relativeLinePath}
           style={relativeLineStyle}
         >
-          <path d={relativeLinePath} fill="#50D1131e" />
+          <path d={relativeLinePath} fill="#44C4761e" />
         </svg>
       )}
       <div

@@ -154,21 +154,23 @@ const PoolSize = () => {
           <span className={styles['unit']}>
             {automator?.vaultInfo.positionCcy}
           </span>
-          <span className={styles['separator']}>≈</span>
-          <AmountDisplay
-            amount={automator?.aumByVaultDepositCcy}
-            ccy={automator?.vaultInfo.vaultDepositCcy}
-          />
-          <span className={styles['unit']}>
-            {automator?.vaultInfo.depositCcy}
-          </span>
-          <span className={styles['separator']}>≈</span>
-          <AmountDisplay
-            amount={automator?.aumByClientDepositCcy}
-            ccy={automator?.vaultInfo.depositCcy}
-          />
-          <span className={styles['unit']}>
-            {automator?.vaultInfo.depositCcy}
+          <span className={styles['cvt']}>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={automator?.aumByVaultDepositCcy}
+              ccy={automator?.vaultInfo.vaultDepositCcy}
+            />
+            <span className={styles['unit']}>
+              {automator?.vaultInfo.depositCcy}
+            </span>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={automator?.aumByClientDepositCcy}
+              ccy={automator?.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {automator?.vaultInfo.depositCcy}
+            </span>
           </span>
         </div>
         {automator?.vaultInfo.interestType && (
@@ -302,15 +304,21 @@ const PnL = () => {
           <span className={styles['separator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
             <AmountDisplay amount={automator?.totalRchAmount} ccy={'RCH'} />
-            <span className={styles['unit']}>RCH</span>
+            <span
+              className={classNames(styles['unit'], styles['icon-airdrop'])}
+            >
+              RCH
+            </span>
           </span>
-          <span className={styles['separator']}>≈</span>
-          <AmountDisplay
-            amount={automator?.totalPnlWithRchByClientDepositCcy}
-            ccy={automator?.vaultInfo.depositCcy}
-          />
-          <span className={styles['unit']}>
-            {automator?.vaultInfo.depositCcy}
+          <span className={classNames(styles['cvt'], styles['weaken'])}>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={automator?.totalPnlWithRchByClientDepositCcy}
+              ccy={automator?.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {automator?.vaultInfo.depositCcy}
+            </span>
           </span>
         </div>
       </div>

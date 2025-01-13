@@ -9,7 +9,7 @@
     border-radius: 8px;
     background: linear-gradient(
       125deg,
-      rgba(#50d113, 0.25) 0%,
+      rgba(#44c476, 0.25) 0%,
       rgba(#ffe500, 0.2) 100%
     );
   }
@@ -98,7 +98,7 @@
       @include bold;
 
       font-size: min(28px, 6.4vw);
-      color: #50d113;
+      color: #44c476;
     }
   }
 

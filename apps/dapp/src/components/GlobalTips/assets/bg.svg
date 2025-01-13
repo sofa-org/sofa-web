@@ -12,12 +12,12 @@
   <defs>
     <linearGradient id="paint0_linear_12469_33317" x1="0.0562755" y1="0.660656" x2="36.1717"
       y2="4.70961" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#50D113" />
+      <stop stop-color="#44C476" />
       <stop offset="1" stop-color="#FFE600" />
     </linearGradient>
     <linearGradient id="paint1_linear_12469_33317" x1="65.9437" y1="33.6607" x2="29.8283"
       y2="37.7096" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#50D113" />
+      <stop stop-color="#44C476" />
       <stop offset="1" stop-color="#FFE600" />
     </linearGradient>
   </defs>

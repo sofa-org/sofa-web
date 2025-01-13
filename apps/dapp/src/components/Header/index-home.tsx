@@ -216,6 +216,7 @@ export const RenderMenu = (it: MenuItem) => {
   }
   const groups = it.children.reduce(
     (pre, it) => {
+      if (it.hide?.()) return pre;
       const group = String(it.group?.(t));
       if (!pre[group]) pre[group] = [];
       pre[group].push(it);
@@ -396,9 +397,10 @@ export const CommonHeader = (props: {
               />
             </div>
 
-            {menusForRender.map((it, i) => (
-              <RenderMenu {...it} key={i} />
-            ))}
+            {menusForRender.map((it, i) => {
+              if (it.hide?.()) return <Fragment key={i} />;
+              return <RenderMenu {...it} key={i} />;
+            })}
           </nav>
           <aside className={styles['right']}>
             <LangSelector className={styles['lang-selector']} />

@@ -54,29 +54,31 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
               simple
               linkBtn
             />
-            <div className={styles['fee']}>
-              <span>{t({ enUS: 'Fee', zhCN: '手续费' })}</span>
-              {props.info.vaultInfo.createTime
-                ? formatDuration(
-                    Date.now() - +props.info.vaultInfo.createTime,
-                    1,
-                    true,
-                  )
-                : '-'}
-            </div>
-            <div className={styles['runtime']}>
-              <IconCalendar />
-              {props.info.vaultInfo.createTime
-                ? formatDuration(
-                    Date.now() - +props.info.vaultInfo.createTime,
-                    1,
-                    true,
-                  )
-                : '-'}
-            </div>
-            <div className={styles['people']}>
-              <IconPeople />
-              {props.info.participantNum || '-'}
+            <div className={styles['other-infos']}>
+              <div className={styles['fee']}>
+                <span>{t({ enUS: 'Fee', zhCN: '手续费' })}</span>
+                {props.info.vaultInfo.createTime
+                  ? formatDuration(
+                      Date.now() - +props.info.vaultInfo.createTime,
+                      1,
+                      true,
+                    )
+                  : '-'}
+              </div>
+              <div className={styles['runtime']}>
+                <IconCalendar />
+                {props.info.vaultInfo.createTime
+                  ? formatDuration(
+                      Date.now() - +props.info.vaultInfo.createTime,
+                      1,
+                      true,
+                    )
+                  : '-'}
+              </div>
+              <div className={styles['people']}>
+                <IconPeople />
+                {props.info.participantNum || '-'}
+              </div>
             </div>
           </div>
         </div>
@@ -120,21 +122,23 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
           <span className={styles['unit']}>
             {props.info.vaultInfo.positionCcy}
           </span>
-          <span className={styles['separator']}>≈</span>
-          <AmountDisplay
-            amount={props.info.aumByVaultDepositCcy}
-            ccy={props.info.vaultInfo.vaultDepositCcy}
-          />
-          <span className={styles['unit']}>
-            {props.info.vaultInfo.depositCcy}
-          </span>
-          <span className={styles['separator']}>≈</span>
-          <AmountDisplay
-            amount={props.info.aumByClientDepositCcy}
-            ccy={props.info.vaultInfo.depositCcy}
-          />
-          <span className={styles['unit']}>
-            {props.info.vaultInfo.depositCcy}
+          <span className={styles['cvt']}>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={props.info.aumByVaultDepositCcy}
+              ccy={props.info.vaultInfo.vaultDepositCcy}
+            />
+            <span className={styles['unit']}>
+              {props.info.vaultInfo.depositCcy}
+            </span>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={props.info.aumByClientDepositCcy}
+              ccy={props.info.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {props.info.vaultInfo.depositCcy}
+            </span>
           </span>
         </div>
       </div>
@@ -179,15 +183,21 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
           <span className={styles['separator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
             <AmountDisplay amount={props.info.totalRchAmount} ccy={'RCH'} />
-            <span className={styles['unit']}>RCH</span>
+            <span
+              className={classNames(styles['unit'], styles['icon-airdrop'])}
+            >
+              RCH
+            </span>
           </span>
-          <span className={styles['separator']}>≈</span>
-          <AmountDisplay
-            amount={props.info.totalPnlWithRchByClientDepositCcy}
-            ccy={props.info.vaultInfo.depositCcy}
-          />
-          <span className={styles['unit']}>
-            {props.info.vaultInfo.depositCcy}
+          <span className={classNames(styles['cvt'], styles['weaken'])}>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={props.info.totalPnlWithRchByClientDepositCcy}
+              ccy={props.info.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {props.info.vaultInfo.depositCcy}
+            </span>
           </span>
         </div>
       </div>
@@ -229,21 +239,29 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
       </div>
       <div className={styles['footer']}>
         <AsyncButton
-          className={styles['btn-deposit']}
+          className={styles['btn-trade']}
           onClick={() =>
-            props.modalController.open(props.info.vaultInfo, 'deposit')
+            navigate(
+              `/products/automator/operate?automator-vault=${
+                props.info.vaultInfo.vault || ''
+              }&automator-operate-tab=trade`,
+            )
           }
         >
           {t({ enUS: 'Trade', zhCN: '交易' })}
         </AsyncButton>
         <AsyncButton
-          className={classNames(styles['btn-redeem'], 'btn-ghost')}
+          className={classNames(styles['btn-position'], 'btn-ghost')}
           onClick={() =>
-            props.modalController.open(props.info.vaultInfo, 'redeem')
+            navigate(
+              `/products/automator/operate?automator-vault=${
+                props.info.vaultInfo.vault || ''
+              }&automator-operate-tab=positions`,
+            )
           }
         >
           {t({ enUS: 'Positions', zhCN: '头寸' })}
-          {!props.info.positionSize && (
+          {!!props.info.positionSize && (
             <span className={styles['position-size']}>
               {props.info.positionSize}
             </span>
