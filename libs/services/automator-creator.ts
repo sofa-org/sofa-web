@@ -51,9 +51,10 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<unknown, HttpResponse<AutomatorFactory[]>>(
-        `/optivisors/automator/factories`,
-      )
+      .get<
+        unknown,
+        HttpResponse<AutomatorFactory[]>
+      >(`/optivisors/automator/factories`)
       .then((res) => res.value);
   }
 
@@ -435,8 +436,7 @@ export class AutomatorCreatorService {
           ethers.parseUnits(String(data.feeRate), 18), // 乘以 1e18
           (data.redemptionPeriodDay * MsIntervals.day) / 1000, // s
           data.factory.clientDepositCcyAddress,
-          // adding gasLimit here will results JSON RPC error
-          // { gasLimit },
+          { gasLimit },
         ],
       );
       cb({
@@ -478,11 +478,9 @@ export class AutomatorCreatorService {
       signer,
     );
     console.info(`automator-creator.hasCredits ${signer.address}`);
-    const res = await factoryContract
-      .credits(signer.address)
-      .then((res) => !!res);
+    const res = await factoryContract.credits(signer.address);
     console.info(`automator-creator.hasCredits ${signer.address} => ${res}`);
-    return res;
+    return !!res;
   }
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
