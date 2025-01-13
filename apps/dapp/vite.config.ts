@@ -46,8 +46,8 @@ export default defineConfig(({ mode }) => ({
       inject: {
         data: {
           extraScript: `
-            ${['daily', 'demo'].includes(process.env.VITE_ENV || '') ? mockScript : ''}
-            ${['development'].includes(process.env.NODE_ENV || '') ? '' : cloudflareScript}
+            ${process.env.NODE_ENV === 'development' || mode === 'demo' ? mockScript : ''}
+            ${process.env.NODE_ENV === 'development' ? '' : cloudflareScript}
             <!-- Site Version: ${VERSION.replace(/[\s-:]/g, '_')} -->
             <!-- Site Build Time: ${time} -->
           `,
