@@ -237,21 +237,21 @@ export const AutomatorPerformanceChart = (
               className={styles['color']}
               style={{ background: '#EC5E88' }}
             />
-            {t({ enUS: `PnL Of Trading` })}
+            {t({ enUS: 'PnL Of Trading', zhCN: '交易盈亏' })}
           </div>
           <div className={styles['legend-item']}>
             <div
               className={styles['color']}
               style={{ background: '#27a0a0' }}
             />
-            {t({ enUS: `PnL Of Interest` })}
+            {t({ enUS: 'PnL Of Interest', zhCN: '利息盈亏' })}
           </div>
           <div className={styles['legend-item']}>
             <div
               className={styles['color']}
               style={{ background: '#51acf1' }}
             />
-            {t({ enUS: 'PnL Of RCH' })}
+            {t({ enUS: 'PnL Of RCH', zhCN: 'RCH盈亏' })}
           </div>
         </div>
         <div className={styles['chart']} ref={chartRef} />

@@ -43,7 +43,7 @@ const defaultProductType = ProductType.BullSpread;
 const defaultForCCY: VaultInfo['forCcy'] = 'BTC';
 
 const TicketEditor = (props: CustomTicketProps) => {
-  const [t] = useTranslation('AutomatorTrade');
+  const [t] = useTranslation('AutomatorOperate');
 
   const [productType, setProductType] = useState<ProductType>(
     props.product.vault.productType || defaultProductType,
@@ -135,9 +135,7 @@ const TicketEditor = (props: CustomTicketProps) => {
         <div className={styles['form-item']}>
           <div className={styles['value']}>
             <CCYSelector
-              prefix={t({
-                enUS: 'Anchor',
-              })}
+              prefix={t({ enUS: 'Anchor', zhCN: '锚点' })}
               localState={[forCcy, setForCcy]}
               afterChange={() => {
                 onChange({
@@ -149,9 +147,7 @@ const TicketEditor = (props: CustomTicketProps) => {
         </div>
         <div className={classNames(styles['form-item'], styles['side'])}>
           <div className={styles['label']}>
-            {t({
-              enUS: 'Side',
-            })}
+            {t({ enUS: 'Side', zhCN: '方向' })}
           </div>
           <div className={styles['value']}>
             <ProductTypeSelector
@@ -234,9 +230,7 @@ const TicketEditor = (props: CustomTicketProps) => {
 
         <div className={styles['form-item']}>
           <div className={styles['label']}>
-            {t({
-              enUS: 'Max Acceptable Loss',
-            })}
+            {t({ enUS: 'Max Acceptable Loss', zhCN: '最大可接受损失' })}
           </div>
           <div className={styles['value']}>
             <AmountInput
@@ -283,9 +277,7 @@ const TicketEditor = (props: CustomTicketProps) => {
           {props.product.expiry ? (
             <span className={styles['term']}>
               {t(
-                {
-                  enUS: '{{days}} Days',
-                },
+                { enUS: '{{days}} Days', zhCN: '{{days}} 天' },
                 {
                   days: Math.abs(
                     dayjs().diff(props.product.expiry * 1000, 'day'),
@@ -304,9 +296,7 @@ const TicketEditor = (props: CustomTicketProps) => {
               </span>
               <div className={styles['calc']}>
                 <div className={styles['title']}>
-                  {t({
-                    enUS: 'Max Win',
-                  })}
+                  {t({ enUS: 'Max Win', zhCN: '最大赢利' })}
                 </div>
                 <span className={styles['digi']}>
                   {(quoteInfo &&
@@ -317,11 +307,7 @@ const TicketEditor = (props: CustomTicketProps) => {
               </div>
             </div>
             <div className={styles['or']}>
-              <span>
-                {t({
-                  enUS: 'Or',
-                })}
-              </span>
+              <span>{t({ enUS: 'Or', zhCN: '或' })}</span>
             </div>
             <div className={styles['lose']}>
               {ProductTypeRefs[productType]?.img}
@@ -330,9 +316,7 @@ const TicketEditor = (props: CustomTicketProps) => {
               </span>
               <div className={styles['calc']}>
                 <div className={styles['title']}>
-                  {t({
-                    enUS: 'Max Loss',
-                  })}
+                  {t({ enUS: 'Max Loss', zhCN: '最大损失' })}
                 </div>
                 <span className={styles['digi']}>
                   {(props.product.depositAmount &&
@@ -344,6 +328,7 @@ const TicketEditor = (props: CustomTicketProps) => {
                   {t(
                     {
                       enUS: '{{percent}}% of Pool Size',
+                      zhCN: '池大小的{{percent}}%',
                     },
                     {
                       percent: percentOfPool < 1 ? '<1' : percentOfPool,
@@ -383,7 +368,7 @@ const CustomTickets = (props: {
   vault: Pick<AutomatorVaultInfo, 'vault' | 'chainId' | 'depositCcy'>;
   automator: AutomatorDetail;
 }) => {
-  const [t] = useTranslation('AutomatorTrade');
+  const [t] = useTranslation('AutomatorOperate');
   const init = useLazyCallback(
     () =>
       ({
@@ -441,17 +426,13 @@ const CustomTickets = (props: {
           //   render: (_, it) => undefined,
           // },
           {
-            title: t({
-              enUS: 'Side',
-            }),
+            title: t({ enUS: 'Side', zhCN: '方向' }),
             render: (_, it) => (
               <b>{ProductTypeRefs[it.vault.productType]?.label(t)}</b>
             ),
           },
           {
-            title: t({
-              enUS: 'Anchor',
-            }),
+            title: t({ enUS: 'Anchor', zhCN: '锚点' }),
             render: (_, it) => (
               <b>
                 <img
@@ -459,9 +440,7 @@ const CustomTickets = (props: {
                   alt=""
                 />
                 {t(
-                  {
-                    enUS: '{{ccy}} Price',
-                  },
+                  { enUS: '{{ccy}} Price', zhCN: '{{ccy}} 价格' },
                   {
                     ccy: CCYService.ccyConfigs[it.vault.forCcy]?.name,
                   },
@@ -470,9 +449,7 @@ const CustomTickets = (props: {
             ),
           },
           {
-            title: t({
-              enUS: 'Expiry',
-            }),
+            title: t({ enUS: 'Expiry', zhCN: '到期' }),
             render: (_, it) =>
               it.expiry ? (
                 <span>
@@ -488,9 +465,7 @@ const CustomTickets = (props: {
               ),
           },
           {
-            title: t({
-              enUS: 'Strikes',
-            }),
+            title: t({ enUS: 'Strikes', zhCN: '行权价' }),
             render: (_, it) =>
               it.anchorPrices ? (
                 <span>
@@ -506,9 +481,7 @@ const CustomTickets = (props: {
               ),
           },
           {
-            title: t({
-              enUS: 'Max Acceptable Loss',
-            }),
+            title: t({ enUS: 'Max Acceptable Loss', zhCN: '最大可接受损失' }),
             render: (_, it) => {
               const q = quoteInfos[ProductsService.productKey(it)];
               return q ? (
@@ -523,9 +496,7 @@ const CustomTickets = (props: {
             },
           },
           {
-            title: t({
-              enUS: 'Max Return',
-            }),
+            title: t({ enUS: 'Max Return', zhCN: '最大回报' }),
             render: (_, it) => {
               const q = quoteInfos[ProductsService.productKey(it)];
               return q ? (

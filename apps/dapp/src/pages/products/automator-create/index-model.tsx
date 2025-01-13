@@ -95,6 +95,7 @@ const StepStart = () => {
       Toast.error(
         t({
           enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',
+          zhCN: '您已基于所选的已部署链和存款代币创建了Automator合约。',
         }),
       );
       return;
@@ -145,12 +146,11 @@ const StepStart = () => {
         onClick={() => burn()}
       >
         {chainId == AutomatorCreatorService.rchBurnContract.chainId
-          ? t({
-              enUS: 'Confirm to Burn',
-            })
+          ? t({ enUS: 'Confirm to Burn', zhCN: '确认销毁' })
           : t(
               {
                 enUS: 'Switch to {{chainName}} to Burn',
+                zhCN: '切换到{{chainName}}进行销毁',
               },
               {
                 chainName: getNameForChain(
@@ -171,6 +171,7 @@ const StepBurning = () => {
       <div className={styles['desc']}>
         {t({
           enUS: 'Processing, Please Do Not Close This Page',
+          zhCN: '处理中，请勿关闭此页面',
         })}
       </div>
     </div>
@@ -236,15 +237,14 @@ const StepForm = () => {
           <Col span={24}>
             <Form.Input
               field="automatorName"
-              label={t({
-                enUS: 'Automator Name',
-              })}
+              label={t({ enUS: 'Automator Name', zhCN: 'Automator名称' })}
               trigger="blur"
               rules={[
                 {
                   required: true,
                   message: t({
                     enUS: 'This field is required',
+                    zhCN: '此字段为必填项',
                   }),
                 },
               ]}
@@ -257,9 +257,7 @@ const StepForm = () => {
               field="redemptionPeriodDay"
               label={
                 <>
-                  {t({
-                    enUS: 'Redemption Waiting Period',
-                  })}
+                  {t({ enUS: 'Redemption Waiting Period', zhCN: '赎回等待期' })}
                   <Tooltip
                     style={{
                       maxWidth: isMobileUI ? '80vw' : '500px',
@@ -268,7 +266,8 @@ const StepForm = () => {
                       <div
                         dangerouslySetInnerHTML={{
                           __html: t({
-                            enUS: `The Redemption Waiting Period refers to the time users must wait after submitting a redemption request for their funds to become claimable. Additionally, this period determines the maximum expiration date range for options tradable by the Automator manager.`,
+                            enUS: 'The Redemption Waiting Period refers to the time users must wait after submitting a redemption request for their funds to become claimable. Additionally, this period determines the maximum expiration date range for options tradable by the Automator manager.',
+                            zhCN: '赎回等待期指用户提交赎回请求后，需等待的时间才能认领其资金。此外，该期限还规定了由Automator经理交易的期权的最大到期日期范围。',
                           }).replace(/\n/g, '<br />'),
                         }}
                       />
@@ -279,6 +278,7 @@ const StepForm = () => {
                   <div className={styles['field-desc']}>
                     {t({
                       enUS: 'You can only trade products with expiration dates within the selected waiting period.',
+                      zhCN: '您只能交易到期日期在选择的等待期内的产品。',
                     })}
                   </div>
                 </>
@@ -289,6 +289,7 @@ const StepForm = () => {
                   required: true,
                   message: t({
                     enUS: 'This field is required',
+                    zhCN: '此字段为必填项',
                   }),
                 },
               ]}
@@ -305,9 +306,7 @@ const StepForm = () => {
               field="feeRate"
               label={
                 <>
-                  {t({
-                    enUS: 'Profits Share Ratio',
-                  })}
+                  {t({ enUS: 'Profits Share Ratio', zhCN: '利润分成比例' })}
                   <Tooltip
                     style={{
                       maxWidth: isMobileUI ? '80vw' : '500px',
@@ -316,7 +315,8 @@ const StepForm = () => {
                       <div
                         dangerouslySetInnerHTML={{
                           __html: t({
-                            enUS: `The Profits Share Ratio defines the percentage of user profits that the Automator manager can share as their performance fee. If the Automator generates losses, the shared profits are recorded as negative until the account balance turns positive again. Only then can the manager resume withdrawing profit shares.`,
+                            enUS: 'The Profits Share Ratio defines the percentage of user profits that the Automator manager can share as their performance fee. If the Automator generates losses, the shared profits are recorded as negative until the account balance turns positive again. Only then can the manager resume withdrawing profit shares.',
+                            zhCN: '利润分成比例定义了Automator经理可共享的用户利润百分比，作为其绩效费用。如果Automator产生亏损，共享利润记录为负，直到账户余额再次变为正数，此时经理才可继续提取利润分成。',
                           }).replace(/\n/g, '<br />'),
                         }}
                       />
@@ -333,6 +333,7 @@ const StepForm = () => {
                   required: true,
                   message: t({
                     enUS: 'This field is required',
+                    zhCN: '此字段为必填项',
                   }),
                 },
               ]}
@@ -352,6 +353,7 @@ const StepForm = () => {
                 <>
                   {t({
                     enUS: 'Automator Risk Level',
+                    zhCN: 'Automator风险级别',
                   })}
                   <Tooltip
                     style={{
@@ -361,7 +363,8 @@ const StepForm = () => {
                       <div
                         dangerouslySetInnerHTML={{
                           __html: t({
-                            enUS: `The maximum percentage of your Automator capital you can lose.`,
+                            enUS: 'The maximum percentage of your Automator capital you can lose.',
+                            zhCN: '您Automator资本的最大可损失百分比。',
                           }).replace(/\n/g, '<br />'),
                         }}
                       />
@@ -372,6 +375,7 @@ const StepForm = () => {
                   <div className={styles['field-desc']}>
                     {t({
                       enUS: 'You can only trade products with expiration dates within the selected waiting period.',
+                      zhCN: '您只能交易到期日期在选择的等待期内的产品。',
                     })}
                   </div>
                 </>
@@ -382,6 +386,7 @@ const StepForm = () => {
                   required: true,
                   message: t({
                     enUS: 'This field is required',
+                    zhCN: '此字段为必填项',
                   }),
                 },
               ]}
@@ -411,15 +416,14 @@ const StepForm = () => {
           <Col span={24}>
             <Form.TextArea
               field="description"
-              label={t({
-                enUS: 'Strategy Description',
-              })}
+              label={t({ enUS: 'Strategy Description', zhCN: '策略描述' })}
               trigger="blur"
               rules={[
                 {
                   required: true,
                   message: t({
                     enUS: 'This field is required',
+                    zhCN: '此字段为必填项',
                   }),
                 },
               ]}
@@ -439,19 +443,19 @@ const StepForm = () => {
           ? t(
               {
                 enUS: 'Switch to {{chainName}} to Deploy',
+                zhCN: '切换到{{chainName}}进行部署',
               },
               {
                 chainName: ChainMap[payload.factory.chainId!]?.name,
               },
             )
-          : t({
-              enUS: 'Deploy Automator Vault',
-            })}
+          : t({ enUS: 'Deploy Automator Vault', zhCN: '部署Automator金库' })}
       </AsyncButton>
       <div className={styles['tips']}>
         <p className={styles['tip']}>
           {t({
             enUS: 'Note: Automator information cannot be edited after vault created.',
+            zhCN: '注意：创建金库后，Automator信息不可编辑。',
           })}
         </p>
       </div>
@@ -469,6 +473,7 @@ const StepCreating = () => {
           t(
             {
               enUS: 'Automator [[{{name}}]] is Creating',
+              zhCN: '自动化器[[{{name}}]]正在创建',
             },
             {
               name: payload.automatorName,
@@ -482,6 +487,7 @@ const StepCreating = () => {
       <div className={styles['desc']}>
         {t({
           enUS: 'Processing, Please Do Not Close This Page',
+          zhCN: '处理中，请勿关闭此页面',
         })}
       </div>
     </div>
@@ -511,6 +517,7 @@ const StepFinished = () => {
           t(
             {
               enUS: 'Automator [[{{name}}]] is created!',
+              zhCN: '自动化器[[{{name}}]]已创建！',
             },
             {
               name: payload.automatorName,
@@ -539,9 +546,7 @@ const StepFinished = () => {
           styles['btn-finish'],
         )}
       >
-        {t({
-          enUS: 'Go to Automator Management',
-        })}
+        {t({ enUS: 'Go to Automator Management', zhCN: '前往自动化器管理' })}
       </Button>
     </div>
   );
@@ -576,9 +581,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
       })}
       title={
         <div className={styles['title']}>
-          {t({
-            enUS: 'Create Your Automator',
-          })}
+          {t({ enUS: 'Create Your Automator', zhCN: '创建Automator' })}
         </div>
       }
     >
@@ -586,9 +589,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
         <div className={classNames(styles['chain-and-ccy'])}>
           <div className={styles['chain']}>
             <span className={styles['label']}>
-              {t({
-                enUS: 'Automator Chain',
-              })}
+              {t({ enUS: 'Automator Chain', zhCN: 'Automator链' })}
             </span>
             <span className={styles['value']}>
               <img
@@ -601,9 +602,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
           </div>
           <div className={styles['token']}>
             <span className={styles['label']}>
-              {t({
-                enUS: 'Deposit Token',
-              })}
+              {t({ enUS: 'Deposit Token', zhCN: '存入代币' })}
             </span>
             <span className={styles['value']}>
               <img
@@ -624,16 +623,12 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
         <ol className={styles['steps']}>
           <li className={currentStep.step1 ? styles['done'] : undefined}>
             <span className={styles['step']}>
-              {t({
-                enUS: 'Step 1',
-              })}
+              {t({ enUS: 'Step 1', zhCN: '步骤1' })}
             </span>
             <span>
               {formatHighlightedText(
                 t(
-                  {
-                    enUS: 'Burn {{amount}} RCH',
-                  },
+                  { enUS: 'Burn {{amount}} RCH', zhCN: '燃烧{{amount}} RCH' },
                   {
                     amount: AutomatorCreatorService.rchAmountForBurning,
                   },
@@ -646,14 +641,13 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
           </li>
           <li className={currentStep.step2 ? styles['done'] : undefined}>
             <span className={styles['step']}>
-              {t({
-                enUS: 'Step 2',
-              })}
+              {t({ enUS: 'Step 2', zhCN: '步骤2' })}
             </span>
             <span>
               {formatHighlightedText(
                 t({
                   enUS: 'Deploy Automator Contract',
+                  zhCN: '部署Automator合约',
                 }),
                 {
                   hightlightedClassName: styles['highlighted'],

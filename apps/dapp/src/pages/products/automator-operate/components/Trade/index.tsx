@@ -85,9 +85,7 @@ const ProductLottery = (
           <div className={styles['cart-brief']}>
             <div className={styles['amount']}>
               <span className={styles['label']}>
-                {t({
-                  enUS: 'Total Cost',
-                })}
+                {t({ enUS: 'Total Cost', zhCN: '总成本' })}
               </span>
               <span className={styles['total-cost']}>
                 <span className={styles['digi']}>
@@ -98,9 +96,7 @@ const ProductLottery = (
             <div className={styles['profits']}>
               <div className={styles['amount']}>
                 <span className={styles['label']}>
-                  {t({
-                    enUS: 'Target Max Return',
-                  })}
+                  {t({ enUS: 'Target Max Return', zhCN: '目标最大回报' })}
                 </span>
                 <span className={styles['win']}>
                   <span className={styles['digi']}>
@@ -200,6 +196,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
             <span className={styles['label']}>
               {t({
                 enUS: 'Automator Total Available Balance',
+                zhCN: '自动化器总可用余额',
               })}
             </span>
             <span className={styles['value']}>
@@ -227,6 +224,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
             <span className={styles['label']}>
               {t({
                 enUS: 'Available Balance Excluding Principal',
+                zhCN: '扣除本金后的可用余额',
               })}
             </span>
             <span className={styles['value']}>
@@ -257,9 +255,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
           </div>
           <div className={styles['amount']}>
             <span className={styles['label']}>
-              {t({
-                enUS: 'Estimated 7-Day Interest',
-              })}
+              {t({ enUS: 'Estimated 7-Day Interest', zhCN: '预估7天利息' })}
             </span>
             <span className={styles['value']}>
               {automator && apy ? (
@@ -305,9 +301,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                       <div className={styles['automator-details']}>
                         <div className={styles['amount']}>
                           <span className={styles['label']}>
-                            {t({
-                              enUS: 'Pool Size',
-                            })}
+                            {t({ enUS: 'Pool Size', zhCN: '池大小' })}
                           </span>
                           <span className={styles['value']}>
                             {/* TODO */}
@@ -340,13 +334,15 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <span className={styles['label']}>
                             {t({
                               enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
+                              zhCN: '预估Aave/Lido/Sofa/Curve收益率',
                             })}
                           </span>
                           <span className={styles['value']}>
                             {amountFormatter(automator.yieldPercentage, 2)}%
                             <span className={styles['desc']}>
                               {t({
-                                enUS: `Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)`,
+                                enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
+                                zhCN: '最小值（1个月Aave/Lido/Sofa/Curve平均，当前Aave/Lido/Sofa/Curve年化），（Aave/Lido/Sofa/Curve年化）',
                               })}
                             </span>
                           </span>
@@ -355,12 +351,14 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <span className={styles['label']}>
                             {t({
                               enUS: 'Estimated Aave/Lido/Sofa/Curve Return',
+                              zhCN: '预估Aave/Lido/Sofa/Curve回报',
                             })}
                           </span>
                           <span className={styles['value']}>
                             <span className={styles['desc']}>
                               {t({
-                                enUS: `(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)`,
+                                enUS: '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)',
+                                zhCN: '(存款 * (1 + Aave/Lido/Sofa/Curve 预期年化) ^ (期限 / 365) - 存款)',
                               })}
                             </span>
                           </span>

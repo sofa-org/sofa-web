@@ -9,9 +9,7 @@ export function getNameForChain(chainId: number | undefined, t: TFunction) {
     return '';
   }
   if (chainId == 1) {
-    return t({
-      enUS: 'Ethereum Mainnet',
-    });
+    return t({ enUS: 'Ethereum Mainnet', zhCN: '以太坊主网' });
   }
   return ChainMap[chainId].name;
 }
