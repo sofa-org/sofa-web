@@ -16,7 +16,7 @@ import {
   AutomatorVaultInfo,
   TransactionStatus,
 } from './base-type';
-import { defaultChain } from './chains';
+import { ChainMap, defaultChain } from './chains';
 import { ContractsService } from './contracts';
 import { TransactionProgress } from './positions';
 import { PositionStatus } from './the-graph';
@@ -87,6 +87,13 @@ export class AutomatorCreatorService {
       const { signer } = await WalletService.connect(
         AutomatorCreatorService.rchBurnContract.chainId,
       );
+      const amountWithDecimals = ethers.parseUnits(String(AutomatorCreatorService.rchAmountForBurning), 18);
+      await WalletService.$approve(
+        ChainMap[AutomatorCreatorService.rchBurnContract.chainId].rchAddress,
+        amountWithDecimals,
+        signer,
+        AutomatorCreatorService.rchBurnContract.address,
+      );
       const burnContract = new ethers.Contract(
         AutomatorCreatorService.rchBurnContract.address,
         burnAbis,
@@ -126,6 +133,9 @@ export class AutomatorCreatorService {
           ],
         ],
       });
+      if (/debug=1/i.test(location.search)) {
+        debugger;
+      }
       await waitUntil(() => AutomatorCreatorService.hasCredits(factory), {
         interval: 1000,
         timeout: MsIntervals.min * 10,

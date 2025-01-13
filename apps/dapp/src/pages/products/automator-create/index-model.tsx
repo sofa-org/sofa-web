@@ -39,6 +39,7 @@ import {
 } from './store';
 
 import styles from './index-model.module.scss';
+import { useAutomatorCreatorStore } from '../automator-mine/store';
 
 const steps: {
   arrived: (store: AutomatorCreateStoreType) => boolean;
@@ -79,11 +80,21 @@ const steps: {
 ];
 const StepStart = () => {
   const [t] = useTranslation('AutomatorCreate');
-  const { chainId } = useWalletStore();
+  const { chainId, address } = useWalletStore();
   const { payload } = useAutomatorCreateStore();
+  const myAutomators = useAutomatorCreatorStore(
+    (state) =>
+      state.vaults[`${chainId}-${address?.toLowerCase()}`],
+  );
   const burn = useLazyCallback(async () => {
     const factory = payload.factory;
     if (!factory) {
+      return;
+    }
+    if (myAutomators?.length) {
+      Toast.error(t({
+        enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',
+      }));
       return;
     }
     try {
