@@ -100,12 +100,6 @@ const StepStart = () => {
       return;
     }
     try {
-      if (chainId != AutomatorCreatorService.rchAmountForBurning) {
-        // switch chain
-        await useWalletStore.setChain(
-          AutomatorCreatorService.rchBurnContract.chainId,
-        );
-      }
       useAutomatorCreateStore.setState({
         rchBurning: true,
       });
@@ -186,7 +180,7 @@ const StepForm = () => {
   const api = useRef<FormApi>();
   const [t] = useTranslation('AutomatorCreate');
   const { payload, updatePayload } = useAutomatorCreateStore();
-  const { chainId } = useWalletStore();
+  const { address, chainId } = useWalletStore();
   const isMobileUI = useIsMobileUI();
   const deploy = useLazyCallback(async () => {
     const values = (await api.current
@@ -197,9 +191,12 @@ const StepForm = () => {
     }
     updatePayload(values);
 
-    const _payload = payload;
+    const _payload = {
+      ...payload,
+      ...values,
+    };
     const factory = _payload.factory;
-    if (!_payload || !factory) {
+    if (!_payload || !factory || !address) {
       return;
     }
     try {
@@ -210,25 +207,22 @@ const StepForm = () => {
       useAutomatorCreateStore.setState({
         automatorCreating: true,
       });
-      const result = await AutomatorCreatorService.createAutomator(
-        () => {},
-        _payload as AutomatorCreateParams,
-      );
+      const result = await AutomatorCreatorService.createAutomator(() => {}, {
+        ..._payload,
+        creator: address,
+      } as AutomatorCreateParams);
 
       useAutomatorCreateStore.setState({
         automatorCreating: false,
         automatorCreateResult: result,
       });
     } catch (e) {
-      if (isMockEnabled()) {
-        useAutomatorCreateStore.setState({
-          automatorCreating: false,
-          automatorCreateResult: '0xMockResult',
-        });
-        return;
-      }
       console.error(e);
       Toast.error(getErrorMsg(e));
+      useAutomatorCreateStore.setState({
+        automatorCreating: false,
+        automatorCreateResult: undefined,
+      });
     }
   });
   return (
@@ -260,7 +254,7 @@ const StepForm = () => {
         <Row>
           <Col span={24}>
             <Form.Select
-              field="redemptionWaitingPeriod"
+              field="redemptionPeriodDay"
               label={
                 <>
                   {t({
@@ -299,16 +293,16 @@ const StepForm = () => {
                 },
               ]}
             >
-              <Form.Select.Option value={'7'}>7D</Form.Select.Option>
-              <Form.Select.Option value={'14'}>14D</Form.Select.Option>
-              <Form.Select.Option value={'30'}>30D</Form.Select.Option>
+              <Form.Select.Option value={7}>7D</Form.Select.Option>
+              <Form.Select.Option value={14}>14D</Form.Select.Option>
+              <Form.Select.Option value={30}>30D</Form.Select.Option>
             </Form.Select>
           </Col>
         </Row>
         <Row>
           <Col span={24}>
             <Form.RadioGroup
-              field="sharePercent"
+              field="feeRate"
               label={
                 <>
                   {t({
@@ -416,7 +410,7 @@ const StepForm = () => {
         <Row>
           <Col span={24}>
             <Form.TextArea
-              field="automatorDesc"
+              field="description"
               label={t({
                 enUS: 'Strategy Description',
               })}

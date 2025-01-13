@@ -18,12 +18,14 @@ import {
 } from './base-type';
 import { ChainMap, defaultChain } from './chains';
 import { ContractsService } from './contracts';
+import { isMockEnabled } from './mock';
 import { TransactionProgress } from './positions';
 import { PositionStatus } from './the-graph';
 import { WalletService } from './wallet';
 
 export interface OriginAutomatorCreateParams {
   chainId: number; // 链ID
+  creator: string; // 创建者的钱包
   automatorAddress: string;
   burnTransactionHash: string; // burn的transaction hash
   automatorName: string; // automator名称
@@ -32,10 +34,12 @@ export interface OriginAutomatorCreateParams {
   description: string; // Automator描述
   factoryAddress: string; // Factory地址
   clientDepositCcy: string; // 用户存入的标的物
+  riskLevel: string; // 风险等级
 }
 
 export interface AutomatorCreateParams {
   factory: AutomatorFactory;
+  creator: string; // 创建者的钱包
   burnTransactionHash: string; // burn的transaction hash
   automatorName: string; // automator名称
   redemptionPeriodDay: number; // 赎回观察时间（单位：天）
@@ -149,14 +153,19 @@ export class AutomatorCreatorService {
           ],
         ],
       });
-      await waitUntil(() => AutomatorCreatorService.hasCredits(factory), {
-        interval: 1000,
-        timeout: MsIntervals.min * 10,
-      });
+      if (isMockEnabled()) {
+        // do nothing in mock mode
+      } else {
+        await waitUntil(() => AutomatorCreatorService.hasCredits(factory), {
+          interval: 1000,
+          timeout: MsIntervals.min * 10,
+        });
+      }
       cb({
         status: 'Success',
         details: [[`--`, { ids: [], status: PositionStatus.MINTED, hash: tx }]],
       });
+
       return tx;
     } catch (e) {
       cb({
@@ -176,11 +185,17 @@ export class AutomatorCreatorService {
       data,
     );
     return AutomatorCreatorService.$createAutomator({
-      ...data,
+      creator: data.creator,
       chainId: data.factory.chainId,
       factoryAddress: data.factory.factoryAddress,
       clientDepositCcy: data.factory.clientDepositCcy,
       automatorAddress: address,
+      burnTransactionHash: data.burnTransactionHash,
+      automatorName: data.automatorName,
+      redemptionPeriodDay: data.redemptionPeriodDay,
+      feeRate: data.feeRate,
+      description: data.description,
+      riskLevel: data.riskLevel,
     });
   }
 
@@ -429,16 +444,18 @@ export class AutomatorCreatorService {
         factoryAbis,
         signer,
       );
-      const tx = await ContractsService.dirtyCall(
-        factory,
-        'createAutomator',
-        (gasLimit) => [
-          ethers.parseUnits(String(data.feeRate), 18), // 乘以 1e18
-          (data.redemptionPeriodDay * MsIntervals.day) / 1000, // s
-          data.factory.clientDepositCcyAddress,
-          { gasLimit },
-        ],
-      );
+      const tx = isMockEnabled()
+        ? '0x4f6d99da55f7a13e0ed598b8f409d320137f9cdf0b10442b17528b4a676f50b5'
+        : await ContractsService.dirtyCall(
+            factory,
+            'createAutomator',
+            (gasLimit) => [
+              ethers.parseUnits(String(data.feeRate), 18), // 乘以 1e18
+              (data.redemptionPeriodDay * MsIntervals.day) / 1000, // s
+              data.factory.clientDepositCcyAddress,
+              { gasLimit },
+            ],
+          );
       cb({
         status: 'QueryResult',
         details: [
@@ -458,9 +475,32 @@ export class AutomatorCreatorService {
         status: 'Success',
         details: [[`--`, { ids: [], status: PositionStatus.MINTED, hash: tx }]],
       });
-      // TODO 得看一下怎么从 logs 里面拿到生成的 automator 地址
-      // return res.logs.find((e) => e === 'AutomatorCreated')?.args[2];
-      return '';
+      const findAutomatorAddress = (log: ethers.Log) => {
+        // example log.data: 0x0000000000000000000000004adb5b4bc65e85310a10b011a09045569b0c99a20000000000000000000000000000000000000000000000004563918244f400000000000000000000000000000000000000000000000000000000000000093a80
+        // 0x 000000000000000000000000 4adb5b4bc65e85310a10b011a09045569b0c99a2
+        // len: 2 24 40
+        if (!log.data?.length) return undefined;
+        if (
+          log.address?.toLowerCase() !=
+          data.factory.factoryAddress.toLowerCase()
+        )
+          return undefined;
+        if (!/^0x$/.test(log.data.substring(0, 2))) {
+          return undefined;
+        }
+        if (log.data.length < 64 + 2) return undefined;
+        return `0x${log.data.substring(2 + 24, 2 + 24 + 40)}`;
+      };
+      const automatorAddressArr = res.logs
+        .map(findAutomatorAddress)
+        .filter(Boolean) as string[];
+      if (automatorAddressArr.length != 1) {
+        console.log(res);
+        throw new Error(
+          `Unexpected tx log hash, cannot find automator address`,
+        );
+      }
+      return automatorAddressArr[0];
     } catch (e) {
       cb({
         status: 'SubmitFailed',
