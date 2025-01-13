@@ -10,6 +10,7 @@ import Address from '@/components/Address';
 import { MsgDisplay } from '@/components/MsgDisplay';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
+import { addI18nResources } from '@/locales';
 
 import { Comp as IconCalendar } from '../automator-mine/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../automator-mine/assets/icon-people.svg';
@@ -23,9 +24,11 @@ import { AutomatorPerformance } from './components/Performance';
 import { AutomatorPositions } from './components/Positions';
 import AutomatorTrade from './components/Trade';
 import { AutomatorTransactions } from './components/Transactions';
+import locale from './locale';
 
 import styles from './index.module.scss';
 
+addI18nResources(locale, 'AutomatorOperate');
 const PositionTab = () => {
   const [t] = useTranslation('AutomatorOperate');
   const { automator } = useCreatorAutomatorSelector();
