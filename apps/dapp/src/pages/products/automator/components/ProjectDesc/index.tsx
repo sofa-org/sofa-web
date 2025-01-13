@@ -86,7 +86,10 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
         </div>
       </section>
       <Snapshot vault={props.vault} />
-      <AutomatorPerformanceChart vault={props.vault} />
+      <AutomatorPerformanceChart
+        className={styles['chart']}
+        vault={props.vault}
+      />
       <section className={styles['section']}>
         <h2 className={styles['title']}>
           {/* <span className={styles['icon']}>︎︎✹︎</span> */}

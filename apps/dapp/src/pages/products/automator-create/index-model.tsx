@@ -534,7 +534,9 @@ const StepFinished = () => {
       <Button
         onClick={() =>
           navigate(
-            `/products/automator/operate?automator-vault=${automatorCreateResult || ''}`,
+            `/products/automator/operate?automator-vault=${
+              automatorCreateResult || ''
+            }`,
           )
         }
         className={classNames(
@@ -669,7 +671,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
         <Progress
           percent={currentStep.processPercent}
           size="large"
-          stroke={'linear-gradient(96deg, #50d113 0.36%, #ffe500 100%)'}
+          stroke={'linear-gradient(96deg, #44C476 0.36%, #ffe500 100%)'}
           strokeGradient
           className={styles['progress']}
         />

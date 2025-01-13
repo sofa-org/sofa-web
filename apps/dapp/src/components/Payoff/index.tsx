@@ -255,15 +255,15 @@ export const PayoffChart = (props: PayoffChartProps) => {
           <linearGradient id="fadeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop
               offset="0%"
-              style={{ stopColor: '#50D113', stopOpacity: 1 }}
+              style={{ stopColor: '#44C476', stopOpacity: 1 }}
             />
             <stop
               offset="100%"
-              style={{ stopColor: '#50D113', stopOpacity: 0 }}
+              style={{ stopColor: '#44C476', stopOpacity: 0 }}
             />
           </linearGradient>
         </defs> */}
-        {path && <path d={path} fill="#50D113" />}
+        {path && <path d={path} fill="#44C476" />}
         {protectedYieldPath && (
           <path
             d={protectedYieldPath}
@@ -286,7 +286,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
             y={it.y}
             dominantBaseline="middle"
             textAnchor="middle"
-            fill="#50D113"
+            fill="#44C476"
             fontWeight={700}
             fontSize={12 / window.winScale}
           >
@@ -304,7 +304,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
               <span>{t('Base Yield')}</span>
               <span
                 style={{
-                  color: props.protectedYield! < 0 ? '#B9B3BE' : '#50D113',
+                  color: props.protectedYield! < 0 ? '#B9B3BE' : '#44C476',
                 }}
               >
                 {displayPercentage(props.protectedYield)}
@@ -320,7 +320,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
                 {t('Base + RCH')}
                 {/* <span>| {t('With RCH')}</span> */}
               </span>
-              <span style={{ color: baseApy < 0 ? '#B9B3BE' : '#50D113' }}>
+              <span style={{ color: baseApy < 0 ? '#B9B3BE' : '#44C476' }}>
                 {displayPercentage(baseApy)}
               </span>
             </span>
@@ -330,7 +330,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
             style={{ height: yAxisLabelHeight[2] }}
           >
             <span>{t('Potential Yield')}</span>
-            <span style={{ color: maxApy < 0 ? '#B9B3BE' : '#50D113' }}>
+            <span style={{ color: maxApy < 0 ? '#B9B3BE' : '#44C476' }}>
               {displayPercentage(maxApy)}
             </span>
           </span>

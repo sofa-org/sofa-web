@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 
 import './index.scss';
 
-const colors = ['#50d113', '#ffe500', '#fffa00', '#ffa82e', '#ffa82e'];
+const colors = ['#44C476', '#ffe500', '#fffa00', '#ffa82e', '#ffa82e'];
 
 export const FloatingBorder = (
   props: BaseProps & {

@@ -179,7 +179,7 @@ export const AutomatorPerformanceChart = (
           stack: 'bar',
           data: data.map((it) => ({
             value: it.tradingPnl,
-            itemStyle: { color: it.tradingPnl > 0 ? '#50D113' : '#EC5E88' },
+            itemStyle: { color: it.tradingPnl > 0 ? '#44C476' : '#EC5E88' },
           })),
         },
         {
@@ -231,7 +231,7 @@ export const AutomatorPerformanceChart = (
           <div className={styles['legend-item']}>
             <div
               className={styles['color']}
-              style={{ background: '#50D113' }}
+              style={{ background: '#44C476' }}
             />
             <div
               className={styles['color']}

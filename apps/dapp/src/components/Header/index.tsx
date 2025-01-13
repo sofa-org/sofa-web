@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
+import { useIsPortrait } from '@sofa/utils/hooks';
 import { joinUrl } from '@sofa/utils/url';
 import classNames from 'classnames';
 
@@ -32,7 +33,7 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'Header');
 
 const allMenuItems = (
-  options: { hasCreateAutomator: boolean },
+  options: { hasCreateAutomator: boolean; isPortrait?: boolean },
   project: ProjectType,
   location: ReturnType<typeof useLocation>,
 ): MenuItem[] => {
@@ -127,36 +128,34 @@ const allMenuItems = (
               }),
             path: '/positions/automator',
           },
-          ...(options.hasCreateAutomator
-            ? [
-                {
-                  icon: <IconOverview />,
-                  group: (t: TFunction) =>
-                    t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
-                  label: (t: TFunction) =>
-                    t({ enUS: 'Overview', zhCN: '我的 Automator' }),
-                  desc: (t: TFunction) =>
-                    t({
-                      enUS: 'View your Automators at a glance.',
-                      zhCN: '查看你创建的 Automator',
-                    }),
-                  path: '/products/automator/mine',
-                },
-                {
-                  icon: <IconSwap />,
-                  group: (t: TFunction) =>
-                    t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
-                  label: (t: TFunction) =>
-                    t({ enUS: 'Trade Your Strategy', zhCN: '交易' }),
-                  desc: (t: TFunction) =>
-                    t({
-                      enUS: 'Make trades to grow investor returns.',
-                      zhCN: '为你的 Automator 创收',
-                    }),
-                  path: '/products/automator/operate',
-                },
-              ]
-            : []),
+          {
+            icon: <IconOverview />,
+            group: (t: TFunction) =>
+              t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
+            label: (t: TFunction) =>
+              t({ enUS: 'Overview', zhCN: '我的 Automator' }),
+            desc: (t: TFunction) =>
+              t({
+                enUS: 'View your Automators at a glance.',
+                zhCN: '查看你创建的 Automator',
+              }),
+            path: '/products/automator/mine',
+            hide: () => !options.hasCreateAutomator,
+          },
+          {
+            icon: <IconSwap />,
+            group: (t: TFunction) =>
+              t({ enUS: 'My Automator', zhCN: '我的 Automator' }),
+            label: (t: TFunction) =>
+              t({ enUS: 'Trade Your Strategy', zhCN: '交易' }),
+            desc: (t: TFunction) =>
+              t({
+                enUS: 'Make trades to grow investor returns.',
+                zhCN: '为你的 Automator 创收',
+              }),
+            path: '/products/automator/operate',
+            hide: () => !options.hasCreateAutomator || !!options.isPortrait,
+          },
           {
             icon: <IconAdd />,
             group: (t: TFunction) =>
@@ -172,6 +171,7 @@ const allMenuItems = (
                 zhCN: '从 Automator 的管理中赚取收益',
               }),
             path: '/products/automator/create',
+            hide: () => !!options.isPortrait,
           },
         ],
       },
@@ -212,6 +212,7 @@ const allMenuItems = (
 const DappHeader = () => {
   const [t] = useTranslation('Header');
   const location = useLocation();
+  const isPortrait = useIsPortrait();
   const more = useMemo(() => true, []);
 
   const wallet = useWalletStore();
@@ -248,7 +249,10 @@ const DappHeader = () => {
         </>
       }
       menus={(...args) =>
-        allMenuItems({ hasCreateAutomator: !!myAutomators?.length }, ...args)
+        allMenuItems(
+          { hasCreateAutomator: !!myAutomators?.length, isPortrait },
+          ...args,
+        )
       }
       moreIcons={more}
     />

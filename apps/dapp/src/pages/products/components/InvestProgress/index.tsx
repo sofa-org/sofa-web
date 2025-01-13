@@ -243,7 +243,7 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
       return [
         900,
         <div className={styles['deposit-progress']}>
-          <IconRight style={{ color: '#50d113' }} />
+          <IconRight style={{ color: '#44C476' }} />
           <span
             className={styles['deposit-progress-title']}
             dangerouslySetInnerHTML={{

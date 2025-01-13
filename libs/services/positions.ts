@@ -119,7 +119,7 @@ export class PositionsService {
     },
     [PositionStatus.MINTED]: {
       label: (t: TFunction) => t('MINTED'),
-      color: '#50d113',
+      color: '#44C476',
     },
     [PositionStatus.FAILED]: {
       label: (t: TFunction) => t('FAILED'),

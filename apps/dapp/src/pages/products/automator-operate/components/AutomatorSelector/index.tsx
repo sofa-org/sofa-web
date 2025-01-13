@@ -61,8 +61,6 @@ export const CreatorAutomatorSelector = (
     }));
   }, [automators]);
 
-  console.log(1111, options);
-
   return (
     <CSelect
       className={classNames(

@@ -48,10 +48,12 @@
 
 .btn-add-container {
   padding: min(20px, 2vw) min(20px + 12px, 2vw + 12px);
+
   .btn-add {
     height: min(40px, 8vw);
     border-radius: 8px;
     border-color: #e0e0e0;
+
     svg {
       width: 1em;
     }
@@ -66,10 +68,12 @@
   :global(.semi-table-row-expanded) {
     display: none;
   }
+
   b {
     @include bold;
 
     font-size: 14px;
+
     img {
       height: 20px;
       vertical-align: middle;
@@ -83,6 +87,7 @@
     font-size: 11px;
   }
 }
+
 .right {
   @include flex-column-center;
 
@@ -93,11 +98,14 @@
   border-left: dotted rgba(#000, 0.12) 1px;
   align-items: flex-start;
   gap: 20px;
+
   > .title {
     font-size: 16px;
+
     > span {
       margin-right: 6px;
     }
+
     .term {
       background: #f0f0f0;
       border-radius: 4px;
@@ -107,50 +115,61 @@
       margin-top: -2px;
     }
   }
+
   .win,
   .lose,
   .rch {
     border: 1px solid rgba(#000, 0.12);
     border-radius: 8px;
   }
+
   .scenarios {
     width: 100%;
     @include flex-center;
     justify-content: space-between;
+
     .desc {
       color: #b1b1b1;
       font-size: 12px;
     }
+
     .digi {
       @include bold;
       font-size: 18px;
     }
+
     > .rch {
       @include flex-column-center;
       flex: 1;
       gap: 1px;
       height: 100%;
+
       .unit,
       .digi {
         @include bold;
         color: var(--color-rch);
       }
     }
+
     > .ccy {
       @include flex-column-center;
       flex: 4;
       gap: 0;
+
       svg {
         max-width: 36px;
         max-width: 36px;
       }
+
       .calc {
         width: 100px;
+
         > .title {
           @include bold;
           font-size: 14px;
         }
       }
+
       .win,
       .lose {
         @include flex-center;
@@ -160,11 +179,13 @@
         width: 100%;
         height: 87px;
       }
+
       .price {
         @include bold;
 
         font-size: 18px;
       }
+
       .win {
         .title,
         .digi,
@@ -172,6 +193,7 @@
           color: var(--color-rise);
         }
       }
+
       .lose {
         .title,
         .digi,
@@ -179,10 +201,12 @@
           color: var(--color-fall);
         }
       }
+
       > .or {
         height: 10px;
         position: relative;
         color: rgba(#b1b1b1, 0.85);
+
         > span {
           position: relative;
           z-index: 1;
@@ -191,6 +215,7 @@
           line-height: 18px;
           display: block;
         }
+
         &::before {
           content: "";
           background: #fff;
@@ -203,6 +228,7 @@
         }
       }
     }
+
     > .plus {
       flex: 0;
     }
@@ -221,21 +247,24 @@
   :global {
     .semi-select.semi-select {
       background: #f0f0f0 !important;
+
       .semi-select-prefix {
         @include bold;
         color: rgba($color: #000000, $alpha: 0.65);
       }
+
       .semi-select-selection,
       .semi-select-arrow {
         color: #000;
       }
     }
+
     .semi-input {
       @include bold;
     }
 
+    // stylelint-disable-next-line selector-class-pattern
     .semi-radioGroup-horizontal {
-      // stylelint-disable-line selector-class-pattern
       gap: 6px;
 
       .semi-radio {
@@ -247,9 +276,11 @@
         padding: 0 6px;
         min-width: 100px;
         justify-content: center;
+
         .semi-radio-content {
           display: inline-block;
           line-height: 32px;
+
           .semi-radio-addon {
             @include regular;
           }
@@ -259,24 +290,27 @@
           .semi-radio-content {
             .semi-radio-addon {
               @include bold;
-              color: #50d113;
+              color: #44c476;
             }
           }
         }
       }
     }
   }
+
   &.side {
     .current-icon {
       display: inline-block;
       width: 36px;
       height: 32px;
       padding: 4px 0 0 6px;
+
       svg {
         width: 36px;
         height: 24px;
       }
     }
+
     :global {
       .semi-radio {
         svg {
@@ -285,6 +319,7 @@
       }
     }
   }
+
   &.expiry {
     .date-picker {
       width: 152px;
@@ -330,6 +365,7 @@
         font-size: 14px;
       }
     }
+
     .preset {
       @include pointer;
 
@@ -339,6 +375,7 @@
       display: inline-block;
     }
   }
+
   &.strikes {
     .value {
       @include bold;
@@ -360,6 +397,7 @@
   text-align: left;
   flex: 1;
   padding: min(20px, 2.2vw);
+
   .form-item {
     .label {
       min-width: 48px;

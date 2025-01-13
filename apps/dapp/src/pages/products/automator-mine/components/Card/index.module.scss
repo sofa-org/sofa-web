@@ -3,7 +3,7 @@
 
   flex: 1;
   margin: 0;
-  padding: 16px 24px;
+  padding: 16px;
   border-radius: 16px;
   background: #fff;
 }
@@ -12,13 +12,14 @@
   @include bold;
 
   margin: 0;
+  font-size: 20px;
 }
 
 .label {
   width: 140px;
   margin: 0;
   font-size: 14px;
-  opacity: 0.65;
+  opacity: 0.45;
 }
 
 .value {
@@ -32,6 +33,16 @@
 
     font-size: 18px;
   }
+
+  .cvt {
+    padding-left: 6px;
+  }
+
+  .weaken {
+    @include regular;
+    opacity: 0.45;
+    font-size: 0.9em;
+  }
 }
 
 .unit {
@@ -41,22 +52,35 @@
   padding: 0 0 0 0.2em;
   font-size: 0.8em;
   opacity: 0.8;
+
+  &.icon-airdrop {
+    padding-right: 1em;
+    background: url(../../../../positions/automator/assets/icon-airdrop.svg)
+      no-repeat;
+    background-position: 100% 34%;
+    background-size: 0.9em 0.9em;
+    display: inline-block;
+  }
 }
 
 .separator {
   @include regular;
 
   padding: 0 6px;
-  font-size: 14px;
+  font-size: 0.9em;
   opacity: 0.8;
   vertical-align: text-top;
+
+  &:first-child {
+    padding-left: 0;
+  }
 }
 
 .item {
   @include flex-center;
 
   justify-content: flex-start;
-  margin: 0 0 16px;
+  margin: 0 0 min(16px, 3.2vw);
 }
 
 .header {
@@ -93,6 +117,12 @@
       @include flex-center;
 
       gap: 40px;
+
+      .other-infos {
+        @include flex-center;
+
+        gap: 40px;
+      }
     }
   }
 
@@ -103,6 +133,7 @@
 
     .item {
       display: block;
+      margin: 0;
 
       .label {
         width: auto;
@@ -133,10 +164,10 @@
   border-top: 1px dashed #e0e0e0;
 
   .btn,
-  .btn-deposit,
-  .btn-redeem {
+  .btn-trade,
+  .btn-position {
     padding: 0 24px;
-    height: 48px;
+    height: min(48px, 10vw);
     border-radius: 24px;
     opacity: 0.8;
 
@@ -144,7 +175,7 @@
       opacity: 1;
     }
 
-    &.btn-deposit {
+    &.btn-trade {
       background: #000;
       color: #fff;
 
@@ -190,25 +221,90 @@
     height: 1.2em;
     opacity: 0.4;
   }
-
-  &::after {
-    content: "";
-    position: absolute;
-    right: -15px;
-    top: 50%;
-    width: 1px;
-    height: 12px;
-    transform: translate(0, -50%);
-    background: rgba(#000, 0.1);
-  }
-
-  &:last-child::after {
-    content: none;
-  }
 }
 
 .mobile-ui {
   &.card {
     max-width: unset;
+  }
+}
+
+@mixin rewrite {
+  .item {
+    @include flex-column-center;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 100%;
+
+    .value {
+      margin: 0;
+      font-size: 16px;
+
+      .cvt {
+        display: block;
+        padding: 0;
+      }
+    }
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    .left {
+      margin: 0 0 40px;
+
+      .infos {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        height: 20px;
+        gap: 12px;
+
+        .other-infos {
+          margin-left: -56px;
+        }
+      }
+    }
+
+    .right {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      width: 100%;
+      gap: 8px;
+
+      .item {
+        @include flex-center;
+        justify-content: space-between;
+        width: 100%;
+        margin: 0;
+
+        .value {
+          margin: 0;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .footer {
+    .btn-trade {
+      display: none;
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=720px) {
+  :global(.is-pc) {
+    @include rewrite;
   }
 }

@@ -357,7 +357,7 @@ export const PositionClaimProgress = forwardRef<
     return [
       900,
       <div className={styles['claim-progress']}>
-        <IconRight style={{ color: '#50d113' }} />
+        <IconRight style={{ color: '#44C476' }} />
         <span
           className={styles['claim-progress-title']}
           dangerouslySetInnerHTML={{

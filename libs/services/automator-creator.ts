@@ -51,10 +51,9 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<
-        unknown,
-        HttpResponse<AutomatorFactory[]>
-      >(`/optivisors/automator/factories`)
+      .get<unknown, HttpResponse<AutomatorFactory[]>>(
+        `/optivisors/automator/factories`,
+      )
       .then((res) => res.value);
   }
 

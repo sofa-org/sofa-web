@@ -13,6 +13,16 @@
   font-size: min(24px, 5vw);
   color: #fff;
 
+  .title {
+    @include flex-center;
+
+    display: none;
+    margin: 0;
+    font-size: min(24px, 5vw);
+    text-align: center;
+    color: #fff;
+  }
+
   .infos {
     @include flex-center;
 
@@ -75,5 +85,44 @@
 
       height: 50vh;
     }
+  }
+}
+
+@mixin rewrite {
+  .head-title.head-title {
+    width: 100%;
+    margin: 110px auto -1px;
+    padding: 12px 0 0;
+    background: #000;
+
+    .title {
+      display: flex;
+      margin: -56px 0 32px;
+    }
+
+    .infos {
+      width: $width-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .selector {
+      width: fit-content;
+      min-width: 150px;
+      height: 36px;
+      margin: 0 0 0 12px;
+      border-radius: 16px;
+      background-color: rgba(#fff, 0.12);
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  @include rewrite;
+}
+
+@media (width <=720px) {
+  :global(.is-pc) {
+    @include rewrite;
   }
 }

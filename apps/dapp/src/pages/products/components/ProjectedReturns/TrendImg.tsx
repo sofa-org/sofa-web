@@ -69,7 +69,7 @@ export const TrendImg = (props: { data: Partial<PositionInfo> }) => {
         <path
           d="M0 130H93.9992L172.332 1H260.848"
           strokeWidth="2"
-          stroke={hasExpired ? 'black' : '#50d113'}
+          stroke={hasExpired ? 'black' : '#44C476'}
         />
         {anchorPricesTransform && (
           <path

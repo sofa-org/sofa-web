@@ -69,7 +69,7 @@
   @include rewrite;
 }
 
-@media (width <=500px) {
+@media (width <=720px) {
   :global(.is-pc) {
     @include rewrite;
   }
