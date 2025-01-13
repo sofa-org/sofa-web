@@ -84,6 +84,18 @@ export class AutomatorCreatorService {
   ): Promise<string /* transaction hash */> {
     cb({ status: 'Submitting' });
     try {
+      const hasCredits = await AutomatorCreatorService.hasCredits(factory);
+      if (hasCredits) {
+        const tx = '';
+        cb({
+          status: 'Success',
+          details: [
+            [`--`, { ids: [], status: PositionStatus.MINTED, hash: tx }],
+          ],
+        });
+        return tx;
+      }
+
       const { signer } = await WalletService.connect(
         AutomatorCreatorService.rchBurnContract.chainId,
       );
@@ -410,9 +422,7 @@ export class AutomatorCreatorService {
   ): Promise<string /* automator address */> {
     cb({ status: 'Submitting' });
     try {
-      const { signer } = await WalletService.connect(
-        AutomatorCreatorService.rchBurnContract.chainId,
-      );
+      const { signer } = await WalletService.connect(data.factory.chainId);
       const factory = new ethers.Contract(
         data.factory.factoryAddress,
         factoryAbis,
@@ -425,7 +435,8 @@ export class AutomatorCreatorService {
           ethers.parseUnits(String(data.feeRate), 18), // 乘以 1e18
           (data.redemptionPeriodDay * MsIntervals.day) / 1000, // s
           data.factory.clientDepositCcyAddress,
-          { gasLimit },
+          // adding gasLimit here will results JSON RPC error
+          // { gasLimit },
         ],
       );
       cb({
@@ -460,15 +471,18 @@ export class AutomatorCreatorService {
   }
 
   private static async hasCredits(factory: AutomatorFactory) {
-    const { signer } = await WalletService.connect(
-      AutomatorCreatorService.rchBurnContract.chainId,
-    );
+    const { signer } = await WalletService.connect(factory.chainId);
     const factoryContract = new ethers.Contract(
       factory.factoryAddress,
       factoryAbis,
       signer,
     );
-    return factoryContract.credits(signer.address).then((res) => !!res);
+    console.info(`automator-creator.hasCredits ${signer.address}`);
+    const res = await factoryContract
+      .credits(signer.address)
+      .then((res) => !!res);
+    console.info(`automator-creator.hasCredits ${signer.address} => ${res}`);
+    return res;
   }
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
