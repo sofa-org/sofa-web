@@ -29,7 +29,6 @@ import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { Time } from '@/components/TimezoneSelector';
 
 import { useHoverTicket, useProductsState } from '../../../automator-store';
-import { TicketTypeOptions } from '../../../components/TicketTypeSelector';
 
 import styles from './index.module.scss';
 
@@ -90,11 +89,6 @@ const TicketEditor = (props: CustomTicketProps) => {
     }
   }, [vault]);
 
-  const ticketMeta = useMemo(
-    () => TicketTypeOptions.find((it) => it.value === vault?.depositCcy),
-    [vault?.depositCcy],
-  );
-
   const quoteInfo = useProductsState(
     (state) => state.quoteInfos[ProductsService.productKey(props.product)],
   );
@@ -118,10 +112,7 @@ const TicketEditor = (props: CustomTicketProps) => {
       );
       return;
     }
-    if (!ticketMeta) {
-      console.warn(`cannot find ticketMeta: ${vault.depositCcy}`);
-    }
-  }, [vault, ticketMeta]);
+  }, [vault]);
 
   const percentOfPool = useMemo(() => {
     return Math.round(
@@ -130,7 +121,7 @@ const TicketEditor = (props: CustomTicketProps) => {
         100,
     );
   }, [props.product.depositAmount]);
-  if (!vault || !ticketMeta) return <></>;
+  if (!vault) return <></>;
 
   return (
     <div
@@ -393,15 +384,6 @@ const CustomTickets = (props: {
   automator: AutomatorDetail;
 }) => {
   const [t] = useTranslation('AutomatorTrade');
-  const ticketMeta = useMemo(
-    () => TicketTypeOptions.find((it) => it.value === props.vault.depositCcy)!,
-    [props.vault.depositCcy],
-  );
-  useEffect(() => {
-    // if (!ticketMeta) {
-    //   throw new Error(`cannot find ticketMeta: ${[props.vault.depositCcy]}`);
-    // }
-  }, [ticketMeta]);
   const init = useLazyCallback(
     () =>
       ({
@@ -413,7 +395,7 @@ const CustomTickets = (props: {
           chainId: props.vault.chainId,
           depositCcy: props.vault.depositCcy,
         },
-        depositAmount: ticketMeta.per,
+        depositAmount: 1,
       }) as PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
   );
   const products = useProductsState((state) => {

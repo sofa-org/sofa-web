@@ -31,6 +31,7 @@ import { useAutomatorCreateStore } from './store';
 import styles from './index.module.scss';
 
 const FAQ = (t: TFunction) => {
+  // const [t] = useTranslation('AutomatorCreate');
   return [
     {
       title: t({
