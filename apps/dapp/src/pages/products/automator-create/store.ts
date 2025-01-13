@@ -4,6 +4,7 @@ import { TFunction } from '@sofa/services/i18n';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 export function getNameForChain(chainId: number | undefined, t: TFunction) {
+  // const [t] = useTranslation('AutomatorCreate');
   if (!chainId) {
     return '';
   }
