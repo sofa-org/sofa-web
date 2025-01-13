@@ -21,6 +21,7 @@ import {
   useWalletUIState,
 } from '@/components/WalletConnector/store';
 
+import { Comp as IconInfo } from './assets/icon-info.svg';
 import { Comp as IconPoints } from './assets/icon-points.svg';
 import { Comp as IconShare } from './assets/icon-share.svg';
 import { Comp as IconZero } from './assets/icon-zero.svg';
@@ -256,6 +257,12 @@ const AutomatorCreate = () => {
                   enUS: 'Burn RCH & Create Your Automator',
                 })}
           </Button>
+          <div className={styles['tips']}>
+            <IconInfo className={styles['icon-info']} />
+            {t({
+              enUS: 'Note: Each wallet address can create only one Automator per chain and deposit token combination.',
+            })}
+          </div>
           <ul className={styles['features']}>
             <li>
               <IconZero />
