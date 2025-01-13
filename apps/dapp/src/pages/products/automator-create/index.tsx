@@ -328,37 +328,44 @@ const AutomatorCreate = () => {
           <ul className={styles['features']}>
             <li>
               <IconZero />
-              <div className={styles['title']}>{t('Zero Trading Fees')}</div>
+              <div className={styles['title']}>
+                {t({ enUS: 'Zero Trading Fees', zhCN: '零交易费用' })}
+              </div>
               <div className={styles['desc']}>
-                {t(
-                  'Enjoy 0 trading fees when executing trades through your AutoMator.',
-                )}
+                {t({
+                  enUS: 'Enjoy 0 trading fees when executing trades through your AutoMator.',
+                  zhCN: '通过AutoMator交易享受零交易费用。',
+                })}
               </div>
             </li>
             <li>
               <IconShare />
-              <div className={styles['title']}>{t('Share Profits')}</div>
+              <div className={styles['title']}>
+                {t({ enUS: 'Share Profits', zhCN: '分享利润' })}
+              </div>
               <div className={styles['desc']}>
-                {t(
-                  'Earn up to 15% profit share from the users who subscribe to your AutoMator.',
-                )}
+                {t({
+                  enUS: 'Earn up to 15% profit share from the users who subscribe to your AutoMator.',
+                  zhCN: '通过订阅您AutoMator的用户可赚取高达15%的利润分成。',
+                })}
               </div>
             </li>
             <li>
               <IconPoints />
               <div className={styles['title']}>
-                {t('Earn Risk-Free Interest')}
+                {t({ enUS: 'Earn Risk-Free Interest', zhCN: '赚取无风险利息' })}
               </div>
               <div className={styles['desc']}>
-                {t(
-                  'Funds in your Automator grow passively through AAVE/CRV, earning stable returns with zero risk.',
-                )}
+                {t({
+                  enUS: 'Funds in your Automator grow passively through AAVE/CRV, earning stable returns with zero risk.',
+                  zhCN: '您在AutoMator中的资金通过AAVE/CRV被动增长，赚取稳定的无风险回报。',
+                })}
               </div>
             </li>
           </ul>
         </div>
         <div className={classNames(styles['form'], styles['faq'])}>
-          <h2>{t('FAQ')}</h2>
+          <h2>{t({ enUS: 'FAQ', zhCN: '常见问题' })}</h2>
           <ol className={styles['faq-ol']}>
             {FAQ(t).map((faq, idx) => (
               <li
