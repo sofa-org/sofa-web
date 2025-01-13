@@ -207,7 +207,7 @@ export class WalletService {
       signer.address,
       approveTo,
     );
-    if (Number(allowance) >= Number(amount)) return;
+    if (Big(allowance).gte(Big(String(amount)))) return;
     console.info('Approve:', {
       allowance,
       amount,
@@ -531,8 +531,8 @@ export class WalletService {
       } as const;
     };
     return pollingUntil(
-      () => poll().catch(() => TransactionStatus.PENDING),
-      (s) => s !== TransactionStatus.PENDING,
+      () => poll().catch(() => ({ status: TransactionStatus.PENDING })),
+      (s) => s.status !== TransactionStatus.PENDING,
       1000,
     ).then(
       (res) =>

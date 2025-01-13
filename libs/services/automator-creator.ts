@@ -41,6 +41,7 @@ export interface AutomatorCreateParams {
   redemptionPeriodDay: number; // 赎回观察时间（单位：天）
   feeRate: number | string; // 抽佣比率
   description: string; // Automator描述
+  riskLevel: string; // 风险等级
 }
 
 export class AutomatorCreatorService {
@@ -87,7 +88,10 @@ export class AutomatorCreatorService {
       const { signer } = await WalletService.connect(
         AutomatorCreatorService.rchBurnContract.chainId,
       );
-      const amountWithDecimals = ethers.parseUnits(String(AutomatorCreatorService.rchAmountForBurning), 18);
+      const amountWithDecimals = ethers.parseUnits(
+        String(AutomatorCreatorService.rchAmountForBurning),
+        18,
+      );
       await WalletService.$approve(
         ChainMap[AutomatorCreatorService.rchBurnContract.chainId].rchAddress,
         amountWithDecimals,
@@ -103,7 +107,7 @@ export class AutomatorCreatorService {
         burnContract,
         'burn',
         (gasLimit) => [
-          AutomatorCreatorService.rchAmountForBurning,
+          amountWithDecimals,
           factory.chainId,
           factory.clientDepositCcyAddress,
           { gasLimit },
@@ -133,9 +137,6 @@ export class AutomatorCreatorService {
           ],
         ],
       });
-      if (/debug=1/i.test(location.search)) {
-        debugger;
-      }
       await waitUntil(() => AutomatorCreatorService.hasCredits(factory), {
         interval: 1000,
         timeout: MsIntervals.min * 10,

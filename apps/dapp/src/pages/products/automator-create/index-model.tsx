@@ -30,6 +30,8 @@ import AsyncButton from '@/components/AsyncButton';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
+import { useAutomatorCreatorStore } from '../automator-mine/store';
+
 import { Comp as IconInfo } from './assets/icon-info.svg';
 import { Comp as IconLoading } from './assets/icon-loading.svg';
 import {
@@ -39,7 +41,6 @@ import {
 } from './store';
 
 import styles from './index-model.module.scss';
-import { useAutomatorCreatorStore } from '../automator-mine/store';
 
 const steps: {
   arrived: (store: AutomatorCreateStoreType) => boolean;
@@ -83,8 +84,7 @@ const StepStart = () => {
   const { chainId, address } = useWalletStore();
   const { payload } = useAutomatorCreateStore();
   const myAutomators = useAutomatorCreatorStore(
-    (state) =>
-      state.vaults[`${chainId}-${address?.toLowerCase()}`],
+    (state) => state.vaults[`${chainId}-${address?.toLowerCase()}`],
   );
   const burn = useLazyCallback(async () => {
     const factory = payload.factory;
@@ -92,9 +92,11 @@ const StepStart = () => {
       return;
     }
     if (myAutomators?.length) {
-      Toast.error(t({
-        enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',
-      }));
+      Toast.error(
+        t({
+          enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',
+        }),
+      );
       return;
     }
     try {
@@ -346,6 +348,69 @@ const StepForm = () => {
               <Form.Radio value={10}>10%</Form.Radio>
               <Form.Radio value={15}>15%</Form.Radio>
             </Form.RadioGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Form.Select
+              field="riskLevel"
+              label={
+                <>
+                  {t({
+                    enUS: 'Automator Risk Level',
+                  })}
+                  <Tooltip
+                    style={{
+                      maxWidth: isMobileUI ? '80vw' : '500px',
+                    }}
+                    content={
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: t({
+                            enUS: `The maximum percentage of your Automator capital you can lose.`,
+                          }).replace(/\n/g, '<br />'),
+                        }}
+                      />
+                    }
+                  >
+                    <IconInfo className={styles['icon-info']} />
+                  </Tooltip>
+                  <div className={styles['field-desc']}>
+                    {t({
+                      enUS: 'You can only trade products with expiration dates within the selected waiting period.',
+                    })}
+                  </div>
+                </>
+              }
+              trigger="blur"
+              rules={[
+                {
+                  required: true,
+                  message: t({
+                    enUS: 'This field is required',
+                  }),
+                },
+              ]}
+            >
+              <Form.Select.Option value={'R0'}>
+                【R0 - Ultra-Safe】Max Risk Exposure: 0.1%
+              </Form.Select.Option>
+              <Form.Select.Option value={'R1'}>
+                【R1 - Minimal Risk】Max Risk Exposure: 5%
+              </Form.Select.Option>
+              <Form.Select.Option value={'R2'}>
+                【R2 - Low Risk】Max Risk Exposure: 10%
+              </Form.Select.Option>
+              <Form.Select.Option value={'R3'}>
+                【R3 - Moderate Risk】Max Risk Exposure: 20%
+              </Form.Select.Option>
+              <Form.Select.Option value={'R4'}>
+                【R4 - High Risk】Max Risk Exposure: 35%
+              </Form.Select.Option>
+              <Form.Select.Option value={'R5'}>
+                【R5 - Very High Risk】Max Risk Exposure: 50%
+              </Form.Select.Option>
+            </Form.Select>
           </Col>
         </Row>
         <Row>
