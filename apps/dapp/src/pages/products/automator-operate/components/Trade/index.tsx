@@ -242,6 +242,95 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                     {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                       ?.name || automator.vaultInfo.vaultDepositCcy}
                   </span>
+
+                  <Tooltip
+                    className={styles['automator-number-tooltip']}
+                    content={
+                      <div className={styles['automator-details']}>
+                        <div className={styles['amount']}>
+                          <span
+                            className={styles['label']}
+                            dangerouslySetInnerHTML={{
+                              __html: t({
+                                enUS: 'Historical Interest Earned & Net PnL\n(RCH not included)',
+                              }).replace(/\n/g, '<br />'),
+                            }}
+                          />
+                          <span className={styles['desc']}>
+                            {t({
+                              enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {/* TODO */}
+                            {amountFormatter(
+                              0,
+                              CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.precision || undefined,
+                            )}
+                            <span className={styles['unit']}>
+                              {CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.name || automator.vaultInfo.positionCcy}
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({ enUS: 'Current Position' })}
+                          </span>
+                          <span className={styles['desc']}>
+                            {t({
+                              enUS: 'Value of open & Unclaimed positions.',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {/* TODO */}
+                            {amountFormatter(
+                              0,
+                              CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.precision || undefined,
+                            )}
+                            <span className={styles['unit']}>
+                              {CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.name || automator.vaultInfo.positionCcy}
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({
+                              enUS: 'Available Balance Excluding Principal',
+                            })}
+                          </span>
+                          <span className={styles['desc']}>
+                            {t({
+                              enUS: 'Historical Interest Earned + Net PnL - Current Position.',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {/* TODO */}
+                            {amountFormatter(
+                              availableBalanceExcludingPrincipal,
+                              CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.precision || undefined,
+                            )}
+                            <span className={styles['unit']}>
+                              {CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.name || automator.vaultInfo.positionCcy}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <IconDetail className={styles['icon-detail']} />
+                  </Tooltip>
                 </>
               ) : (
                 '-'
@@ -272,6 +361,79 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                     {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                       ?.name || automator.vaultInfo.vaultDepositCcy}
                   </span>
+
+                  <Tooltip
+                    className={styles['automator-number-tooltip']}
+                    content={
+                      <div>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({ enUS: 'Pool Size' })}
+                          </span>
+                          <span className={styles['desc']}>
+                            {t({
+                              enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {amountFormatter(
+                              automator.aumByVaultDepositCcy,
+                              CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.precision || undefined,
+                            )}
+                            <span className={styles['unit']}>
+                              {CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.name || automator.vaultInfo.positionCcy}
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({
+                              enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
+                            })}
+                          </span>
+                          <span className={styles['desc']}>
+                            {t({
+                              enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {amountFormatter(apy.apyUsed, 2)}%
+                            <span className={styles['unit']}>
+                              {CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.name || automator.vaultInfo.positionCcy}
+                            </span>
+                          </span>
+                        </div>
+                        <div className={styles['amount']}>
+                          <span className={styles['label']}>
+                            {t({
+                              enUS: 'Estimated Aave/Lido/Sofa/Curve Interest',
+                            })}
+                          </span>
+                          <span className={styles['desc']}>
+                            {t({
+                              enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Pool Size)',
+                            })}
+                          </span>
+                          <span className={styles['value']}>
+                            {amountFormatter(
+                              interest7d,
+                              CCYService.ccyConfigs[
+                                automator.vaultInfo.positionCcy
+                              ]?.precision || undefined,
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <IconDetail className={styles['icon-detail']} />
+                  </Tooltip>
                 </>
               ) : (
                 '-'
@@ -296,78 +458,6 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                     {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                       ?.name || automator.vaultInfo.vaultDepositCcy}
                   </span>
-                  <Tooltip
-                    content={
-                      <div className={styles['automator-details']}>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({ enUS: 'Pool Size', zhCN: '池大小' })}
-                          </span>
-                          <span className={styles['value']}>
-                            {/* TODO */}
-                            {amountFormatter(
-                              1000,
-                              CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.precision || undefined,
-                            )}
-                            <span className={styles['unit']}>
-                              {CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.name || automator.vaultInfo.positionCcy}
-                            </span>
-                            ≈
-                            {amountFormatter(
-                              900,
-                              CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.precision || undefined,
-                            )}
-                            <span className={styles['unit']}>
-                              {CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.name || automator.vaultInfo.vaultDepositCcy}
-                            </span>
-                          </span>
-                        </div>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({
-                              enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
-                              zhCN: '预估Aave/Lido/Sofa/Curve收益率',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            {amountFormatter(automator.yieldPercentage, 2)}%
-                            <span className={styles['desc']}>
-                              {t({
-                                enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
-                                zhCN: '最小值（1个月Aave/Lido/Sofa/Curve平均，当前Aave/Lido/Sofa/Curve年化），（Aave/Lido/Sofa/Curve年化）',
-                              })}
-                            </span>
-                          </span>
-                        </div>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({
-                              enUS: 'Estimated Aave/Lido/Sofa/Curve Return',
-                              zhCN: '预估Aave/Lido/Sofa/Curve回报',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            <span className={styles['desc']}>
-                              {t({
-                                enUS: '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)',
-                                zhCN: '(存款 * (1 + Aave/Lido/Sofa/Curve 预期年化) ^ (期限 / 365) - 存款)',
-                              })}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    }
-                  >
-                    <IconDetail className={styles['icon-detail']} />
-                  </Tooltip>
                 </>
               ) : (
                 '-'
