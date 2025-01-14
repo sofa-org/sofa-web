@@ -79,7 +79,7 @@ export interface AutomatorVaultInfo {
   abis: ethers.InterfaceAbi;
   creator: string;
   creatorFeeRate: number | string; // 默认为 0
-  createTime: number | string; // 创建时间
+  createTime: number | string; // 创建时间, ms
   interestType?: InterestType; // 生息方式，一期的没有
 }
 

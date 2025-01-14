@@ -32,7 +32,7 @@ export interface OriginAutomatorInfo {
   dateTime: number; // 净值产生的时间 (秒级时间戳)
   yieldPercentage: number | string; // 7D Yield(百分比)
   creator: string; // 创建者
-  createTime: number; // automator创建时间
+  createTime: number; // automator创建时间, s
   vaultDepositCcy: string; // Automator 拿到客户的钱之后 用来申购 vault 的币种
   clientDepositCcy: string; // 用户存入的标的物
   sharesToken: string; // Automator 的份额代币
@@ -214,6 +214,7 @@ export class AutomatorService {
             if (it.vaultDepositCcy.startsWith('a')) return InterestType.AAVE;
             return undefined;
           })(),
+        createTime: it.createTime * 1000 || vault?.createTime,
       },
     } as never;
   }
