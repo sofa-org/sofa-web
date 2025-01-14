@@ -75,7 +75,7 @@
   padding: 24px;
 
   .aum {
-    width: 50%;
+    // width: 50%;
     margin: 0 0 min(24px, 3vw);
   }
 
@@ -104,7 +104,7 @@
 
   :global {
     .progress-wrapper {
-      width: 326px;
+      width: calc(100% - 24px);
       margin: 10px 0 0;
     }
   }

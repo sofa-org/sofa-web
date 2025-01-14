@@ -185,9 +185,12 @@ export class AutomatorUserService {
     };
   }
 
-  static async userShares({ chainId, vault }: AutomatorVaultInfo) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
+  static async userShares(vaultInfo: AutomatorVaultInfo) {
+    const { signer } = await WalletService.connect(vaultInfo.chainId);
+    const Automator = await ContractsService.automatorContract(
+      vaultInfo,
+      signer,
+    );
     const [shareDecimals, sharesWithDecimals, pricePerShare] =
       await Promise.all([
         Automator.decimals().then((res) => Number(res)),
@@ -270,11 +273,14 @@ export class AutomatorUserService {
   }
 
   private static async $deposit(
-    { chainId, vault }: AutomatorVaultInfo,
+    vaultInfo: AutomatorVaultInfo,
     amount: string | number,
   ) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    const { signer } = await WalletService.connect(vaultInfo.chainId);
+    const Automator = await ContractsService.automatorContract(
+      vaultInfo,
+      signer,
+    );
     const [decimals, collateralAddress] = await Promise.all([
       Automator.decimals(),
       Automator.collateral(),
@@ -284,7 +290,7 @@ export class AutomatorUserService {
       collateralAddress,
       amountWithDecimals,
       signer,
-      vault,
+      vaultInfo.vault,
     );
     const genArgs = (gasLimit?: number) => [
       String(amountWithDecimals),
@@ -302,9 +308,12 @@ export class AutomatorUserService {
     },
   );
 
-  static async userRedemptionInfo({ chainId, vault }: AutomatorVaultInfo) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
+  static async userRedemptionInfo(vaultInfo: AutomatorVaultInfo) {
+    const { signer } = await WalletService.connect(vaultInfo.chainId);
+    const Automator = await ContractsService.automatorContract(
+      vaultInfo,
+      signer,
+    );
     return Automator.getRedemption().then((res) => {
       return {
         pendingSharesWithDecimals: Number(res[0]),
@@ -314,11 +323,14 @@ export class AutomatorUserService {
   }
 
   private static async $redeem(
-    { chainId, vault }: AutomatorVaultInfo,
+    vaultInfo: AutomatorVaultInfo,
     sharesWithDecimals: string | number,
   ) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
+    const { signer } = await WalletService.connect(vaultInfo.chainId);
+    const Automator = await ContractsService.automatorContract(
+      vaultInfo,
+      signer,
+    );
     const genArgs = (gasLimit?: number) => [
       String(sharesWithDecimals),
       { gasLimit },
@@ -335,9 +347,12 @@ export class AutomatorUserService {
     },
   );
 
-  private static async $claim({ chainId, vault }: AutomatorVaultInfo) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
+  private static async $claim(vaultInfo: AutomatorVaultInfo) {
+    const { signer } = await WalletService.connect(vaultInfo.chainId);
+    const Automator = await ContractsService.automatorContract(
+      vaultInfo,
+      signer,
+    );
     const genArgs = (gasLimit?: number) => [{ gasLimit }];
     return ContractsService.dirtyCall(Automator, 'claimRedemptions', genArgs);
   }

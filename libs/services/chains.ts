@@ -273,7 +273,7 @@ export const ChainMap: Record<
       name: 'Arbitrum Sepolia',
       currency: 'ETH',
       icon: IconSepoliaArb,
-      explorerUrl: 'https://sepolia.arbitrum.io',
+      explorerUrl: 'https://sepolia.arbiscan.io',
       rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
       rpcUrlsForAddNetwork: [
         'https://sepolia-rollup.arbitrum.io/rpc',
