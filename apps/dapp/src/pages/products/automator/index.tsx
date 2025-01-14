@@ -4,6 +4,7 @@ import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
+import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
@@ -14,6 +15,7 @@ import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
+import { useAutomatorMarketSelector } from '../automator-market/hooks';
 import ProductDesc from '../components/ProductDesc';
 
 import { AutomatorDeposit } from './components/Deposit';
@@ -31,17 +33,9 @@ export const AutomatorEl = (props: BaseProps) => {
     tab: p['automator-trade-tab'] as string,
     v: p['automator-vault'] as string,
   }));
-  const { chainId, address } = useWalletStore((state) => state);
+  const { address } = useWalletStore((state) => state);
   const isMobileUI = useIsMobileUI();
-  const vault = useMemo(
-    () =>
-      ContractsService.AutomatorVaults.find((it) => {
-        if (it.chainId !== chainId) return false;
-        if (!v) return true;
-        return it.vault.toLowerCase() === v.toLowerCase();
-      }),
-    [chainId, v],
-  );
+  const { automator: vault } = useAutomatorMarketSelector();
 
   const handleSuccess = useLazyCallback(() => {
     if (vault && address) {
@@ -126,21 +120,11 @@ export const AutomatorEl = (props: BaseProps) => {
 
 const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('Automator');
-  const { v } = useQuery((p) => ({ v: p['automator-vault'] as string }));
-  const { chainId } = useWalletStore((state) => state);
-  const vault = useMemo(
-    () =>
-      ContractsService.AutomatorVaults.find((it) => {
-        if (it.chainId !== chainId) return false;
-        if (!v) return true;
-        return it.vault.toLowerCase() === v.toLowerCase();
-      }),
-    [chainId, v],
-  );
+  const { automator: vault } = useAutomatorMarketSelector();
 
   const chains = useMemo(
     () =>
-      [...new Set(ContractsService.AutomatorVaults.map((it) => it.chainId))]
+      (Env.isDaily ? [421614] : [1, 42161])
         .map((it) => ChainMap[it]?.name)
         .filter(Boolean)
         .join(', '),
