@@ -39,7 +39,16 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           <div className={styles['title']}>
             {t({ enUS: '7D Target Yield', zhCN: '7日年化收益率' })}
           </div>
-          <div className={styles['value']}>
+          <div
+            className={styles['value']}
+            style={{
+              color:
+                data?.yieldPercentage === undefined ||
+                +data?.yieldPercentage >= 0
+                  ? 'var(--color-rise)'
+                  : 'var(--color-fall)',
+            }}
+          >
             {displayPercentage(Number(data?.yieldPercentage) / 100)}
             <span className={styles['footnote']}>
               {t({ enUS: 'Est.', zhCN: '估算' })}
