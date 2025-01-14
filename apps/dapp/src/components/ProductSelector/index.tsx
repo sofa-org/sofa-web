@@ -151,7 +151,8 @@ export const ProductTypeSelector = (
     localState?: ReturnType<typeof useProductSelect>;
     useRadioCard?: boolean;
     radioClassName?: string;
-    filter?: (t: ProductType) => boolean;
+    optionFilter?: (t: ProductType) => boolean;
+    optionDisabled?: (v: ProductType) => boolean;
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
@@ -167,7 +168,7 @@ export const ProductTypeSelector = (
       .filter(
         (it) =>
           productTypes.includes(it.value) &&
-          (!props.filter || props.filter(it.value)),
+          (!props.optionFilter || props.optionFilter(it.value)),
       )
       .map((it) => ({
         label: (
@@ -177,8 +178,11 @@ export const ProductTypeSelector = (
           </span>
         ),
         value: it.value,
+        disabled: props.optionDisabled
+          ? props.optionDisabled(it.value)
+          : undefined,
       }));
-  }, [chainId, t]);
+  }, [chainId, t, props.optionDisabled, props.optionFilter]);
 
   useEffect(() => {
     if (options.length && !options.some((it) => it.value === product)) {
@@ -195,7 +199,9 @@ export const ProductTypeSelector = (
           onChange={(v) => setProduct(v.target.value as ProductType)}
         >
           {options.map((o) => (
-            <Radio value={o.value}>{o.label}</Radio>
+            <Radio value={o.value} disabled={o.disabled}>
+              {o.label}
+            </Radio>
           ))}
         </RadioGroup>
       </>

@@ -12,6 +12,8 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { useWalletStore } from '@/components/WalletConnector/store';
+
+import { getCurrentCreatorAutomator } from './automator-operate/components/AutomatorSelector';
 export const useProductsState = Object.assign(
   createWithEqualityFn(
     persist(
@@ -32,7 +34,6 @@ export const useProductsState = Object.assign(
           `${AutomatorVaultInfo['vault']}-${AutomatorVaultInfo['chainId']}`,
           string | undefined
         >,
-        automatorVault: undefined as undefined | AutomatorVaultInfo,
       }),
       {
         name: 'products-state-new',
@@ -45,11 +46,6 @@ export const useProductsState = Object.assign(
       vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType'>,
     ) => {
       // automator don't support recommended list yet
-    },
-    updateAutomatorVault: (vault?: AutomatorVaultInfo) => {
-      useProductsState.setState({
-        automatorVault: vault,
-      });
     },
     clearCart: (vault: Pick<AutomatorVaultInfo, 'vault' | 'chainId'>) => {
       useProductsState.setState((pre) => ({
@@ -140,9 +136,10 @@ export const useProductsState = Object.assign(
       const error = useProductsState.productValidator(params);
       if (error) throw error;
       const vault = params.vault;
+      const { automator } = getCurrentCreatorAutomator();
       return ProductsService.quote(vault.productType, {
         ...params,
-        takerWallet: useProductsState.getState().automatorVault?.vault,
+        takerWallet: automator?.vaultInfo?.vault,
       } as ProductQuoteParams).then((res) => {
         useProductsState.updateQuotes(res);
         return res;

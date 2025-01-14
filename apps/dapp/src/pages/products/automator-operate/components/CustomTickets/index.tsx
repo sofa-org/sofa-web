@@ -43,7 +43,7 @@ export interface CustomTicketProps {
 }
 
 const defaultProductType = ProductType.BullSpread;
-const defaultForCCY: VaultInfo['forCcy'] = 'BTC';
+const defaultForCCY: VaultInfo['forCcy'] = 'WBTC';
 
 const TicketEditor = (props: CustomTicketProps) => {
   const [t] = useTranslation('AutomatorOperate');
@@ -53,19 +53,19 @@ const TicketEditor = (props: CustomTicketProps) => {
   );
   const customDev = useMemo(() => currQuery()['custom-dev'] === '1', []);
 
+  const { automator } = useCreatorAutomatorSelector();
+  const vaults = useAsyncMemo(async () => {
+    const results = !automator?.vaultInfo
+      ? undefined
+      : await AutomatorCreatorService.vaults(automator.vaultInfo);
+    // console.log('my-vaults', results, automator?.vaultInfo);
+    return results;
+  }, [automator?.vaultInfo]);
+
   const [forCcy, setForCcy] = useState<VaultInfo['forCcy']>(
-    props.product.vault.forCcy || defaultForCCY,
+    props.product.vault.forCcy || vaults?.[0].forCcy || defaultForCCY,
   );
   const [riskType] = [RiskType.RISKY];
-
-  const { automator } = useCreatorAutomatorSelector();
-  const vaults = useAsyncMemo(
-    async () =>
-      !automator?.vaultInfo
-        ? undefined
-        : AutomatorCreatorService.vaults(automator.vaultInfo),
-    [automator?.vaultInfo],
-  );
 
   useLayoutEffect(() => {
     if (
@@ -78,8 +78,8 @@ const TicketEditor = (props: CustomTicketProps) => {
     }
   }, [forCcy, productType, setProductType, vaults]);
 
-  const vault = useMemo(
-    () =>
+  const vault = useMemo(() => {
+    const result =
       vaults &&
       ProductsService.findVault(vaults, {
         chainId: props.product.vault.chainId,
@@ -87,16 +87,23 @@ const TicketEditor = (props: CustomTicketProps) => {
         riskType,
         forCcy,
         depositCcy: props.product.vault.depositCcy,
-      }),
-    [
-      vaults,
-      props.product.vault.chainId,
-      props.product.vault.depositCcy,
-      productType,
-      riskType,
-      forCcy,
-    ],
-  );
+      });
+    // console.warn('my-vault', result, {
+    //   chainId: props.product.vault.chainId,
+    //   productType,
+    //   riskType,
+    //   forCcy,
+    //   depositCcy: props.product.vault.depositCcy,
+    // });
+    return result;
+  }, [
+    vaults,
+    props.product.vault.chainId,
+    props.product.vault.depositCcy,
+    productType,
+    riskType,
+    forCcy,
+  ]);
 
   const onChange = useLazyCallback((val: Partial<ProductQuoteParams>) => {
     useProductsState.updateCart(props.automatorVault, {
@@ -180,7 +187,35 @@ const TicketEditor = (props: CustomTicketProps) => {
             <CCYSelector
               prefix={t({ enUS: 'Anchor', zhCN: '锚点' })}
               localState={[forCcy, setForCcy]}
-              afterChange={() => {
+              optionDisabled={(ccy: typeof forCcy) => {
+                if (!vaults) return true;
+                const possibleVault = ProductsService.findVault(vaults, {
+                  chainId: props.product.vault.chainId,
+                  riskType,
+                  depositCcy: props.product.vault.depositCcy,
+                  forCcy: ccy,
+                });
+                console.log('anchor', ccy, possibleVault);
+                return !possibleVault;
+              }}
+              afterChange={(forCcy) => {
+                const filteredVaults =
+                  (vaults &&
+                    ProductsService.filterVaults(vaults, {
+                      chainId: props.product.vault.chainId,
+                      riskType,
+                      depositCcy: props.product.vault.depositCcy,
+                      forCcy,
+                    })) ||
+                  [];
+                if (
+                  filteredVaults.length &&
+                  !ProductsService.findVault(filteredVaults, {
+                    productType,
+                  })
+                ) {
+                  setProductType(filteredVaults[0].productType);
+                }
                 onChange({
                   anchorPrices: undefined,
                 });
@@ -196,7 +231,19 @@ const TicketEditor = (props: CustomTicketProps) => {
             <ProductTypeSelector
               useRadioCard
               localState={[productType, setProductType]}
-              filter={(t) => ![ProductType.DNT].includes(t)}
+              optionFilter={(t) => ![ProductType.DNT].includes(t)}
+              optionDisabled={(productType) => {
+                if (!vaults) return true;
+                const possibleVault = ProductsService.findVault(vaults, {
+                  chainId: props.product.vault.chainId,
+                  riskType,
+                  depositCcy: props.product.vault.depositCcy,
+                  forCcy: props.product.vault.forCcy,
+                  productType,
+                });
+                // console.log('side', productType, possibleVault);
+                return possibleVault ? false : true;
+              }}
             />
             <span className={styles['current-icon']}>
               {ProductTypeRefs[productType]?.img}
@@ -409,24 +456,27 @@ const TicketEditor = (props: CustomTicketProps) => {
 };
 
 const CustomTickets = (props: {
-  vault: Pick<AutomatorVaultInfo, 'vault' | 'chainId' | 'depositCcy'>;
+  vault: Pick<
+    AutomatorVaultInfo,
+    'vault' | 'chainId' | 'depositCcy' | 'vaultDepositCcy'
+  >;
   automator: AutomatorDetail;
 }) => {
   const [t] = useTranslation('AutomatorOperate');
-  const init = useLazyCallback(
-    () =>
-      ({
-        id: nanoid(),
-        vault: {
-          vault: '',
-          forCcy: defaultForCCY,
-          productType: defaultProductType,
-          chainId: props.vault.chainId,
-          depositCcy: props.vault.depositCcy,
-        },
-        depositAmount: 1,
-      }) as PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
-  );
+  const init = useLazyCallback(() => {
+    // console.warn(`props.vault`, props.vault)
+    return {
+      id: nanoid(),
+      vault: {
+        vault: '',
+        forCcy: defaultForCCY,
+        productType: defaultProductType,
+        chainId: props.vault.chainId,
+        depositCcy: props.vault.vaultDepositCcy,
+      },
+      depositAmount: 1,
+    } as PartialRequired<ProductQuoteParams, 'id' | 'vault'>;
+  });
   const products = useProductsState((state) => {
     return (
       state.cart[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`] ||

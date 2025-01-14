@@ -33,6 +33,7 @@
     max-height: calc(100vh - 48px - 80px - 40px);
   }
 }
+
 .unit {
   > span {
     display: inline-block;
@@ -71,6 +72,7 @@
     line-height: 21px;
     font-size: 18px;
   }
+
   .label {
     font-size: 14px;
     line-height: 17px;
@@ -99,51 +101,63 @@
 .automator-number-tooltip {
   max-width: min(560px, 80vw);
   background: #fff;
+
   > svg {
     color: #fff !important;
   }
 
   .amount {
     position: relative;
+
     .label {
       font-size: 14px;
       color: #000;
     }
+
     .desc {
       font-size: 12px;
-      color: rgba($color: #000, $alpha: 0.45);
+      color: rgba($color: #000, $alpha: 45%);
+      white-space: break-spaces;
     }
+
     .value {
       position: absolute;
       top: 10px;
       right: 10px;
     }
+
     padding: 10px;
+
     &:last-child {
-      border-top: 1px dotted rgba($color: #000, $alpha: 0.12);
+      border-top: 1px dotted rgba($color: #000, $alpha: 12%);
       margin-top: 5px;
       padding-top: 15px;
     }
   }
 }
+
 .header {
   .content {
     padding-top: min(20rem, 2vw);
     margin-top: 0;
+
     .amount {
       padding-bottom: 0;
       padding-top: 0;
       position: relative;
+
       &:first-child {
         max-width: 270px;
-        border-right: 0.5px solid rgba($color: #000000, $alpha: 0.1);
+        border-right: 0.5px solid rgba($color: #000, $alpha: 10%);
       }
+
       .unit {
         font-size: 12px;
         margin-left: 2px;
       }
     }
   }
+
   .icon-detail {
     // display: none;
     width: 16px;
@@ -151,52 +165,65 @@
     margin: -4px 0 0 2px;
   }
 }
+
 .body {
   padding-bottom: 0;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
+
   .content {
     margin: 0;
     border-top-left-radius: 30px;
     border-top-right-radius: 30px;
     overflow: hidden;
+
     :global {
       .semi-table-thead {
         height: 50px;
+
         th {
           @include regular;
 
           border-bottom: 1px rgba(#000, 0.08) solid;
         }
+
         th:first-child {
           padding-left: min(20px + 12px, 2vw + 12px);
         }
+
         th:last-child {
           padding-right: min(20px + 12px, 2vw + 12px);
         }
       }
+
       .semi-table-tbody {
         tr {
           height: 50px;
+
           td {
             background: transparent !important;
             border-bottom: none;
+
             &:first-child {
               padding-left: min(20px + 12px, 2vw + 12px);
             }
+
             &:last-child {
               padding-right: min(20px + 12px, 2vw + 12px);
               position: relative;
             }
           }
+
           &:hover > td {
             background: rgba(#000, 0.08) !important;
           }
         }
+
         tr.semi-table-row-expand {
           td {
             padding: min(20px, 2vw) min(20px + 12px, 2vw + 12px);
           }
+
           &:hover > td {
             background: transparent !important;
           }
@@ -233,28 +260,29 @@
   padding: 6px 20px;
   justify-content: space-between;
   background: #000;
+
   > * {
     position: relative;
     z-index: 1;
   }
+
   &::after {
     content: "";
     background: #2c2f34;
     position: absolute;
     z-index: 0;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    inset: 0;
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
   }
+
   .total-cost {
     @include bold;
 
     font-size: 24px;
     color: #fff;
   }
+
   .win,
   .win-rch {
     @include bold;
@@ -271,14 +299,17 @@
     font-size: 16px;
     color: rgba(#fff, 0.65);
   }
+
   .label.label {
     color: rgba(#fff, 0.45);
   }
+
   .digi {
     @include bold;
 
     font-size: 24px;
   }
+
   .cart-brief {
     @include flex-center;
 
@@ -305,18 +336,22 @@
     > div:last-child {
       overflow: hidden;
     }
+
     button {
       width: 100%;
       padding: 0 20px;
       background: $color-main-gradient;
+
       &:hover {
         background: $color-main-gradient !important;
         opacity: 0.75;
       }
+
       &:global(.semi-button-primary-disabled) {
         background: $color-main-gradient !important;
         opacity: 0.55;
       }
+
       > span {
         color: #000;
         background: transparent;

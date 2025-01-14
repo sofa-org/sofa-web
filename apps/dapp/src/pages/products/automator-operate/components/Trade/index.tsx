@@ -34,7 +34,8 @@ const ProductLottery = (
   const prices = useIndexPrices((state) => state.prices);
   const [ticket] = useTicketType();
 
-  const { automatorVault: vault } = useProductsState();
+  const { automator } = useCreatorAutomatorSelector();
+  const vault = useMemo(() => automator?.vaultInfo, [automator]);
   const products = useProductsState(
     (state) =>
       (vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]) ||
@@ -141,8 +142,9 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
   const tab = useQuery(
     (q) => (q['automator-operate-tab'] || 'performance') as string,
   );
+
   const { automator } = useCreatorAutomatorSelector();
-  const { automatorVault } = useProductsState();
+  const automatorVault = useMemo(() => automator?.vaultInfo, [automator]);
   useEffect(() => {
     return useAutomatorStore.subscribeVaults(chainId);
   }, [chainId]);
@@ -170,15 +172,6 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     () => (automator && Number(automator.availableBalance)) || 0,
     [automator?.availableBalance],
   );
-  useEffect(() => {
-    const vault = vaults?.[chainId]?.find((it) => {
-      if (it.chainId !== chainId) return false;
-      return (
-        it.vault.toLowerCase() === automator?.vaultInfo.vault.toLowerCase()
-      );
-    });
-    useProductsState.updateAutomatorVault(vault);
-  }, [vaults, automator]);
 
   return !automatorVault ? (
     <CEmpty

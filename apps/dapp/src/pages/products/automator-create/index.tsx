@@ -175,7 +175,7 @@ const AutomatorCreate = () => {
       bringUpConnect();
       return;
     }
-    if (myAutomators?.length) {
+    if (myAutomators?.find((a) => a.vaultInfo.depositCcy == token)) {
       Toast.error(
         t({
           enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',

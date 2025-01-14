@@ -3,6 +3,7 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
+import { parse } from 'qs';
 
 import { CSelect } from '@/components/CSelect';
 import { useWalletStore } from '@/components/WalletConnector/store';
@@ -37,6 +38,31 @@ export function useCreatorAutomatorSelector() {
   );
 
   return { automator, setAutomator, automators };
+}
+
+export function getCurrentCreatorAutomator() {
+  const currentVault = String(
+    parse(location.search, { ignoreQueryPrefix: true })['automator-vault'] ||
+      '',
+  );
+  const wallet = useWalletStore.getState();
+  const automators =
+    useAutomatorCreatorStore.getState().vaults[
+      `${wallet.chainId}-${wallet.address?.toLowerCase()}`
+    ];
+  if (!automators?.length)
+    return {
+      automator: undefined,
+      automators,
+    };
+  const automator =
+    automators?.find(
+      (it) => it.vaultInfo.vault.toLowerCase() === currentVault.toLowerCase(),
+    ) || automators?.[0];
+  return {
+    automator,
+    automators,
+  };
 }
 
 export const CreatorAutomatorSelector = (
