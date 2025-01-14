@@ -33,6 +33,11 @@ import { Time } from '@/components/TimezoneSelector';
 import { useHoverTicket, useProductsState } from '../../../automator-store';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 
+import { Comp as ScenarioBearLose } from './assets/scenario-bear-lose.svg';
+import { Comp as ScenarioBearWin } from './assets/scenario-bear-win.svg';
+import { Comp as ScenarioBullLose } from './assets/scenario-bull-lose.svg';
+import { Comp as ScenarioBullWin } from './assets/scenario-bull-win.svg';
+
 import styles from './index.module.scss';
 
 export interface CustomTicketProps {
@@ -63,7 +68,7 @@ const TicketEditor = (props: CustomTicketProps) => {
   }, [automator?.vaultInfo]);
 
   const [forCcy, setForCcy] = useState<VaultInfo['forCcy']>(
-    props.product.vault.forCcy || vaults?.[0].forCcy || defaultForCCY,
+    props.product.vault.forCcy || vaults?.[0].vault.forCcy || defaultForCCY,
   );
   const [riskType] = [RiskType.RISKY];
 
@@ -71,23 +76,27 @@ const TicketEditor = (props: CustomTicketProps) => {
     if (
       vaults?.length &&
       !vaults.some(
-        (it) => it.productType === productType && it.forCcy === forCcy,
+        (it) =>
+          it.vault.productType === productType && it.vault.forCcy === forCcy,
       )
     ) {
-      setProductType(vaults[0].productType);
+      setProductType(vaults[0].vault.productType);
     }
   }, [forCcy, productType, setProductType, vaults]);
 
-  const vault = useMemo(() => {
-    const result =
+  const { vault, quoteConfig } = useMemo(() => {
+    const v =
       vaults &&
-      ProductsService.findVault(vaults, {
-        chainId: props.product.vault.chainId,
-        productType,
-        riskType,
-        forCcy,
-        depositCcy: props.product.vault.depositCcy,
-      });
+      ProductsService.findVault(
+        vaults.map((v) => v.vault),
+        {
+          chainId: props.product.vault.chainId,
+          productType,
+          riskType,
+          forCcy,
+          depositCcy: props.product.vault.depositCcy,
+        },
+      );
     // console.warn('my-vault', result, {
     //   chainId: props.product.vault.chainId,
     //   productType,
@@ -95,7 +104,14 @@ const TicketEditor = (props: CustomTicketProps) => {
     //   forCcy,
     //   depositCcy: props.product.vault.depositCcy,
     // });
-    return result;
+    return v
+      ? {
+          vault: v,
+          quoteConfig: vaults.find(
+            (it) => it.vault.chainId == v.chainId && it.vault.vault == v.vault,
+          )?.quoteConfig,
+        }
+      : { vault: undefined, quoteConfig: undefined };
   }, [
     vaults,
     props.product.vault.chainId,
@@ -147,6 +163,12 @@ const TicketEditor = (props: CustomTicketProps) => {
   }, [props.product.vault.chainId, props.product.vault.vault, vault]);
 
   const percentOfPool = useMemo(() => {
+    if (Number(props.product.depositAmount) == 0) {
+      return 0;
+    }
+    if (Number(props.automator.aumByVaultDepositCcy) == 0) {
+      return undefined;
+    }
     return Math.round(
       (Number(props.product.depositAmount) /
         Number(props.automator.aumByVaultDepositCcy)) *
@@ -189,24 +211,30 @@ const TicketEditor = (props: CustomTicketProps) => {
               localState={[forCcy, setForCcy]}
               optionDisabled={(ccy: typeof forCcy) => {
                 if (!vaults) return true;
-                const possibleVault = ProductsService.findVault(vaults, {
-                  chainId: props.product.vault.chainId,
-                  riskType,
-                  depositCcy: props.product.vault.depositCcy,
-                  forCcy: ccy,
-                });
+                const possibleVault = ProductsService.findVault(
+                  vaults.map((v) => v.vault),
+                  {
+                    chainId: props.product.vault.chainId,
+                    riskType,
+                    depositCcy: props.product.vault.depositCcy,
+                    forCcy: ccy,
+                  },
+                );
                 console.log('anchor', ccy, possibleVault);
                 return !possibleVault;
               }}
               afterChange={(forCcy) => {
                 const filteredVaults =
                   (vaults &&
-                    ProductsService.filterVaults(vaults, {
-                      chainId: props.product.vault.chainId,
-                      riskType,
-                      depositCcy: props.product.vault.depositCcy,
-                      forCcy,
-                    })) ||
+                    ProductsService.filterVaults(
+                      vaults.map((v) => v.vault),
+                      {
+                        chainId: props.product.vault.chainId,
+                        riskType,
+                        depositCcy: props.product.vault.depositCcy,
+                        forCcy,
+                      },
+                    )) ||
                   [];
                 if (
                   filteredVaults.length &&
@@ -234,13 +262,16 @@ const TicketEditor = (props: CustomTicketProps) => {
               optionFilter={(t) => ![ProductType.DNT].includes(t)}
               optionDisabled={(productType) => {
                 if (!vaults) return true;
-                const possibleVault = ProductsService.findVault(vaults, {
-                  chainId: props.product.vault.chainId,
-                  riskType,
-                  depositCcy: props.product.vault.depositCcy,
-                  forCcy: props.product.vault.forCcy,
-                  productType,
-                });
+                const possibleVault = ProductsService.findVault(
+                  vaults.map((v) => v.vault),
+                  {
+                    chainId: props.product.vault.chainId,
+                    riskType,
+                    depositCcy: props.product.vault.depositCcy,
+                    forCcy: props.product.vault.forCcy,
+                    productType,
+                  },
+                );
                 // console.log('side', productType, possibleVault);
                 return possibleVault ? false : true;
               }}
@@ -288,16 +319,24 @@ const TicketEditor = (props: CustomTicketProps) => {
               </span>
             )}
           </div>
-          {[3, 7, 10, 14].map((day) => (
-            <span
-              className={styles['preset']}
-              onClick={() =>
-                onChange({ expiry: next8h(undefined, day + 1) / 1000 })
-              }
-            >
-              {day}d
-            </span>
-          ))}
+          {[3, 7, 10, 14]
+            .map((day) => ({ day, expiry: next8h(undefined, day + 1) / 1000 }))
+            .filter(({ expiry }) => {
+              // debugger;
+              return (
+                quoteConfig &&
+                (!quoteConfig.expiryDateTimes?.[1] ||
+                  quoteConfig.expiryDateTimes[1] >= expiry)
+              );
+            })
+            .map(({ expiry, day }) => (
+              <span
+                className={styles['preset']}
+                onClick={() => onChange({ expiry })}
+              >
+                {day}d
+              </span>
+            ))}
         </div>
         <div className={classNames(styles['form-item'], styles['strikes'])}>
           <div className={styles['label']}>{t('Strikes')}</div>
@@ -381,9 +420,21 @@ const TicketEditor = (props: CustomTicketProps) => {
         <div className={styles['scenarios']}>
           <div className={styles['ccy']}>
             <div className={styles['win']}>
-              {ProductTypeRefs[productType]?.img}
+              {productType == ProductType.BearSpread ? (
+                <ScenarioBearWin />
+              ) : (
+                <ScenarioBullWin />
+              )}
               <span className={styles['price']}>
-                {props.product.anchorPrices?.[1]}
+                {productType == ProductType.BearSpread ? (
+                  <>
+                    {'<'} {props.product.anchorPrices?.[0]}
+                  </>
+                ) : (
+                  <>
+                    {'>'} {props.product.anchorPrices?.[1]}
+                  </>
+                )}
               </span>
               <div className={styles['calc']}>
                 <div className={styles['title']}>
@@ -401,9 +452,21 @@ const TicketEditor = (props: CustomTicketProps) => {
               <span>{t({ enUS: 'Or', zhCN: '或' })}</span>
             </div>
             <div className={styles['lose']}>
-              {ProductTypeRefs[productType]?.img}
+              {productType == ProductType.BearSpread ? (
+                <ScenarioBearLose />
+              ) : (
+                <ScenarioBullLose />
+              )}
               <span className={styles['price']}>
-                {props.product.anchorPrices?.[0]}
+                {productType == ProductType.BearSpread ? (
+                  <>
+                    {'>'} {props.product.anchorPrices?.[1]}
+                  </>
+                ) : (
+                  <>
+                    {'<'} {props.product.anchorPrices?.[0]}
+                  </>
+                )}
               </span>
               <div className={styles['calc']}>
                 <div className={styles['title']}>
@@ -422,7 +485,12 @@ const TicketEditor = (props: CustomTicketProps) => {
                       zhCN: '池大小的{{percent}}%',
                     },
                     {
-                      percent: percentOfPool < 1 ? '<1' : percentOfPool,
+                      percent:
+                        percentOfPool === undefined
+                          ? 'N/A'
+                          : percentOfPool < 1
+                            ? '<1'
+                            : percentOfPool,
                     },
                   )}
                 </div>
@@ -479,8 +547,9 @@ const CustomTickets = (props: {
   });
   const products = useProductsState((state) => {
     return (
-      state.cart[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`] ||
-      []
+      state.cart[
+        `${props.vault.vault?.toLowerCase()}-${props.vault.chainId}`
+      ] || []
     );
     // const list =
     //   state.cart[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`] ||

@@ -86,7 +86,9 @@ export class AutomatorCreatorService {
   }) {
     return http.get<
       unknown,
-      HttpResponse<{ chainId: number; vault: string }[]>
+      HttpResponse<
+        { chainId: number; vault: string; expiryDateTimes: number[] }[]
+      >
     >('/optivisors/automator/quote/config', {
       params,
     });
@@ -106,7 +108,7 @@ export class AutomatorCreatorService {
           throw new Error(
             `Do not config this vault(${it.chainId}-${it.vault})`,
           );
-        return vault;
+        return { vault, quoteConfig: it };
       });
     });
   }

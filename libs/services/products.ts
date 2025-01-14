@@ -172,7 +172,7 @@ export class ProductsService {
     },
   ) {
     if (!product) return '';
-    const vault = product.vault?.vault.toLowerCase();
+    const vault = product.vault?.vault?.toLowerCase();
     const prices = product.anchorPrices?.map(Number).join('-');
     const protectedApy =
       product.vault?.riskType === RiskType.LEVERAGE ||
@@ -218,7 +218,7 @@ export class ProductsService {
       const k = $k as keyof VaultInfo;
       if (isNullLike(filters[k])) continue;
       if (k === 'vault') {
-        if (vault.vault.toLowerCase() === filters.vault!.toLowerCase())
+        if (vault.vault?.toLowerCase() === filters.vault?.toLowerCase())
           continue;
         return false;
       }
@@ -435,10 +435,10 @@ export class ProductsService {
 
   static async genExpiries(vault: VaultInfo) {
     return http
-      .get<unknown, HttpResponse<{ timestamp: number; expiries: number[] }>>(
-        '/rfq/expiry-list',
-        { params: { chainId: vault.chainId, vault: vault.vault } },
-      )
+      .get<
+        unknown,
+        HttpResponse<{ timestamp: number; expiries: number[] }>
+      >('/rfq/expiry-list', { params: { chainId: vault.chainId, vault: vault.vault } })
       .then((res) => res.value?.expiries.map((it) => it * 1000));
   }
 
