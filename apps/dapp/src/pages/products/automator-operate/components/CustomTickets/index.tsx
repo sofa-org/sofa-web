@@ -1,9 +1,10 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Table } from '@douyinfe/semi-ui';
 import { AutomatorDetail } from '@sofa/services/automator';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
-import { ContractsService, RiskType } from '@sofa/services/contracts';
+import { RiskType } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteParams,
@@ -29,6 +30,7 @@ import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { Time } from '@/components/TimezoneSelector';
 
 import { useHoverTicket, useProductsState } from '../../../automator-store';
+import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 
 import styles from './index.module.scss';
 
@@ -55,9 +57,30 @@ const TicketEditor = (props: CustomTicketProps) => {
   );
   const [riskType] = [RiskType.RISKY];
 
+  const { automator } = useCreatorAutomatorSelector();
+  const vaults = useAsyncMemo(
+    async () =>
+      !automator?.vaultInfo
+        ? undefined
+        : AutomatorCreatorService.vaults(automator.vaultInfo),
+    [automator?.vaultInfo],
+  );
+
+  useLayoutEffect(() => {
+    if (
+      vaults?.length &&
+      !vaults.some(
+        (it) => it.productType === productType && it.forCcy === forCcy,
+      )
+    ) {
+      setProductType(vaults[0].productType);
+    }
+  }, [forCcy, productType, setProductType, vaults]);
+
   const vault = useMemo(
     () =>
-      ProductsService.findVault(ContractsService.vaults, {
+      vaults &&
+      ProductsService.findVault(vaults, {
         chainId: props.product.vault.chainId,
         productType,
         riskType,
@@ -65,11 +88,12 @@ const TicketEditor = (props: CustomTicketProps) => {
         depositCcy: props.product.vault.depositCcy,
       }),
     [
-      forCcy,
-      productType,
-      riskType,
+      vaults,
       props.product.vault.chainId,
       props.product.vault.depositCcy,
+      productType,
+      riskType,
+      forCcy,
     ],
   );
 
@@ -87,7 +111,7 @@ const TicketEditor = (props: CustomTicketProps) => {
         vault,
       });
     }
-  }, [vault]);
+  }, [props.automatorVault, props.product.id, props.product.vault, vault]);
 
   const quoteInfo = useProductsState(
     (state) => state.quoteInfos[ProductsService.productKey(props.product)],
@@ -112,7 +136,7 @@ const TicketEditor = (props: CustomTicketProps) => {
       );
       return;
     }
-  }, [vault]);
+  }, [props.product.vault.chainId, props.product.vault.vault, vault]);
 
   const percentOfPool = useMemo(() => {
     return Math.round(
@@ -120,7 +144,7 @@ const TicketEditor = (props: CustomTicketProps) => {
         Number(props.automator.aumByVaultDepositCcy)) *
         100,
     );
-  }, [props.product.depositAmount]);
+  }, [props.automator.aumByVaultDepositCcy, props.product.depositAmount]);
   if (!vault) return <></>;
 
   return (
@@ -412,7 +436,7 @@ const CustomTickets = (props: {
       useProductsState.updateCart(props.vault, product);
       setHoverTicket(product.id);
     }
-  }, [init, products.length, setHoverTicket]);
+  }, [init, products.length, props.vault, setHoverTicket]);
 
   return (
     <div className={styles['custom-tickets']}>

@@ -4,6 +4,7 @@ import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
+import { arrToDict } from '@sofa/utils/object';
 import { AbstractSigner, ethers } from 'ethers';
 import { omitBy } from 'lodash-es';
 
@@ -55,10 +56,9 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<
-        unknown,
-        HttpResponse<AutomatorFactory[]>
-      >(`/optivisors/automator/factories`)
+      .get<unknown, HttpResponse<AutomatorFactory[]>>(
+        `/optivisors/automator/factories`,
+      )
       .then((res) => res.value);
   }
 
@@ -73,6 +73,33 @@ export class AutomatorCreatorService {
         },
       )
       .then((res) => res.value.map(AutomatorService.cvtAutomatorInfo));
+  }
+
+  static async vaults(automator: AutomatorVaultInfo) {
+    return http
+      .get<unknown, HttpResponse<{ chainId: number; vault: string }[]>>(
+        '/optivisors/automator/quote/config',
+        {
+          params: {
+            chainId: automator.chainId,
+            automatorVault: automator.vault,
+          },
+        },
+      )
+      .then((res) => {
+        const map = arrToDict(
+          ContractsService.vaults,
+          (it) => `${it.chainId}-${it.vault.toLowerCase()}`,
+        );
+        return res.value.map((it) => {
+          const vault = map[`${it.chainId}-${it.vault.toLowerCase()}`];
+          if (!vault)
+            throw new Error(
+              `Do not config this vault(${it.chainId}-${it.vault})`,
+            );
+          return vault;
+        });
+      });
   }
 
   static rchAmountForBurning = 500; // TODO 待定
@@ -525,7 +552,10 @@ export class AutomatorCreatorService {
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
     return http
-      .post<unknown, boolean>('/optivisors/automator/create', data)
+      .post<unknown, HttpResponse<boolean>>(
+        '/optivisors/automator/create',
+        data,
+      )
       .then(() => data.automatorAddress);
   }
 }

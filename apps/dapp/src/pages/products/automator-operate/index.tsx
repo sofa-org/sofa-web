@@ -35,7 +35,7 @@ const PositionTab = () => {
   return (
     <span>
       {t({ enUS: 'Positions', zhCN: '头寸' })}
-      {automator?.positionSize && (
+      {!!automator?.positionSize && (
         <span className={styles['position-size']}>
           {automator?.positionSize || '1'}
         </span>
