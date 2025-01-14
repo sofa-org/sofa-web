@@ -24,6 +24,7 @@ import { Comp as IconDel } from '@/assets/icon-del.svg';
 import { Comp as IconPlus } from '@/assets/icon-plus.svg';
 import AmountInput from '@/components/AmountInput';
 import { CCYSelector } from '@/components/CCYSelector';
+import { CSelect } from '@/components/CSelect';
 import PriceRangeInput from '@/components/PriceRangeInput';
 import { ProductTypeSelector } from '@/components/ProductSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
@@ -156,7 +157,25 @@ const TicketEditor = (props: CustomTicketProps) => {
       id={`custom-ticket-${props.product.id}`}
     >
       <div className={styles['left']}>
-        <div className={styles['form-item']}>
+        <div className={classNames(styles['form-item'], styles['product'])}>
+          <div className={styles['value']}>
+            <CSelect
+              {...props}
+              className={classNames(styles['product-selector'])}
+              dropdownClassName={classNames(styles['product-dropdown'])}
+              optionList={[
+                {
+                  value: 'smart_trend',
+                  label: t({
+                    enUS: 'Smart Trend',
+                  }),
+                },
+              ]}
+              value={'smart_trend'}
+            />
+          </div>
+        </div>
+        <div className={classNames(styles['form-item'], styles['ccy'])}>
           <div className={styles['value']}>
             <CCYSelector
               prefix={t({ enUS: 'Anchor', zhCN: '锚点' })}
@@ -177,6 +196,7 @@ const TicketEditor = (props: CustomTicketProps) => {
             <ProductTypeSelector
               useRadioCard
               localState={[productType, setProductType]}
+              filter={(t) => ![ProductType.DNT].includes(t)}
             />
             <span className={styles['current-icon']}>
               {ProductTypeRefs[productType]?.img}

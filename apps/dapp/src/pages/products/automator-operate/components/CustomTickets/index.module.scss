@@ -125,7 +125,9 @@
 
   .scenarios {
     width: 100%;
+
     @include flex-center;
+
     justify-content: space-between;
 
     .desc {
@@ -135,11 +137,13 @@
 
     .digi {
       @include bold;
+
       font-size: 18px;
     }
 
     > .rch {
       @include flex-column-center;
+
       flex: 1;
       gap: 1px;
       height: 100%;
@@ -147,17 +151,18 @@
       .unit,
       .digi {
         @include bold;
+
         color: var(--color-rch);
       }
     }
 
     > .ccy {
       @include flex-column-center;
+
       flex: 4;
       gap: 0;
 
       svg {
-        max-width: 36px;
         max-width: 36px;
       }
 
@@ -166,6 +171,7 @@
 
         > .title {
           @include bold;
+
           font-size: 14px;
         }
       }
@@ -221,10 +227,7 @@
           background: #fff;
           position: absolute;
           z-index: 0;
-          top: -4px;
-          left: -6px;
-          right: -6px;
-          bottom: -4px;
+          inset: -4px -6px;
         }
       }
     }
@@ -250,7 +253,8 @@
 
       .semi-select-prefix {
         @include bold;
-        color: rgba($color: #000000, $alpha: 0.65);
+
+        color: rgba($color: #000, $alpha: 65%);
       }
 
       .semi-select-selection,
@@ -290,12 +294,30 @@
           .semi-radio-content {
             .semi-radio-addon {
               @include bold;
+
               color: #44c476;
             }
           }
         }
       }
     }
+  }
+
+  &.product {
+    display: inline-block;
+
+    .product-selector {
+      height: 36rem;
+      font-size: 14rem;
+      border-radius: 18rem;
+      color: #fff;
+      background: #f0f0f0 !important;
+      margin-right: 6px;
+    }
+  }
+
+  &.ccy {
+    display: inline-block;
   }
 
   &.side {
@@ -358,6 +380,7 @@
 
       .term {
         @include bold;
+
         position: absolute;
         right: 34px;
         top: 50%;

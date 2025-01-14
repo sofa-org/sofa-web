@@ -151,6 +151,7 @@ export const ProductTypeSelector = (
     localState?: ReturnType<typeof useProductSelect>;
     useRadioCard?: boolean;
     radioClassName?: string;
+    filter?: (t: ProductType) => boolean;
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
@@ -163,7 +164,11 @@ export const ProductTypeSelector = (
     );
     const productTypes = uniq(vaults.map((it) => it.productType));
     return Object.values(ProductTypeRefs)
-      .filter((it) => productTypes.includes(it.value))
+      .filter(
+        (it) =>
+          productTypes.includes(it.value) &&
+          (!props.filter || props.filter(it.value)),
+      )
       .map((it) => ({
         label: (
           <span className={classNames(styles['product-item'], 'product-item')}>
