@@ -360,9 +360,8 @@ const PnL = () => {
       </div>
       <div className={styles['footer']}>
         <AsyncButton
-          disabled={!automator}
+          disabled={!automator?.profits}
           className={styles['btn-claim']}
-          disabled={automator}
           onClick={() =>
             automator &&
             AutomatorCreatorService.harvestProfits(
