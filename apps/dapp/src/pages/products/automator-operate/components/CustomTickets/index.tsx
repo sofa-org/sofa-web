@@ -325,6 +325,8 @@ const TicketEditor = (props: CustomTicketProps) => {
               // debugger;
               return (
                 quoteConfig &&
+                (!quoteConfig.expiryDateTimes?.[0] ||
+                  quoteConfig.expiryDateTimes[0] <= expiry) &&
                 (!quoteConfig.expiryDateTimes?.[1] ||
                   quoteConfig.expiryDateTimes[1] >= expiry)
               );

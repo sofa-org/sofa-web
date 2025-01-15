@@ -175,12 +175,23 @@ const AutomatorCreate = () => {
       bringUpConnect();
       return;
     }
-    if (myAutomators?.find((a) => a.vaultInfo.depositCcy == token)) {
+    const existingAutomator = myAutomators?.find(
+      (a) =>
+        a.vaultInfo.depositCcy == token &&
+        a.vaultInfo.creator.toLowerCase() == wallet.address?.toLowerCase() &&
+        a.vaultInfo.chainId == chainId,
+    );
+    if (existingAutomator) {
       Toast.error(
-        t({
-          enUS: 'You have already created an Automator contract with the selected deployed chain and deposit token.',
-          zhCN: '您已基于所选的已部署链和存款代币创建了Automator合约。',
-        }),
+        t(
+          {
+            enUS: 'You have already created an Automator contract "{{existingAutomatorName}}" with the selected deployed chain and deposit token.',
+            zhCN: '您已基于所选的已部署链和存款代币创建了 "{{existingAutomatorName}}" Automator 合约。',
+          },
+          {
+            existingAutomatorName: existingAutomator.vaultInfo.name,
+          },
+        ),
       );
       return;
     }
