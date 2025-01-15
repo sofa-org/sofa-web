@@ -155,8 +155,9 @@ const TicketEditor = (props: CustomTicketProps) => {
         : _next8h,
       (isLegalNum(automator.vaultInfo.redeemWaitPeriod)
         ? automator.vaultInfo.redeemWaitPeriod
-        : AutomatorCreatorService.redemptionPeriodDayValues[0] *
-          MsIntervals.day) + Date.now(),
+        : AutomatorCreatorService.redemptionPeriodDayValues[0]) *
+        MsIntervals.day +
+        Date.now(),
     );
     return {
       min,
