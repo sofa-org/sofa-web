@@ -74,16 +74,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         </div>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={cvtAmountsInCcy(
-              [
-                [
-                  props.info.vaultInfo.vaultDepositCcy,
-                  +props.info.aumByVaultDepositCcy,
-                ],
-              ],
-              prices,
-              props.info.vaultInfo.depositCcy,
-            )}
+            amount={+props.info.aumByClientDepositCcy}
             ccy={props.info.vaultInfo.depositCcy}
           />
           <span className={styles['unit']}>
@@ -95,24 +86,15 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         <>
           <div className={styles['creator']}>
             <div className={styles['label']}>
-              {t({ enUS: `Creator's`, zhCN: '创建者份额' })}
+              {t({ enUS: `Optivisor's`, zhCN: '创建者份额' })}
             </div>
             <div className={styles['value']}>
               <AmountDisplay
-                amount={cvtAmountsInCcy(
-                  [
-                    [
-                      props.info.vaultInfo.vaultDepositCcy,
-                      Number(props.info.creatorAumByVaultDepositCcy),
-                    ],
-                  ],
-                  prices,
-                  props.info.vaultInfo.depositCcy,
-                )}
+                amount={props.info.creatorAumByClientDepositCcy || 0}
                 ccy={props.info.vaultInfo.depositCcy}
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.positionCcy}
+                {props.info.vaultInfo.depositCcy}
               </span>
               <span className={styles['percent']}>
                 {displayPercentage(

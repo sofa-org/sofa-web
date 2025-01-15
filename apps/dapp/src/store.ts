@@ -1,6 +1,7 @@
 import { ContractsService } from '@sofa/services/contracts';
 import { MarketService } from '@sofa/services/market';
 import { AuthValue } from '@sofa/utils/env';
+import { isEqual } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -29,6 +30,7 @@ export const useGlobalState = Object.assign(
         storage: createJSONStorage(() => localStorage),
       },
     ),
+    isEqual,
   ),
   {
     getVaultInfo: ContractsService.getVaultInfo,

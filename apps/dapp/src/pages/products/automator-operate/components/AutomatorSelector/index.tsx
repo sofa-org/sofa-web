@@ -1,12 +1,14 @@
 import { useEffect, useMemo } from 'react';
+import { AutomatorService } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { updateQuery } from '@sofa/utils/history';
-import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
+import { useAsyncMemo, useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import { parse } from 'qs';
 
 import { CSelect } from '@/components/CSelect';
 import { useWalletStore } from '@/components/WalletConnector/store';
+import { useAutomatorStore } from '@/pages/products/automator/store';
 import { useAutomatorCreatorStore } from '@/pages/products/automator-mine/store';
 
 import styles from './index.module.scss';
@@ -35,6 +37,13 @@ export function useCreatorAutomatorSelector() {
         (it) => it.vaultInfo.vault.toLowerCase() === vault?.toLowerCase(),
       ) || automators?.[0],
     [automators, vault],
+  );
+
+  useEffect(
+    () =>
+      automator?.vaultInfo &&
+      useAutomatorStore.subscribeOverview(automator.vaultInfo),
+    [automator?.vaultInfo],
   );
 
   return { automator, setAutomator, automators };

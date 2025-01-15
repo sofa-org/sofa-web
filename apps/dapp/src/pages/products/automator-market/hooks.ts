@@ -14,10 +14,10 @@ export function useAutomatorMarketSelector() {
   useEffect(() => {
     return useAutomatorStore.subscribeVaults(chainId);
   }, [chainId]);
-  const automators = useAutomatorStore(
-    (state) =>
-      state.vaults[chainId] ||
-      ContractsService.AutomatorVaults.filter((it) => it.chainId === chainId),
+  const automators = useAutomatorStore((state) =>
+    state.vaults[chainId]
+      ? Object.values(state.vaults[chainId]!)
+      : ContractsService.AutomatorVaults.filter((it) => it.chainId === chainId),
   );
   const automator = useMemo(
     () =>
@@ -28,6 +28,12 @@ export function useAutomatorMarketSelector() {
       }) || (automators?.[0] as AutomatorVaultInfo | undefined),
     [automators, chainId, v],
   );
+
+  useEffect(
+    () => automator && useAutomatorStore.subscribeOverview(automator),
+    [automator],
+  );
+
   const setAutomator = useLazyCallback((v: AutomatorVaultInfo['vault']) =>
     updateQuery({ 'automator-vault': v }),
   );

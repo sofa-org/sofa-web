@@ -7,6 +7,7 @@ import {
 } from '@sofa/services/products';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { dirtyArrayOmit, toArray } from '@sofa/utils/object';
+import { isEqual } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -38,6 +39,7 @@ export const useProductsState = Object.assign(
         storage: createJSONStorage(() => sessionStorage),
       },
     ),
+    isEqual,
   ),
   {
     updateRecommendedList: async (

@@ -1,6 +1,7 @@
 import { Toast } from '@douyinfe/semi-ui';
 import {
   AutomatorDepositStatus,
+  AutomatorDetail,
   AutomatorInfo,
   AutomatorPerformance,
   AutomatorPosition,
@@ -14,6 +15,7 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { arrToDict } from '@sofa/utils/object';
+import { isEqual } from 'lodash-es';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 type K = `${AutomatorVaultInfo['chainId']}-${AutomatorVaultInfo['vault']}-${
@@ -29,29 +31,32 @@ export interface AutomatorRedeemData {
 }
 
 export const useAutomatorStore = Object.assign(
-  createWithEqualityFn(() => ({
-    vaults: {} as Record<
-      AutomatorVaultInfo['chainId'],
-      AutomatorVaultInfo[] | null
-    >,
-    vaultOverviews: {} as Record<K, AutomatorInfo>,
-    snapshots: {} as Record<K, AutomatorPosition[]>,
-    performances: {} as Record<K, AutomatorPerformance[]>,
-    userInfos: {} as Record<
-      K,
-      {
-        server?: AutomatorUserPosition;
-        shareInfo?: PromiseVal<
-          ReturnType<typeof AutomatorUserService.userShares>
-        >;
-        redemptionInfo?: PromiseVal<
-          ReturnType<typeof AutomatorUserService.userRedemptionInfo>
-        >;
-      }
-    >,
-    depositData: {} as Record<K, AutomatorDepositData>,
-    redeemData: {} as Record<K, AutomatorRedeemData>,
-  })),
+  createWithEqualityFn(
+    () => ({
+      vaults: {} as Record<
+        AutomatorVaultInfo['chainId'],
+        Record<AutomatorVaultInfo['vault'], AutomatorVaultInfo> | null
+      >,
+      vaultOverviews: {} as Record<K, AutomatorInfo & Partial<AutomatorDetail>>,
+      snapshots: {} as Record<K, AutomatorPosition[]>,
+      performances: {} as Record<K, AutomatorPerformance[]>,
+      userInfos: {} as Record<
+        K,
+        {
+          server?: AutomatorUserPosition;
+          shareInfo?: PromiseVal<
+            ReturnType<typeof AutomatorUserService.userShares>
+          >;
+          redemptionInfo?: PromiseVal<
+            ReturnType<typeof AutomatorUserService.userRedemptionInfo>
+          >;
+        }
+      >,
+      depositData: {} as Record<K, AutomatorDepositData>,
+      redeemData: {} as Record<K, AutomatorRedeemData>,
+    }),
+    isEqual,
+  ),
   {
     getAutomatorVaults: async (chainId: number) => {
       return AutomatorService.automatorList({ chainId }).then((res) => {
@@ -62,7 +67,10 @@ export const useAutomatorStore = Object.assign(
             `${it.vaultInfo.chainId}-${it.vaultInfo.vault.toLowerCase()}-`,
         );
         useAutomatorStore.setState((pre) => ({
-          vaults: { ...pre.vaults, [chainId]: vaults },
+          vaults: {
+            ...pre.vaults,
+            [chainId]: arrToDict(vaults, (it) => it.vault.toLowerCase()),
+          },
           vaultOverviews: { ...pre.vaultOverviews, ...vaultOverviews },
         }));
       });
@@ -80,6 +88,13 @@ export const useAutomatorStore = Object.assign(
         AutomatorService.info(vault)
           .then((overview) =>
             useAutomatorStore.setState((pre) => ({
+              vaults: {
+                ...pre.vaults,
+                [vault.chainId]: {
+                  ...pre.vaults[vault.chainId],
+                  [vault.vault.toLowerCase()]: overview.vaultInfo,
+                },
+              },
               vaultOverviews: {
                 ...pre.vaultOverviews,
                 [`${vault.chainId}-${vault.vault.toLowerCase()}-`]: overview,

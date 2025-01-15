@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { isEqual } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -69,6 +70,7 @@ export const useTimezone = Object.assign(
         storage: createJSONStorage(() => localStorage),
       },
     ),
+    isEqual,
   ),
   {
     setTimezone: (t: Timezone) =>

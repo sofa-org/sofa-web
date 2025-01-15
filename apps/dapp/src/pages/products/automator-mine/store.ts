@@ -3,18 +3,21 @@ import { AutomatorDetail } from '@sofa/services/automator';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { arrToDict } from '@sofa/utils/object';
-import { uniqBy } from 'lodash-es';
+import { isEqual } from 'lodash-es';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { useAutomatorStore } from './../automator/store';
 
 export const useAutomatorCreatorStore = Object.assign(
-  createWithEqualityFn(() => ({
-    vaults: {} as Record<
-      `${number}-${string}` /* chainId-wallet */,
-      AutomatorDetail[] | null
-    >,
-  })),
+  createWithEqualityFn(
+    () => ({
+      vaults: {} as Record<
+        `${number}-${string}` /* chainId-wallet */,
+        AutomatorDetail[] | null
+      >,
+    }),
+    isEqual,
+  ),
   {
     list: async (chainId: number, wallet: string) => {
       return AutomatorCreatorService.automatorList({ chainId, wallet })
@@ -35,13 +38,16 @@ export const useAutomatorCreatorStore = Object.assign(
             ...pre,
             vaults: {
               ...pre.vaults,
-              [chainId]: uniqBy(
-                [
-                  ...(pre.vaults[chainId] || []),
-                  ...res.map((it) => it.vaultInfo),
-                ],
-                (it) => it.vault.toLowerCase(),
-              ),
+              [chainId]: {
+                ...pre.vaults[chainId],
+                ...arrToDict(
+                  res.map((it) => ({
+                    ...pre.vaults[chainId]?.[it.vaultInfo.vault.toLowerCase()],
+                    ...it.vaultInfo,
+                  })),
+                  (it) => it.vault.toLowerCase(),
+                ),
+              },
             },
             vaultOverviews: { ...pre.vaultOverviews, ...vaultOverviews },
           }));

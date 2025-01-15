@@ -1,8 +1,8 @@
 import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
-import { isLegalNum } from '@sofa/utils/fns';
+import { isLegalNum, isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
-import { get, pick } from 'lodash-es';
+import { get, omitBy, pick } from 'lodash-es';
 
 import AutomatorAbis from './abis/AAVEAutomatorBase.json';
 import {
@@ -182,40 +182,48 @@ export class AutomatorService {
     );
     return {
       ...it,
-      vaultInfo: {
-        ...it,
-        ...vault,
-        vault: it.automatorVault,
-        name: get(it, 'automatorName') || vault?.name || it.clientDepositCcy,
-        desc: it.automatorDescription || vault?.desc,
-        creatorFeeRate: get(it, 'creatorFeeRate') || vault?.creatorFeeRate || 0,
-        depositCcy: it.clientDepositCcy,
-        vaultDepositCcy: it.vaultDepositCcy,
-        positionCcy: it.sharesToken,
-        redeemWaitPeriod: +it.redemptionPeriodDay * MsIntervals.day,
-        claimPeriod: MsIntervals.day * 3,
-        abis: AutomatorAbis,
-        collateralDecimal,
-        anchorPricesDecimal: 1e8,
-        depositMinAmount: getDepositMinAmount(
-          it.clientDepositCcy,
-          ProjectType.Automator,
-        ),
-        depositTickAmount: getDepositTickAmount(
-          it.clientDepositCcy,
-          ProjectType.Automator,
-        ),
-        interestType:
-          vault?.interestType ??
-          (() => {
-            if (it.vaultDepositCcy === 'scrvUSD') return InterestType.CURVE;
-            if (it.vaultDepositCcy === 'stRCH') return InterestType.SOFA;
-            if (it.vaultDepositCcy.startsWith('st')) return InterestType.LIDO;
-            if (it.vaultDepositCcy.startsWith('a')) return InterestType.AAVE;
-            return undefined;
-          })(),
-        createTime: it.createTime * 1000 || vault?.createTime,
-      },
+      vaultInfo: omitBy(
+        {
+          ...Object.fromEntries(
+            Object.keys(ContractsService.AutomatorVaults[0]).map((k) => [
+              k,
+              it[k as never] || vault?.[k as never],
+            ]),
+          ),
+          vault: it.automatorVault,
+          name: get(it, 'automatorName') || vault?.name || it.clientDepositCcy,
+          desc: it.automatorDescription || vault?.desc,
+          creatorFeeRate:
+            get(it, 'creatorFeeRate') || vault?.creatorFeeRate || 0,
+          depositCcy: it.clientDepositCcy,
+          vaultDepositCcy: it.vaultDepositCcy,
+          positionCcy: it.sharesToken,
+          redeemWaitPeriod: +it.redemptionPeriodDay * MsIntervals.day,
+          claimPeriod: MsIntervals.day * 3,
+          abis: AutomatorAbis,
+          collateralDecimal,
+          anchorPricesDecimal: 1e8,
+          depositMinAmount: getDepositMinAmount(
+            it.clientDepositCcy,
+            ProjectType.Automator,
+          ),
+          depositTickAmount: getDepositTickAmount(
+            it.clientDepositCcy,
+            ProjectType.Automator,
+          ),
+          interestType:
+            vault?.interestType ??
+            (() => {
+              if (it.vaultDepositCcy === 'scrvUSD') return InterestType.CURVE;
+              if (it.vaultDepositCcy === 'stRCH') return InterestType.SOFA;
+              if (it.vaultDepositCcy.startsWith('st')) return InterestType.LIDO;
+              if (it.vaultDepositCcy.startsWith('a')) return InterestType.AAVE;
+              return undefined;
+            })(),
+          createTime: it.createTime * 1000 || vault?.createTime,
+        },
+        (it) => isNullLike(it),
+      ),
     } as never;
   }
 

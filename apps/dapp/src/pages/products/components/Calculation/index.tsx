@@ -904,7 +904,9 @@ export const Calculation = (props: CalculationProps) => {
                   <tr key={i} className={it.className}>
                     <td>{it.name}</td>
                     <td>{it.value}</td>
-                    <td dangerouslySetInnerHTML={{ __html: it.desc || '' }} />
+                    <td
+                      dangerouslySetInnerHTML={{ __html: it.desc || '...' }}
+                    />
                   </tr>
                 );
               })}
@@ -930,7 +932,7 @@ export const Calculation = (props: CalculationProps) => {
                     <div className={styles['td']}>{it.value}</div>
                     <div
                       className={styles['td']}
-                      dangerouslySetInnerHTML={{ __html: it.desc || '' }}
+                      dangerouslySetInnerHTML={{ __html: it.desc || '...' }}
                     />
                   </div>
                 );
