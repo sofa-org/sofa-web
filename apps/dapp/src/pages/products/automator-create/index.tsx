@@ -262,7 +262,7 @@ const AutomatorCreate = () => {
             >
               {data &&
                 uniq(data.map((c) => c.chainId)).map((chainId) => (
-                  <Select.Option value={chainId}>
+                  <Select.Option key={chainId} value={chainId}>
                     <img
                       className={styles['logo']}
                       src={ChainMap[chainId]?.icon}
@@ -309,7 +309,7 @@ const AutomatorCreate = () => {
                       .filter((c) => c.chainId == chainId)
                       .map((c) => c.clientDepositCcy),
                   ).map((depositCcy) => (
-                    <Select.Option value={depositCcy}>
+                    <Select.Option key={depositCcy} value={depositCcy}>
                       <img
                         className={styles['logo']}
                         src={CCYService.ccyConfigs[depositCcy]?.icon}

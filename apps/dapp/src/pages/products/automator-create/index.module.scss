@@ -48,6 +48,11 @@
     color: #000 !important;
     font-size: 16px;
   }
+  :global(.semi-select-suffix) {
+    .select-label {
+      color: rgba(#000, 0.5) !important;
+    }
+  }
 
   :global {
     .semi-select {
@@ -147,7 +152,7 @@
 
       .title {
         @include flex-center;
-        @include bold;
+        @include regular;
 
         position: relative;
         justify-content: flex-start;
@@ -171,6 +176,7 @@
         font-size: 14px;
         line-height: 16px;
         padding: 0 20px 20px 0;
+        color: rgba(#000, 0.6);
       }
 
       &:hover {
