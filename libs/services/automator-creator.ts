@@ -237,7 +237,7 @@ export class AutomatorCreatorService {
     });
   }
 
-  // // 需要 automator 白名单钱包签名
+  // 需要 automator 白名单钱包签名
   static async signSignatures(
     automator: AutomatorVaultInfo,
     products: Parameters<typeof WalletService.mint>[0][],
@@ -248,7 +248,11 @@ export class AutomatorCreatorService {
         {
           chainId: automator.chainId,
           automatorVault: automator.vault,
-          quotes: products.map((it) => it.quote),
+          quotes: products.map((it) => ({
+            ...it.quote,
+            vault: it.vault.vault,
+            expiry: it.expiry,
+          })),
         },
       )
       .then((res) => res.value.signature);
