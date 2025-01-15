@@ -170,7 +170,7 @@ const AutomatorCreate = () => {
       },
     },
   );
-  const onStartClick = useLazyCallback(() => {
+  const onStartClick = useLazyCallback(async () => {
     if (!wallet.address) {
       bringUpConnect();
       return;
@@ -208,6 +208,11 @@ const AutomatorCreate = () => {
     updatePayload({
       factory,
     });
+    if (await AutomatorCreatorService.hasCredits(factory)) {
+      useAutomatorCreateStore.setState({
+        rchBurned: true,
+      });
+    }
     setModelVisible(true);
   });
   return (
