@@ -145,10 +145,12 @@ const AutomatorCreate = () => {
       useAutomatorCreatorStore.list(wallet.chainId, wallet.address);
   }, [wallet.address, wallet.chainId]);
 
-  const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({
-    [0]: true,
-  });
+  const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({});
   const onFaqTitleClicked = useLazyCallback((idx: number) => {
+    if (faqExpanded[idx]) {
+      setFaqExpanded({});
+      return;
+    }
     setFaqExpanded({ [idx]: true });
   });
   useEffect(() => {

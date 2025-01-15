@@ -143,6 +143,7 @@
     li {
       border-bottom: dotted 1px rgba(#000, 0.24);
       text-align: left;
+      cursor: pointer;
 
       .title {
         @include flex-center;
@@ -172,17 +173,16 @@
         padding: 0 20px 20px 0;
       }
 
+      &:hover {
+        .title {
+          opacity: 0.65;
+        }
+      }
       &.folded {
-        cursor: pointer;
-
         .title {
           &::after {
             background-image: url("./assets/icon-expand.svg");
           }
-        }
-
-        &:hover {
-          color: rgba(#000, 0.5);
         }
       }
     }
