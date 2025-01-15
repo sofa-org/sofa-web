@@ -2,12 +2,16 @@ import { useEffect, useMemo } from 'react';
 import { Tooltip } from '@douyinfe/semi-ui';
 import { calc_yield } from '@sofa/alg';
 import { AutomatorDetail } from '@sofa/services/automator';
+import { InterestTypeRefs } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductsService } from '@sofa/services/products';
-import { amountFormatter, cvtAmountsInUsd } from '@sofa/utils/amount';
-import { MsIntervals, next8h } from '@sofa/utils/expiry';
-import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
+import {
+  amountFormatter,
+  cvtAmountsInCcy,
+  cvtAmountsInUsd,
+} from '@sofa/utils/amount';
+import { MsIntervals } from '@sofa/utils/expiry';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
@@ -136,14 +140,11 @@ const ProductLottery = (
 };
 
 const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
-  const { chainId, address } = useWalletStore((state) => state);
-  const { vaults } = useAutomatorStore();
+  const { chainId } = useWalletStore((state) => state);
   const [t] = useTranslation('AutomatorOperate');
-  const tab = useQuery(
-    (q) => (q['automator-operate-tab'] || 'performance') as string,
-  );
 
   const { automator } = useCreatorAutomatorSelector();
+  const prices = useIndexPrices((s) => s.prices);
   const automatorVault = useMemo(() => automator?.vaultInfo, [automator]);
   useEffect(() => {
     return useAutomatorStore.subscribeVaults(chainId);
@@ -153,24 +154,42 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     (state) =>
       automator &&
       state.interestRate[automator.vaultInfo.chainId]?.[
-        automator.vaultInfo.vaultDepositCcy
+        automator.vaultInfo.depositCcy
       ],
   );
-  const interest7d = useMemo(
-    () =>
-      apy && automator
-        ? calc_yield(
-            apy.apyUsed,
-            +automator.aumByVaultDepositCcy,
-            Date.now(),
-            Date.now() + MsIntervals.day * 7,
-          )
-        : 0,
-    [apy?.apyUsed, automator?.aumByVaultDepositCcy],
-  );
+
+  const interest7d = useMemo(() => {
+    if (!apy?.apyUsed || !automator?.aumByVaultDepositCcy)
+      return { interestByVaultDepositCcy: 0, interestByDepositCcy: 0 };
+    const interestByDepositCcy = calc_yield(
+      apy.apyUsed,
+      +automator.aumByVaultDepositCcy,
+      Date.now(),
+      Date.now() + MsIntervals.day * 7,
+    );
+    const interestByVaultDepositCcy = (() => {
+      if (!InterestTypeRefs[automator.vaultInfo.interestType!].isRebase) {
+        return cvtAmountsInCcy(
+          [[automator.vaultInfo.depositCcy, interestByDepositCcy]],
+          prices,
+          automator.vaultInfo.vaultDepositCcy,
+        );
+      }
+      return interestByDepositCcy;
+    })();
+    return { interestByVaultDepositCcy, interestByDepositCcy };
+  }, [
+    apy?.apyUsed,
+    automator?.aumByVaultDepositCcy,
+    automator?.vaultInfo.depositCcy,
+    automator?.vaultInfo.interestType,
+    automator?.vaultInfo.vaultDepositCcy,
+    prices,
+  ]);
+
   const availableBalanceExcludingPrincipal = useMemo(
-    () => (automator && Number(automator.availableBalance)) || 0,
-    [automator?.availableBalance],
+    () => Number(automator?.availableAmount) || 0,
+    [automator?.availableAmount],
   );
 
   return !automatorVault ? (
@@ -197,7 +216,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                 <>
                   <span className={styles['digi']}>
                     {amountFormatter(
-                      automator.availableBalance,
+                      automator.availableAmount,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}
@@ -259,13 +278,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             {amountFormatter(
                               0,
                               CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
+                                automator.vaultInfo.vaultDepositCcy
                               ]?.precision || undefined,
                             )}
                             <span className={styles['unit']}>
                               {CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.name || automator.vaultInfo.positionCcy}
+                                automator.vaultInfo.vaultDepositCcy
+                              ]?.name || automator.vaultInfo.vaultDepositCcy}
                             </span>
                           </span>
                         </div>
@@ -283,13 +302,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             {amountFormatter(
                               0,
                               CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
+                                automator.vaultInfo.vaultDepositCcy
                               ]?.precision || undefined,
                             )}
                             <span className={styles['unit']}>
                               {CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.name || automator.vaultInfo.positionCcy}
+                                automator.vaultInfo.vaultDepositCcy
+                              ]?.name || automator.vaultInfo.vaultDepositCcy}
                             </span>
                           </span>
                         </div>
@@ -309,13 +328,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             {amountFormatter(
                               availableBalanceExcludingPrincipal,
                               CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
+                                automator.vaultInfo.vaultDepositCcy
                               ]?.precision || undefined,
                             )}
                             <span className={styles['unit']}>
                               {CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.name || automator.vaultInfo.positionCcy}
+                                automator.vaultInfo.vaultDepositCcy
+                              ]?.name || automator.vaultInfo.vaultDepositCcy}
                             </span>
                           </span>
                         </div>
@@ -342,14 +361,32 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
             <span className={styles['value']}>
               {automator && apy ? (
                 <>
+                  {interest7d.interestByVaultDepositCcy !==
+                    interest7d.interestByDepositCcy && (
+                    <>
+                      <span className={styles['digi']}>
+                        {amountFormatter(
+                          interest7d.interestByVaultDepositCcy,
+                          CCYService.ccyConfigs[
+                            automator.vaultInfo.vaultDepositCcy
+                          ]?.precision || undefined,
+                        )}
+                      </span>
+                      <span className={styles['unit']}>
+                        {CCYService.ccyConfigs[
+                          automator.vaultInfo.vaultDepositCcy
+                        ]?.name || automator.vaultInfo.vaultDepositCcy}
+                      </span>
+                      <span className={styles['separator']}>≈</span>
+                    </>
+                  )}
                   <span className={styles['digi']}>
                     {amountFormatter(
-                      interest7d,
+                      interest7d.interestByVaultDepositCcy,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}
                   </span>
-
                   <span className={styles['unit']}>
                     {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                       ?.name || automator.vaultInfo.vaultDepositCcy}
@@ -363,24 +400,36 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <span className={styles['label']}>
                             {t({ enUS: 'Pool Size' })}
                           </span>
-                          <span className={styles['desc']}>
-                            {t({
-                              enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            {amountFormatter(
-                              automator.aumByVaultDepositCcy,
-                              CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.precision || undefined,
-                            )}
-                            <span className={styles['unit']}>
-                              {CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.name || automator.vaultInfo.positionCcy}
+                          {!InterestTypeRefs[automator.vaultInfo.interestType!]
+                            .isRebase ? (
+                            <span className={styles['value']}>
+                              {amountFormatter(
+                                automator.aumByClientDepositCcy,
+                                CCYService.ccyConfigs[
+                                  automator.vaultInfo.depositCcy
+                                ]?.precision || undefined,
+                              )}
+                              <span className={styles['unit']}>
+                                {CCYService.ccyConfigs[
+                                  automator.vaultInfo.depositCcy
+                                ]?.name || automator.vaultInfo.depositCcy}
+                              </span>
                             </span>
-                          </span>
+                          ) : (
+                            <span className={styles['value']}>
+                              {amountFormatter(
+                                automator.aumByVaultDepositCcy,
+                                CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.precision || undefined,
+                              )}
+                              <span className={styles['unit']}>
+                                {CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.name || automator.vaultInfo.vaultDepositCcy}
+                              </span>
+                            </span>
+                          )}
                         </div>
                         <div className={styles['amount']}>
                           <span className={styles['label']}>
@@ -395,11 +444,6 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           </span>
                           <span className={styles['value']}>
                             {amountFormatter(apy.apyUsed, 2)}%
-                            <span className={styles['unit']}>
-                              {CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.name || automator.vaultInfo.positionCcy}
-                            </span>
                           </span>
                         </div>
                         <div className={styles['amount']}>
@@ -415,7 +459,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           </span>
                           <span className={styles['value']}>
                             {amountFormatter(
-                              interest7d,
+                              interest7d.interestByVaultDepositCcy,
                               CCYService.ccyConfigs[
                                 automator.vaultInfo.positionCcy
                               ]?.precision || undefined,
@@ -441,7 +485,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                   <span className={styles['digi']}>
                     =&nbsp;
                     {amountFormatter(
-                      availableBalanceExcludingPrincipal + interest7d,
+                      availableBalanceExcludingPrincipal +
+                        interest7d.interestByVaultDepositCcy,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}

@@ -82,7 +82,7 @@ const Index = () => {
   const [t] = useTranslation('AutomatorOperate');
   const isPortrait = useIsPortrait();
   const tab = useQuery(
-    (q) => (q['automator-operate-tab'] || 'performance') as string,
+    (q) => (q['automator-operate-tab'] || 'trade') as string,
   );
   const options = useMemo(
     () =>

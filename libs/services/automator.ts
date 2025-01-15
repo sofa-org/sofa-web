@@ -50,7 +50,6 @@ export interface OriginAutomatorDetail extends OriginAutomatorInfo {
   totalPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
   pnlPercentage: number | string; // Yield (百分比) (基于clientDepositCcy)
   sharesToken: string; // 净值单位 (sharesToken)
-  availableBalance: number | string; // Available Balance (vaultDepositCcy)
   profits: number | string; // totalTradingPnlByVaultDepositCcy * feeRate (vaultDepositCcy)
   positionLockedAmount: number | string; // Active Position Locked (vaultDepositCcy)
   unclaimedAmount: number | string; // Position unclaimed (vaultDepositCcy)

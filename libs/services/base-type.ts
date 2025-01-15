@@ -26,11 +26,18 @@ export enum TransactionStatus {
 }
 
 export enum InterestType {
-  AAVE = 'Aave',
-  LIDO = 'Lido',
-  SOFA = 'Sofa',
-  CURVE = 'Curve',
+  AAVE = 'Aave', // rebase 数量增加
+  LIDO = 'Lido', // rebase，数量增加
+  SOFA = 'Sofa', // 净值增加
+  CURVE = 'Curve', // 净值增加
 }
+
+export const InterestTypeRefs = {
+  [InterestType.AAVE]: { isRebase: true },
+  [InterestType.LIDO]: { isRebase: true },
+  [InterestType.SOFA]: { isRebase: false },
+  [InterestType.CURVE]: { isRebase: false },
+};
 
 export enum AutomatorTransactionStatus {
   PENDING = 'PENDING',
