@@ -158,26 +158,26 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
       ],
   );
 
-  const interest7d = useMemo(() => {
+  const interest = useMemo(() => {
     if (!apy?.apyUsed || !automator?.aumByVaultDepositCcy)
-      return { interestByVaultDepositCcy: 0, interestByDepositCcy: 0 };
-    const interestByDepositCcy = calc_yield(
+      return { byVaultDepositCcy: 0, byDepositCcy: 0 };
+    const byDepositCcy = calc_yield(
       apy.apyUsed,
       +automator.aumByVaultDepositCcy,
       Date.now(),
       Date.now() + MsIntervals.day * 7,
     );
-    const interestByVaultDepositCcy = (() => {
+    const byVaultDepositCcy = (() => {
       if (!InterestTypeRefs[automator.vaultInfo.interestType!].isRebase) {
         return cvtAmountsInCcy(
-          [[automator.vaultInfo.depositCcy, interestByDepositCcy]],
+          [[automator.vaultInfo.depositCcy, byDepositCcy]],
           prices,
           automator.vaultInfo.vaultDepositCcy,
         );
       }
-      return interestByDepositCcy;
+      return byDepositCcy;
     })();
-    return { interestByVaultDepositCcy, interestByDepositCcy };
+    return { byVaultDepositCcy, byDepositCcy };
   }, [
     apy?.apyUsed,
     automator?.aumByVaultDepositCcy,
@@ -361,12 +361,11 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
             <span className={styles['value']}>
               {automator && apy ? (
                 <>
-                  {interest7d.interestByVaultDepositCcy !==
-                    interest7d.interestByDepositCcy && (
+                  {interest.byVaultDepositCcy !== interest.byDepositCcy && (
                     <>
                       <span className={styles['digi']}>
                         {amountFormatter(
-                          interest7d.interestByVaultDepositCcy,
+                          interest.byVaultDepositCcy,
                           CCYService.ccyConfigs[
                             automator.vaultInfo.vaultDepositCcy
                           ]?.precision || undefined,
@@ -382,7 +381,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                   )}
                   <span className={styles['digi']}>
                     {amountFormatter(
-                      interest7d.interestByVaultDepositCcy,
+                      interest.byVaultDepositCcy,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}
@@ -459,7 +458,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           </span>
                           <span className={styles['value']}>
                             {amountFormatter(
-                              interest7d.interestByVaultDepositCcy,
+                              interest.byVaultDepositCcy,
                               CCYService.ccyConfigs[
                                 automator.vaultInfo.positionCcy
                               ]?.precision || undefined,
@@ -486,7 +485,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                     =&nbsp;
                     {amountFormatter(
                       availableBalanceExcludingPrincipal +
-                        interest7d.interestByVaultDepositCcy,
+                        interest.byVaultDepositCcy,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}

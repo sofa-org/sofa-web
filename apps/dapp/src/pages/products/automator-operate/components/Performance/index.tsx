@@ -2,8 +2,14 @@ import { useMemo, useState } from 'react';
 import { Spin, Toast } from '@douyinfe/semi-ui';
 import { calc_yield } from '@sofa/alg';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
+import { InterestTypeRefs } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
+import {
+  amountFormatter,
+  cvtAmountsInCcy,
+  displayPercentage,
+} from '@sofa/utils/amount';
 import { MsIntervals, next8h } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { simplePlus } from '@sofa/utils/object';
@@ -32,22 +38,38 @@ const PoolSize = () => {
     (state) =>
       automator &&
       state.interestRate[automator.vaultInfo.chainId]?.[
-        automator.vaultInfo.vaultDepositCcy
+        automator.vaultInfo.depositCcy
       ],
   );
-  const estimatedYield = useMemo(
-    () =>
-      apy &&
-      automator &&
-      automator.vaultInfo.interestType &&
-      calc_yield(
-        apy.apyUsed,
-        +automator.aumByVaultDepositCcy,
-        Date.now(),
-        Date.now() + MsIntervals.day * 7,
-      ),
-    [apy, automator],
-  );
+
+  const estimatedYield = useMemo(() => {
+    if (!apy?.apyUsed || !automator?.aumByVaultDepositCcy)
+      return { byVaultDepositCcy: 0, byDepositCcy: 0 };
+    const byDepositCcy = calc_yield(
+      apy.apyUsed,
+      +automator.aumByVaultDepositCcy,
+      Date.now(),
+      Date.now() + MsIntervals.day * 7,
+    );
+    const byVaultDepositCcy = (() => {
+      if (!InterestTypeRefs[automator.vaultInfo.interestType!].isRebase) {
+        return cvtAmountsInCcy(
+          [[automator.vaultInfo.depositCcy, byDepositCcy]],
+          prices,
+          automator.vaultInfo.vaultDepositCcy,
+        );
+      }
+      return byDepositCcy;
+    })();
+    return { byVaultDepositCcy, byDepositCcy };
+  }, [
+    apy?.apyUsed,
+    automator?.aumByVaultDepositCcy,
+    automator?.vaultInfo.depositCcy,
+    automator?.vaultInfo.interestType,
+    automator?.vaultInfo.vaultDepositCcy,
+    prices,
+  ]);
 
   const byCcyOptions = useMemo(
     () =>
@@ -202,7 +224,7 @@ const PoolSize = () => {
               </span>
               <span className={styles['value']}>
                 <AmountDisplay
-                  amount={estimatedYield}
+                  amount={estimatedYield.byVaultDepositCcy}
                   ccy={automator.vaultInfo.vaultDepositCcy}
                 />
                 <span className={styles['unit']}>
