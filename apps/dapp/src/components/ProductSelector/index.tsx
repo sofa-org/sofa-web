@@ -199,7 +199,7 @@ export const ProductTypeSelector = (
           onChange={(v) => setProduct(v.target.value as ProductType)}
         >
           {options.map((o) => (
-            <Radio value={o.value} disabled={o.disabled}>
+            <Radio key={o.value} value={o.value} disabled={o.disabled}>
               {o.label}
             </Radio>
           ))}

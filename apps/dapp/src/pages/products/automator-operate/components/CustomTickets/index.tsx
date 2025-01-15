@@ -232,7 +232,7 @@ const TicketEditor = (props: CustomTicketProps) => {
                     forCcy: ccy,
                   },
                 );
-                console.log('anchor', ccy, possibleVault);
+                // console.log('anchor', ccy, possibleVault);
                 return !possibleVault;
               }}
               afterChange={(forCcy) => {
@@ -338,6 +338,7 @@ const TicketEditor = (props: CustomTicketProps) => {
             )
             .map(({ expiry, day }) => (
               <span
+                key={day}
                 className={styles['preset']}
                 onClick={() => onChange({ expiry })}
               >
@@ -485,22 +486,19 @@ const TicketEditor = (props: CustomTicketProps) => {
                     undefined}
                 </span>
                 <span className={styles['unit']}>{vault.depositCcy}</span>
-                <div className={styles['desc']}>
-                  {t(
-                    {
-                      enUS: '{{percent}}% of Pool Size',
-                      zhCN: '池大小的{{percent}}%',
-                    },
-                    {
-                      percent:
-                        percentOfPool === undefined
-                          ? 'N/A'
-                          : percentOfPool < 1
-                            ? '<1'
-                            : percentOfPool,
-                    },
-                  )}
-                </div>
+                {percentOfPool !== undefined ? (
+                  <div className={styles['desc']}>
+                    {t(
+                      {
+                        enUS: '{{percent}}% of Pool Size',
+                        zhCN: '池大小的{{percent}}%',
+                      },
+                      {
+                        percent: percentOfPool < 1 ? '<1' : percentOfPool,
+                      },
+                    )}
+                  </div>
+                ) : undefined}
               </div>
             </div>
           </div>
@@ -573,9 +571,9 @@ const CustomTickets = (props: {
   });
   const quoteInfos = useProductsState((state) => state.quoteInfos);
   const [hoverTicket, setHoverTicket] = useHoverTicket(props.vault);
-  useEffect(() => {
-    console.log('hoverTicket', hoverTicket);
-  }, [hoverTicket]);
+  // useEffect(() => {
+  //   console.log('hoverTicket', hoverTicket);
+  // }, [hoverTicket]);
   useEffect(() => {
     if (!products.length) {
       const product = init();
