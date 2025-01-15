@@ -36,9 +36,15 @@ const ProductLottery = (
 ) => {
   const [t] = useTranslation('AutomatorOperate');
   const prices = useIndexPrices((state) => state.prices);
-  const [ticket] = useTicketType();
 
   const { automator } = useCreatorAutomatorSelector();
+  const ticket = useMemo(
+    () => ({
+      ccy: automator?.vaultInfo.vaultDepositCcy,
+      precision: 2,
+    }),
+    [automator],
+  );
   const vault = useMemo(() => automator?.vaultInfo, [automator]);
   const products = useProductsState(
     (state) =>
@@ -96,6 +102,7 @@ const ProductLottery = (
                 <span className={styles['digi']}>
                   {amountFormatter(totalCost, ticket?.precision)}
                 </span>
+                <span className={styles['unit']}>{ticket?.ccy}</span>
               </span>
             </div>
             <div className={styles['profits']}>

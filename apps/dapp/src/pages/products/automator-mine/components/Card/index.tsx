@@ -57,12 +57,8 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
             <div className={styles['other-infos']}>
               <div className={styles['fee']}>
                 <span>{t({ enUS: 'Fee', zhCN: '手续费' })}</span>
-                {props.info.vaultInfo.createTime
-                  ? formatDuration(
-                      Date.now() - +props.info.vaultInfo.createTime,
-                      1,
-                      true,
-                    )
+                {props.info.vaultInfo?.creatorFeeRate !== undefined
+                  ? displayPercentage(props.info.vaultInfo.creatorFeeRate, 0)
                   : '-'}
               </div>
               <div className={styles['runtime']}>

@@ -2,6 +2,7 @@ import { ReactNode, useMemo } from 'react';
 import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
+import { displayPercentage } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
 import { useIsPortrait, useQuery } from '@sofa/utils/hooks';
 import { formatDuration } from '@sofa/utils/time';
@@ -138,12 +139,8 @@ const Index = () => {
                 <span className={styles['label']}>
                   {t({ enUS: 'Fee', zhCN: '手续费' })}
                 </span>
-                {automator?.vaultInfo.createTime
-                  ? formatDuration(
-                      Date.now() - +automator?.vaultInfo.createTime,
-                      1,
-                      true,
-                    )
+                {automator?.vaultInfo.creatorFeeRate !== undefined
+                  ? displayPercentage(automator.vaultInfo.creatorFeeRate, 0)
                   : '-'}
               </div>
               <div className={styles['item']}>
