@@ -195,7 +195,7 @@ export class AutomatorService {
           desc: it.automatorDescription || vault?.desc,
           creatorFeeRate: [
             get(it, 'creatorFeeRate'),
-            get(it, 'feeRate') === undefined
+            isNullLike(get(it, 'feeRate'))
               ? undefined
               : (get(it, 'feeRate') as number) / 100.0,
             vault?.creatorFeeRate,
