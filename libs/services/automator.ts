@@ -193,8 +193,14 @@ export class AutomatorService {
           vault: it.automatorVault,
           name: get(it, 'automatorName') || vault?.name || it.clientDepositCcy,
           desc: it.automatorDescription || vault?.desc,
-          creatorFeeRate:
-            get(it, 'creatorFeeRate') || vault?.creatorFeeRate || 0,
+          creatorFeeRate: [
+            get(it, 'creatorFeeRate'),
+            get(it, 'feeRate') == undefined
+              ? undefined
+              : get(it, 'feeRate')! / 100.0,
+            vault?.creatorFeeRate,
+            0,
+          ].find((x) => !Number.isNaN(x) && !isNullLike(x)),
           depositCcy: it.clientDepositCcy,
           vaultDepositCcy: it.vaultDepositCcy,
           positionCcy: it.sharesToken,
