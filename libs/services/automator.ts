@@ -195,9 +195,9 @@ export class AutomatorService {
           desc: it.automatorDescription || vault?.desc,
           creatorFeeRate: [
             get(it, 'creatorFeeRate'),
-            get(it, 'feeRate') == undefined
+            get(it, 'feeRate') === undefined
               ? undefined
-              : get(it, 'feeRate')! / 100.0,
+              : (get(it, 'feeRate') as number) / 100.0,
             vault?.creatorFeeRate,
             0,
           ].find((x) => !Number.isNaN(x) && !isNullLike(x)),
