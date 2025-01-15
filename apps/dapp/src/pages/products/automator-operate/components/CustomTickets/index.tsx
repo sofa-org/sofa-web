@@ -50,6 +50,7 @@ export interface CustomTicketProps {
 
 const defaultProductType = ProductType.BullSpread;
 const defaultForCCY: VaultInfo['forCcy'] = 'WBTC';
+const riskType = RiskType.RISKY;
 
 const TicketEditor = (props: CustomTicketProps) => {
   const [t] = useTranslation('AutomatorOperate');
@@ -70,7 +71,6 @@ const TicketEditor = (props: CustomTicketProps) => {
   const [forCcy, setForCcy] = useState<VaultInfo['forCcy']>(
     props.product.vault.forCcy || vaults?.[0].vault.forCcy || defaultForCCY,
   );
-  const [riskType] = [RiskType.RISKY];
 
   useLayoutEffect(() => {
     if (
@@ -536,16 +536,65 @@ const CustomTickets = (props: {
   automator: AutomatorDetail;
 }) => {
   const [t] = useTranslation('AutomatorOperate');
+
+  const { automator } = useCreatorAutomatorSelector();
+  const vaults = useAsyncMemo(async () => {
+    const results = !automator?.vaultInfo
+      ? undefined
+      : await AutomatorCreatorService.vaults(automator.vaultInfo);
+    // console.log('my-vaults', results, automator?.vaultInfo);
+    return results;
+  }, [automator?.vaultInfo]);
+
   const init = useLazyCallback(() => {
-    // console.warn(`props.vault`, props.vault)
+    // 有时候 defaultForCCY + defaultProductType 没有 vault
+    const termsToTry = [
+      {
+        chainId: props.vault.chainId,
+        riskType,
+        depositCcy: props.vault.vaultDepositCcy,
+        forCcy: defaultForCCY,
+        productType: defaultProductType,
+      },
+      {
+        chainId: props.vault.chainId,
+        riskType,
+        depositCcy: props.vault.vaultDepositCcy,
+        forCcy: defaultForCCY,
+      },
+      {
+        chainId: props.vault.chainId,
+        riskType,
+        depositCcy: props.vault.vaultDepositCcy,
+        productType: defaultProductType,
+      },
+      {
+        chainId: props.vault.chainId,
+        riskType,
+        depositCcy: props.vault.vaultDepositCcy,
+      },
+    ];
+
+    const v =
+      vaults &&
+      termsToTry.reduce(
+        (acc, term) =>
+          acc ||
+          ProductsService.findVault(
+            vaults.map((v) => v.vault),
+            term,
+          ),
+        undefined as VaultInfo | undefined,
+      );
+
     return {
       id: nanoid(),
       vault: {
-        vault: '',
-        forCcy: defaultForCCY,
-        productType: defaultProductType,
-        chainId: props.vault.chainId,
-        depositCcy: props.vault.vaultDepositCcy,
+        vault: v?.vault || '',
+        forCcy: v?.forCcy || defaultForCCY,
+        productType: v?.productType || defaultProductType,
+        chainId: v?.chainId || props.vault.chainId,
+        depositCcy: v?.depositCcy || props.vault.vaultDepositCcy,
       },
       depositAmount: 1,
     } as PartialRequired<ProductQuoteParams, 'id' | 'vault'>;
@@ -651,8 +700,7 @@ const CustomTickets = (props: {
           {
             title: t({ enUS: 'Max Acceptable Loss', zhCN: '最大可接受损失' }),
             render: (_, it) => {
-              const q = quoteInfos[ProductsService.productKey(it)];
-              return q ? (
+              return (
                 <>
                   <b>{amountFormatter(it.depositAmount, 2)}</b>
                   <span className={styles['unit']}>
@@ -660,7 +708,7 @@ const CustomTickets = (props: {
                       it.vault.depositCcy}
                   </span>
                 </>
-              ) : undefined;
+              );
             },
           },
           {
@@ -675,7 +723,9 @@ const CustomTickets = (props: {
                       it.vault.depositCcy}
                   </span>
                 </>
-              ) : undefined;
+              ) : (
+                <>...</>
+              );
             },
           },
           {
@@ -720,7 +770,11 @@ const CustomTickets = (props: {
           block
           size="large"
           className={classNames('btn-ghost', styles['btn-add'])}
-          onClick={() => useProductsState.updateCart(props.vault, init())}
+          onClick={() => {
+            const newItem = init();
+            useProductsState.updateCart(props.vault, newItem);
+            setHoverTicket(newItem.id);
+          }}
         >
           <IconPlus />
         </Button>
