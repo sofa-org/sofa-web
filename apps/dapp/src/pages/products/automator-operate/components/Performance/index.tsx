@@ -3,14 +3,9 @@ import { Spin, Toast } from '@douyinfe/semi-ui';
 import { calc_yield } from '@sofa/alg';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { InterestTypeRefs } from '@sofa/services/base-type';
-import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import {
-  amountFormatter,
-  cvtAmountsInCcy,
-  displayPercentage,
-} from '@sofa/utils/amount';
-import { MsIntervals, next8h } from '@sofa/utils/expiry';
+import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
+import { MsIntervals } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { simplePlus } from '@sofa/utils/object';
 import { useRequest } from 'ahooks';
@@ -367,6 +362,7 @@ const PnL = () => {
         <AsyncButton
           disabled={!automator}
           className={styles['btn-claim']}
+          disabled={automator}
           onClick={() =>
             automator &&
             AutomatorCreatorService.harvestProfits(

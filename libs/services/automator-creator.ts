@@ -56,10 +56,9 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<
-        unknown,
-        HttpResponse<AutomatorFactory[]>
-      >(`/optivisors/automator/factories`)
+      .get<unknown, HttpResponse<AutomatorFactory[]>>(
+        `/optivisors/automator/factories`,
+      )
       .then((res) => res.value);
   }
 
@@ -237,23 +236,21 @@ export class AutomatorCreatorService {
     });
   }
 
+  // // 需要 automator 白名单钱包签名
   static async signSignatures(
+    automator: AutomatorVaultInfo,
     products: Parameters<typeof WalletService.mint>[0][],
-    signer: AbstractSigner,
   ) {
-    const signatures = products.reduce((acc, product) => {
-      const signature = ethers.keccak256(
-        ethers.solidityPacked(
-          ['address', 'bytes'],
-          [product.quote.makerWallet, product.quote.signature],
-        ),
-      );
-      const xorResult = ethers.toBigInt(acc) ^ ethers.toBigInt(signature);
-      return ethers.hexlify(ethers.zeroPadValue(ethers.toBeHex(xorResult), 32));
-    }, ethers.ZeroHash);
-
-    const signature = await signer.signMessage(ethers.getBytes(signatures));
-    return signature;
+    return http
+      .post<unknown, HttpResponse<{ signature: string }>>(
+        '/optivisors/automator/sign',
+        {
+          chainId: automator.chainId,
+          automatorVault: automator.vault,
+          quotes: products.map((it) => it.quote),
+        },
+      )
+      .then((res) => res.value.signature);
   }
 
   static async mintProducts(
@@ -269,8 +266,8 @@ export class AutomatorCreatorService {
       const contract = new ethers.Contract(vault.vault, vault.abis, signer);
 
       const signature = await AutomatorCreatorService.signSignatures(
+        vault,
         products,
-        signer,
       );
       const productList = products.map((it) => {
         return {
@@ -563,10 +560,10 @@ export class AutomatorCreatorService {
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
     return http
-      .post<
-        unknown,
-        HttpResponse<boolean>
-      >('/optivisors/automator/create', data)
+      .post<unknown, HttpResponse<boolean>>(
+        '/optivisors/automator/create',
+        data,
+      )
       .then(() => data.automatorAddress);
   }
 }
