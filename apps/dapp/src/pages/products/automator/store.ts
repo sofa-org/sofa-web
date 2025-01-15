@@ -38,6 +38,7 @@ export const useAutomatorStore = Object.assign(
         Record<AutomatorVaultInfo['vault'], AutomatorVaultInfo> | null
       >,
       vaultOverviews: {} as Record<K, AutomatorInfo & Partial<AutomatorDetail>>,
+      vaultDetails: {} as Record<K, AutomatorDetail>,
       snapshots: {} as Record<K, AutomatorPosition[]>,
       performances: {} as Record<K, AutomatorPerformance[]>,
       userInfos: {} as Record<
@@ -97,6 +98,10 @@ export const useAutomatorStore = Object.assign(
               },
               vaultOverviews: {
                 ...pre.vaultOverviews,
+                [`${vault.chainId}-${vault.vault.toLowerCase()}-`]: overview,
+              },
+              vaultDetails: {
+                ...pre.vaultDetails,
                 [`${vault.chainId}-${vault.vault.toLowerCase()}-`]: overview,
               },
             })),

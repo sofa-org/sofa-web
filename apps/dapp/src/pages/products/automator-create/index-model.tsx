@@ -406,15 +406,7 @@ const StepForm = () => {
               field="description"
               label={t({ enUS: 'Strategy Description', zhCN: '策略描述' })}
               trigger="blur"
-              rules={[
-                {
-                  required: true,
-                  message: t({
-                    enUS: 'This field is required',
-                    zhCN: '此字段为必填项',
-                  }),
-                },
-              ]}
+              rules={[]}
             />
           </Col>
         </Row>

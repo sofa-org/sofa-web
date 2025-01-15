@@ -13,6 +13,7 @@ import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { addI18nResources } from '@/locales';
 
+import { useAutomatorStore } from '../automator/store';
 import { Comp as IconCalendar } from '../automator-mine/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../automator-mine/assets/icon-people.svg';
 
@@ -98,7 +99,13 @@ const Index = () => {
   );
 
   const { automator } = useCreatorAutomatorSelector();
-
+  const automatorDetail = useAutomatorStore(
+    (state) =>
+      automator &&
+      state.vaultDetails[
+        `${automator.vaultInfo.chainId}-${automator.vaultInfo.vault.toLowerCase()}-`
+      ],
+  );
   return (
     <TopTabs
       type="banner-expandable-tab"
@@ -159,11 +166,15 @@ const Index = () => {
               </div>
               <div className={styles['desc']}>
                 <MsgDisplay>
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: automator?.vaultInfo.desc || '...',
-                    }}
-                  />
+                  {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
+                  {(automatorDetail?.vaultInfo.desc || '...')
+                    .split('\n')
+                    .map((line, idx) => (
+                      <>
+                        {idx > 0 ? <br key={`lb-${idx}`} /> : undefined}
+                        {line}
+                      </>
+                    ))}
                 </MsgDisplay>
               </div>
             </div>
