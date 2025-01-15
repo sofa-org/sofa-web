@@ -103,6 +103,10 @@ export interface ProductInvestButtonProps extends BaseProps {
   useProductsState: ProductsStateType;
   products: PartialRequired<ProductQuoteParams, 'id' | 'vault'>[];
   quoteInfos: (ProductQuoteResult | undefined)[];
+  mint: (
+    cb: (progress: TransactionProgress) => void,
+    data: ProductQuoteResult[],
+  ) => Promise<void>;
 }
 
 function useShouldQuote(
@@ -265,14 +269,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
         }).then(() => props.afterInvest?.());
       }
     };
-    if (quoteInfos.length === 1) {
-      return PositionsService.deposit((it) => {
-        progressRef.current?.update(it);
-        judgeConsumed(it);
-        judgeSuccess(it);
-      }, quoteInfos[0]!);
-    }
-    return PositionsService.batchDeposit((it) => {
+    return props.mint((it) => {
       progressRef.current?.update(it);
       judgeConsumed(it);
       judgeSuccess(it);
@@ -308,7 +305,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
 const InvestButton = (
   props: Omit<
     ProductInvestButtonProps,
-    'useProductsState' | 'products' | 'quoteInfos'
+    'useProductsState' | 'products' | 'quoteInfos' | 'mint'
   >,
 ) => {
   const $products = useProductsState(
@@ -337,6 +334,12 @@ const InvestButton = (
       quoteInfos={quoteInfos}
       useProductsState={useProductsState}
       vaultInfo={vault}
+      mint={(cb, data) => {
+        if (data.length === 1) {
+          return PositionsService.deposit(cb, data[0]!);
+        }
+        return PositionsService.batchDeposit(cb, data as ProductQuoteResult[]);
+      }}
       {...props}
     />
   );

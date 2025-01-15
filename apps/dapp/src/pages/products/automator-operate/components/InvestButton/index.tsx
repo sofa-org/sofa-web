@@ -1,4 +1,6 @@
 import { useMemo } from 'react';
+import { Toast } from '@douyinfe/semi-ui';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { ProductType, RiskType } from '@sofa/services/contracts';
 import { ProductsService } from '@sofa/services/products';
 
@@ -8,10 +10,12 @@ import {
   ProductInvestButtonProps,
 } from '@/pages/products/components/InvestButton';
 
+import { getCurrentCreatorAutomator } from '../AutomatorSelector';
+
 const InvestButton = (
   props: Omit<
     ProductInvestButtonProps,
-    'useProductsState' | 'products' | 'quoteInfos'
+    'useProductsState' | 'products' | 'quoteInfos' | 'mint'
   > & {
     depositCcy: string;
   },
@@ -38,6 +42,18 @@ const InvestButton = (
         riskType: RiskType.RISKY,
         // for automator, there is no recommended list, so the value of productType doesn't matter
         productType: ProductType.BearSpread,
+      }}
+      mint={async (cb, data) => {
+        const a = getCurrentCreatorAutomator();
+        if (!a.automator) {
+          Toast.error('cannot find current creator automator');
+          return;
+        }
+        return AutomatorCreatorService.mintProducts(
+          cb,
+          a.automator.vaultInfo,
+          data,
+        );
       }}
       {...props}
     />
