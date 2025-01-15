@@ -13,7 +13,8 @@ import {
   VaultInfo,
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
-import { day8h, next8h, pre8h } from '@sofa/utils/expiry';
+import { day8h, MsIntervals, next8h, pre8h } from '@sofa/utils/expiry';
+import { isLegalNum } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
@@ -56,7 +57,6 @@ const TicketEditor = (props: CustomTicketProps) => {
   const [productType, setProductType] = useState<ProductType>(
     props.product.vault.productType || defaultProductType,
   );
-  const customDev = useMemo(() => currQuery()['custom-dev'] === '1', []);
 
   const { automator } = useCreatorAutomatorSelector();
   const vaults = useAsyncMemo(async () => {
@@ -141,17 +141,28 @@ const TicketEditor = (props: CustomTicketProps) => {
     (state) => state.quoteInfos[ProductsService.productKey(props.product)],
   );
 
-  const expiries = useAsyncMemo(
-    async () => vault && ProductsService.genExpiries(vault),
-    [vault],
-  );
   const { min, max } = useMemo(() => {
-    if (!expiries?.length) return { min: next8h(), max: pre8h() };
+    const _next8h = next8h();
+    if (!quoteConfig || !automator) return { min: next8h(), max: pre8h() };
+    const min =
+      (quoteConfig.expiryDateTimes?.[0] &&
+        quoteConfig.expiryDateTimes[0] * 1000) ||
+      _next8h;
+    const max = Math.min(
+      quoteConfig.expiryDateTimes?.length
+        ? quoteConfig.expiryDateTimes[quoteConfig.expiryDateTimes.length - 1] *
+            1000
+        : _next8h,
+      (isLegalNum(automator.vaultInfo.redeemWaitPeriod)
+        ? automator.vaultInfo.redeemWaitPeriod
+        : AutomatorCreatorService.redemptionPeriodDayValues[0] *
+          MsIntervals.day) + Date.now(),
+    );
     return {
-      min: customDev ? next8h(undefined, 1) : expiries[0],
-      max: customDev ? next8h(undefined, 180) : expiries[expiries.length - 1],
+      min,
+      max,
     };
-  }, [customDev, expiries]);
+  }, [quoteConfig, automator]);
 
   useEffect(() => {
     if (!vault) {
@@ -321,16 +332,9 @@ const TicketEditor = (props: CustomTicketProps) => {
           </div>
           {[3, 7, 10, 14]
             .map((day) => ({ day, expiry: next8h(undefined, day + 1) / 1000 }))
-            .filter(({ expiry }) => {
-              // debugger;
-              return (
-                quoteConfig &&
-                (!quoteConfig.expiryDateTimes?.[0] ||
-                  quoteConfig.expiryDateTimes[0] <= expiry) &&
-                (!quoteConfig.expiryDateTimes?.[1] ||
-                  quoteConfig.expiryDateTimes[1] >= expiry)
-              );
-            })
+            .filter(
+              ({ expiry }) => expiry * 1000 >= min && expiry * 1000 <= max,
+            )
             .map(({ expiry, day }) => (
               <span
                 className={styles['preset']}

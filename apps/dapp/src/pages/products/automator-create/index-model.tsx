@@ -282,9 +282,9 @@ const StepForm = () => {
                 },
               ]}
             >
-              <Form.Select.Option value={7}>7D</Form.Select.Option>
-              <Form.Select.Option value={14}>14D</Form.Select.Option>
-              <Form.Select.Option value={30}>30D</Form.Select.Option>
+              {AutomatorCreatorService.redemptionPeriodDayValues.map((day) => (
+                <Form.Select.Option value={day}>{day}D</Form.Select.Option>
+              ))}
             </Form.Select>
           </Col>
         </Row>

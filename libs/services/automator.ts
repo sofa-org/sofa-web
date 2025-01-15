@@ -1,9 +1,10 @@
 import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
+import { isLegalNum } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import { get, pick } from 'lodash-es';
 
-import AutomatorAbis from './abis/Automator.json';
+import AutomatorAbis from './abis/AAVEAutomatorBase.json';
 import {
   getCollateralDecimal,
   getDepositMinAmount,

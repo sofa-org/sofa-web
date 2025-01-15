@@ -50,6 +50,7 @@ export interface AutomatorCreateParams {
 }
 
 export class AutomatorCreatorService {
+  static redemptionPeriodDayValues = [7, 14, 30];
   @applyMock('creatorAutomatorFactories')
   @asyncCache({
     until: (i, t) => !i || !t || Date.now() - t > MsIntervals.min,
@@ -277,7 +278,6 @@ export class AutomatorCreatorService {
             {
               expiry: it.expiry,
               anchorPrices: it.quote.anchorPrices,
-              collateralAtRisk: it.quote.collateralAtRisk,
               makerCollateral: it.quote.makerCollateral,
               deadline: it.quote.deadline,
               maker: it.quote.makerWallet!,
