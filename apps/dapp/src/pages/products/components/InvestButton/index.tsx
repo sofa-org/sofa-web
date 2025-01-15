@@ -107,6 +107,8 @@ export interface ProductInvestButtonProps extends BaseProps {
     cb: (progress: TransactionProgress) => void,
     data: ProductQuoteResult[],
   ) => Promise<void>;
+  insufficientGetBalance: (depositCcy: string) => number | undefined;
+  insufficientDeps: unknown[];
 }
 
 function useShouldQuote(
@@ -162,11 +164,11 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   );
   const insufficient = useMemo(() => {
     if (!vault?.depositCcy) return false;
-    const balance = wallet.balance?.[vault.depositCcy];
+    const balance = props.insufficientGetBalance(vault.depositCcy);
     if (shouldQuote || isNullLike(balance)) return false;
     const amount = simplePlus(...products.map((it) => it.depositAmount))!;
     return amount > balance;
-  }, [products, shouldQuote, vault?.depositCcy, wallet.balance]);
+  }, [products, shouldQuote, vault?.depositCcy, ...props.insufficientDeps]);
 
   const showQuote = shouldQuote || !quoteInfos.length;
   const quote = useLazyCallback(async (noToast?: boolean) => {
@@ -305,9 +307,15 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
 const InvestButton = (
   props: Omit<
     ProductInvestButtonProps,
-    'useProductsState' | 'products' | 'quoteInfos' | 'mint'
+    | 'useProductsState'
+    | 'products'
+    | 'quoteInfos'
+    | 'mint'
+    | 'insufficientGetBalance'
+    | 'insufficientDeps'
   >,
 ) => {
+  const wallet = useWalletStore();
   const $products = useProductsState(
     (state) =>
       state.cart[`${props.vault.toLowerCase()}-${props.chainId}`] || [],
@@ -340,6 +348,8 @@ const InvestButton = (
         }
         return PositionsService.batchDeposit(cb, data as ProductQuoteResult[]);
       }}
+      insufficientGetBalance={(depositCcy) => wallet.balance?.[depositCcy]}
+      insufficientDeps={[wallet.balance]}
       {...props}
     />
   );
