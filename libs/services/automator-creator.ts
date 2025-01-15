@@ -487,7 +487,7 @@ export class AutomatorCreatorService {
             factory,
             'createAutomator',
             (gasLimit) => [
-              ethers.parseUnits(String(data.feeRate), 18), // 乘以 1e18
+              ethers.parseUnits(String(data.feeRate), 16), // 乘以 1e16
               (data.redemptionPeriodDay * MsIntervals.day) / 1000, // s
               data.factory.clientDepositCcyAddress,
               { gasLimit },
