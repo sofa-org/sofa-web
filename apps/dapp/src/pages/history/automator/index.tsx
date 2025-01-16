@@ -33,7 +33,7 @@ export const AutomatorHistory = (props: {
   const [t] = useTranslation('AutomatorHistory');
 
   const market = useAutomatorMarketSelector();
-  const vault = props.automator || market.automator;
+  const vault = 'automator' in props ? props.automator : market.automator;
 
   const { data: $data, loading } = useInfiniteScroll<
     PromiseVal<ReturnType<typeof AutomatorUserService.userTransactions>>
@@ -55,7 +55,7 @@ export const AutomatorHistory = (props: {
       target: () => document.querySelector('#root'),
       isNoMore: (d) => !d?.hasMore,
       onError: (err) => Toast.error(getErrorMsg(err)),
-      reloadDeps: [wallet.chainId, wallet.address],
+      reloadDeps: [wallet.chainId, wallet.address, vault],
     },
   );
 

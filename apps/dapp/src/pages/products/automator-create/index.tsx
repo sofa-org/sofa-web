@@ -139,9 +139,10 @@ const AutomatorCreate = () => {
   const { updatePayload, reset } = useAutomatorCreateStore();
   const [chainId, setChainId] = useState(0);
   const [token, setToken] = useState('');
-  const myAutomators = useAutomatorCreatorStore(
-    (state) => state.vaults[`${chainId}-${wallet.address?.toLowerCase()}`],
-  );
+  const myAutomators = useAutomatorCreatorStore((state) => {
+    const map = state.vaults[`${chainId}-${wallet.address?.toLowerCase()}`];
+    return map && Object.values(map);
+  });
   useEffect(() => {
     if (wallet.address)
       useAutomatorCreatorStore.list(wallet.chainId, wallet.address);

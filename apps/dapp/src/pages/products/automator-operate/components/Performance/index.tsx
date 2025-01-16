@@ -74,7 +74,7 @@ const PoolSize = () => {
             (['depositCcy', 'vaultDepositCcy', 'positionCcy'] as const).map(
               (key) => ({
                 label: automator.vaultInfo[key],
-                value: automator.vaultInfo[key],
+                value: key,
               }),
             ),
             (it) => it.value,
@@ -86,10 +86,10 @@ const PoolSize = () => {
   >('depositCcy');
   const items = useMemo(() => {
     const total = simplePlus(
-      automator?.positionLockedAmount,
-      automator?.redeemedAmount,
-      automator?.unclaimedAmount,
-      automator?.availableAmount,
+      automator?.unExpiredAmountByVaultDepositCcy,
+      automator?.redeemedAmountByVaultDepositCcy,
+      automator?.unclaimedAmountByVaultDepositCcy,
+      automator?.availableAmountByVaultDepositCcy,
     ) as number;
     return [
       {
@@ -99,13 +99,13 @@ const PoolSize = () => {
           [
             [
               String(automator?.vaultInfo.vaultDepositCcy),
-              automator?.positionLockedAmount,
+              automator?.unExpiredAmountByVaultDepositCcy,
             ],
           ],
           prices,
           String(automator?.vaultInfo[byCcy]),
         ),
-        percent: Number(automator?.positionLockedAmount) / total,
+        percent: Number(automator?.unExpiredAmountByVaultDepositCcy) / total,
       },
       {
         color: '#77B6F0',
@@ -114,13 +114,13 @@ const PoolSize = () => {
           [
             [
               String(automator?.vaultInfo.vaultDepositCcy),
-              automator?.redeemedAmount,
+              automator?.redeemedAmountByVaultDepositCcy,
             ],
           ],
           prices,
           String(automator?.vaultInfo[byCcy]),
         ),
-        percent: Number(automator?.redeemedAmount) / total,
+        percent: Number(automator?.redeemedAmountByVaultDepositCcy) / total,
       },
       {
         color: '#D89614',
@@ -129,13 +129,13 @@ const PoolSize = () => {
           [
             [
               String(automator?.vaultInfo.vaultDepositCcy),
-              automator?.unclaimedAmount,
+              automator?.unclaimedAmountByVaultDepositCcy,
             ],
           ],
           prices,
           String(automator?.vaultInfo[byCcy]),
         ),
-        percent: Number(automator?.unclaimedAmount) / total,
+        percent: Number(automator?.unclaimedAmountByVaultDepositCcy) / total,
       },
       {
         color: '#46B8A6',
@@ -144,13 +144,13 @@ const PoolSize = () => {
           [
             [
               String(automator?.vaultInfo.vaultDepositCcy),
-              automator?.availableAmount,
+              automator?.availableAmountByVaultDepositCcy,
             ],
           ],
           prices,
           String(automator?.vaultInfo[byCcy]),
         ),
-        percent: Number(automator?.availableAmount) / total,
+        percent: Number(automator?.availableAmountByVaultDepositCcy) / total,
       },
     ];
   }, [automator, byCcy, prices, t]);
@@ -178,7 +178,7 @@ const PoolSize = () => {
               ccy={automator?.vaultInfo.vaultDepositCcy}
             />
             <span className={styles['unit']}>
-              {automator?.vaultInfo.depositCcy}
+              {automator?.vaultInfo.vaultDepositCcy}
             </span>
             <span className={styles['separator']}>≈</span>
             <AmountDisplay
@@ -235,7 +235,7 @@ const PoolSize = () => {
           <CSelect
             className={styles['selector']}
             optionList={byCcyOptions}
-            value={automator?.vaultInfo[byCcy]}
+            value={byCcy}
             onChange={(v) => setByCcy(v as never)}
           />
         </div>
@@ -296,10 +296,7 @@ const PnL = () => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t(
-            { enUS: 'PnL({{time}})', zhCN: 'PnL({{time}})' },
-            { time: formatTime(automator?.dateTime, 'MMM.DD') },
-          )}
+          {t({ enUS: 'Historical Cumulative PnL', zhCN: '历史累计损益' })}
         </div>
         <div className={styles['value']}>
           <span
@@ -341,10 +338,7 @@ const PnL = () => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t(
-            { enUS: 'PnL%({{time}})', zhCN: 'PnL%({{time}})' },
-            { time: formatTime(automator?.dateTime, 'MMM.DD') },
-          )}
+          {t({ enUS: 'Historical Cumulative PnL%', zhCN: '历史累计损益%' })}
         </div>
         <div
           className={styles['value']}

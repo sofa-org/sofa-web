@@ -27,6 +27,7 @@ import { Comp as IconDetails } from './assets/icon-details.svg';
 import locale from './locale';
 
 addI18nResources(locale, 'History');
+import { useQuery } from '@sofa/utils/hooks';
 import { uniqBy } from 'lodash-es';
 
 import { formatTime } from '@/components/TimezoneSelector/store';
@@ -39,6 +40,9 @@ import styles from './index.module.scss';
 
 const OrderHistory = () => {
   const wallet = useWalletStore();
+  const address = useQuery(
+    (q) => (q['automator-vault'] as string) || wallet.address,
+  );
   const prices = useIndexPrices((state) => state.prices);
   const [t] = useTranslation('History');
   const [project] = useProjectChange();
@@ -46,11 +50,11 @@ const OrderHistory = () => {
 
   const { data: $data, loading } = useInfiniteScroll(
     async (pre) => {
-      if (!wallet.address) return new Promise(() => {});
+      if (!address) return new Promise(() => {});
       const params = {
         chainId: wallet.chainId,
-        owner: wallet.address,
-        riskType,
+        owner: address,
+        riskType: address !== wallet.address ? undefined : riskType,
       };
       const limit = 20;
       const page = {
@@ -63,7 +67,7 @@ const OrderHistory = () => {
       target: () => document.querySelector('#root'),
       isNoMore: (d) => !d?.hasMore,
       onError: (err) => Toast.error(getErrorMsg(err)),
-      reloadDeps: [wallet.chainId, wallet.address],
+      reloadDeps: [wallet.chainId, address],
     },
   );
 
@@ -269,6 +273,7 @@ const OrderHistory = () => {
 const Index = () => {
   const [t] = useTranslation('History');
   const [project] = useProjectChange();
+  const isAutomatorTradeHistory = useQuery((q) => !!q['automator-vault']);
   return (
     <TopTabs
       banner={
@@ -276,10 +281,16 @@ const Index = () => {
           <h1 className={styles['head-title']}>
             {project === ProjectType.Automator
               ? t({ enUS: 'Transaction History', zhCN: '交易历史' })
-              : t({ enUS: 'Order History', zhCN: '订单历史' })}
+              : isAutomatorTradeHistory
+                ? t({
+                    enUS: 'Automator Trade History',
+                    zhCN: 'Automator 交易历史',
+                  })
+                : t({ enUS: 'Order History', zhCN: '订单历史' })}
           </h1>
         </>
       }
+      tabClassName={styles['tabs']}
       options={[]}
       dark
       type={'banner-expandable'}

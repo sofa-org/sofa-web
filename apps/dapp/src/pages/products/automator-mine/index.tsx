@@ -28,7 +28,9 @@ const Index = () => {
   }, [wallet.address, wallet.chainId]);
 
   const list = useAutomatorCreatorStore((state) => {
-    return state.vaults[`${wallet.chainId}-${wallet.address?.toLowerCase()}`];
+    const map =
+      state.vaults[`${wallet.chainId}-${wallet.address?.toLowerCase()}`];
+    return map && Object.values(map);
   });
 
   const tab = useQuery((q) => (q['automator-market-tab'] as string) || 'all');

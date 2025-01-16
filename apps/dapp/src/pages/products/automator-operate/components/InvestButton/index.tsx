@@ -56,7 +56,7 @@ const InvestButton = (
       insufficientGetBalance={(depositCcy) => {
         if (
           !automator?.vaultInfo?.vaultDepositCcy ||
-          !automator.availableAmount
+          !automator.availableAmountByVaultDepositCcy
         ) {
           return 0;
         }
@@ -64,12 +64,12 @@ const InvestButton = (
           automator.vaultInfo.vaultDepositCcy == depositCcy ||
           `a${depositCcy}` == automator.vaultInfo.vaultDepositCcy
         ) {
-          return Number(automator.availableAmount);
+          return Number(automator.availableAmountByVaultDepositCcy);
         }
         return 0;
       }}
       insufficientDeps={[
-        automator?.availableAmount,
+        automator?.availableAmountByVaultDepositCcy,
         automator?.vaultInfo.vaultDepositCcy,
       ]}
       mint={async (cb, data) => {

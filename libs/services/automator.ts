@@ -52,12 +52,19 @@ export interface OriginAutomatorDetail extends OriginAutomatorInfo {
   pnlPercentage: number | string; // Yield (百分比) (基于clientDepositCcy)
   sharesToken: string; // 净值单位 (sharesToken)
   profits: number | string; // totalTradingPnlByVaultDepositCcy * feeRate (vaultDepositCcy)
-  positionLockedAmount: number | string; // Active Position Locked (vaultDepositCcy)
-  unclaimedAmount: number | string; // Position unclaimed (vaultDepositCcy)
-  redeemedAmount: number | string; // To Be Redeemed (vaultDepositCcy)
-  availableAmount: number | string; // Available Balance (vaultDepositCcy)
+  unExpiredAmountByVaultDepositCcy: number | string; // Active Position Locked (vaultDepositCcy)
+  unclaimedAmountByVaultDepositCcy: number | string; // Position unclaimed (vaultDepositCcy)
+  redeemedAmountByVaultDepositCcy: number | string; // To Be Redeemed (vaultDepositCcy)
+  availableAmountByVaultDepositCcy: number | string; // Available Balance (vaultDepositCcy)
   redemptionPeriodDay: number; // 赎回观察时间 (单位：天)
-  positionSize?: number | string;
+  positionSize?: number | string; // 当前未到期的头寸数量
+  pastAvailableBalanceExcludingPrincipal: number | string; // Available Balance Excluding Principal-vaultDepositCcy
+  historicalInterestPlusNetPnL: number | string; // Historical Interest Earned(The cumulative interest earned through Aave/Lido/Sofa/Curve)-vaultDepositCcy
+  lockedByUnclaimedPosition: number | string; // Current Position(Value of open & Unclaimed positions.)-vaultDepositCcy
+  estimatedFutureInterestByVaultCcy: number | string; // Estimated (estimatedTenorInDays)-Day Interest-vaultDepositCcy
+  estimatedTenorInDays: number | string; // estimated Tenor In Days-vaultDepositCcy
+  poolSizeForFutureInterestByVaultCcy: number | string; // Net PnL (RCH not included)-vaultDepositCcy
+  estimatedFundingApyPercentage: number | string; // Estimated Aave/Lido/Sofa/Curve Yield(百分比)
 }
 
 export interface AutomatorInfo
@@ -312,7 +319,8 @@ export class AutomatorService {
         }>
       >(`/optivisors/automator/user/list`, {
         params: {
-          ...pick(vault, ['chainId', 'automatorVault']),
+          chainId: vault.chainId,
+          automatorVault: vault.vault,
           pageSize,
           currentPage,
         },

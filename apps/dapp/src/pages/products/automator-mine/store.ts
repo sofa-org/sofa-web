@@ -1,21 +1,29 @@
 import { Toast } from '@douyinfe/semi-ui';
 import { AutomatorDetail } from '@sofa/services/automator';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
+import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { getErrorMsg } from '@sofa/utils/fns';
-import { arrToDict } from '@sofa/utils/object';
+import { arrToDict, objectValCvt } from '@sofa/utils/object';
 import { isEqual } from 'lodash-es';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { useAutomatorStore } from './../automator/store';
 
 export const useAutomatorCreatorStore = Object.assign(
   createWithEqualityFn(
-    () => ({
-      vaults: {} as Record<
-        `${number}-${string}` /* chainId-wallet */,
-        AutomatorDetail[] | null
-      >,
-    }),
+    persist(
+      () => ({
+        vaults: {} as Record<
+          `${number}-${string}` /* chainId-wallet */,
+          Record<AutomatorVaultInfo['vault'], AutomatorDetail> | null
+        >,
+      }),
+      {
+        name: 'global-state',
+        storage: createJSONStorage(() => localStorage),
+      },
+    ),
     isEqual,
   ),
   {
@@ -49,7 +57,13 @@ export const useAutomatorCreatorStore = Object.assign(
                 ),
               },
             },
-            vaultOverviews: { ...pre.vaultOverviews, ...vaultOverviews },
+            vaultOverviews: {
+              ...pre.vaultOverviews,
+              ...objectValCvt(vaultOverviews, (v, k) => ({
+                ...pre.vaultOverviews[k as never],
+                ...v,
+              })),
+            },
           }));
         })
         .catch((err) => Toast.error(getErrorMsg(err)));

@@ -195,9 +195,11 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
   ]);
 
   const availableBalanceExcludingPrincipal = useMemo(
-    () => Number(automator?.availableAmount) || 0,
-    [automator?.availableAmount],
+    () => Number(automator?.pastAvailableBalanceExcludingPrincipal) || 0,
+    [automator?.pastAvailableBalanceExcludingPrincipal],
   );
+
+  console.log(1111, automator);
 
   return !automatorVault ? (
     <CEmpty
@@ -223,7 +225,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                 <>
                   <span className={styles['digi']}>
                     {amountFormatter(
-                      automator.availableAmount,
+                      automator.availableAmountByVaultDepositCcy,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}

@@ -11,6 +11,7 @@ import {
 import { PositionStatus } from '@sofa/services/the-graph';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
+import { joinUrl } from '@sofa/utils/url';
 import { useInfiniteScroll } from 'ahooks';
 import classNames from 'classnames';
 import { uniqBy } from 'lodash-es';
@@ -252,7 +253,11 @@ const List = (props: {
           type="primary"
           className={classNames(styles['btn-bottom'], styles['btn-txt'])}
           onClick={() => {
-            const link = `/positions/orders${window.location.search}`;
+            const link = joinUrl(
+              '/positions/orders',
+              window.location.search,
+              `?automator-vault=${!props.automator?.vault ? '' : address}`,
+            );
             window.location.href = link;
           }}
         >

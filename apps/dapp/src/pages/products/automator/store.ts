@@ -76,18 +76,25 @@ export const useAutomatorStore = Object.assign(
         }));
       });
     },
+    _subscribeVaultsTimer: null as ReturnType<typeof setInterval> | null,
     subscribeVaults: (chainId: number) => {
-      useAutomatorStore.getAutomatorVaults(chainId);
-      const timer = setInterval(
-        () => useAutomatorStore.getAutomatorVaults(chainId),
-        MsIntervals.min,
-      );
-      return () => clearInterval(timer);
+      if (!useAutomatorStore._subscribeVaultsTimer) {
+        useAutomatorStore.getAutomatorVaults(chainId);
+        useAutomatorStore._subscribeVaultsTimer = setInterval(
+          () => useAutomatorStore.getAutomatorVaults(chainId),
+          MsIntervals.min,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeVaultsTimer!);
+        useAutomatorStore._subscribeVaultsTimer = null;
+      };
     },
+    _subscribeOverviewTimer: null as ReturnType<typeof setInterval> | null,
     subscribeOverview: (vault: AutomatorVaultInfo) => {
       const sync = () =>
         AutomatorService.info(vault)
-          .then((overview) =>
+          .then((overview) => {
             useAutomatorStore.setState((pre) => ({
               vaults: {
                 ...pre.vaults,
@@ -104,15 +111,24 @@ export const useAutomatorStore = Object.assign(
                 ...pre.vaultDetails,
                 [`${vault.chainId}-${vault.vault.toLowerCase()}-`]: overview,
               },
-            })),
-          )
+            }));
+          })
           .catch((err) =>
             Toast.error(`Failed to fetch overview: ${getErrorMsg(err)}`),
           );
-      sync();
-      const interval = setInterval(sync, MsIntervals.day);
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribeOverviewTimer) {
+        sync();
+        useAutomatorStore._subscribeOverviewTimer = setInterval(
+          sync,
+          MsIntervals.day,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeOverviewTimer!);
+        useAutomatorStore._subscribeOverviewTimer = null;
+      };
     },
+    _subscribeSnapshotsTimer: null as ReturnType<typeof setInterval> | null,
     subscribeSnapshots: (vault: AutomatorVaultInfo) => {
       const sync = () =>
         AutomatorService.positionsSnapshot(vault)
@@ -128,10 +144,19 @@ export const useAutomatorStore = Object.assign(
           .catch((err) =>
             Toast.error(`Failed to fetch snapshots: ${getErrorMsg(err)}`),
           );
-      sync();
-      const interval = setInterval(sync, MsIntervals.day);
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribeSnapshotsTimer) {
+        sync();
+        useAutomatorStore._subscribeSnapshotsTimer = setInterval(
+          sync,
+          MsIntervals.day,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeSnapshotsTimer!);
+        useAutomatorStore._subscribeSnapshotsTimer = null;
+      };
     },
+    _subscribePerformancesTimer: null as ReturnType<typeof setInterval> | null,
     subscribePerformances: (vault: AutomatorVaultInfo) => {
       const sync = () =>
         AutomatorService.performance(vault)
@@ -147,9 +172,17 @@ export const useAutomatorStore = Object.assign(
           .catch((err) =>
             Toast.error(`Failed to fetch weekly pnl list: ${getErrorMsg(err)}`),
           );
-      sync();
-      const interval = setInterval(sync, MsIntervals.day);
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribePerformancesTimer) {
+        sync();
+        useAutomatorStore._subscribePerformancesTimer = setInterval(
+          sync,
+          MsIntervals.day,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribePerformancesTimer!);
+        useAutomatorStore._subscribePerformancesTimer = null;
+      };
     },
     getUserInfoList: async (chainId: number, wallet: string) => {
       return Promise.all([
@@ -179,13 +212,19 @@ export const useAutomatorStore = Object.assign(
         });
       });
     },
+    _subscribeUserInfoListTimer: null as ReturnType<typeof setInterval> | null,
     subscribeUserInfoList: (chainId: number, wallet: string) => {
-      useAutomatorStore.getUserInfoList(chainId, wallet);
-      const timer = setInterval(
-        () => useAutomatorStore.getUserInfoList(chainId, wallet),
-        MsIntervals.min,
-      );
-      return () => clearInterval(timer);
+      if (!useAutomatorStore._subscribeUserInfoListTimer) {
+        useAutomatorStore.getUserInfoList(chainId, wallet);
+        useAutomatorStore._subscribeUserInfoListTimer = setInterval(
+          () => useAutomatorStore.getUserInfoList(chainId, wallet),
+          MsIntervals.min,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeUserInfoListTimer!);
+        useAutomatorStore._subscribeUserInfoListTimer = null;
+      };
     },
     updateUserInfo: (vault: AutomatorVaultInfo, address: string) => {
       AutomatorUserService.userPosition(vault, address)
@@ -240,13 +279,19 @@ export const useAutomatorStore = Object.assign(
           Toast.error(`Failed to fetch redemption info: ${getErrorMsg(err)}`),
         );
     },
+    _subscribeUserInfoTimer: null as ReturnType<typeof setInterval> | null,
     subscribeUserInfo: (vault: AutomatorVaultInfo, address: string) => {
-      useAutomatorStore.updateUserInfo(vault, address);
-      const interval = setInterval(
-        () => useAutomatorStore.updateUserInfo(vault, address),
-        MsIntervals.min,
-      );
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribeUserInfoTimer) {
+        useAutomatorStore.updateUserInfo(vault, address);
+        useAutomatorStore._subscribeUserInfoTimer = setInterval(
+          () => useAutomatorStore.updateUserInfo(vault, address),
+          MsIntervals.min,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeUserInfoTimer!);
+        useAutomatorStore._subscribeUserInfoTimer = null;
+      };
     },
     updateDepositData: (
       vault: AutomatorVaultInfo,

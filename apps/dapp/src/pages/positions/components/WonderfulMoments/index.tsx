@@ -3,6 +3,7 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionsService } from '@sofa/services/positions';
 import { ProductType, RiskType } from '@sofa/services/products';
+import { joinUrl } from '@sofa/utils/url';
 import { useRequest } from 'ahooks';
 import classNames from 'classnames';
 
@@ -67,11 +68,15 @@ const List = (props: {
           type="primary"
           className={classNames(styles['btn-bottom'], styles['btn-txt'])}
           onClick={() => {
-            const link = `/positions/orders${window.location.search}`;
+            const link = joinUrl(
+              '/positions/orders',
+              window.location.search,
+              `?automator-vault=${!props.automator?.vault ? '' : address}`,
+            );
             window.location.href = link;
           }}
         >
-          {t('ALL HISTORY')}
+          {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}
         </Button>
         <RuleDescriptions />
       </div>

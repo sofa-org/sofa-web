@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react';
-import { AutomatorService } from '@sofa/services/automator';
+import { AutomatorDetail } from '@sofa/services/automator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { updateQuery } from '@sofa/utils/history';
-import { useAsyncMemo, useLazyCallback, useQuery } from '@sofa/utils/hooks';
+import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import { parse } from 'qs';
 
@@ -26,18 +26,31 @@ export function useCreatorAutomatorSelector() {
       useAutomatorCreatorStore.list(wallet.chainId, wallet.address);
   }, [wallet.address, wallet.chainId]);
 
-  const automators = useAutomatorCreatorStore(
-    (state) =>
-      state.vaults[`${wallet.chainId}-${wallet.address?.toLowerCase()}`],
-  );
+  const automators = useAutomatorCreatorStore((state) => {
+    const map =
+      state.vaults[`${wallet.chainId}-${wallet.address?.toLowerCase()}`];
+    return map && Object.values(map);
+  });
 
-  const automator = useMemo(
+  const $automator = useMemo(
     () =>
       automators?.find(
         (it) => it.vaultInfo.vault.toLowerCase() === vault?.toLowerCase(),
       ) || automators?.[0],
     [automators, vault],
   );
+
+  const automator = useAutomatorStore((state) => {
+    if (!$automator) return undefined;
+    return {
+      ...$automator,
+      ...state.vaultOverviews[
+        `${
+          $automator.vaultInfo.chainId
+        }-${$automator.vaultInfo.vault.toLowerCase()}-`
+      ],
+    } as AutomatorDetail;
+  });
 
   useEffect(
     () =>
@@ -55,10 +68,11 @@ export function getCurrentCreatorAutomator() {
       '',
   );
   const wallet = useWalletStore.getState();
-  const automators =
+  const $automators =
     useAutomatorCreatorStore.getState().vaults[
       `${wallet.chainId}-${wallet.address?.toLowerCase()}`
     ];
+  const automators = $automators && Object.values($automators);
   if (!automators?.length)
     return {
       automator: undefined,

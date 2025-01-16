@@ -144,7 +144,7 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
         </div>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={props.info.availableAmount}
+            amount={props.info.availableAmountByVaultDepositCcy}
             ccy={props.info.vaultInfo.vaultDepositCcy}
           />
           <span className={styles['unit']}>
@@ -154,10 +154,7 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t(
-            { enUS: 'PnL({{time}})', zhCN: 'PnL({{time}})' },
-            { time: formatTime(props.info.dateTime, 'MMM.DD') },
-          )}
+          {t({ enUS: 'Historical Cumulative PnL', zhCN: '历史累计损益' })}
         </div>
         <div className={styles['value']}>
           <span
@@ -199,10 +196,7 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t(
-            { enUS: 'PnL%({{time}})', zhCN: 'PnL%({{time}})' },
-            { time: formatTime(props.info.dateTime, 'MMM.DD') },
-          )}
+          {t({ enUS: 'Historical Cumulative PnL%', zhCN: '历史累计损益%' })}
         </div>
         <div
           className={styles['value']}
