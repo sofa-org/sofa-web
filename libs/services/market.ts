@@ -292,9 +292,8 @@ export class MarketService {
   > {
     const ccyList = ContractsService.vaults.reduce(
       (pre, it) =>
-        it.chainId !== chainId ||
-        it.riskType === RiskType.RISKY ||
-        pre.includes(it.depositCcy)
+        it.riskType !== RiskType.RISKY &&
+        (it.chainId !== chainId || pre.includes(it.depositCcy))
           ? pre
           : pre.concat(it.depositCcy),
       [] as string[],
