@@ -213,7 +213,7 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
       <div className={styles['item']}>
         <div className={styles['label']}>
           {t(
-            { enUS: 'Total Share Profits', zhCN: '你的收益' },
+            { enUS: 'Total Share Profits', zhCN: '总分润' },
             { time: formatTime(props.info.dateTime, 'MMM.DD') },
           )}
         </div>

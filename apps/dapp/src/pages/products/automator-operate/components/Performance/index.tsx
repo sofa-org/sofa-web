@@ -374,7 +374,7 @@ const PnL = () => {
         <div className={styles['item']}>
           <div className={styles['label']}>
             {t(
-              { enUS: 'Total Share Profits', zhCN: '你的收益' },
+              { enUS: 'Total Share Profits', zhCN: '总分润' },
               { time: formatTime(automator?.dateTime, 'MMM.DD') },
             )}
           </div>
@@ -391,7 +391,7 @@ const PnL = () => {
         <div className={styles['item']}>
           <div className={styles['label']}>
             {t(
-              { enUS: 'Unclaimed Share Profit', zhCN: '你的收益' },
+              { enUS: 'Unclaimed Share Profit', zhCN: '未提取的分润' },
               { time: formatTime(automator?.dateTime, 'MMM.DD') },
             )}
           </div>

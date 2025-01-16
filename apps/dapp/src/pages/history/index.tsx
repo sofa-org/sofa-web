@@ -30,6 +30,7 @@ addI18nResources(locale, 'History');
 import { useQuery } from '@sofa/utils/hooks';
 import { uniqBy } from 'lodash-es';
 
+import AmountDisplay from '@/components/AmountDisplay';
 import { formatTime } from '@/components/TimezoneSelector/store';
 
 import { judgeSettled } from '../positions/components/PositionCard';
@@ -148,8 +149,12 @@ const OrderHistory = () => {
                   color: pnl >= 0 ? 'var(--color-rise)' : 'var(--color-fall)',
                 }}
               >
-                {pnl >= 0 ? '+' : ''}
-                {amountFormatter(pnl, 2)} {record.product.vault.depositCcy}
+                <AmountDisplay
+                  amount={pnl}
+                  ccy={record.product.vault.depositCcy}
+                  signed
+                />{' '}
+                {record.product.vault.depositCcy}
               </span>
             );
           },
