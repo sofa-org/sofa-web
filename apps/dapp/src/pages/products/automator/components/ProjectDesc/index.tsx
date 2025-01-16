@@ -82,7 +82,7 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
       </section>
       <Snapshot vault={props.vault} />
       <AutomatorPerformanceChart
-        className={styles['chart']}
+        className={styles['performance']}
         vault={props.vault}
       />
       <section className={styles['section']}>

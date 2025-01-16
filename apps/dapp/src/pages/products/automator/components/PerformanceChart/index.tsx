@@ -4,6 +4,7 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
+import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 import { BarChart } from 'echarts/charts';
 import {
@@ -75,6 +76,12 @@ export const AutomatorPerformanceChart = (
           return {
             tradingPnl: cvt(+it.incrTradingPnlByClientDepositCcy),
             interestPnl: cvt(+it.incrInterestPnlByClientDepositCcy),
+            tradingAndInterestPnl: cvt(
+              simplePlus(
+                it.incrTradingPnlByClientDepositCcy,
+                it.incrInterestPnlByClientDepositCcy,
+              )!,
+            ),
             rchPnl: cvt(+it.incrRchPnlByClientDepositCcy),
             timestamp: it.dateTime * 1000,
           };
@@ -174,23 +181,25 @@ export const AutomatorPerformanceChart = (
       },
       series: [
         {
-          name: `PnL Of Trading`,
+          name: t({ enUS: 'PnL Of Trading & Interest', zhCN: '交易&利息盈亏' }),
           type: 'bar',
           stack: 'bar',
           data: data.map((it) => ({
-            value: it.tradingPnl,
-            itemStyle: { color: it.tradingPnl > 0 ? '#44C476' : '#EC5E88' },
+            value: it.tradingAndInterestPnl,
+            itemStyle: {
+              color: it.tradingAndInterestPnl > 0 ? '#44C476' : '#EC5E88',
+            },
           })),
         },
-        {
-          name: `PnL Of Interest`,
-          type: 'bar',
-          stack: 'bar',
-          data: data.map((it) => ({
-            value: it.interestPnl,
-            itemStyle: { color: '#27a0a0' },
-          })),
-        },
+        // {
+        //   name: `PnL Of Interest`,
+        //   type: 'bar',
+        //   stack: 'bar',
+        //   data: data.map((it) => ({
+        //     value: it.interestPnl,
+        //     itemStyle: { color: '#27a0a0' },
+        //   })),
+        // },
         {
           name: 'PnL Of RCH',
           type: 'bar',
@@ -205,6 +214,7 @@ export const AutomatorPerformanceChart = (
 
     myChart.current.setOption(option);
   }, [
+    t,
     data,
     props.vault?.depositCcy,
     precision,
@@ -226,7 +236,10 @@ export const AutomatorPerformanceChart = (
         {/* <span className={styles['icon']}>︎︎✹︎</span> */}
         {t({ enUS: 'Vault Performance', zhCN: '历史表现' })}
       </h2>
-      <Spin spinning={!list} wrapperClassName={styles['content']}>
+      <Spin
+        spinning={!list}
+        wrapperClassName={classNames(styles['content'], 'content')}
+      >
         <div className={styles['legend']}>
           <div className={styles['legend-item']}>
             <div
@@ -237,15 +250,15 @@ export const AutomatorPerformanceChart = (
               className={styles['color']}
               style={{ background: '#EC5E88' }}
             />
-            {t({ enUS: 'PnL Of Trading', zhCN: '交易盈亏' })}
+            {t({ enUS: 'PnL Of Trading & Interest', zhCN: '交易&利息盈亏' })}
           </div>
-          <div className={styles['legend-item']}>
+          {/* <div className={styles['legend-item']}>
             <div
               className={styles['color']}
               style={{ background: '#27a0a0' }}
             />
             {t({ enUS: 'PnL Of Interest', zhCN: '利息盈亏' })}
-          </div>
+          </div> */}
           <div className={styles['legend-item']}>
             <div
               className={styles['color']}
@@ -254,7 +267,7 @@ export const AutomatorPerformanceChart = (
             {t({ enUS: 'PnL Of RCH', zhCN: 'RCH盈亏' })}
           </div>
         </div>
-        <div className={styles['chart']} ref={chartRef} />
+        <div className={classNames(styles['chart'], 'chart')} ref={chartRef} />
       </Spin>
     </div>
   );

@@ -37,8 +37,8 @@ const List = (props: {
         : PositionsService.wonderful({
             chainId: wallet.chainId,
             owner: address,
-            riskType: props.riskType,
-            productType: props.productType,
+            riskType: props.automator ? undefined : props.riskType,
+            productType: props.automator ? undefined : props.productType,
           }),
     {
       refreshDeps: [wallet.chainId, address, props.riskType, props.productType],
