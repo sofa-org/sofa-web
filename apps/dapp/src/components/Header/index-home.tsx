@@ -170,6 +170,7 @@ export function useHeaderOpacity() {
 }
 export const RenderMenu = (it: MenuItem) => {
   const [t] = useTranslation('Header');
+  const navigate = useNavigate();
   const isMobileUI = useIsMobileUI();
   const { selectedMenuItem, setSelectedMenuItem } = useMobileHeaderState();
   if (it.hide?.()) return <Fragment />;
@@ -256,6 +257,7 @@ export const RenderMenu = (it: MenuItem) => {
           }
         }
       }}
+      clickToHide
       render={
         <Dropdown.Menu className={styles['nav-selector-items']}>
           {Object.entries(groups).map(([group, children], _, arr) => {
@@ -277,7 +279,9 @@ export const RenderMenu = (it: MenuItem) => {
                       )}
                       onClick={() => {
                         const path = joinUrl(location.search, m.path);
-                        window.location.href = path;
+                        if (path.startsWith('http'))
+                          window.location.href = path;
+                        else navigate(path);
                       }}
                     >
                       <span className="semi-select-option-text">

@@ -5,12 +5,11 @@ import { MsIntervals } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import { arrToDict } from '@sofa/utils/object';
-import { AbstractSigner, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { omitBy } from 'lodash-es';
 
 import burnAbis from './abis/AutomatorBurner.json';
 import factoryAbis from './abis/AutomatorFactory.json';
-import { CommonAbis } from './abis/common-abis';
 import { AutomatorService, OriginAutomatorDetail } from './automator';
 import {
   AutomatorFactory,
