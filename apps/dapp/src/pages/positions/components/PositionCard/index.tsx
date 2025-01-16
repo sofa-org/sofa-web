@@ -1,11 +1,17 @@
 import { useMemo, useRef } from 'react';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { useTranslation } from '@sofa/services/i18n';
-import { PositionInfo, PositionsService } from '@sofa/services/positions';
+import {
+  PositionInfo,
+  PositionsService,
+  TransactionProgress,
+} from '@sofa/services/positions';
 import { ProductType, RiskType } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
 import { currQuery } from '@sofa/utils/history';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -31,6 +37,7 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'PositionCard');
 
 export interface PositionCardProps {
+  isAutomator?: boolean;
   position: PositionInfo;
   onStatusChange?(status: PositionStatus): void;
   onClick?(): void;
@@ -200,7 +207,7 @@ const RiskyAmounts = (
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
-      {claimable && (
+      {claimable && !props.isAutomator && (
         <div className={styles['btns']}>
           <AsyncButton
             type="primary"
@@ -296,6 +303,15 @@ const PositionCard = (props: PositionCardProps) => {
   );
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
+
+  const handleClaim = useLazyCallback(async () => {
+    const cb = (it: TransactionProgress) => {
+      claimProgressRef.current?.update(it);
+      if (it.status === 'Success')
+        props.onStatusChange?.(PositionStatus.CLAIMED);
+    };
+    return PositionsService.claim(cb, params);
+  });
 
   return (
     <>
@@ -393,27 +409,9 @@ const PositionCard = (props: PositionCardProps) => {
           </div>
         </div>
         {product.vault.riskType !== RiskType.RISKY ? (
-          <ProtectedAmounts
-            {...props}
-            onClaim={() => {
-              return PositionsService.claim((it) => {
-                claimProgressRef.current?.update(it);
-                if (it.status === 'Success')
-                  props.onStatusChange?.(PositionStatus.CLAIMED);
-              }, params);
-            }}
-          />
+          <ProtectedAmounts {...props} onClaim={handleClaim} />
         ) : (
-          <RiskyAmounts
-            {...props}
-            onClaim={() => {
-              return PositionsService.claim((it) => {
-                claimProgressRef.current?.update(it);
-                if (it.status === 'Success')
-                  props.onStatusChange?.(PositionStatus.CLAIMED);
-              }, params);
-            }}
-          />
+          <RiskyAmounts {...props} onClaim={handleClaim} />
         )}
         {Date.now() >
           next8h(position.createdAt * 1000) + MsIntervals.min * 10 &&

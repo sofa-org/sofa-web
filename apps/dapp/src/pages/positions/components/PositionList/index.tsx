@@ -1,8 +1,13 @@
 import { Fragment, useMemo, useRef, useState } from 'react';
 import { Button, Modal, Spin, Toast } from '@douyinfe/semi-ui';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { PositionInfo, PositionsService } from '@sofa/services/positions';
+import {
+  PositionInfo,
+  PositionsService,
+  TransactionProgress,
+} from '@sofa/services/positions';
 import {
   ProductsService,
   ProductType,
@@ -114,41 +119,42 @@ const List = (props: {
   const claimAll = useLazyCallback(() => {
     if (!address) return;
     setClaimAllList(unClaimedList);
-    return PositionsService.claimBatch(
-      (it) => {
-        claimProgressRef.current?.update(it);
-        if (['Success', 'Partial Failed'].includes(it.status)) {
-          const successIds = it.details?.flatMap((d) => {
-            if (d[1].status === PositionStatus.CLAIMED) return d[1].ids;
-            return [];
-          });
-          if (successIds) {
-            mutate(
-              (pre) =>
-                pre && {
-                  ...pre,
-                  list: pre?.list.map((it) =>
-                    successIds.includes(it.id) ? { ...it, claimed: true } : it,
-                  ),
-                },
-            );
-          }
+    const data = unClaimedList.map((it) => ({
+      positionId: it.id,
+      vault: it.product.vault.vault,
+      productType: it.product.vault.productType,
+      chainId: it.product.vault.chainId,
+      owner: it.wallet,
+      term: it.claimParams.term,
+      expiry: it.product.expiry,
+      anchorPrices: it.claimParams.anchorPrices,
+      collateralAtRiskPercentage: it.claimParams.collateralAtRiskPercentage,
+      isMaker: it.claimParams.maker,
+      redeemableAmount: it.amounts.redeemable || 0,
+    }));
+    const cb = (it: TransactionProgress) => {
+      claimProgressRef.current?.update(it);
+      if (['Success', 'Partial Failed'].includes(it.status)) {
+        const successIds = it.details?.flatMap((d) => {
+          if (d[1].status === PositionStatus.CLAIMED) return d[1].ids;
+          return [];
+        });
+        if (successIds) {
+          mutate(
+            (pre) =>
+              pre && {
+                ...pre,
+                list: pre?.list.map((it) =>
+                  successIds.includes(it.id) ? { ...it, claimed: true } : it,
+                ),
+              },
+          );
         }
-      },
-      unClaimedList.map((it) => ({
-        positionId: it.id,
-        vault: it.product.vault.vault,
-        productType: it.product.vault.productType,
-        chainId: it.product.vault.chainId,
-        owner: it.wallet,
-        term: it.claimParams.term,
-        expiry: it.product.expiry,
-        anchorPrices: it.claimParams.anchorPrices,
-        collateralAtRiskPercentage: it.claimParams.collateralAtRiskPercentage,
-        isMaker: it.claimParams.maker,
-        redeemableAmount: it.amounts.redeemable || 0,
-      })),
-    );
+      }
+    };
+    if (props.automator)
+      return AutomatorCreatorService.claimPositions(cb, props.automator, data);
+    return PositionsService.claimBatch(cb, data);
   });
 
   const [selectedPosition, setSelectedPosition] = useState<PositionInfo>();
@@ -186,6 +192,7 @@ const List = (props: {
               position={it}
               onStatusChange={(status) => handleStatusChange(status, it)}
               onClick={() => setSelectedPosition(it)}
+              isAutomator={!!props.automator}
               key={`${it.id}-${ProductsService.productKey(it.product)}`}
             />
           ),

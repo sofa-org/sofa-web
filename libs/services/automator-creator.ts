@@ -16,6 +16,7 @@ import {
   AutomatorFactory,
   AutomatorVaultInfo,
   TransactionStatus,
+  VaultInfo,
 } from './base-type';
 import { ChainMap, defaultChain } from './chains';
 import { ContractsService } from './contracts';
@@ -352,13 +353,25 @@ export class AutomatorCreatorService {
     try {
       const { signer } = await WalletService.connect(vault.chainId);
       const contract = new ethers.Contract(vault.vault, vault.abis, signer);
-      const positionList = {
-        vault: vault.vault,
-        products: positions.map((it) => ({
-          expiry: it.expiry,
-          anchorPrices: it.anchorPrices,
-        })),
-      };
+      const $positionList = positions.reduce(
+        (pre, it) => {
+          const key = it.vault.toLowerCase();
+          const product = {
+            expiry: it.expiry,
+            anchorPrices: it.anchorPrices,
+          };
+          if (!pre[key]) pre[key] = [];
+          pre[key].push(product);
+          return pre;
+        },
+        {} as Record<
+          VaultInfo['vault'],
+          { expiry: number; anchorPrices: string[] }[]
+        >,
+      );
+      const positionList = Object.entries($positionList).map(
+        ([vault, products]) => ({ vault, products }),
+      );
       const vaultQuotes = positions.reduce(
         (pre, it) => {
           const key = `${it.vault.toLowerCase()}-${it.chainId}-${it.claimCcy}`;
