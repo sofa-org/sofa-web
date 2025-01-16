@@ -194,11 +194,6 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     prices,
   ]);
 
-  const availableBalanceExcludingPrincipal = useMemo(
-    () => Number(automator?.pastAvailableBalanceExcludingPrincipal) || 0,
-    [automator?.pastAvailableBalanceExcludingPrincipal],
-  );
-
   return !automatorVault ? (
     <CEmpty
       className="semi-always-dark"
@@ -251,7 +246,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                 <>
                   <span className={styles['digi']}>
                     {amountFormatter(
-                      availableBalanceExcludingPrincipal,
+                      automator.pastAvailableBalanceExcludingPrincipal,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
                     )}
@@ -281,9 +276,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             })}
                           </span>
                           <span className={styles['value']}>
-                            {/* TODO */}
                             {amountFormatter(
-                              0,
+                              automator.historicalInterestPlusNetPnL,
                               CCYService.ccyConfigs[
                                 automator.vaultInfo.vaultDepositCcy
                               ]?.precision || undefined,
@@ -305,9 +299,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             })}
                           </span>
                           <span className={styles['value']}>
-                            {/* TODO */}
                             {amountFormatter(
-                              0,
+                              automator.lockedByUnclaimedPosition,
                               CCYService.ccyConfigs[
                                 automator.vaultInfo.vaultDepositCcy
                               ]?.precision || undefined,
@@ -331,9 +324,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             })}
                           </span>
                           <span className={styles['value']}>
-                            {/* TODO */}
                             {amountFormatter(
-                              availableBalanceExcludingPrincipal,
+                              automator.pastAvailableBalanceExcludingPrincipal,
                               CCYService.ccyConfigs[
                                 automator.vaultInfo.vaultDepositCcy
                               ]?.precision || undefined,
@@ -491,7 +483,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                   <span className={styles['digi']}>
                     =&nbsp;
                     {amountFormatter(
-                      availableBalanceExcludingPrincipal +
+                      Number(automator.pastAvailableBalanceExcludingPrincipal) +
                         interest.byVaultDepositCcy,
                       CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
                         ?.precision || undefined,
