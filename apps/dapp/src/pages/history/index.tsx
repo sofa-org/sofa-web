@@ -213,15 +213,17 @@ const OrderHistory = () => {
       expandedRowKeys={expandedRowKeys}
       expandedRowRender={(record) => {
         if (!record) return null;
-        const returnInDepositCcy = cvtAmountsInCcy(
-          [
-            [record.product.vault.depositCcy, record.amounts.redeemable],
-            ['RCH', record.amounts.rchAirdrop],
-          ],
-          prices,
-          record.product.vault.depositCcy,
-        );
         const hasSettled = judgeSettled(record);
+        const returnInDepositCcy = !hasSettled
+          ? undefined
+          : cvtAmountsInCcy(
+              [
+                [record.product.vault.depositCcy, record.amounts.redeemable],
+                ['RCH', record.amounts.rchAirdrop],
+              ],
+              prices,
+              record.product.vault.depositCcy,
+            );
         return (
           <div className={styles['extra']}>
             <div className={styles['extra-item']}>

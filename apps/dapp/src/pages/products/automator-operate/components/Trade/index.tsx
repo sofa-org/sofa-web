@@ -199,8 +199,6 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     [automator?.pastAvailableBalanceExcludingPrincipal],
   );
 
-  console.log(1111, automator);
-
   return !automatorVault ? (
     <CEmpty
       className="semi-always-dark"

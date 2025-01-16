@@ -5,7 +5,6 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
-import { useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import { parse, stringify } from 'qs';
 
@@ -18,21 +17,14 @@ import { AutomatorEl } from '.';
 
 import styles from './index.module.scss';
 
-const AutomatorModal = (props: BaseInputProps<boolean>) => {
+const AutomatorModalEl = () => {
   const [t] = useTranslation('Automator');
-  const { v } = useQuery((p) => ({ v: p['automator-vault'] as string }));
   const { automator: vault } = useAutomatorMarketSelector();
 
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Modal
-      footer={null}
-      width={1080}
-      visible={props.value}
-      onCancel={() => props.onChange?.(false)}
-      className={styles['automator-modal']}
-    >
+    <>
       <div className={styles['modal-form']}>
         <AutomatorEl />
         <div
@@ -58,6 +50,20 @@ const AutomatorModal = (props: BaseInputProps<boolean>) => {
           ]}
         />
       )}
+    </>
+  );
+};
+
+const AutomatorModal = (props: BaseInputProps<boolean>) => {
+  return (
+    <Modal
+      footer={null}
+      width={1080}
+      visible={props.value}
+      onCancel={() => props.onChange?.(false)}
+      className={styles['automator-modal']}
+    >
+      <AutomatorModalEl />
     </Modal>
   );
 };

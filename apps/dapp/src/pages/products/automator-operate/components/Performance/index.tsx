@@ -272,6 +272,7 @@ const PnL = () => {
       AutomatorCreatorService.profitsCanBeHarvested(automator.vaultInfo),
     {
       refreshDeps: [automator?.vaultInfo],
+      pollingInterval: MsIntervals.min,
     },
   );
 
@@ -354,7 +355,7 @@ const PnL = () => {
       </div>
       <div className={styles['footer']}>
         <AsyncButton
-          disabled={!automator?.profits}
+          disabled={!(Number(automator?.profits) > 0)}
           className={styles['btn-claim']}
           onClick={() =>
             automator &&
@@ -379,7 +380,7 @@ const PnL = () => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay
-              amount={claimableProfits}
+              amount={automator?.profits}
               ccy={automator?.vaultInfo.vaultDepositCcy}
             />
             <span className={styles['unit']}>

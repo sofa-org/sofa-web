@@ -27,8 +27,8 @@ export interface OriginAutomatorInfo {
   participantNum: number; // 参与者数量
   aumByVaultDepositCcy: number | string; // aum
   aumByClientDepositCcy: number | string; // aum
-  creatorAumByVaultDepositCcy: number | string; // creator 份额
-  creatorAumByClientDepositCcy: number | string; // aum
+  creatorAmountByVaultDepositCcy: number | string; // creator 份额
+  creatorAmountByClientDepositCcy: number | string; // aum
   nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
   dateTime: number; // 净值产生的时间 (秒级时间戳)
   yieldPercentage: number | string; // 7D Yield(百分比)

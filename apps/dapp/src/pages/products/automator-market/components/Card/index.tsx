@@ -2,13 +2,12 @@ import { useMemo } from 'react';
 import { AutomatorInfo } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
+import { displayPercentage } from '@sofa/utils/amount';
 import { formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
-import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
@@ -25,7 +24,6 @@ export interface AutomatorCardProps {
 export const AutomatorCard = (props: AutomatorCardProps) => {
   const [t] = useTranslation('AutomatorCard');
   const isMobileUI = useIsMobileUI();
-  const prices = useIndexPrices((s) => s.prices);
   const depositCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
     [props.info.vaultInfo.depositCcy],
@@ -90,7 +88,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
             </div>
             <div className={styles['value']}>
               <AmountDisplay
-                amount={props.info.creatorAumByClientDepositCcy || 0}
+                amount={props.info.creatorAmountByClientDepositCcy || 0}
                 ccy={props.info.vaultInfo.depositCcy}
               />
               <span className={styles['unit']}>
@@ -98,7 +96,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
               </span>
               <span className={styles['percent']}>
                 {displayPercentage(
-                  Number(props.info?.creatorAumByVaultDepositCcy) /
+                  Number(props.info?.creatorAmountByVaultDepositCcy) /
                     Number(props.info?.aumByVaultDepositCcy),
                 )}
               </span>

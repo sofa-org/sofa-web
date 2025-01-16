@@ -209,6 +209,10 @@
     background: #000;
   }
 
+  &[disabled] {
+    opacity: 0.5;
+  }
+
   :global {
     .semi-button-content {
       color: #fff;

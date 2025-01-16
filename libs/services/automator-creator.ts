@@ -411,17 +411,17 @@ export class AutomatorCreatorService {
   static async profitsCanBeHarvested(vault: AutomatorVaultInfo) {
     const provider = await WalletService.readonlyConnect(vault.chainId);
     const contract = new ethers.Contract(vault.vault, vault.abis, provider);
-    const vaultDepositCcy = new ethers.Contract(
-      vault.vaultDepositCcy,
-      [CommonAbis.decimals],
-      provider,
-    );
+    const decimal = ContractsService.vaults.find(
+      (it) =>
+        it.chainId === vault.chainId && it.depositCcy === vault.vaultDepositCcy,
+    )?.collateralDecimal;
+    const decimals = decimal ? String(decimal).length - 1 : 0;
     try {
-      return Promise.all([
-        contract.totalFee(),
-        vaultDepositCcy.decimals(),
-      ]).then(([res, decimals]) => +ethers.formatUnits(res, decimals));
+      return contract
+        .totalFee()
+        .then((res) => +ethers.formatUnits(res, decimals));
     } catch (e) {
+      console.warn(1111, e);
       return 0;
     }
   }

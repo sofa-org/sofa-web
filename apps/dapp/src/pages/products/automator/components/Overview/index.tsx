@@ -117,7 +117,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                         [
                           [
                             props.vault.vaultDepositCcy,
-                            data?.creatorAumByVaultDepositCcy,
+                            data?.creatorAmountByVaultDepositCcy,
                           ],
                         ],
                         prices,
@@ -129,14 +129,15 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
               <span className={styles['percentage']}>
                 {displayPercentage(
-                  Number(data?.creatorAumByVaultDepositCcy) /
+                  Number(data?.creatorAmountByVaultDepositCcy) /
                     Number(data?.aumByVaultDepositCcy),
                 )}
               </span>
               <ProgressBar
                 type="3"
+                disabled
                 percent={
-                  Number(data?.creatorAumByVaultDepositCcy) /
+                  Number(data?.creatorAmountByVaultDepositCcy) /
                   Number(data?.aumByVaultDepositCcy)
                 }
                 minWidthPercentage={0.05}

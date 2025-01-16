@@ -13,7 +13,7 @@ import { useAutomatorCreatorStore } from '@/pages/products/automator-mine/store'
 
 import styles from './index.module.scss';
 
-export function useCreatorAutomatorSelector() {
+export function useCreatorAutomatorSelector(noNeedDetail?: boolean) {
   const wallet = useWalletStore();
 
   const vault = useQuery((q) => q['automator-vault'] as string | undefined);
@@ -52,12 +52,10 @@ export function useCreatorAutomatorSelector() {
     } as AutomatorDetail;
   });
 
-  useEffect(
-    () =>
-      automator?.vaultInfo &&
-      useAutomatorStore.subscribeOverview(automator.vaultInfo),
-    [automator?.vaultInfo],
-  );
+  useEffect(() => {
+    if (!noNeedDetail && automator?.vaultInfo)
+      return useAutomatorStore.subscribeOverview(automator.vaultInfo);
+  }, [automator?.vaultInfo, noNeedDetail]);
 
   return { automator, setAutomator, automators };
 }

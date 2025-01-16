@@ -157,13 +157,17 @@ const Index = () => {
         {!lists?.length && !loading && (
           <CEmpty
             className="semi-always-dark"
-            description={t(
-              {
-                enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
-                zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
-              },
-              { chains },
-            )}
+            description={
+              tab === 'holding'
+                ? undefined
+                : t(
+                    {
+                      enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
+                      zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
+                    },
+                    { chains },
+                  )
+            }
           />
         )}
       </Spin>
