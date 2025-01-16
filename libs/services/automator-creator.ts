@@ -57,9 +57,10 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<unknown, HttpResponse<AutomatorFactory[]>>(
-        `/optivisors/automator/factories`,
-      )
+      .get<
+        unknown,
+        HttpResponse<AutomatorFactory[]>
+      >(`/optivisors/automator/factories`)
       .then((res) => res.value);
   }
 
@@ -501,7 +502,7 @@ export class AutomatorCreatorService {
             factory,
             'createAutomator',
             (gasLimit) => [
-              ethers.parseUnits(String(data.feeRate), 16), // 乘以 1e16
+              ethers.parseUnits(String(data.feeRate), 18), // 乘以 1e18
               (data.redemptionPeriodDay * MsIntervals.day) / 1000, // s
               data.factory.clientDepositCcyAddress,
               { gasLimit },
@@ -576,10 +577,10 @@ export class AutomatorCreatorService {
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
     return http
-      .post<unknown, HttpResponse<boolean>>(
-        '/optivisors/automator/create',
-        data,
-      )
+      .post<
+        unknown,
+        HttpResponse<boolean>
+      >('/optivisors/automator/create', data)
       .then(() => data.automatorAddress);
   }
 }

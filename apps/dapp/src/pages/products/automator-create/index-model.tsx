@@ -326,10 +326,10 @@ const StepForm = () => {
                 },
               ]}
             >
-              <Form.Radio value={0}>0%</Form.Radio>
-              <Form.Radio value={5}>5%</Form.Radio>
-              <Form.Radio value={10}>10%</Form.Radio>
-              <Form.Radio value={15}>15%</Form.Radio>
+              <Form.Radio value={'0'}>0%</Form.Radio>
+              <Form.Radio value={'0.05'}>5%</Form.Radio>
+              <Form.Radio value={'0.10'}>10%</Form.Radio>
+              <Form.Radio value={'0.15'}>15%</Form.Radio>
             </Form.RadioGroup>
           </Col>
         </Row>

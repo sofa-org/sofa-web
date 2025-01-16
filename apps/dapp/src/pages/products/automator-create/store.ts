@@ -36,7 +36,7 @@ export const useAutomatorCreateStore =
           burnTransactionHash: '',
           automatorName: '',
           redemptionPeriodDay: 7,
-          feeRate: 5,
+          feeRate: '0.05',
         },
         automatorCreateResult: undefined,
         rchBurning: false,
