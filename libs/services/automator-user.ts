@@ -99,7 +99,7 @@ export class AutomatorUserService {
     const [it, vaults, prices] = await Promise.all([
       http
         .get<unknown, HttpResponse<OriginAutomatorUserPosition>>(
-          `/automator/user/detail`,
+          `/users/automator/detail`,
           {
             params: { chainId, automatorVault: vault, wallet },
           },
@@ -119,7 +119,7 @@ export class AutomatorUserService {
     const [list, vaults, prices] = await Promise.all([
       http
         .get<unknown, HttpResponse<OriginAutomatorUserPosition[]>>(
-          `/automator/user/list`,
+          `/users/automator/list`,
           { params },
         )
         .then((res) => res.value),
@@ -138,7 +138,7 @@ export class AutomatorUserService {
   ): Promise<PageResult<AutomatorTransaction, { hasMore: boolean }, 'cursor'>> {
     const limit = extraParams?.limit ?? 20;
     const res = await http.get<unknown, HttpResponse<AutomatorTransaction[]>>(
-      `/automator/user/transaction/list`,
+      `/users/automator/transaction/list`,
       {
         params: {
           chainId,
