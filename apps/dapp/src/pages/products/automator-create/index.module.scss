@@ -49,9 +49,26 @@
     font-size: 16px;
   }
   :global(.semi-select-suffix) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 36px;
+
     .select-label {
       color: rgba(#000, 0.5) !important;
     }
+  }
+  :global(.semi-select-arrow) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 6px;
+  }
+  :global(.semi-select-selection) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 36px;
   }
 
   :global {

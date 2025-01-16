@@ -32,6 +32,8 @@ import { useAutomatorCreateStore } from './store';
 
 addI18nResources(locale, 'AutomatorCreate');
 
+import AsyncButton from '@/components/AsyncButton';
+
 import { useAutomatorCreatorStore } from '../automator-mine/store';
 
 import styles from './index.module.scss';
@@ -323,19 +325,38 @@ const AutomatorCreate = () => {
               </Select>
             </Tooltip>
           </div>
-          <Button
-            size="large"
-            className={classNames(styles['btn-create'], 'btn-primary')}
-            disabled={!!(wallet.address && !(chainId && token))}
-            onClick={onStartClick}
+          <Tooltip
+            key={`tt-btn-${chainId}-${token}`}
+            trigger={chainId && token ? 'custom' : undefined}
+            visible={!(chainId && token)}
+            content={
+              !chainId
+                ? t({
+                    enUS: 'Please select Automator Chain',
+                    zhCN: '请选择 Automator 链',
+                  })
+                : !token
+                  ? t({
+                      enUS: 'Please select Deposit Token',
+                      zhCN: '请选择存入代币',
+                    })
+                  : undefined
+            }
           >
-            {!wallet.address
-              ? t({ enUS: 'Connect Wallet', zhCN: '连接钱包' })
-              : t({
-                  enUS: 'Burn RCH & Create Your Automator',
-                  zhCN: '燃烧 RCH 并创建您的 Automator',
-                })}
-          </Button>
+            <AsyncButton
+              size="large"
+              className={classNames(styles['btn-create'], 'btn-primary')}
+              disabled={!!(wallet.address && !(chainId && token))}
+              onClick={onStartClick}
+            >
+              {!wallet.address
+                ? t({ enUS: 'Connect Wallet', zhCN: '连接钱包' })
+                : t({
+                    enUS: 'Burn RCH & Create Your Automator',
+                    zhCN: '燃烧 RCH 并创建您的 Automator',
+                  })}
+            </AsyncButton>
+          </Tooltip>
           <div className={styles['tips']}>
             <IconInfo className={styles['icon-info']} />
             {t({
