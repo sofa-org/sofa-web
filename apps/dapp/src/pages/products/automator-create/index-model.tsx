@@ -218,6 +218,12 @@ const StepForm = () => {
           automatorAddress,
         });
       }
+      if (
+        !Env.isProd &&
+        /test-fail-at=[^&]*\bregister-to-server\b/.test(location.search)
+      ) {
+        throw new Error('Test RegisterToServer Fail');
+      }
       await AutomatorCreatorService.registerAutomator({
         ..._payload,
         creator: address,
@@ -226,12 +232,6 @@ const StepForm = () => {
       // polling server, until we see the automator in the /list
       const automatorReturnedByServer = await pollingUntil(
         async () => {
-          if (
-            !Env.isProd &&
-            /test-fail-at=[^&]*\bwait-server\b/.test(location.search)
-          ) {
-            throw new Error('Test WaitServer Fail');
-          }
           return AutomatorCreatorService.automatorList({
             chainId,
             wallet: address,
@@ -247,10 +247,7 @@ const StepForm = () => {
             .catch(() => undefined);
         },
         (automatorReturnedByServer, count) =>
-          !!automatorReturnedByServer ||
-          count > 5 * 60 ||
-          (!Env.isProd &&
-            /test-fail-at=[^&]*\bwait-server\b/.test(location.search)),
+          !!automatorReturnedByServer || count > 5 * 60,
         1000,
       );
       if (!automatorReturnedByServer[automatorReturnedByServer.length - 1]) {
