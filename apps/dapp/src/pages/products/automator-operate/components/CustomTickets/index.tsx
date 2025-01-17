@@ -209,6 +209,7 @@ const TicketEditor = (props: CustomTicketProps) => {
                   value: 'smart_trend',
                   label: t({
                     enUS: 'Smart Trend',
+                    zhCN: '趋势智赢',
                   }),
                 },
               ]}
@@ -395,7 +396,13 @@ const TicketEditor = (props: CustomTicketProps) => {
       <div className={styles['right']}>
         <div className={styles['title']}>
           <span className={styles['side']}>
-            {ProductTypeRefs[vault.productType]?.label(t)}
+            {ProductTypeRefs[vault.productType]?.label2(t)}
+          </span>
+          <span className={styles['product']}>
+            {t({
+              enUS: 'Smart Trend',
+              zhCN: '趋势智赢',
+            })}
           </span>
           <span className={styles['expiry']}>
             {props.product?.expiry ? (
@@ -635,17 +642,25 @@ const CustomTickets = (props: {
     <div className={styles['custom-tickets']}>
       <Table<PartialRequired<ProductQuoteParams, 'vault' | 'id'>>
         columns={[
-          // {
-          //   title: t({
-          //     enUS: 'Product',
-          //   }),
-          //   // TODO
-          //   render: (_, it) => undefined,
-          // },
+          {
+            title: t({
+              enUS: 'Product',
+            }),
+            // TODO
+            render: (_, it) =>
+              t({
+                enUS: 'Smart Trend',
+                zhCN: '趋势智赢',
+              }),
+          },
           {
             title: t({ enUS: 'Side', zhCN: '方向' }),
             render: (_, it) => (
-              <b>{ProductTypeRefs[it.vault.productType]?.label(t)}</b>
+              <b>
+                {ProductTypeRefs[it.vault.productType]
+                  ?.label2(t)
+                  ?.toUpperCase()}
+              </b>
             ),
           },
           {

@@ -186,20 +186,20 @@ const AutomatorCreate = () => {
         a.vaultInfo.creator.toLowerCase() == wallet.address?.toLowerCase() &&
         a.vaultInfo.chainId == chainId,
     );
-    if (existingAutomator) {
-      Toast.error(
-        t(
-          {
-            enUS: 'You have already created an Automator contract "{{existingAutomatorName}}" with the selected deployed chain and deposit token.',
-            zhCN: '您已基于所选的已部署链和存款代币创建了 "{{existingAutomatorName}}" Automator 合约。',
-          },
-          {
-            existingAutomatorName: existingAutomator.vaultInfo.name,
-          },
-        ),
-      );
-      return;
-    }
+    // if (existingAutomator) {
+    //   Toast.error(
+    //     t(
+    //       {
+    //         enUS: 'You have already created an Automator contract "{{existingAutomatorName}}" with the selected deployed chain and deposit token.',
+    //         zhCN: '您已基于所选的已部署链和存款代币创建了 "{{existingAutomatorName}}" Automator 合约。',
+    //       },
+    //       {
+    //         existingAutomatorName: existingAutomator.vaultInfo.name,
+    //       },
+    //     ),
+    //   );
+    //   return;
+    // }
     if (!data) {
       return;
     }
@@ -213,10 +213,31 @@ const AutomatorCreate = () => {
     updatePayload({
       factory,
     });
-    if (await AutomatorCreatorService.hasCredits(factory)) {
+    const [hasBurned, hasCredits, hasAutomator] = await Promise.all([
+      AutomatorCreatorService.hasBurned(factory),
+      AutomatorCreatorService.hasCredits(factory),
+      AutomatorCreatorService.hasAutomatorBeenCreated(factory),
+    ]);
+    if (hasAutomator) {
       useAutomatorCreateStore.setState({
-        rchBurned: true,
+        automatorAddress: hasAutomator,
+        rchBurn: 'burned',
+        rchCredits: 'has_credits',
       });
+    } else if (hasCredits) {
+      // skip the entire burn step
+      useAutomatorCreateStore.setState({
+        rchBurn: 'burned',
+        rchCredits: 'has_credits',
+      });
+    } else if (hasBurned) {
+      // skip the burn step, still awaiting for credit
+      useAutomatorCreateStore.setState({
+        rchBurn: 'burned',
+        rchCredits: 'waiting',
+      });
+    } else {
+      // normal burn
     }
     setModelVisible(true);
   });

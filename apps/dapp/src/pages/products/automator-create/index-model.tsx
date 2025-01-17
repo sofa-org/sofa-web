@@ -20,8 +20,10 @@ import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import { isMockEnabled } from '@sofa/services/mock';
+import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
+import { pollingUntil } from '@sofa/utils/http';
 import { formatHighlightedText } from '@sofa/utils/string';
 import classNames from 'classnames';
 import { copy } from 'clipboard';
@@ -50,7 +52,7 @@ const steps: {
   comp: () => JSX.Element[] | JSX.Element;
 }[] = [
   {
-    arrived: (store) => !!store.automatorCreateResult,
+    arrived: (store) => !!store.automatorDetail,
     processPercent: 100,
     step1: true,
     step2: true,
@@ -63,13 +65,14 @@ const steps: {
     comp: () => <StepCreating />,
   },
   {
-    arrived: (store) => store.rchBurned,
+    arrived: (store) => store.rchCredits == 'has_credits',
     processPercent: 50,
     step1: true,
     comp: () => <StepForm />,
   },
   {
-    arrived: (store) => store.rchBurning,
+    arrived: (store) =>
+      store.rchBurn == 'burning' || store.rchCredits == 'waiting',
     processPercent: 30,
     comp: () => <StepBurning />,
   },
@@ -90,33 +93,36 @@ const StepStart = () => {
     }
     try {
       useAutomatorCreateStore.setState({
-        rchBurning: true,
+        rchBurn: 'burning',
       });
       // burn
+      if (!Env.isProd && /test-fail-at=[^&]*\bburn\b/.test(location.search)) {
+        throw new Error('Test Burn Fail');
+      }
       const hash = await AutomatorCreatorService.burnRCHBeforeCreate(
         () => {},
         factory,
       );
+      useAutomatorCreateStore.setState({
+        rchBurn: 'burned',
+        rchCredits: 'waiting',
+      });
+      if (
+        !Env.isProd &&
+        /test-fail-at=[^&]*\bwait-credit\b/.test(location.search)
+      ) {
+        throw new Error('Test WaitCredit Fail');
+      }
+      await AutomatorCreatorService.awaitingForCreateCredits(() => {}, factory);
 
       useAutomatorCreateStore.setState({
-        rchBurned: true,
+        rchCredits: 'has_credits',
         payload: {
           ...useAutomatorCreateStore.getState().payload,
           burnTransactionHash: hash,
         },
       });
     } catch (e) {
-      if (isMockEnabled()) {
-        useAutomatorCreateStore.setState({
-          rchBurned: true,
-          payload: {
-            ...useAutomatorCreateStore.getState().payload,
-            burnTransactionHash: '0xMockHash',
-          },
-        });
-        return;
-      }
-      useAutomatorCreateStore.getState().reset();
       console.error('error burn rch for automator creation', e);
       Toast.error(getErrorMsg(e));
     }
@@ -196,21 +202,72 @@ const StepForm = () => {
       useAutomatorCreateStore.setState({
         automatorCreating: true,
       });
-      const result = await AutomatorCreatorService.createAutomator(() => {}, {
+      if (!Env.isProd && /test-fail-at=[^&]*\bcreate\b/.test(location.search)) {
+        throw new Error('Test Create Fail');
+      }
+      let automatorAddress =
+        useAutomatorCreateStore.getState().automatorAddress;
+      if (!automatorAddress) {
+        automatorAddress =
+          await AutomatorCreatorService.createAutomatorContract(() => {}, {
+            ..._payload,
+            creator: address,
+          } as AutomatorCreateParams);
+
+        useAutomatorCreateStore.setState({
+          automatorAddress,
+        });
+      }
+      await AutomatorCreatorService.registerAutomator({
         ..._payload,
         creator: address,
-      } as AutomatorCreateParams);
-
+        automatorAddress,
+      });
+      // polling server, until we see the automator in the /list
+      const automatorReturnedByServer = await pollingUntil(
+        async () => {
+          if (
+            !Env.isProd &&
+            /test-fail-at=[^&]*\bwait-server\b/.test(location.search)
+          ) {
+            throw new Error('Test WaitServer Fail');
+          }
+          return AutomatorCreatorService.automatorList({
+            chainId,
+            wallet: address,
+          })
+            .then((res) =>
+              res.find(
+                (a) =>
+                  a.vaultInfo.depositCcy == factory.clientDepositCcy &&
+                  a.vaultInfo.creator.toLowerCase() == address.toLowerCase() &&
+                  a.vaultInfo.chainId == chainId,
+              ),
+            )
+            .catch(() => undefined);
+        },
+        (automatorReturnedByServer, count) =>
+          !!automatorReturnedByServer ||
+          count > 5 * 60 ||
+          (!Env.isProd &&
+            /test-fail-at=[^&]*\bwait-server\b/.test(location.search)),
+        1000,
+      );
+      if (!automatorReturnedByServer[automatorReturnedByServer.length - 1]) {
+        throw new Error(
+          `Timeout awaiting automator creation complete: ${automatorAddress}`,
+        );
+      }
       useAutomatorCreateStore.setState({
         automatorCreating: false,
-        automatorCreateResult: result,
+        automatorDetail:
+          automatorReturnedByServer[automatorReturnedByServer.length - 1],
       });
     } catch (e) {
       console.error(e);
       Toast.error(getErrorMsg(e));
       useAutomatorCreateStore.setState({
         automatorCreating: false,
-        automatorCreateResult: undefined,
       });
     }
   });
@@ -476,10 +533,10 @@ const StepCreating = () => {
 const StepFinished = () => {
   const [t] = useTranslation('AutomatorCreate');
   const navigate = useNavigate();
-  const { automatorCreateResult, payload } = useAutomatorCreateStore();
+  const { automatorAddress, payload } = useAutomatorCreateStore();
   const handleCopy = useLazyCallback(() => {
     Promise.resolve()
-      .then(() => copy(automatorCreateResult!))
+      .then(() => copy(automatorAddress!))
       .then(() =>
         Toast.success(
           t({
@@ -509,14 +566,14 @@ const StepFinished = () => {
         )}
       </div>
       <div className={styles['desc']} onClick={handleCopy}>
-        {automatorCreateResult}
+        {automatorAddress}
       </div>
       <div />
       <Button
         onClick={() =>
           navigate(
             `/products/automator/operate?automator-vault=${
-              automatorCreateResult || ''
+              automatorAddress || ''
             }`,
           )
         }

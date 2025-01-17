@@ -57,9 +57,10 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<unknown, HttpResponse<AutomatorFactory[]>>(
-        `/optivisors/automator/factories`,
-      )
+      .get<
+        unknown,
+        HttpResponse<AutomatorFactory[]>
+      >(`/optivisors/automator/factories`)
       .then((res) => res.value);
   }
 
@@ -121,24 +122,12 @@ export class AutomatorCreatorService {
         ? ''
         : '0xab3344989e7e4357d4db494ac53c189956ddf0fb', // TODO
   };
-  static async burnRCHBeforeCreate(
+  public static async burnRCHBeforeCreate(
     cb: (progress: TransactionProgress) => void,
     factory: AutomatorFactory,
   ): Promise<string /* transaction hash */> {
     cb({ status: 'Submitting' });
     try {
-      const hasCredits = await AutomatorCreatorService.hasCredits(factory);
-      if (hasCredits) {
-        const tx = '';
-        cb({
-          status: 'Success',
-          details: [
-            [`--`, { ids: [], status: PositionStatus.MINTED, hash: tx }],
-          ],
-        });
-        return tx;
-      }
-
       const { signer } = await WalletService.connect(
         AutomatorCreatorService.rchBurnContract.chainId,
       );
@@ -191,14 +180,6 @@ export class AutomatorCreatorService {
           ],
         ],
       });
-      if (isMockEnabled()) {
-        // do nothing in mock mode
-      } else {
-        await waitUntil(() => AutomatorCreatorService.hasCredits(factory), {
-          interval: 1000,
-          timeout: MsIntervals.min * 10,
-        });
-      }
       cb({
         status: 'Success',
         details: [[`--`, { ids: [], status: PositionStatus.MINTED, hash: tx }]],
@@ -213,21 +194,40 @@ export class AutomatorCreatorService {
       throw e;
     }
   }
-
-  static async createAutomator(
+  public static async awaitingForCreateCredits(
     cb: (progress: TransactionProgress) => void,
-    data: Omit<AutomatorCreateParams, 'automatorAddress'>,
+    factory: AutomatorFactory,
+  ): Promise<void> {
+    cb({ status: 'Submitting' });
+    try {
+      const { signer } = await WalletService.connect(
+        AutomatorCreatorService.rchBurnContract.chainId,
+      );
+      await waitUntil(() => AutomatorCreatorService.hasCredits(factory), {
+        interval: 1000,
+        timeout: MsIntervals.min * 10,
+      });
+      cb({
+        status: 'Success',
+        details: [[`--`, { ids: [], status: PositionStatus.MINTED }]],
+      });
+    } catch (e) {
+      cb({
+        status: 'SubmitFailed',
+        details: [[`--`, { ids: [], status: PositionStatus.FAILED, error: e }]],
+      });
+    }
+  }
+
+  public static async registerAutomator(
+    data: AutomatorCreateParams & { automatorAddress: string },
   ) {
-    const address = await AutomatorCreatorService.$createAutomatorByFactory(
-      cb,
-      data,
-    );
     return AutomatorCreatorService.$createAutomator({
       creator: data.creator,
       chainId: data.factory.chainId,
       factoryAddress: data.factory.factoryAddress,
       clientDepositCcy: data.factory.clientDepositCcy,
-      automatorAddress: address,
+      automatorAddress: data.automatorAddress,
       burnTransactionHash: data.burnTransactionHash,
       automatorName: data.automatorName,
       redemptionPeriodDay: data.redemptionPeriodDay,
@@ -483,7 +483,7 @@ export class AutomatorCreatorService {
     }
   }
 
-  private static async $createAutomatorByFactory(
+  public static async createAutomatorContract(
     cb: (progress: TransactionProgress) => void,
     data: Omit<AutomatorCreateParams, 'automatorAddress'>,
   ): Promise<string /* automator address */> {
@@ -574,7 +574,7 @@ export class AutomatorCreatorService {
     return !!res;
   }
 
-  static async hasAutomatorBeenCreated(factory: AutomatorFactory) {
+  public static async hasAutomatorBeenCreated(factory: AutomatorFactory) {
     const { signer } = await WalletService.connect(factory.chainId);
     const factoryContract = new ethers.Contract(
       factory.factoryAddress,
@@ -617,10 +617,10 @@ export class AutomatorCreatorService {
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
     return http
-      .post<unknown, HttpResponse<boolean>>(
-        '/optivisors/automator/create',
-        data,
-      )
+      .post<
+        unknown,
+        HttpResponse<boolean>
+      >('/optivisors/automator/create', data)
       .then(() => data.automatorAddress);
   }
 }

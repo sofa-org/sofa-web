@@ -101,6 +101,10 @@
 
   > .title {
     font-size: 16px;
+    > .side {
+      color: #50d113;
+      text-transform: uppercase;
+    }
 
     > span {
       margin-right: 6px;
@@ -321,6 +325,9 @@
   }
 
   &.side {
+    .value {
+      text-transform: uppercase;
+    }
     .current-icon {
       display: inline-block;
       width: 36px;

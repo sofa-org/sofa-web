@@ -1,3 +1,4 @@
+import { AutomatorDetail } from '@sofa/services/automator';
 import { AutomatorCreateParams } from '@sofa/services/automator-creator';
 import { ChainMap } from '@sofa/services/chains';
 import { TFunction } from '@sofa/services/i18n';
@@ -15,9 +16,10 @@ export function getNameForChain(chainId: number | undefined, t: TFunction) {
 }
 export type AutomatorCreateStoreType = {
   payload: Partial<AutomatorCreateParams>;
-  automatorCreateResult?: string;
-  rchBurning: boolean;
-  rchBurned: boolean;
+  automatorDetail?: AutomatorDetail;
+  automatorAddress?: string;
+  rchBurn?: 'burned' | 'burning';
+  rchCredits?: 'has_credits' | 'waiting';
   automatorCreating: boolean;
   reset: () => void;
   updatePayload: (v: Partial<AutomatorCreateParams>) => void;
@@ -25,9 +27,9 @@ export type AutomatorCreateStoreType = {
 export const useAutomatorCreateStore =
   createWithEqualityFn<AutomatorCreateStoreType>((set, get) => ({
     payload: {},
-    rchBurning: false,
-    rchBurned: false,
     automatorCreating: false,
+    rchBurn: undefined,
+    rchCredits: undefined,
     reset() {
       set({
         payload: {
@@ -38,9 +40,10 @@ export const useAutomatorCreateStore =
           redemptionPeriodDay: 7,
           feeRate: '0.05',
         },
-        automatorCreateResult: undefined,
-        rchBurning: false,
-        rchBurned: false,
+        automatorDetail: undefined,
+        automatorAddress: undefined,
+        rchBurn: undefined,
+        rchCredits: undefined,
         automatorCreating: false,
       });
     },
