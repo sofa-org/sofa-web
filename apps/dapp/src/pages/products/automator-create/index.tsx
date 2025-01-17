@@ -30,6 +30,8 @@ import { useAutomatorCreateStore } from './store';
 
 addI18nResources(locale, 'AutomatorCreate');
 
+import { Env } from '@sofa/utils/env';
+
 import AsyncButton from '@/components/AsyncButton';
 
 import { useAutomatorCreatorStore } from '../automator-mine/store';
