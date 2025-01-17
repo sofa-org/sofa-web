@@ -35,6 +35,8 @@ import { useAutomatorStore } from '@/pages/products/automator/store';
 import { useHoverTicket, useProductsState } from '../../../automator-store';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 
+import { Comp as IconBear } from './assets/icon-bear.svg';
+import { Comp as IconBull } from './assets/icon-bull.svg';
 import { Comp as IconInfo } from './assets/icon-info.svg';
 import { Comp as ScenarioBearLose } from './assets/scenario-bear-lose.svg';
 import { Comp as ScenarioBearWin } from './assets/scenario-bear-win.svg';
@@ -316,7 +318,12 @@ const TicketEditor = (props: CustomTicketProps) => {
               }}
             />
             <span className={styles['current-icon']}>
-              {ProductTypeRefs[productType]?.img}
+              {(
+                {
+                  [ProductType.BearSpread]: () => <IconBear />,
+                  [ProductType.BullSpread]: () => <IconBull />,
+                } as Record<ProductType, () => JSX.Element>
+              )[productType]?.()}
             </span>
           </div>
         </div>
