@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Button, DatePicker, Table } from '@douyinfe/semi-ui';
+import { Button, DatePicker, Table, Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorDetail } from '@sofa/services/automator';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
@@ -35,6 +35,7 @@ import { useAutomatorStore } from '@/pages/products/automator/store';
 import { useHoverTicket, useProductsState } from '../../../automator-store';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 
+import { Comp as IconInfo } from './assets/icon-info.svg';
 import { Comp as ScenarioBearLose } from './assets/scenario-bear-lose.svg';
 import { Comp as ScenarioBearWin } from './assets/scenario-bear-win.svg';
 import { Comp as ScenarioBullLose } from './assets/scenario-bull-lose.svg';
@@ -153,22 +154,30 @@ const TicketEditor = (props: CustomTicketProps) => {
     const _next8h = next8h();
     if (!quoteConfig || !automator || !automatorDetail)
       return { min: next8h(), max: pre8h() };
-    const min =
-      (quoteConfig.expiryDateTimes?.[0] &&
-        quoteConfig.expiryDateTimes[0] * 1000) ||
-      _next8h;
-    const max = Math.min(
-      quoteConfig.expiryDateTimes?.length
-        ? quoteConfig.expiryDateTimes[quoteConfig.expiryDateTimes.length - 1] *
-            1000
-        : _next8h + MsIntervals.month,
-      next8h(
-        undefined,
-        Math.round(
-          automatorDetail.vaultInfo.redeemWaitPeriod / MsIntervals.day,
-        ) + 1,
-      ),
+    const min = _next8h;
+
+    const max = next8h(
+      undefined,
+      Math.round(automatorDetail.vaultInfo.redeemWaitPeriod / MsIntervals.day) +
+        1,
     );
+    // const min =
+    //   (quoteConfig.expiryDateTimes?.[0] &&
+    //     quoteConfig.expiryDateTimes[0] * 1000) ||
+    //   _next8h;
+
+    // const max = Math.min(
+    //   quoteConfig.expiryDateTimes?.length
+    //     ? quoteConfig.expiryDateTimes[quoteConfig.expiryDateTimes.length - 1] *
+    //         1000
+    //     : _next8h + MsIntervals.month,
+    //   next8h(
+    //     undefined,
+    //     Math.round(
+    //       automatorDetail.vaultInfo.redeemWaitPeriod / MsIntervals.day,
+    //     ) + 1,
+    //   ),
+    // );
     return {
       min,
       max,
@@ -363,6 +372,24 @@ const TicketEditor = (props: CustomTicketProps) => {
                 {day}d
               </span>
             ))}
+          {(automatorDetail?.vaultInfo.redeemWaitPeriod && (
+            <Tooltip
+              content={t(
+                {
+                  enUS: "This Automator's Redemption Waiting Period is set to {{days}} days, allowing you to trade options with expirations within this range.",
+                },
+                {
+                  days: Math.round(
+                    automatorDetail.vaultInfo.redeemWaitPeriod /
+                      MsIntervals.day,
+                  ),
+                },
+              )}
+            >
+              <IconInfo className={styles['info-icon']} />
+            </Tooltip>
+          )) ||
+            undefined}
         </div>
         <div className={classNames(styles['form-item'], styles['strikes'])}>
           <div className={styles['label']}>{t('Strikes')}</div>

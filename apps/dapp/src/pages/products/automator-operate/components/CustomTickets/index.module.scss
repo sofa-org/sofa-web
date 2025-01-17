@@ -101,11 +101,14 @@
 
   > .title {
     font-size: 16px;
+
     > .side {
       @include bold;
+
       &.side-bullspread {
         color: var(--color-rise);
       }
+
       &.side-bearspread {
         color: var(--color-fall);
       }
@@ -335,6 +338,7 @@
     .value {
       text-transform: uppercase;
     }
+
     .current-icon {
       display: inline-block;
       width: 36px;
@@ -410,6 +414,12 @@
       text-align: center;
       font-size: 14px;
       display: inline-block;
+    }
+
+    .info-icon {
+      width: 18px;
+      height: 18px;
+      margin-left: 4px;
     }
   }
 
