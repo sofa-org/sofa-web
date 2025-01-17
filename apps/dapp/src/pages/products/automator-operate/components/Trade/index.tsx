@@ -112,7 +112,9 @@ const ProductLottery = (
                 </span>
                 <span className={styles['win']}>
                   <span className={styles['digi']}>
-                    {amountFormatter(totalWin.amount, 2)}
+                    {totalWin.amount === undefined
+                      ? '-'
+                      : amountFormatter(totalWin.amount, 2)}
                   </span>
                   <span className={styles['unit']}>{ticket?.ccy}</span>
                 </span>

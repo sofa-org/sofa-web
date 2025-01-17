@@ -514,7 +514,7 @@ const TicketEditor = (props: CustomTicketProps) => {
                 <span className={styles['digi']}>
                   {(quoteInfo &&
                     amountFormatter(quoteInfo.amounts.maxRedeemable, 2)) ||
-                    undefined}
+                    '-'}
                 </span>
                 <span className={styles['unit']}>{vault.depositCcy}</span>
               </div>
@@ -546,7 +546,7 @@ const TicketEditor = (props: CustomTicketProps) => {
                 <span className={styles['digi']}>
                   {(props.product.depositAmount &&
                     amountFormatter(props.product.depositAmount, 2)) ||
-                    undefined}
+                    '-'}
                 </span>
                 <span className={styles['unit']}>{vault.depositCcy}</span>
                 {percentOfPool !== undefined ? (
