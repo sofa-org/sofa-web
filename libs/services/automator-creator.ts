@@ -585,7 +585,9 @@ export class AutomatorCreatorService {
       signer.address,
       factory.clientDepositCcyAddress,
     );
-    return res !== '0x0000000000000000000000000000000000000000';
+    return res !== '0x0000000000000000000000000000000000000000'
+      ? (res as string)
+      : undefined;
   }
 
   static async hasBurned(factory: AutomatorFactory) {
