@@ -102,7 +102,14 @@
   > .title {
     font-size: 16px;
     > .side {
-      color: #50d113;
+      @include bold;
+      &.side-bullspread {
+        color: var(--color-rise);
+      }
+      &.side-bearspread {
+        color: var(--color-fall);
+      }
+
       text-transform: uppercase;
     }
 
@@ -351,7 +358,7 @@
 
   &.expiry {
     .date-picker {
-      width: 152px;
+      width: 162px;
     }
 
     .date-picker-dropdown {

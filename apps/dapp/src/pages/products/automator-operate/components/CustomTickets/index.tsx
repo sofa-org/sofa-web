@@ -30,6 +30,7 @@ import PriceRangeInput from '@/components/PriceRangeInput';
 import { ProductTypeSelector } from '@/components/ProductSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { Time } from '@/components/TimezoneSelector';
+import { useAutomatorStore } from '@/pages/products/automator/store';
 
 import { useHoverTicket, useProductsState } from '../../../automator-store';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
@@ -60,6 +61,13 @@ const TicketEditor = (props: CustomTicketProps) => {
   );
 
   const { automator } = useCreatorAutomatorSelector();
+  const automatorDetail = useAutomatorStore(
+    (state) =>
+      automator &&
+      state.vaultDetails[
+        `${automator.vaultInfo.chainId}-${automator.vaultInfo.vault.toLowerCase()}-`
+      ],
+  );
   const vaults = useAsyncMemo(async () => {
     const results = !automator?.vaultInfo
       ? undefined
@@ -143,7 +151,8 @@ const TicketEditor = (props: CustomTicketProps) => {
 
   const { min, max } = useMemo(() => {
     const _next8h = next8h();
-    if (!quoteConfig || !automator) return { min: next8h(), max: pre8h() };
+    if (!quoteConfig || !automator || !automatorDetail)
+      return { min: next8h(), max: pre8h() };
     const min =
       (quoteConfig.expiryDateTimes?.[0] &&
         quoteConfig.expiryDateTimes[0] * 1000) ||
@@ -152,12 +161,13 @@ const TicketEditor = (props: CustomTicketProps) => {
       quoteConfig.expiryDateTimes?.length
         ? quoteConfig.expiryDateTimes[quoteConfig.expiryDateTimes.length - 1] *
             1000
-        : _next8h,
-      (isLegalNum(automator.vaultInfo.redeemWaitPeriod)
-        ? automator.vaultInfo.redeemWaitPeriod
-        : AutomatorCreatorService.redemptionPeriodDayValues[0]) *
-        MsIntervals.day +
-        Date.now(),
+        : _next8h + MsIntervals.month,
+      next8h(
+        undefined,
+        Math.round(
+          automatorDetail.vaultInfo.redeemWaitPeriod / MsIntervals.day,
+        ) + 1,
+      ),
     );
     return {
       min,
@@ -273,6 +283,13 @@ const TicketEditor = (props: CustomTicketProps) => {
               useRadioCard
               localState={[productType, setProductType]}
               optionFilter={(t) => ![ProductType.DNT].includes(t)}
+              label={(it) => (
+                <span
+                  className={classNames(styles['product-item'], 'product-item')}
+                >
+                  {it.label2(t)}
+                </span>
+              )}
               optionDisabled={(productType) => {
                 if (!vaults) return true;
                 const possibleVault = ProductsService.findVault(
@@ -395,7 +412,12 @@ const TicketEditor = (props: CustomTicketProps) => {
       </div>
       <div className={styles['right']}>
         <div className={styles['title']}>
-          <span className={styles['side']}>
+          <span
+            className={classNames(
+              styles['side'],
+              styles['side-' + vault.productType.toLowerCase()],
+            )}
+          >
             {ProductTypeRefs[vault.productType]?.label2(t)}
           </span>
           <span className={styles['product']}>

@@ -153,6 +153,9 @@ export const ProductTypeSelector = (
     radioClassName?: string;
     optionFilter?: (t: ProductType) => boolean;
     optionDisabled?: (v: ProductType) => boolean;
+    label?: (
+      v: (typeof ProductTypeRefs)[ProductType],
+    ) => JSX.Element[] | JSX.Element | string;
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
@@ -171,7 +174,9 @@ export const ProductTypeSelector = (
           (!props.optionFilter || props.optionFilter(it.value)),
       )
       .map((it) => ({
-        label: (
+        label: props.label ? (
+          props.label(it)
+        ) : (
           <span className={classNames(styles['product-item'], 'product-item')}>
             {it.img}
             {it.label(t)}
