@@ -186,20 +186,27 @@ const AutomatorCreate = () => {
         a.vaultInfo.creator.toLowerCase() == wallet.address?.toLowerCase() &&
         a.vaultInfo.chainId == chainId,
     );
-    // if (existingAutomator) {
-    //   Toast.error(
-    //     t(
-    //       {
-    //         enUS: 'You have already created an Automator contract "{{existingAutomatorName}}" with the selected deployed chain and deposit token.',
-    //         zhCN: '您已基于所选的已部署链和存款代币创建了 "{{existingAutomatorName}}" Automator 合约。',
-    //       },
-    //       {
-    //         existingAutomatorName: existingAutomator.vaultInfo.name,
-    //       },
-    //     ),
-    //   );
-    //   return;
-    // }
+    if (
+      !Env.isProd &&
+      /automator-create-skip-server-check/.test(location.search)
+    ) {
+      // skip check
+    } else {
+      if (existingAutomator) {
+        Toast.error(
+          t(
+            {
+              enUS: 'You have already created an Automator contract "{{existingAutomatorName}}" with the selected deployed chain and deposit token.',
+              zhCN: '您已基于所选的已部署链和存款代币创建了 "{{existingAutomatorName}}" Automator 合约。',
+            },
+            {
+              existingAutomatorName: existingAutomator.vaultInfo.name,
+            },
+          ),
+        );
+        return;
+      }
+    }
     if (!data) {
       return;
     }
