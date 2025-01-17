@@ -344,7 +344,7 @@
   .btn-deposit {
     @include flex-center;
 
-    flex: 1;
+    flex: 0.7;
 
     > div:last-child {
       overflow: hidden;
