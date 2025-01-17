@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Select, Toast, Tooltip } from '@douyinfe/semi-ui';
-import { Button } from '@douyinfe/semi-ui';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
-import { AutomatorFactory, ProjectType } from '@sofa/services/base-type';
+import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
-import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useRequest } from 'ahooks';

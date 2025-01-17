@@ -124,7 +124,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                         props.vault.vaultDepositCcy,
                       )
                 }
-                precision={0}
+                ccy={props.vault?.vaultDepositCcy}
               />
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
               <span className={styles['percentage']}>

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Button, Spin } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
@@ -27,6 +28,7 @@ const List = (props: {
   automator?: AutomatorVaultInfo;
 }) => {
   const [t] = useTranslation('WonderfulMoment');
+  const navigate = useNavigate();
   const wallet = useWalletStore();
   const address = props.automator?.vault || wallet.address;
 
@@ -73,7 +75,7 @@ const List = (props: {
               window.location.search,
               `?automator-vault=${!props.automator?.vault ? '' : address}`,
             );
-            window.location.href = link;
+            navigate(link);
           }}
         >
           {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}

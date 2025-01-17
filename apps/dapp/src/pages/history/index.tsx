@@ -7,10 +7,14 @@ import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
+import { useQuery } from '@sofa/utils/hooks';
 import { displayTenor } from '@sofa/utils/time';
 import { useInfiniteScroll } from 'ahooks';
 import dayjs from 'dayjs';
+import { uniqBy } from 'lodash-es';
 
+import Address from '@/components/Address';
+import AmountDisplay from '@/components/AmountDisplay';
 import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
@@ -19,25 +23,20 @@ import {
   RiskTypeRefs,
 } from '@/components/ProductSelector/enums';
 import { Time } from '@/components/TimezoneSelector';
+import { formatTime } from '@/components/TimezoneSelector/store';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
-import { Comp as IconDetails } from './assets/icon-details.svg';
-import locale from './locale';
-
-addI18nResources(locale, 'History');
-import { useQuery } from '@sofa/utils/hooks';
-import { uniqBy } from 'lodash-es';
-
-import AmountDisplay from '@/components/AmountDisplay';
-import { formatTime } from '@/components/TimezoneSelector/store';
-
 import { judgeSettled } from '../positions/components/PositionCard';
 
+import { Comp as IconDetails } from './assets/icon-details.svg';
 import { AutomatorHistory } from './automator';
+import locale from './locale';
 
 import styles from './index.module.scss';
+
+addI18nResources(locale, 'History');
 
 const OrderHistory = () => {
   const wallet = useWalletStore();
@@ -280,20 +279,36 @@ const OrderHistory = () => {
 const Index = () => {
   const [t] = useTranslation('History');
   const [project] = useProjectChange();
-  const isAutomatorTradeHistory = useQuery((q) => !!q['automator-vault']);
+  const automatorAddress = useQuery((q) => q['automator-vault'] as string);
   return (
     <TopTabs
       banner={
         <>
           <h1 className={styles['head-title']}>
-            {project === ProjectType.Automator
-              ? t({ enUS: 'Transaction History', zhCN: '交易历史' })
-              : isAutomatorTradeHistory
-                ? t({
-                    enUS: 'Automator Trade History',
-                    zhCN: 'Automator 交易历史',
-                  })
-                : t({ enUS: 'Order History', zhCN: '订单历史' })}
+            {project === ProjectType.Automator ? (
+              <>
+                {t({ enUS: 'Transaction History', zhCN: '交易历史' })}
+                {automatorAddress && (
+                  <Address
+                    address={automatorAddress}
+                    linkBtn={`/products/automator?automator-vault=${automatorAddress}`}
+                  />
+                )}
+              </>
+            ) : automatorAddress ? (
+              <>
+                {t({
+                  enUS: 'Automator Trade History',
+                  zhCN: 'Automator 交易历史',
+                })}
+                <Address
+                  address={automatorAddress}
+                  linkBtn={`/products/automator?automator-vault=${automatorAddress}`}
+                />
+              </>
+            ) : (
+              t({ enUS: 'Order History', zhCN: '订单历史' })
+            )}
           </h1>
         </>
       }

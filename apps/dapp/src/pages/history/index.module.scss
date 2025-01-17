@@ -1,11 +1,19 @@
 .head-title {
-  @include flex-center;
+  @include flex-column-center;
 
   margin: 0;
   padding: 75px 0 32px;
   font-size: 24px;
   text-align: center;
   color: #fff;
+
+  :global {
+    .address {
+      @include regular;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+  }
 }
 
 .tabs {
@@ -103,7 +111,7 @@
     }
 
     .semi-table-row-cell {
-      height: min(72px, 10vw);
+      height: min(56px, 9.3vw);
     }
 
     .semi-table-row-expand {

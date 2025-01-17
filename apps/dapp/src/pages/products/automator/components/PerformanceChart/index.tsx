@@ -154,8 +154,8 @@ export const AutomatorPerformanceChart = (
         },
         axisLine: {
           show: true,
-          onZero: false,
-          lineStyle: { color: '#0001' },
+          onZero: true,
+          lineStyle: { color: '#0001', type: 'dashed' },
         },
       },
       yAxis: {
