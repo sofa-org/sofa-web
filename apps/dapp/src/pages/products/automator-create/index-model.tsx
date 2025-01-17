@@ -397,27 +397,10 @@ const StepForm = () => {
                     enUS: 'Automator Risk Level',
                     zhCN: 'Automator风险级别',
                   })}
-                  <Tooltip
-                    style={{
-                      maxWidth: isMobileUI ? '80vw' : '500px',
-                    }}
-                    content={
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: t({
-                            enUS: 'The maximum percentage of your Automator capital you can lose.',
-                            zhCN: '您Automator资本的最大可损失百分比。',
-                          }).replace(/\n/g, '<br />'),
-                        }}
-                      />
-                    }
-                  >
-                    <IconInfo className={styles['icon-info']} />
-                  </Tooltip>
                   <div className={styles['field-desc']}>
                     {t({
-                      enUS: 'You can only trade products with expiration dates within the selected waiting period.',
-                      zhCN: '您只能交易到期日期在选择的等待期内的产品。',
+                      enUS: 'The maximum percentage of your Automator capital you can lose.',
+                      zhCN: '您Automator资本的最大可损失百分比。',
                     })}
                   </div>
                 </>
