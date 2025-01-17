@@ -591,6 +591,7 @@ export const AutomatorCreateModel = (props: BaseInputProps<boolean>) => {
     <Modal
       footer={null}
       width={660}
+      centered
       visible={props.value}
       onCancel={() => props.onChange?.(false)}
       className={classNames(styles['automator-create-modal'], {
