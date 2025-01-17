@@ -21,7 +21,7 @@ import { ChainMap, defaultChain } from './chains';
 import { ContractsService } from './contracts';
 import { isMockEnabled } from './mock';
 import { TransactionProgress } from './positions';
-import { PositionStatus } from './the-graph';
+import { PositionStatus, TheGraphService } from './the-graph';
 import { WalletService } from './wallet';
 
 export interface OriginAutomatorCreateParams {
@@ -574,7 +574,7 @@ export class AutomatorCreatorService {
     return !!res;
   }
 
-  public static async hasAutomatorBeenCreated(factory: AutomatorFactory) {
+  static async hasAutomatorBeenCreated(factory: AutomatorFactory) {
     const { signer } = await WalletService.connect(factory.chainId);
     const factoryContract = new ethers.Contract(
       factory.factoryAddress,
@@ -585,7 +585,32 @@ export class AutomatorCreatorService {
       signer.address,
       factory.clientDepositCcyAddress,
     );
-    return res as string;
+    return res !== '0x0000000000000000000000000000000000000000';
+  }
+
+  static async hasBurned(factory: AutomatorFactory) {
+    const { signer } = await WalletService.connect(factory.chainId);
+    const records = await TheGraphService.rchBurnRecordsForAutomator({
+      chainId: factory.chainId,
+      wallet: signer.address,
+    });
+    return records.some(
+      (it) =>
+        it.collateral.toLowerCase() ===
+        factory.clientDepositCcyAddress.toLowerCase(),
+    );
+  }
+
+  static async hasNoCreditsAfterBurned(factory: AutomatorFactory) {
+    const hasBurn = await AutomatorCreatorService.hasBurned(factory);
+
+    if (!hasBurn) return false;
+
+    const [hasCredits, hasAutomator] = await Promise.all([
+      AutomatorCreatorService.hasCredits(factory),
+      AutomatorCreatorService.hasAutomatorBeenCreated(factory),
+    ]);
+    return !hasCredits && !hasAutomator;
   }
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
