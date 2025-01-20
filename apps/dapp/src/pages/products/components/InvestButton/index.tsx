@@ -225,10 +225,8 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   const handleSubmit = useLazyCallback(async () => {
     if (!vault) return;
     const amount = simplePlus(...quoteInfos.map((it) => it?.amounts.own)) || 0;
-    if (
-      wallet.balance?.[vault.depositCcy] &&
-      wallet.balance[vault.depositCcy]! < amount
-    ) {
+    const balance = props.insufficientGetBalance(vault.depositCcy);
+    if (balance === undefined || balance < amount) {
       return Toast.warning(t('Balance is no enough!'));
     }
     const delRfq = (key: NonNullable<TransactionProgress['details']>[0][0]) => {
