@@ -212,7 +212,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
             <span className={styles['label']}>
               {t({
                 enUS: 'Automator Total Available Balance',
-                zhCN: '自动化器总可用余额',
+                zhCN: 'Automator 总可用余额',
               })}
             </span>
             <span className={styles['value']}>

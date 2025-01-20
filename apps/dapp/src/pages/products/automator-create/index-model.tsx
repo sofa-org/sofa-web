@@ -490,7 +490,7 @@ const StepCreating = () => {
           t(
             {
               enUS: 'Automator [[{{name}}]] is Creating',
-              zhCN: '自动化器[[{{name}}]]正在创建',
+              zhCN: 'Automator [[{{name}}]]正在创建',
             },
             {
               name: payload.automatorName,
@@ -534,7 +534,7 @@ const StepFinished = () => {
           t(
             {
               enUS: 'Automator [[{{name}}]] is created!',
-              zhCN: '自动化器[[{{name}}]]已创建！',
+              zhCN: 'Automator [[{{name}}]]已创建！',
             },
             {
               name: payload.automatorName,
@@ -563,7 +563,7 @@ const StepFinished = () => {
           styles['btn-finish'],
         )}
       >
-        {t({ enUS: 'Go to Automator Management', zhCN: '前往自动化器管理' })}
+        {t({ enUS: 'Go to Automator Management', zhCN: '前往 Automator 管理' })}
       </Button>
     </div>
   );

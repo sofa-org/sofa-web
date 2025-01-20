@@ -278,7 +278,7 @@ const AutomatorCreate = () => {
               className={styles['select-chain']}
               insetLabel={
                 <span className={styles['select-label']}>
-                  {t({ enUS: 'Automator Chain', zhCN: '自动化器链' })}
+                  {t({ enUS: 'Automator Chain', zhCN: 'Automator 链' })}
                 </span>
               }
               suffix={
