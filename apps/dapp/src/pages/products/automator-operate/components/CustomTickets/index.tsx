@@ -799,7 +799,16 @@ const CustomTickets = (props: {
             },
           },
           {
-            title: '',
+            title: () => (
+              <>
+                <div
+                  className={styles['icon-del']}
+                  onClick={() => useProductsState.clearCart(props.vault)}
+                >
+                  <IconDel />
+                </div>
+              </>
+            ),
             render: (_, it) => (
               <div
                 className={styles['icon-del']}
