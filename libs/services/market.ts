@@ -290,14 +290,13 @@ export class MarketService {
       { current: number; avgWeekly: number; apyUsed: number }
     >
   > {
-    const ccyList = ContractsService.vaults.reduce(
-      (pre, it) =>
+    const ccyList = ContractsService.vaults.reduce((pre, it) => {
+      const shouldAdd =
         it.riskType !== RiskType.RISKY &&
-        (it.chainId !== chainId || pre.includes(it.depositCcy))
-          ? pre
-          : pre.concat(it.depositCcy),
-      [] as string[],
-    );
+        it.chainId === chainId &&
+        !pre.includes(it.depositCcy);
+      return shouldAdd ? pre.concat(it.depositCcy) : pre;
+    }, [] as string[]);
     const defaultApy = {
       current: 0,
       avgWeekly: 0,
