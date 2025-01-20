@@ -277,7 +277,7 @@ const List = (props: {
             size="large"
             theme="solid"
             type="primary"
-            className={styles['btn-bottom']}
+            className={classNames(styles['btn-bottom'], styles['btn-claim'])}
             onClick={claimAll}
           >
             {t('CLAIM ALL')} ({unClaimedList.length})

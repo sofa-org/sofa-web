@@ -78,9 +78,10 @@ export function amountFormatter(
   const [int, $decimal] = Big(amount).toFixed(18).split('.');
   const intStr = int.replace(/\B(?=(\d{3})+(\.|$))/g, ',');
   const decimal = $decimal?.replace(/0+$/, '');
-  return decimal && precision
-    ? `${intStr}.${decimal.slice(0, precision).replace(/0+$/, '')}`
-    : intStr;
+  if (!decimal || !precision) return intStr;
+  const $$decimal = decimal.slice(0, precision).replace(/0+$/, '');
+  if (!$$decimal) return intStr;
+  return `${intStr}.${$$decimal}`;
 }
 
 export function roundWith<T extends number | string | undefined>(
