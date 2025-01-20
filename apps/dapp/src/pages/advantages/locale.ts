@@ -39,8 +39,8 @@ export default {
       'Fixed supply token with a regular and known airdrop schedule.  No surprises.',
     "RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.":
       "RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.",
-    'ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
-      'ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.',
+    'All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
+      'All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.',
     'Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.':
       'Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.',
   },
@@ -84,7 +84,7 @@ export default {
       '定期的かつ既知のエアドロップスケジュールを持つ固定供給トークン。サプライズはありません。',
     "RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.":
       'RCHはプロトコル使用またはエコシステム構築報酬によってのみ獲得できます。「取引で得る」。',
-    'ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
+    'All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
       'すべてのプロトコル収益は日々RCHトークンを焼却するために再利用され、時間が経つにつれて正味のデフレ的な流通を確保します。',
     'Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.':
       'モデルの設計により、価値の増大は100%コアユーザーと長期保持者に割り当てられます。コミュニティのために構築します。',
@@ -130,7 +130,7 @@ export default {
       'Токен с фиксированным предложением и регулярным, известным графиком эирдропов. Без сюрпризов.',
     "RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.":
       "Токен RCH можно заработать только использованием протокола или вознаграждениями за создание экосистемы. 'Торговать, чтобы заработать'.",
-    'ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
+    'All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
       'Все доходы протокола будут переработаны для ежедневного сжигания токенов RCH, обеспечивая с течением времени чистую дефляционную динамику.',
     'Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.':
       'Дизайн модели обеспечивает распределение 100% прироста стоимости нашим основным пользователям и долгосрочным держателям. Создано для сообщества.',
@@ -175,7 +175,7 @@ export default {
       '代币总量固定，空投计划定期公布。透明可预期。',
     "RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.":
       'RCH代币只能通过使用协议或参与生态系统建设来获得。"交易即挖矿" 。',
-    'ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
+    'All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
       '协议的所有收入将全数用于回购并销毁RCH代币，确保代币流通量随时间呈净通缩趋势。',
     'Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.':
       '模型设计确保所有价值增长都将分配给我们的核心用户和长期持有者。我们为社区而建。',
@@ -219,7 +219,7 @@ export default {
       '代幣供應固定，且有固定和已知的空投計劃。沒有驚喜。',
     "RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.":
       "RCH代幣只能通過使用協議或參與生態系統建設來獲得。'交易即賺取'。",
-    'ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
+    'All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
       '所有協議收益將每日回收用於銷毀RCH代幣，確保隨時間網絡通縮。',
     'Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.':
       '模型設計確保所有價值增長都將分配給我們的核心用戶和長期持有者。為社區而建。',
@@ -264,7 +264,7 @@ export default {
       '代幣總量固定，空投計劃定期公布。透明可預期。',
     "RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.":
       "RCH代幣只能通過使用協議或參與生態系統建設來獲得。'交易即挖矿'。",
-    'ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
+    'All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.':
       '協議的所有收入將全數用於回購並銷毀RCH代幣，確保代幣流通量隨時間呈淨通縮趨勢。',
     'Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.':
       '模型設計確保所有價值增長都將分配給我們的核心用戶和長期持有者。為社區而建。',

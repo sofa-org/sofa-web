@@ -1,20 +1,20 @@
 export default {
   'en-US': {
-    'CLAIM ALL': 'CLAIM ALL',
+    'Claim All': 'Claim All',
   },
   'ja-JP': {
-    'CLAIM ALL': '全て請求する',
+    'Claim All': '全て請求する',
   },
   'ru-RU': {
-    'CLAIM ALL': 'ЗАБРАТЬ ВСЕ',
+    'Claim All': 'ЗАБРАТЬ ВСЕ',
   },
   'zh-CN': {
-    'CLAIM ALL': '全部领取',
+    'Claim All': '全部领取',
   },
   'zh-HK': {
-    'CLAIM ALL': '全部領取',
+    'Claim All': '全部領取',
   },
   'zh-TW': {
-    'CLAIM ALL': '全部領取',
+    'Claim All': '全部領取',
   },
 };

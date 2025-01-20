@@ -78,7 +78,7 @@ const List = (props: {
             navigate(link);
           }}
         >
-          {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}
+          {t({ enUS: 'All History', zhCN: '全部历史' })}
         </Button>
         <RuleDescriptions />
       </div>

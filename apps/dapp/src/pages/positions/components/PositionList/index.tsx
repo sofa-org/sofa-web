@@ -270,7 +270,7 @@ const List = (props: {
             navigate(link);
           }}
         >
-          {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}
+          {t({ enUS: 'All History', zhCN: '全部历史' })}
         </Button>
         {!!unClaimedList.length && (
           <Button
@@ -280,7 +280,7 @@ const List = (props: {
             className={classNames(styles['btn-bottom'], styles['btn-claim'])}
             onClick={claimAll}
           >
-            {t('CLAIM ALL')} ({unClaimedList.length})
+            {t('Claim All')} ({unClaimedList.length})
           </Button>
         )}
       </div>
