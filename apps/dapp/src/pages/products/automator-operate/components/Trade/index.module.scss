@@ -104,6 +104,9 @@
 
 .automator-number-tooltip {
   max-width: min(560px, 80vw);
+  :global(.semi-tooltip-content) {
+    min-width: min(300px, 50vw);
+  }
   background: #fff;
 
   > svg {

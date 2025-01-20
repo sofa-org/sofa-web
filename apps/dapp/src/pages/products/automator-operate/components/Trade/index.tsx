@@ -269,7 +269,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             dangerouslySetInnerHTML={{
                               __html: t({
                                 enUS: 'Historical Interest Earned & Net PnL\n(RCH not included)',
-                                zhCN: '历史已赚取利息 & 净利润 （不包括RCH）',
+                                zhCN: '历史已赚取利息 & 净利润\n（不包括RCH）',
                               }).replace(/\n/g, '<br />'),
                             }}
                           />
