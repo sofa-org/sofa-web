@@ -79,7 +79,7 @@ export function amountFormatter(
   const intStr = int.replace(/\B(?=(\d{3})+(\.|$))/g, ',');
   const decimal = $decimal?.replace(/0+$/, '');
   return decimal && precision
-    ? `${intStr}.${decimal.slice(0, precision)}`
+    ? `${intStr}.${decimal.slice(0, precision).replace(/0+$/, '')}`
     : intStr;
 }
 

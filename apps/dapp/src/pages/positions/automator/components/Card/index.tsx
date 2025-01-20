@@ -140,8 +140,11 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
                   : 'var(--color-fall)',
             }}
           >
-            {Number(props.info.pnlPercentage) >= 0 && '+'}
-            {displayPercentage(Number(props.info.pnlPercentage) / 100)}
+            {displayPercentage(
+              Number(props.info.pnlPercentage) / 100,
+              undefined,
+              true,
+            )}
           </span>
           {/* <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>

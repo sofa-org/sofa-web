@@ -3,13 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { AutomatorDetail } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
+import {
+  amountFormatter,
+  cvtAmountsInCcy,
+  displayPercentage,
+} from '@sofa/utils/amount';
 import { formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
+import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { formatTime } from '@/components/TimezoneSelector/store';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
@@ -27,6 +32,7 @@ export interface AutomatorCreatorCardProps {
 export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
   const [t] = useTranslation('AutomatorCreatorCard');
   const navigate = useNavigate();
+  const prices = useIndexPrices((s) => s.prices);
   const isMobileUI = useIsMobileUI();
   const depositCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
@@ -207,7 +213,7 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
                 : 'var(--color-fall)',
           }}
         >
-          {displayPercentage(props.info.pnlPercentage, 2, true)}
+          {displayPercentage(+props.info.pnlPercentage / 100, 2, true)}
         </div>
       </div>
       <div className={styles['item']}>
@@ -224,6 +230,20 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
           />
           <span className={styles['unit']}>
             {props.info.vaultInfo.vaultDepositCcy}
+          </span>
+          <span className={styles['cvt']}>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={cvtAmountsInCcy(
+                [[props.info.vaultInfo.vaultDepositCcy, props.info.profits]],
+                prices,
+                props.info.vaultInfo.depositCcy,
+              )}
+              ccy={props.info.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {props.info.vaultInfo.depositCcy}
+            </span>
           </span>
         </div>
       </div>

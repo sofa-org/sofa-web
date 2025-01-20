@@ -103,9 +103,12 @@ const Index = () => {
     (state) =>
       automator &&
       state.vaultDetails[
-        `${automator.vaultInfo.chainId}-${automator.vaultInfo.vault.toLowerCase()}-`
+        `${
+          automator.vaultInfo.chainId
+        }-${automator.vaultInfo.vault.toLowerCase()}-`
       ],
   );
+
   return (
     <TopTabs
       type="banner-expandable-tab"

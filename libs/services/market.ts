@@ -6,7 +6,6 @@ import { http } from '@sofa/utils/http';
 import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
 import { Contract, formatUnits } from 'ethers';
-import { includes } from 'lodash-es';
 
 import { defaultChain } from './chains';
 import { ContractsService, RiskType, VaultInfo } from './contracts';

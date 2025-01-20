@@ -166,7 +166,7 @@ const PoolSize = () => {
             amount={
               Number(automator?.aumByVaultDepositCcy) / Number(automator?.nav)
             }
-            ccy={automator?.vaultInfo.depositCcy}
+            ccy={automator?.vaultInfo.positionCcy}
           />
           <span className={styles['unit']}>
             {automator?.vaultInfo.positionCcy}
@@ -265,6 +265,7 @@ const PoolSize = () => {
 const PnL = () => {
   const [t] = useTranslation('AutomatorPerformance');
   const { automator } = useCreatorAutomatorSelector();
+  const prices = useIndexPrices((s) => s.prices);
 
   const { data: claimableProfits } = useRequest(
     async () =>
@@ -292,7 +293,7 @@ const PnL = () => {
                 : 'var(--color-fall)',
           }}
         >
-          {displayPercentage(automator?.yieldPercentage)}
+          {displayPercentage(Number(automator?.yieldPercentage) / 100)}
         </span>
       </div>
       <div className={styles['item']}>
@@ -350,7 +351,7 @@ const PnL = () => {
                 : 'var(--color-fall)',
           }}
         >
-          {displayPercentage(automator?.pnlPercentage, 2, true)}
+          {displayPercentage(Number(automator?.pnlPercentage) / 100, 2, true)}
         </div>
       </div>
       <div className={styles['footer']}>
@@ -386,6 +387,22 @@ const PnL = () => {
             <span className={styles['unit']}>
               {automator?.vaultInfo.vaultDepositCcy}
             </span>
+            {automator && (
+              <span className={styles['cvt']}>
+                <span className={styles['separator']}>≈</span>
+                <AmountDisplay
+                  amount={cvtAmountsInCcy(
+                    [[automator.vaultInfo.vaultDepositCcy, automator.profits]],
+                    prices,
+                    automator.vaultInfo.depositCcy,
+                  )}
+                  ccy={automator.vaultInfo.depositCcy}
+                />
+                <span className={styles['unit']}>
+                  {automator.vaultInfo.depositCcy}
+                </span>
+              </span>
+            )}
           </div>
         </div>
         <div className={styles['item']}>

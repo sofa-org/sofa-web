@@ -119,7 +119,7 @@ export const AutomatorFollowers = () => {
                     : 'var(--color-fall)',
               }}
             >
-              {displayPercentage(record.pnlPercentage)}
+              {displayPercentage(+record.pnlPercentage / 100)}
             </span>
           ),
         },
