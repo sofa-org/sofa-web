@@ -269,12 +269,14 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             dangerouslySetInnerHTML={{
                               __html: t({
                                 enUS: 'Historical Interest Earned & Net PnL\n(RCH not included)',
+                                zhCN: '历史已赚取利息 & 净利润 （不包括RCH）',
                               }).replace(/\n/g, '<br />'),
                             }}
                           />
                           <span className={styles['desc']}>
                             {t({
                               enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
+                              zhCN: '通过Aave/Lido/Sofa/Curve的累积收益',
                             })}
                           </span>
                           <span className={styles['value']}>
@@ -293,11 +295,12 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                         </div>
                         <div className={styles['amount']}>
                           <span className={styles['label']}>
-                            {t({ enUS: 'Current Position' })}
+                            {t({ enUS: 'Current Position', zhCN: '当前头寸' })}
                           </span>
                           <span className={styles['desc']}>
                             {t({
                               enUS: 'Value of open & Unclaimed positions.',
+                              zhCN: '未平仓及未认领头寸的价值。',
                             })}
                           </span>
                           <span className={styles['value']}>
@@ -318,11 +321,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <span className={styles['label']}>
                             {t({
                               enUS: 'Available Balance Excluding Principal',
+                              zhCN: '不包括本金的可用余额',
                             })}
                           </span>
                           <span className={styles['desc']}>
                             {t({
                               enUS: 'Historical Interest Earned + Net PnL - Current Position.',
+                              zhCN: '历史已赚取利息 + 净利润 - 当前头寸。',
                             })}
                           </span>
                           <span className={styles['value']}>
@@ -398,7 +403,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                       <div>
                         <div className={styles['amount']}>
                           <span className={styles['label']}>
-                            {t({ enUS: 'Pool Size' })}
+                            {t({ enUS: 'Pool Size', zhCN: '池子大小' })}
                           </span>
                           {!InterestTypeRefs[automator.vaultInfo.interestType!]
                             .isRebase ? (
@@ -435,11 +440,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <span className={styles['label']}>
                             {t({
                               enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
+                              zhCN: '预估Aave/Lido/Sofa/Curve收益',
                             })}
                           </span>
                           <span className={styles['desc']}>
                             {t({
                               enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
+                              zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve年化)。 （Aave/Lido/Sofa/Curve年化）',
                             })}
                           </span>
                           <span className={styles['value']}>
@@ -450,11 +457,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <span className={styles['label']}>
                             {t({
                               enUS: 'Estimated Aave/Lido/Sofa/Curve Interest',
+                              zhCN: '预估Aave/Lido/Sofa/Curve利息',
                             })}
                           </span>
                           <span className={styles['desc']}>
                             {t({
                               enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Pool Size)',
+                              zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve年化预估) ^ (期限 / 365) - 池子大小）',
                             })}
                           </span>
                           <span className={styles['value']}>

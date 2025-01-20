@@ -384,6 +384,7 @@ const TicketEditor = (props: CustomTicketProps) => {
               content={t(
                 {
                   enUS: "This Automator's Redemption Waiting Period is set to {{days}} days, allowing you to trade options with expirations within this range.",
+                  zhCN: '此自动化器的赎回等待期设定为{{days}}天，允许您在此范围内交易到期的期权。',
                 },
                 {
                   days: Math.round(
@@ -699,9 +700,7 @@ const CustomTickets = (props: {
       <Table<PartialRequired<ProductQuoteParams, 'vault' | 'id'>>
         columns={[
           {
-            title: t({
-              enUS: 'Product',
-            }),
+            title: t({ enUS: 'Product', zhCN: '产品' }),
             // TODO
             render: (_, it) =>
               t({
