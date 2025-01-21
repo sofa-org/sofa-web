@@ -267,7 +267,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           className={styles['desc']}
                           dangerouslySetInnerHTML={{
                             __html: t({
-                              enUS: `This shows the balance made up of the interest earned by your Automator and net PnL from trading, excluding the principal. It is the amount available for trading without affecting your initial investment.`,
+                              enUS: 'This shows the balance made up of the interest earned by your Automator and net PnL from trading, excluding the principal. It is the amount available for trading without affecting your initial investment.',
+                              zhCN: '这里显示的是您的Automator赚取的利息和交易净PnL组成的余额，不包括本金。这是可用于交易的金额，不会影响您的初始投资。',
                             }).replace(/\n/g, '<br />'),
                           }}
                         />
