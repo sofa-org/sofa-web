@@ -211,8 +211,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
           <div className={styles['amount']}>
             <span className={styles['label']}>
               {t({
-                enUS: 'Automator Total Available Balance',
-                zhCN: 'Automator 总可用余额',
+                enUS: 'Available Balance (Total)',
+                zhCN: '可用余额 (总计)',
               })}
             </span>
             <span className={styles['value']}>
@@ -239,8 +239,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
           <div className={styles['amount']}>
             <span className={styles['label']}>
               {t({
-                enUS: 'Available Balance Excluding Principal',
-                zhCN: '扣除本金后的可用余额',
+                enUS: 'Available Balance (Use Interest-Only)',
+                zhCN: '可用余额 (只用利息交易)',
               })}
             </span>
             <span className={styles['value']}>
@@ -263,12 +263,20 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                     className={styles['automator-number-tooltip']}
                     content={
                       <div className={styles['automator-details']}>
+                        <div
+                          className={styles['desc']}
+                          dangerouslySetInnerHTML={{
+                            __html: t({
+                              enUS: `This shows the balance made up of the interest earned by your Automator and net PnL from trading, excluding the principal. It is the amount available for trading without affecting your initial investment.`,
+                            }).replace(/\n/g, '<br />'),
+                          }}
+                        />
                         <div className={styles['amount']}>
                           <span
                             className={styles['label']}
                             dangerouslySetInnerHTML={{
                               __html: t({
-                                enUS: 'Historical Interest Earned & Net PnL\n(RCH not included)',
+                                enUS: 'Historical Interest Earned & Net PnL\n(without RCH)',
                                 zhCN: '历史已赚取利息 & 净利润\n（不包括RCH）',
                               }).replace(/\n/g, '<br />'),
                             }}
@@ -320,8 +328,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                         <div className={styles['amount']}>
                           <span className={styles['label']}>
                             {t({
-                              enUS: 'Available Balance Excluding Principal',
-                              zhCN: '不包括本金的可用余额',
+                              enUS: 'Available Balance (Use Interest-Only)',
+                              zhCN: '可用余额 (只用利息交易)',
                             })}
                           </span>
                           <span className={styles['desc']}>

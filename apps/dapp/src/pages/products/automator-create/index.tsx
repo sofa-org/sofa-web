@@ -259,8 +259,8 @@ const AutomatorCreate = () => {
             <h1 className={styles['head-title']}>
               {ProjectTypeRefs[ProjectType.Automator]?.icon}
               {t({
-                enUS: 'Create A Automator, Showcase Your Strategy',
-                zhCN: '创建一个 Automator，展示您的策略',
+                enUS: 'Create Your Automator Strategies',
+                zhCN: '创建你 Automator 策略',
               })}
             </h1>
           </>
@@ -389,7 +389,7 @@ const AutomatorCreate = () => {
           <div className={styles['tips']}>
             <IconInfo className={styles['icon-info']} />
             {t({
-              enUS: 'Note: Each wallet address can create only one Automator per chain and deposit token combination.',
+              enUS: 'Note: Each wallet address can only create one Automator with the same deposit token per chain.',
               zhCN: '注意：每个钱包地址在每条链和每种存入代币组合上只能创建一个 Automator。',
             })}
           </div>
@@ -409,11 +409,11 @@ const AutomatorCreate = () => {
             <li>
               <IconShare />
               <div className={styles['title']}>
-                {t({ enUS: 'Share Profits', zhCN: '分享利润' })}
+                {t({ enUS: 'Profits Sharing', zhCN: '分享利润' })}
               </div>
               <div className={styles['desc']}>
                 {t({
-                  enUS: 'Earn up to 15% profit share from the users who subscribe to your AutoMator.',
+                  enUS: 'Enjoy up to 15% in profit sharing from your Automator subscribers.',
                   zhCN: '通过订阅您AutoMator的用户可赚取高达15%的利润分成。',
                 })}
               </div>
@@ -421,11 +421,14 @@ const AutomatorCreate = () => {
             <li>
               <IconPoints />
               <div className={styles['title']}>
-                {t({ enUS: 'Earn Risk-Free Interest', zhCN: '赚取无风险利息' })}
+                {t({
+                  enUS: 'Earn Hassle-Free Interest',
+                  zhCN: '赚取无风险利息',
+                })}
               </div>
               <div className={styles['desc']}>
                 {t({
-                  enUS: 'Funds in your Automator grow passively through AAVE/CRV, earning stable returns with zero risk.',
+                  enUS: 'Funds in your Automator will grow passively through AAVE/CRV, enjoying riskfree-like returns.',
                   zhCN: '您在AutoMator中的资金通过AAVE/CRV被动增长，赚取稳定的无风险回报。',
                 })}
               </div>

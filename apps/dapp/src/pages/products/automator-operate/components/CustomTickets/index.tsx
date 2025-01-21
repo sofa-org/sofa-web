@@ -421,7 +421,7 @@ const TicketEditor = (props: CustomTicketProps) => {
 
         <div className={styles['form-item']}>
           <div className={styles['label']}>
-            {t({ enUS: 'Max Acceptable Loss', zhCN: '最大可接受损失' })}
+            {t({ enUS: 'Max Loss', zhCN: '最大损失' })}
           </div>
           <div className={styles['value']}>
             <AmountInput
@@ -532,11 +532,11 @@ const TicketEditor = (props: CustomTicketProps) => {
               <span className={styles['price']}>
                 {productType == ProductType.BearSpread ? (
                   <>
-                    {'>'} {props.product.anchorPrices?.[1]}
+                    {'>'} {amountFormatter(props.product.anchorPrices?.[1])}
                   </>
                 ) : (
                   <>
-                    {'<'} {props.product.anchorPrices?.[0]}
+                    {'<'} {amountFormatter(props.product.anchorPrices?.[0])}
                   </>
                 )}
               </span>
@@ -768,7 +768,7 @@ const CustomTickets = (props: {
               ),
           },
           {
-            title: t({ enUS: 'Max Acceptable Loss', zhCN: '最大可接受损失' }),
+            title: t({ enUS: 'Max Loss', zhCN: '最大损失' }),
             render: (_, it) => {
               return (
                 <>

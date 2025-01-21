@@ -319,8 +319,8 @@ const StepForm = () => {
                   </Tooltip>
                   <div className={styles['field-desc']}>
                     {t({
-                      enUS: 'You can only trade products with expiration dates within the selected waiting period.',
-                      zhCN: '您只能交易到期日期在选择的等待期内的产品。',
+                      enUS: 'Note: You can only execute underlying products with expiry dates shorter or equal to the redemption period.',
+                      zhCN: '注意：您只能交易到期日期在选择的等待期内的产品。',
                     })}
                   </div>
                 </>
@@ -348,7 +348,7 @@ const StepForm = () => {
               field="feeRate"
               label={
                 <>
-                  {t({ enUS: 'Profits Share Ratio', zhCN: '利润分成比例' })}
+                  {t({ enUS: 'Profit Share %', zhCN: '利润分成百分比' })}
                   <Tooltip
                     style={{
                       maxWidth: isMobileUI ? '80vw' : '500px',
@@ -441,7 +441,10 @@ const StepForm = () => {
           <Col span={24}>
             <Form.TextArea
               field="description"
-              label={t({ enUS: 'Strategy Description', zhCN: '策略描述' })}
+              label={t({
+                enUS: 'Strategy Description (Optional)',
+                zhCN: '策略描述 (可选)',
+              })}
               trigger="blur"
               rules={[]}
             />
@@ -471,7 +474,7 @@ const StepForm = () => {
       <div className={styles['tips']}>
         <p className={styles['tip']}>
           {t({
-            enUS: 'Note: Automator information cannot be edited after vault created.',
+            enUS: 'Note: Automator vault information cannot be modified after creation.',
             zhCN: '注意：创建金库后，Automator信息不可编辑。',
           })}
         </p>
