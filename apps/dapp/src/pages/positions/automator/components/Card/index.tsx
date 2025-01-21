@@ -73,7 +73,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t({ enUS: 'Holding', zhCN: '持仓' })}
+          {t({ enUS: 'Assets', zhCN: '持仓' })}
         </div>
         <div className={styles['value']}>
           <AmountDisplay amount={props.info?.share} />

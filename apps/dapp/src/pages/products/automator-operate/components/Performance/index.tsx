@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Spin, Toast } from '@douyinfe/semi-ui';
+import { Spin, Toast, Tooltip } from '@douyinfe/semi-ui';
 import { calc_yield } from '@sofa/alg';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { InterestTypeRefs } from '@sofa/services/base-type';
@@ -297,8 +297,15 @@ const PnL = () => {
         </span>
       </div>
       <div className={styles['item']}>
-        <div className={styles['label']}>
-          {t({ enUS: 'Historical Cumulative PnL', zhCN: '历史累计损益' })}
+        <div className={classNames(styles['label'], styles['underline'])}>
+          <Tooltip
+            content={t({
+              enUS: 'Means the total profit and loss (PnL) accumulated by the Automator, after deducting platform fees and the profit share for the Optivisor, reflecting the actual realized returns for investors and creators.',
+              zhCN: '指 Automator 累积的总利润和亏损（PnL），扣除平台费用和 Optivisor 的利润分成后，反映投资者和创建者的实际实现收益。',
+            })}
+          >
+            {t({ enUS: 'Historical Cumulative PnL', zhCN: '历史累计损益' })}
+          </Tooltip>
         </div>
         <div className={styles['value']}>
           <span
@@ -339,8 +346,15 @@ const PnL = () => {
         </div>
       </div>
       <div className={styles['item']}>
-        <div className={styles['label']}>
-          {t({ enUS: 'Historical Cumulative PnL%', zhCN: '历史累计损益%' })}
+        <div className={classNames(styles['label'], styles['underline'])}>
+          <Tooltip
+            content={t({
+              enUS: `Represents the percentage return on investment (ROI) accumulated by the Automator, after deducting platform fees and the profit share for the Optivisor. It reflects the overall performance as a percentage of the initial funds invested.`,
+              zhCN: '表示 Automator 在扣除平台费用和 Optivisor 的利润分成后累积的投资回报率（ROI）。该指标以初始投资资金的百分比形式反映整体表现。',
+            })}
+          >
+            {t({ enUS: 'Historical Cumulative PnL%', zhCN: '历史累计损益%' })}
+          </Tooltip>
         </div>
         <div
           className={styles['value']}
@@ -367,17 +381,17 @@ const PnL = () => {
               automator.vaultInfo,
             )
               .then(() =>
-                Toast.info(t({ enUS: 'Harvest successful', zhCN: '已收获' })),
+                Toast.info(t({ enUS: 'Claim successful', zhCN: '已提取' })),
               )
               .catch((err) => Toast.error(getErrorMsg(err)))
           }
         >
-          {t({ enUS: 'Harvest', zhCN: '收获' })}
+          {t({ enUS: 'Claim', zhCN: '提取' })}
         </AsyncButton>
         <div className={styles['item']}>
           <div className={styles['label']}>
             {t(
-              { enUS: 'Total Share Profits', zhCN: '总分润' },
+              { enUS: 'Cumulative Profit Share', zhCN: '累计分润' },
               { time: formatTime(automator?.dateTime, 'MMM.DD') },
             )}
           </div>
@@ -415,7 +429,7 @@ const PnL = () => {
         <div className={styles['item']}>
           <div className={styles['label']}>
             {t(
-              { enUS: 'Unclaimed Share Profit', zhCN: '未提取的分润' },
+              { enUS: 'Unclaimed Profit Share', zhCN: '未提取的分润' },
               { time: formatTime(automator?.dateTime, 'MMM.DD') },
             )}
           </div>

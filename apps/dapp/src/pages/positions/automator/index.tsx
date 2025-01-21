@@ -73,8 +73,8 @@ const Index = () => {
           <h1 className={styles['head-title']}>
             {ProjectTypeRefs[ProjectType.Automator].icon}
             {t({
-              enUS: 'Automator Holding History',
-              zhCN: 'Automator 历史',
+              enUS: 'Automator: Portfolio Record',
+              zhCN: 'Automator 记录',
             })}
           </h1>
           {/* <div className={styles['desc']}>

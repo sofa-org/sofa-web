@@ -12,6 +12,7 @@
 .title {
   @include flex-center;
   @include bold;
+
   position: absolute;
   left: 0;
   top: 28px;
@@ -24,11 +25,13 @@
 
 .label-1 {
   @include gradient-txt(linear-gradient(to right, #e88947, #ffdec3));
+
   margin: 0;
 }
 
 .item-1 {
   @include flex-center;
+
   margin: 0;
 }
 
@@ -36,10 +39,17 @@
   margin: 0;
   font-size: 14px;
   opacity: 0.5;
+
+  &.underline {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: #aaa;
+  }
 }
 
 .value {
   @include bold;
+
   margin: 0;
 
   .cvt {
@@ -48,6 +58,7 @@
 
   .weaken {
     @include regular;
+
     font-size: 0.9em;
     opacity: 0.45;
   }
@@ -55,6 +66,7 @@
 
 .unit {
   @include regular;
+
   margin: 0;
   padding: 0 0 0 3px;
   font-size: min(0.8em, 12px);
@@ -62,7 +74,7 @@
 
   &.icon-airdrop {
     padding-right: 1em;
-    background: url(../../../../positions/automator/assets/icon-airdrop.svg)
+    background: url("../../../../positions/automator/assets/icon-airdrop.svg")
       no-repeat;
     background-position: 100% 34%;
     background-size: 0.9em 0.9em;
@@ -72,6 +84,7 @@
 
 .separator {
   @include regular;
+
   display: inline-block;
   padding: 0 6px;
   font-size: 0.8em;
@@ -84,6 +97,7 @@
 
 .item {
   @include flex-center;
+
   font-size: 18px;
   justify-content: flex-start;
   flex: 1;
@@ -110,6 +124,7 @@
     linear-gradient(to right, #e88947, #ffdec3)
   );
   @include flex-center;
+
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: 4px 24px;
@@ -138,12 +153,14 @@
 
 .pool-size-infos {
   @include flex-center;
+
   justify-content: space-between;
   flex-wrap: wrap;
   margin: 0;
 
   .item {
     @include flex-center;
+
     justify-content: flex-start;
     flex: 1;
     min-width: 45%;
@@ -172,12 +189,11 @@
   height: 8px;
   margin: 0;
   border-radius: 50%;
-  background: currentColor;
+  background: currentcolor;
 }
 
 .percent {
   display: inline-block;
-  margin: 0;
   padding: 0 0 0 6px;
   margin: 0 0 0 6px;
   font-size: min(0.8em, 12px);
@@ -237,7 +253,7 @@
 @mixin rewrite {
   .title {
     top: 0;
-    border-radius: 0 0 4px 0;
+    border-radius: 0 0 4px;
   }
 
   .value {

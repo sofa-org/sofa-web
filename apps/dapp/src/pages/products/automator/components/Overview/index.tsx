@@ -106,7 +106,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         {data?.vaultInfo.creator && (
           <div className={styles['aum']}>
             <div className={styles['title']}>
-              {t({ enUS: `Optivisor's Lead Assets`, zhCN: '创建者份额' })}
+              {t({ enUS: `Optivisor Committed Assets`, zhCN: '创建者份额' })}
             </div>
             <div className={styles['value']}>
               <AmountDisplay
@@ -161,8 +161,8 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
             dangerouslySetInnerHTML={{
               __html: t(
                 {
-                  enUS: 'This product has a <span class="highlight">{{waitDuration}}</span> waiting period for redemptions.',
-                  zhCN: '此产品的赎回需经过 <span class="highlight">{{waitDuration}}</span> 的等待期。',
+                  enUS: 'This strategy has a <span class="highlight">{{waitDuration}}</span> waiting period for redemptions.',
+                  zhCN: '此策略的赎回需经过 <span class="highlight">{{waitDuration}}</span> 的等待期。',
                 },
                 {
                   waitDuration:

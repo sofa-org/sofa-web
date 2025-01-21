@@ -30,7 +30,7 @@ const tabOptions = [
     value: 'all',
   },
   {
-    label: (t: TFunction) => t({ enUS: 'Holding', zhCN: '我参与的' }),
+    label: (t: TFunction) => t({ enUS: 'Portfolio', zhCN: '我参与的' }),
     value: 'holding',
   },
 ];
