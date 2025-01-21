@@ -356,7 +356,7 @@ const PnL = () => {
       </div>
       <div className={styles['footer']}>
         <AsyncButton
-          disabled={!(Number(automator?.profits) > 0)}
+          disabled={!(Number(automator?.totalProfitByVaultDepositCcy) > 0)}
           className={styles['btn-claim']}
           onClick={() =>
             automator &&
@@ -381,7 +381,7 @@ const PnL = () => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay
-              amount={automator?.profits}
+              amount={automator?.totalProfitByVaultDepositCcy}
               ccy={automator?.vaultInfo.vaultDepositCcy}
             />
             <span className={styles['unit']}>
@@ -392,7 +392,12 @@ const PnL = () => {
                 <span className={styles['separator']}>≈</span>
                 <AmountDisplay
                   amount={cvtAmountsInCcy(
-                    [[automator.vaultInfo.vaultDepositCcy, automator.profits]],
+                    [
+                      [
+                        automator.vaultInfo.vaultDepositCcy,
+                        automator.totalProfitByVaultDepositCcy,
+                      ],
+                    ],
                     prices,
                     automator.vaultInfo.depositCcy,
                   )}
