@@ -6,6 +6,7 @@ export function getCollateralDecimal(chainId: number, depositCcy: string) {
   const decimal = {
     RCH: 1e18,
     USDT: chainId == 56 ? 1e18 : 1e6,
+    aUSDT: chainId == 56 ? 1e18 : 1e6,
     USDC: chainId == 56 ? 1e18 : 1e6,
     aArbSepUSDC: chainId == 56 ? 1e18 : 1e6,
     aUSDC: chainId == 56 ? 1e18 : 1e6,
@@ -25,6 +26,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
     return {
       RCH: 0.05,
       USDT: 0.05,
+      aUSDT: 0.05,
       USDC: 0.05,
       aArbSepUSDC: 0.05,
       aUSDC: 0.05,
@@ -39,6 +41,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
     ? {
         RCH: 20,
         USDT: 20,
+        aUSDT: 20,
         USDC: 20,
         aArbSepUSDC: 20,
         aUSDC: 20,
@@ -51,6 +54,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
     : {
         RCH: 100,
         USDT: 100,
+        aUSDT: 100,
         USDC: 100,
         aArbSepUSDC: 100,
         aUSDC: 100,
@@ -68,6 +72,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
     return {
       RCH: 0.05,
       USDT: 0.05,
+      aUSDT: 0.05,
       USDC: 0.05,
       aArbSepUSDC: 0.05,
       aUSDC: 0.05,
@@ -82,6 +87,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
     ? {
         RCH: 20,
         USDT: 20,
+        aUSDT: 20,
         USDC: 20,
         aArbSepUSDC: 20,
         aUSDC: 20,
@@ -94,6 +100,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
     : {
         RCH: 1,
         USDT: 1,
+        aUSDT: 1,
         USDC: 1,
         aArbSepUSDC: 1,
         aUSDC: 1,

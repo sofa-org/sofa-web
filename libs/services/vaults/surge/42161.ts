@@ -74,6 +74,57 @@ const USDTVaults = [
   },
 ];
 
-const vaults = [...USDTVaults];
+const VaultsForAutomator = [
+  // RebaseSmartBullVault(ETH/aUSDT)
+  {
+    chainId: 42161,
+    vault: '0x3d5489b9846cD3BC3e05D32d46C51d50fA37c049',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    rchMultiplier: 1,
+    usePermit2: true,
+  },
+  // RebaseSmartBullVault(BTC/aUSDT)
+  {
+    chainId: 42161,
+    vault: '0x40e439cb71379eE5fF6b914313c11A792A385e93',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    rchMultiplier: 1,
+    usePermit2: true,
+  },
+  // RebaseSmartBearVault(ETH/aUSDT)
+  {
+    chainId: 42161,
+    vault: '0x68C91Df6ecBa6c697217d747f04B72EEDc6af1e7',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    rchMultiplier: 1,
+    usePermit2: true,
+  },
+  // RebaseSmartBearVault(BTC/aUSDT)
+  {
+    chainId: 42161,
+    vault: '0xC914Ba8F6393cC611BD1d207e317C68BE27943eB',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    rchMultiplier: 1,
+    usePermit2: true,
+  },
+].map((it) => ({ ...it, onlyForAutomator: true }));
+
+const vaults = [...USDTVaults, ...VaultsForAutomator];
 
 export default vaults;

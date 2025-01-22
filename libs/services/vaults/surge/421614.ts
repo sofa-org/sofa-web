@@ -51,7 +51,7 @@ const VaultsForAutomator = [
     rchMultiplier: 1,
     usePermit2: true,
   },
-];
+].map((it) => ({ ...it, onlyForAutomator: true }));
 
 const Vaults = [...VaultsForAutomator];
 

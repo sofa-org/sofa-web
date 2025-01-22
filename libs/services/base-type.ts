@@ -63,6 +63,7 @@ export interface VaultInfo {
   observationStyle?: 'Continuous'; // Continuous 连续敲出 属于合约的属性
   rchMultiplier: number; // rch 空投乘数
   tradeDisable?: boolean; // 是否不允许交易，但是允许查看头寸，交易记录，允许 claim
+  onlyForAutomator?: boolean; // 只允许作为主理人为 automator 交易
   usePermit2: boolean; // 合约是否使用了 permit2 签名
   balanceDecimal: number; // 头寸余额的精度
   interestType?: InterestType; // 生息方式，只有 PROTECTED 产品有

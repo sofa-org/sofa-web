@@ -68,7 +68,9 @@ const TicketEditor = (props: CustomTicketProps) => {
     (state) =>
       automator &&
       state.vaultDetails[
-        `${automator.vaultInfo.chainId}-${automator.vaultInfo.vault.toLowerCase()}-`
+        `${
+          automator.vaultInfo.chainId
+        }-${automator.vaultInfo.vault.toLowerCase()}-`
       ],
   );
   const vaults = useAsyncMemo(async () => {

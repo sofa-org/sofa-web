@@ -214,7 +214,7 @@ export class ProductsService {
   }
 
   static matchVault(vault: VaultInfo, filters: Partial<VaultInfo>) {
-    for (const $k in vault) {
+    for (const $k in { ...vault, ...filters }) {
       const k = $k as keyof VaultInfo;
       if (isNullLike(filters[k])) continue;
       if (k === 'vault') {
@@ -225,6 +225,10 @@ export class ProductsService {
       if (k.includes('forCcy')) {
         if (ProductsService.ccyEqual(vault.forCcy, filters.forCcy!)) continue;
         return false;
+      }
+      if (k === 'onlyForAutomator') {
+        if (!!vault[k] === !!filters[k]) continue;
+        else return false;
       }
       if (vault[k] !== filters[k]) return false;
     }
@@ -239,7 +243,7 @@ export class ProductsService {
   ) {
     return vaults.filter((it) => {
       if (!alsoFindOldVault && it.tradeDisable) return false;
-      for (const $k in it) {
+      for (const $k in { ...it, ...filters }) {
         const k = $k as keyof VaultInfo;
         if (
           isNullLike(filters[k]) ||
@@ -268,6 +272,10 @@ export class ProductsService {
         if (k.includes('forCcy')) {
           if (ProductsService.ccyEqual(it.forCcy, filters.forCcy!)) continue;
           return false;
+        }
+        if (k === 'onlyForAutomator') {
+          if (!!it[k] === !!filters[k]) continue;
+          else return false;
         }
         if (it[k] !== filters[k]) return false;
       }
@@ -319,7 +327,9 @@ export class ProductsService {
   }
 
   static TicketTypeOptions = uniqBy(
-    ContractsService.vaults.filter((v) => v.riskType === RiskType.RISKY),
+    ContractsService.vaults.filter(
+      (v) => v.riskType === RiskType.RISKY && !v.onlyForAutomator,
+    ),
     (it) => it.depositCcy,
   ).map((it) => ({
     ccy: it.depositCcy,
@@ -435,10 +445,10 @@ export class ProductsService {
 
   static async genExpiries(vault: VaultInfo) {
     return http
-      .get<
-        unknown,
-        HttpResponse<{ timestamp: number; expiries: number[] }>
-      >('/rfq/expiry-list', { params: { chainId: vault.chainId, vault: vault.vault } })
+      .get<unknown, HttpResponse<{ timestamp: number; expiries: number[] }>>(
+        '/rfq/expiry-list',
+        { params: { chainId: vault.chainId, vault: vault.vault } },
+      )
       .then((res) => res.value?.expiries.map((it) => it * 1000));
   }
 

@@ -57,10 +57,9 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<
-        unknown,
-        HttpResponse<AutomatorFactory[]>
-      >(`/optivisors/automator/factories`)
+      .get<unknown, HttpResponse<AutomatorFactory[]>>(
+        `/optivisors/automator/factories`,
+      )
       .then((res) => res.value);
   }
 
@@ -107,7 +106,7 @@ export class AutomatorCreatorService {
         const vault = map[`${it.chainId}-${it.vault.toLowerCase()}`];
         if (!vault)
           throw new Error(
-            `Do not config this vault(${it.chainId}-${it.vault})`,
+            `Please config this vault(${it.chainId}-${it.vault})`,
           );
         return { vault, quoteConfig: it };
       });
@@ -119,8 +118,8 @@ export class AutomatorCreatorService {
     chainId: defaultChain.chainId,
     address:
       Env.isProd || Env.isPre
-        ? ''
-        : '0xab3344989e7e4357d4db494ac53c189956ddf0fb', // TODO
+        ? '0x9093321dEE6123272Ec54690cE28437e2B59a14D'
+        : '0xab3344989e7e4357d4db494ac53c189956ddf0fb',
   };
   public static async burnRCHBeforeCreate(
     cb: (progress: TransactionProgress) => void,
@@ -433,7 +432,7 @@ export class AutomatorCreatorService {
         .totalFee()
         .then((res) => +ethers.formatUnits(res, decimals));
     } catch (e) {
-      console.warn(1111, e);
+      console.warn(e);
       return 0;
     }
   }
@@ -617,10 +616,10 @@ export class AutomatorCreatorService {
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
     return http
-      .post<
-        unknown,
-        HttpResponse<boolean>
-      >('/optivisors/automator/create', data)
+      .post<unknown, HttpResponse<boolean>>(
+        '/optivisors/automator/create',
+        data,
+      )
       .then(() => data.automatorAddress);
   }
 }
