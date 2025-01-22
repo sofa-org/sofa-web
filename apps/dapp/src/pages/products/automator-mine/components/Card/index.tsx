@@ -119,7 +119,10 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
         </div>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={+props.info.aumByVaultDepositCcy / +props.info.nav}
+            amount={
+              +props.info.aumBySharesToken ||
+              +props.info.aumByVaultDepositCcy / +props.info.nav
+            }
             ccy={props.info.vaultInfo.depositCcy}
           />
           <span className={styles['unit']}>

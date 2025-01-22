@@ -177,7 +177,10 @@ const PoolSize = () => {
       <div className={classNames(styles['item'], styles['border'])}>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={automator?.aumBySharesToken}
+            amount={
+              automator?.aumBySharesToken ||
+              Number(automator?.aumByVaultDepositCcy) / Number(automator?.nav)
+            }
             ccy={automator?.vaultInfo.positionCcy}
           />
           <span className={styles['unit']}>

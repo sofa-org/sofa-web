@@ -76,27 +76,17 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay
-              amount={data?.aumBySharesToken}
+              amount={
+                data?.aumBySharesToken ||
+                Number(data?.aumByVaultDepositCcy) / Number(data?.nav)
+              }
               ccy={props.vault?.positionCcy}
             />
             <span className={styles['unit']}>{props.vault?.positionCcy}</span>
             <div className={styles['decorative']}>
               ≈{' '}
               <AmountDisplay
-                amount={
-                  !props.vault
-                    ? ''
-                    : cvtAmountsInCcy(
-                        [
-                          [
-                            props.vault.vaultDepositCcy,
-                            data?.aumByVaultDepositCcy,
-                          ],
-                        ],
-                        prices,
-                        props.vault.depositCcy,
-                      )
-                }
+                amount={!props.vault ? '' : data?.aumByClientDepositCcy}
                 ccy={props.vault?.depositCcy}
               />
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
