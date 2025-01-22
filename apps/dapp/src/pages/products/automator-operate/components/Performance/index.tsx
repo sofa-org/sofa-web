@@ -385,9 +385,7 @@ const PnL = () => {
       </div>
       <div className={styles['footer']}>
         <AsyncButton
-          disabled={
-            !(Number(automator?.totalOptivisorProfitByVaultDepositCcy) > 0)
-          }
+          disabled={!claimableProfits}
           className={styles['btn-claim']}
           onClick={() =>
             automator &&
