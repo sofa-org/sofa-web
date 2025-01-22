@@ -76,7 +76,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay
-              amount={Number(data?.aumByVaultDepositCcy) / Number(data?.nav)}
+              amount={data?.aumBySharesToken}
               ccy={props.vault?.positionCcy}
             />
             <span className={styles['unit']}>{props.vault?.positionCcy}</span>

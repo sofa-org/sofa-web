@@ -61,7 +61,7 @@ export const AutomatorPerformanceChart = (
   );
   useEffect(() => {
     if (props.vault) {
-      useAutomatorStore.subscribePerformances(props.vault);
+      return useAutomatorStore.subscribePerformances(props.vault);
     }
   }, [props.vault]);
 

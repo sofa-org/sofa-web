@@ -78,12 +78,19 @@
   @include flex-center;
 
   justify-content: space-between;
-  margin: 0 0 6px;
+  margin: 0 0 12px;
   line-height: 25px;
 }
 
 .yield {
   margin: 20px 0 10px;
+}
+
+.size,
+.creator {
+  @include flex-column-center;
+  align-items: flex-start;
+  gap: 0;
 }
 
 .footer {
@@ -126,4 +133,21 @@
   &.card {
     max-width: unset;
   }
+}
+
+@mixin rewrite {
+  .size,
+  .creator {
+    @include flex-center;
+    justify-content: space-between;
+    gap: 0;
+  }
+}
+
+@media (orientation: portrait) {
+  @include rewrite;
+}
+
+@media (width <=720px) {
+  @include rewrite;
 }

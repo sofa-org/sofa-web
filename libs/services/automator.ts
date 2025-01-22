@@ -1,8 +1,8 @@
 import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
-import { isLegalNum, isNullLike } from '@sofa/utils/fns';
+import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
-import { get, omitBy, pick } from 'lodash-es';
+import { get, omitBy } from 'lodash-es';
 
 import AutomatorAbis from './abis/AAVEAutomatorBase.json';
 import {
@@ -27,6 +27,7 @@ export interface OriginAutomatorInfo {
   participantNum: number; // 参与者数量
   aumByVaultDepositCcy: number | string; // aum
   aumByClientDepositCcy: number | string; // aum
+  aumBySharesToken: number | string; // aum
   creatorAmountByVaultDepositCcy: number | string; // creator 份额
   creatorAmountByClientDepositCcy: number | string; // aum
   nav: number | string; // 净值 (vaultDepositCcy/sharesToken)

@@ -25,7 +25,7 @@ const Snapshot = (props: { vault?: AutomatorVaultInfo }) => {
   );
   useEffect(() => {
     if (props.vault) {
-      useAutomatorStore.subscribeSnapshots(props.vault);
+      return useAutomatorStore.subscribeSnapshots(props.vault);
     }
   }, [props.vault]);
   if (!list?.length) return <></>;
