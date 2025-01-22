@@ -50,6 +50,7 @@ const List = (props: {
   const navigate = useNavigate();
   const wallet = useWalletStore();
   const address = props.automator?.vault || wallet.address;
+  console.log(1111, props.automator, address);
 
   const {
     data: $data,
@@ -59,6 +60,7 @@ const List = (props: {
   } = useInfiniteScroll(
     async (d) => {
       if (!address) return { list: [], hasMore: false, limit: 300 };
+      console.log(11112, 'position');
       return PositionsService.history(
         {
           chainId: wallet.chainId,
@@ -82,6 +84,8 @@ const List = (props: {
       reloadDeps: [wallet.chainId, address, props.riskType, props.productType],
     },
   );
+
+  console.log(1111);
 
   const data = useMemo(() => {
     if (!$data) return undefined;

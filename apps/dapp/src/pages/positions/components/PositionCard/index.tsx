@@ -166,10 +166,17 @@ const RiskyAmounts = (
 
   return !hasSettled ? (
     <div className={styles['amounts']}>
-      <div className={styles['amount']}>
-        {amountFormatter(+position.amounts.own / ticketMeta.per, 0)}{' '}
-        {t('Tickets')}
-      </div>
+      {ticketMeta ? (
+        <div className={styles['amount']}>
+          {amountFormatter(+position.amounts.own / ticketMeta.per, 0)}{' '}
+          {t('Tickets')}
+        </div>
+      ) : (
+        <div className={styles['amount']}>
+          {amountFormatter(+position.amounts.own)}{' '}
+          {position.product.vault.depositCcy}
+        </div>
+      )}
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Cost')}</span>{' '}
         <span>
@@ -193,10 +200,17 @@ const RiskyAmounts = (
     </div>
   ) : (
     <div className={styles['amounts']}>
-      <div className={styles['amount']}>
-        {amountFormatter(+position.amounts.own / ticketMeta.per, 0)}{' '}
-        {t('Tickets')}
-      </div>
+      {ticketMeta ? (
+        <div className={styles['amount']}>
+          {amountFormatter(+position.amounts.own / ticketMeta.per, 0)}{' '}
+          {t('Tickets')}
+        </div>
+      ) : (
+        <div className={styles['amount']}>
+          {amountFormatter(+position.amounts.own)}{' '}
+          {position.product.vault.depositCcy}
+        </div>
+      )}
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Cost')}</span>{' '}
         <span>
@@ -401,7 +415,10 @@ const PositionCard = (props: PositionCardProps) => {
             </span>
           </div>
           <div className={styles['risk-type']}>
-            {productTypeRef.alias}_{product.vault.forCcy.replace(/^W/i, '')}
+            {props.isAutomator
+              ? productTypeRef.label3(t)
+              : productTypeRef.alias}
+            _{product.vault.forCcy.replace(/^W/i, '')}
             {product.vault.riskType === RiskType.LEVERAGE && (
               <span className={styles['badge-leverage']}>Lev.</span>
             )}

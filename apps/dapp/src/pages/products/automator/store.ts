@@ -158,17 +158,19 @@ export const useAutomatorStore = Object.assign(
     },
     _subscribePerformancesTimer: null as ReturnType<typeof setInterval> | null,
     subscribePerformances: (vault: AutomatorVaultInfo) => {
+      console.log(111121, useAutomatorStore._subscribePerformancesTimer);
       const sync = () =>
         AutomatorService.performance(vault)
-          .then((weeklyPnlList) =>
+          .then((weeklyPnlList) => {
+            console.log(11112, vault, weeklyPnlList);
             useAutomatorStore.setState((pre) => ({
               performances: {
                 ...pre.performances,
                 [`${vault.chainId}-${vault.vault.toLowerCase()}-`]:
                   weeklyPnlList.value,
               },
-            })),
-          )
+            }));
+          })
           .catch((err) =>
             Toast.error(`Failed to fetch weekly pnl list: ${getErrorMsg(err)}`),
           );
@@ -182,6 +184,7 @@ export const useAutomatorStore = Object.assign(
       return () => {
         clearInterval(useAutomatorStore._subscribePerformancesTimer!);
         useAutomatorStore._subscribePerformancesTimer = null;
+        console.log(111123, 'clear _subscribePerformancesTimer');
       };
     },
     getUserInfoList: async (chainId: number, wallet: string) => {

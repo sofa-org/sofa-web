@@ -214,7 +214,7 @@ export class ProductsService {
   }
 
   static matchVault(vault: VaultInfo, filters: Partial<VaultInfo>) {
-    for (const $k in { ...vault, ...filters }) {
+    for (const $k in vault) {
       const k = $k as keyof VaultInfo;
       if (isNullLike(filters[k])) continue;
       if (k === 'vault') {
@@ -243,7 +243,7 @@ export class ProductsService {
   ) {
     return vaults.filter((it) => {
       if (!alsoFindOldVault && it.tradeDisable) return false;
-      for (const $k in { ...it, ...filters }) {
+      for (const $k in it) {
         const k = $k as keyof VaultInfo;
         if (
           isNullLike(filters[k]) ||

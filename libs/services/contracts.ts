@@ -36,7 +36,13 @@ export { ProductType, RiskType, TransactionStatus };
 export type { VaultInfo };
 
 export class ContractsService {
-  static vaults = [...earnVaults, ...surgeVaults];
+  static vaults = [...earnVaults, ...surgeVaults].map((it) => ({
+    ...it,
+    tradeDisable: it.tradeDisable || undefined,
+    onlyForAutomator: it.onlyForAutomator || undefined,
+    interestType: it.interestType || undefined,
+    earlyClaimable: it.earlyClaimable || undefined,
+  }));
   static AutomatorVaults = AutomatorVaults;
 
   static rchAddress() {

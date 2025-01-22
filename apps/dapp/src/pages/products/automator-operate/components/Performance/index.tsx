@@ -26,7 +26,7 @@ import styles from './index.module.scss';
 
 const PoolSize = () => {
   const [t] = useTranslation('AutomatorPerformance');
-  const prices = useIndexPrices((s) => s.prices);
+  const $prices = useIndexPrices((s) => s.prices);
 
   const { automator } = useCreatorAutomatorSelector();
   const apy = useGlobalState(
@@ -36,6 +36,20 @@ const PoolSize = () => {
         automator.vaultInfo.depositCcy
       ],
   );
+
+  const prices = useMemo(() => {
+    if (!automator) return $prices;
+    const vaultDepositCcyPrice =
+      $prices[automator.vaultInfo.vaultDepositCcy] ||
+      $prices[automator.vaultInfo.depositCcy] ||
+      1;
+    const positionCcyPrice = +automator.nav * vaultDepositCcyPrice;
+    return {
+      ...$prices,
+      [automator.vaultInfo.positionCcy]: positionCcyPrice,
+      [automator.vaultInfo.vaultDepositCcy]: vaultDepositCcyPrice,
+    };
+  }, [$prices, automator]);
 
   const estimatedYield = useMemo(() => {
     if (!apy?.apyUsed || !automator?.aumByVaultDepositCcy)
