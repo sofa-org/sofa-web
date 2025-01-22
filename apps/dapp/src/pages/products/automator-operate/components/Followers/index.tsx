@@ -132,7 +132,7 @@ export const AutomatorFollowers = () => {
       className={styles['table']}
       columns={columns}
       dataSource={data?.list}
-      loading={loading || !data}
+      loading={loading && !data}
       pagination={false}
       rowKey={(record) => String(record?.wallet)}
       empty={<CEmpty />}

@@ -199,7 +199,7 @@ export const AutomatorHistory = (props: {
       className={classNames(styles['table'], props.className)}
       columns={columns}
       dataSource={data?.list}
-      loading={loading}
+      loading={loading && !data}
       pagination={false}
       rowKey={(record) => String(record?.dateTime)}
       empty={<CEmpty />}
