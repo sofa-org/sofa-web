@@ -47,6 +47,26 @@
 .value {
   margin: 0;
 
+  .warning {
+    position: relative;
+    padding: 2px 0;
+    margin-left: 4px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      bottom: 0;
+      border-bottom: 1px dashed rgba(#000, 0.3);
+    }
+  }
+
+  svg {
+    width: 0.9em;
+    height: 0.9em;
+  }
+
   &.apy {
     @include bold;
 
@@ -75,22 +95,16 @@
 .yield,
 .size,
 .creator {
-  @include flex-center;
+  @include flex-column-center;
 
-  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0;
   margin: 0 0 12px;
   line-height: 25px;
 }
 
 .yield {
   margin: 20px 0 10px;
-}
-
-.size,
-.creator {
-  @include flex-column-center;
-  align-items: flex-start;
-  gap: 0;
 }
 
 .footer {
@@ -108,7 +122,7 @@
   position: relative;
   margin: 0;
 
-  svg {
+  > svg {
     width: 1.2em;
     height: 1.2em;
   }
@@ -136,6 +150,7 @@
 }
 
 @mixin rewrite {
+  .yield,
   .size,
   .creator {
     @include flex-center;

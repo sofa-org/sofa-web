@@ -430,7 +430,7 @@ export class AutomatorCreatorService {
     try {
       return contract
         .totalFee()
-        .then((res) => +ethers.formatUnits(res, decimals));
+        .then((res) => Math.max(0, +ethers.formatUnits(res, decimals)));
     } catch (e) {
       console.warn(e);
       return 0;

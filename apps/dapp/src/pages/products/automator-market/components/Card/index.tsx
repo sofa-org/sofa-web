@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
+import { Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorInfo } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
-import { formatDuration } from '@sofa/utils/time';
+import { useIsPortrait } from '@sofa/utils/hooks';
+import { formatDuration, MsIntervals } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
@@ -13,6 +15,7 @@ import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../assets/icon-people.svg';
+import { Comp as IconWarning } from '../../assets/icon-warning.svg';
 
 import styles from './index.module.scss';
 
@@ -28,6 +31,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
     [props.info.vaultInfo.depositCcy],
   );
+  const isPortrait = useIsPortrait();
   return (
     <div
       className={classNames(
@@ -60,10 +64,32 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
               +props.info.yieldPercentage >= 0
                 ? 'var(--color-rise)'
                 : 'var(--color-fall)',
+            opacity:
+              Date.now() - +props.info.vaultInfo.createTime <=
+              MsIntervals.day * 7
+                ? 0.45
+                : 1,
           }}
         >
           {+props.info.yieldPercentage >= 0 && '+'}
           {displayPercentage(+props.info.yieldPercentage / 100)}
+          {Date.now() - +props.info.vaultInfo.createTime <=
+            MsIntervals.day * 7 && (
+            <Tooltip
+              content={t({
+                enUS: 'For Automators with fewer than 7 running days, the displayed APY may be skewed due to early large trades. Please exercise caution when evaluating performance.',
+                zhCN: '对于运行时间少于 7 天的 Automator，由于早期大额交易，显示的年化收益率（APY）可能存在偏差。请在评估表现时谨慎对待。',
+              })}
+              trigger={isPortrait ? 'click' : 'hover'}
+            >
+              <span
+                className={styles['warning']}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <IconWarning />
+              </span>
+            </Tooltip>
+          )}
         </div>
       </div>
       <div className={styles['size']}>
