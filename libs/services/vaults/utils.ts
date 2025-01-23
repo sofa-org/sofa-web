@@ -5,6 +5,7 @@ import { ProjectType } from '../base-type';
 export function getCollateralDecimal(chainId: number, depositCcy: string) {
   const decimal = {
     RCH: 1e18,
+    stRCH: 1e18,
     USDT: chainId == 56 ? 1e18 : 1e6,
     aUSDT: chainId == 56 ? 1e18 : 1e6,
     USDC: chainId == 56 ? 1e18 : 1e6,
@@ -25,6 +26,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
     // 大约 0.05U
     return {
       RCH: 0.05,
+      stRCH: 0.05,
       USDT: 0.05,
       aUSDT: 0.05,
       USDC: 0.05,
@@ -40,6 +42,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
   return project === ProjectType.Surge
     ? {
         RCH: 20,
+        stRCH: 20,
         USDT: 20,
         aUSDT: 20,
         USDC: 20,
@@ -53,6 +56,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
       }[depositCcy]
     : {
         RCH: 100,
+        stRCH: 100,
         USDT: 100,
         aUSDT: 100,
         USDC: 100,
@@ -71,6 +75,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
     // 大约 0.05U
     return {
       RCH: 0.05,
+      stRCH: 0.05,
       USDT: 0.05,
       aUSDT: 0.05,
       USDC: 0.05,
@@ -86,6 +91,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
   return project === ProjectType.Surge
     ? {
         RCH: 20,
+        stRCH: 20,
         USDT: 20,
         aUSDT: 20,
         USDC: 20,
@@ -99,6 +105,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
       }[depositCcy]
     : {
         RCH: 1,
+        stRCH: 1,
         USDT: 1,
         aUSDT: 1,
         USDC: 1,

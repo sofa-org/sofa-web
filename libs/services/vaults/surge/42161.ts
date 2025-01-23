@@ -74,7 +74,7 @@ const USDTVaults = [
   },
 ];
 
-const VaultsForAutomator = [
+const aUSDTVaultsForAutomator = [
   // RebaseSmartBullVault(ETH/aUSDT)
   {
     chainId: 42161,
@@ -125,6 +125,6 @@ const VaultsForAutomator = [
   },
 ].map((it) => ({ ...it, onlyForAutomator: true }));
 
-const vaults = [...USDTVaults, ...VaultsForAutomator];
+const vaults = [...USDTVaults, ...aUSDTVaultsForAutomator];
 
 export default vaults;
