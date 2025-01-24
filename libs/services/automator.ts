@@ -228,6 +228,7 @@ export class AutomatorService {
             (() => {
               if (it.vaultDepositCcy === 'scrvUSD') return InterestType.CURVE;
               if (it.vaultDepositCcy === 'stRCH') return InterestType.SOFA;
+              if (it.vaultDepositCcy === 'zRCH') return InterestType.SOFA;
               if (it.vaultDepositCcy.startsWith('st')) return InterestType.LIDO;
               if (it.vaultDepositCcy.startsWith('a')) return InterestType.AAVE;
               return undefined;

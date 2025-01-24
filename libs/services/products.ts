@@ -159,13 +159,6 @@ export interface ProductQuoteResult
   pricesForCalculation: Record<string, number | undefined>;
 }
 
-console.log(
-  1111,
-  ContractsService.vaults.filter(
-    (v) => v.riskType === RiskType.RISKY && !v.onlyForAutomator,
-  ),
-);
-
 export class ProductsService {
   static ccyEqual(ccy1: CCY | USDS, ccy2: CCY | USDS) {
     return ccy1 === ccy2 || `W${ccy1}` === ccy2 || ccy1 === `W${ccy2}`;
