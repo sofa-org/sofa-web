@@ -231,7 +231,7 @@ const aUSDTVaultsForAutomator = [
   },
 ].map((it) => ({ ...it, onlyForAutomator: true }));
 
-const stRCHVaultsForAutomator = [
+const zRCHVaultsForAutomator = [
   // SimpleSmartBullVault(ETH/zRCH)
   {
     chainId: 1,
@@ -240,7 +240,7 @@ const stRCHVaultsForAutomator = [
     riskType: RiskType.RISKY,
     forCcy: 'WETH',
     domCcy: 'USD',
-    depositCcy: 'stRCH',
+    depositCcy: 'zRCH',
     rchMultiplier: 1,
     usePermit2: false,
   },
@@ -252,7 +252,7 @@ const stRCHVaultsForAutomator = [
     riskType: RiskType.RISKY,
     forCcy: 'WBTC',
     domCcy: 'USD',
-    depositCcy: 'stRCH',
+    depositCcy: 'zRCH',
     rchMultiplier: 1,
     usePermit2: false,
   },
@@ -264,7 +264,7 @@ const stRCHVaultsForAutomator = [
     riskType: RiskType.RISKY,
     forCcy: 'WETH',
     domCcy: 'USD',
-    depositCcy: 'stRCH',
+    depositCcy: 'zRCH',
     rchMultiplier: 1,
     usePermit2: false,
   },
@@ -276,7 +276,7 @@ const stRCHVaultsForAutomator = [
     riskType: RiskType.RISKY,
     forCcy: 'WBTC',
     domCcy: 'USD',
-    depositCcy: 'stRCH',
+    depositCcy: 'zRCH',
     rchMultiplier: 1,
     usePermit2: false,
   },
@@ -287,7 +287,7 @@ const vaults = [
   ...RCHVaults,
   ...scrvUSDVaultsForAutomator,
   ...aUSDTVaultsForAutomator,
-  ...stRCHVaultsForAutomator,
+  ...zRCHVaultsForAutomator,
 ];
 
 export default vaults;
