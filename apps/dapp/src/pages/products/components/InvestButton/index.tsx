@@ -107,8 +107,7 @@ export interface ProductInvestButtonProps extends BaseProps {
     cb: (progress: TransactionProgress) => void,
     data: ProductQuoteResult[],
   ) => Promise<void>;
-  insufficientGetBalance: (depositCcy: string) => number | undefined;
-  insufficientDeps: unknown[];
+  isInsufficientBalance: (amount: string | number) => boolean;
 }
 
 function useShouldQuote(
@@ -135,7 +134,7 @@ function useShouldQuote(
       return shouldQuote;
     });
     return !!shouldQuoteList.length;
-  }, [products, quoteInfos, time, wallet.address]);
+  }, [_useProductsState, products, quoteInfos, time, wallet.address]);
 }
 
 export const ProductInvestButton = (props: ProductInvestButtonProps) => {
@@ -154,7 +153,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
         chainId: props.chainId,
         ...vaultInfo,
       },
-    [vaultInfo],
+    [props.chainId, props.vault, vaultInfo],
   );
   const shouldQuote = useShouldQuote(
     wallet,
@@ -164,11 +163,10 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   );
   const insufficient = useMemo(() => {
     if (!vault?.depositCcy) return false;
-    const balance = props.insufficientGetBalance(vault.depositCcy);
-    if (shouldQuote || isNullLike(balance)) return false;
+    if (shouldQuote) return false;
     const amount = simplePlus(...products.map((it) => it.depositAmount))!;
-    return amount > balance;
-  }, [products, shouldQuote, vault?.depositCcy, ...props.insufficientDeps]);
+    return props.isInsufficientBalance(amount);
+  }, [products, shouldQuote, vault?.depositCcy]);
 
   const showQuote = shouldQuote || !quoteInfos.length;
   const quote = useLazyCallback(async (noToast?: boolean) => {
@@ -225,8 +223,8 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   const handleSubmit = useLazyCallback(async () => {
     if (!vault) return;
     const amount = simplePlus(...quoteInfos.map((it) => it?.amounts.own)) || 0;
-    const balance = props.insufficientGetBalance(vault.depositCcy);
-    if (balance === undefined || balance < amount) {
+    const insufficient = props.isInsufficientBalance(amount);
+    if (insufficient) {
       return Toast.warning(t('Balance is no enough!'));
     }
     const delRfq = (key: NonNullable<TransactionProgress['details']>[0][0]) => {
@@ -309,7 +307,7 @@ const InvestButton = (
     | 'products'
     | 'quoteInfos'
     | 'mint'
-    | 'insufficientGetBalance'
+    | 'isInsufficientBalance'
     | 'insufficientDeps'
   >,
 ) => {
@@ -346,8 +344,11 @@ const InvestButton = (
         }
         return PositionsService.batchDeposit(cb, data as ProductQuoteResult[]);
       }}
-      insufficientGetBalance={(depositCcy) => wallet.balance?.[depositCcy]}
-      insufficientDeps={[wallet.balance]}
+      isInsufficientBalance={(amount) =>
+        !vault ||
+        !wallet.balance ||
+        Number(wallet.balance[vault.depositCcy]) < +amount
+      }
       {...props}
     />
   );
