@@ -19,6 +19,7 @@ import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
+import { min as lodashMin } from 'lodash-es';
 import { nanoid } from 'nanoid';
 
 import { Comp as IconDel } from '@/assets/icon-del.svg';
@@ -157,18 +158,24 @@ const TicketEditor = (props: CustomTicketProps) => {
   const { min, max } = useMemo(() => {
     const _next8h = next8h();
     if (!quoteConfig || !automator || !automatorDetail)
-      return { min: next8h(), max: pre8h() };
-    const min = _next8h;
+      return { min: _next8h, max: pre8h() };
+
+    const min =
+      (quoteConfig.expiryDateTimes?.length &&
+        Math.max(_next8h, lodashMin(quoteConfig.expiryDateTimes)! * 1000)) ||
+      _next8h;
+    // console.warn(
+    //   `quoteConfig.expiryDateTimes`,
+    //   quoteConfig.expiryDateTimes,
+    //   'min',
+    //   min,
+    // );
 
     const max = next8h(
       undefined,
       Math.round(automatorDetail.vaultInfo.redeemWaitPeriod / MsIntervals.day) +
         1,
     );
-    // const min =
-    //   (quoteConfig.expiryDateTimes?.[0] &&
-    //     quoteConfig.expiryDateTimes[0] * 1000) ||
-    //   _next8h;
 
     // const max = Math.min(
     //   quoteConfig.expiryDateTimes?.length
@@ -473,7 +480,7 @@ const TicketEditor = (props: CustomTicketProps) => {
               ? props.product?.anchorPrices.map((it, i) => (
                   <Fragment key={it}>
                     {i !== 0 && <span style={{ padding: '0 2px' }}>-</span>}
-                    {it}
+                    {amountFormatter(it)}
                   </Fragment>
                 ))
               : undefined}
@@ -502,11 +509,11 @@ const TicketEditor = (props: CustomTicketProps) => {
               <span className={styles['price']}>
                 {productType == ProductType.BearSpread ? (
                   <>
-                    {'<'} {props.product.anchorPrices?.[0]}
+                    {'<'} {amountFormatter(props.product.anchorPrices?.[0])}
                   </>
                 ) : (
                   <>
-                    {'>'} {props.product.anchorPrices?.[1]}
+                    {'>'} {amountFormatter(props.product.anchorPrices?.[1])}
                   </>
                 )}
               </span>
@@ -761,7 +768,7 @@ const CustomTickets = (props: {
                   {it.anchorPrices.map((it, i) => (
                     <Fragment key={it}>
                       {i !== 0 && <span style={{ padding: '0 4px' }}>-</span>}
-                      <b>{it}</b>
+                      <b>{amountFormatter(it)}</b>
                     </Fragment>
                   ))}
                 </span>
