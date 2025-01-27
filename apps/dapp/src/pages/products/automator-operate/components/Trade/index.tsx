@@ -15,9 +15,11 @@ import { MsIntervals } from '@sofa/utils/expiry';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
+import AsyncButton from '@/components/AsyncButton';
 import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useWalletStore } from '@/components/WalletConnector/store';
+import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 import { useAutomatorStore } from '@/pages/products/automator/store';
 import { useGlobalState } from '@/store';
 
@@ -196,6 +198,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     prices,
   ]);
 
+  const [modal, modalController] = useAutomatorModal();
+
   return !automatorVault ? (
     <CEmpty
       className="semi-always-dark"
@@ -234,6 +238,15 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
               ) : (
                 '-'
               )}
+              <AsyncButton
+                className={styles['btn-deposit-1']}
+                onClick={() =>
+                  automator &&
+                  modalController.open(automator.vaultInfo, 'deposit')
+                }
+              >
+                {t({ enUS: 'Deposit', zhCN: '铸造' })}
+              </AsyncButton>
             </span>
           </div>
           <div className={styles['amount']}>
@@ -525,6 +538,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
       {automator ? (
         <ProductLottery {...props} automator={automator} />
       ) : undefined}
+      {modal}
     </>
   );
 };

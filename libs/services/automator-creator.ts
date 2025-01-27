@@ -26,7 +26,7 @@ import { WalletService } from './wallet';
 
 export interface OriginAutomatorCreateParams {
   chainId: number; // 链ID
-  creator: string; // 创建者的钱包
+  creator: string; // 主理人的钱包
   automatorAddress: string;
   burnTransactionHash: string; // burn的transaction hash
   automatorName: string; // automator名称
@@ -40,7 +40,7 @@ export interface OriginAutomatorCreateParams {
 
 export interface AutomatorCreateParams {
   factory: AutomatorFactory;
-  creator: string; // 创建者的钱包
+  creator: string; // 主理人的钱包
   burnTransactionHash: string; // burn的transaction hash
   automatorName: string; // automator名称
   redemptionPeriodDay: number; // 赎回观察时间（单位：天）

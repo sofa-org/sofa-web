@@ -33,7 +33,7 @@ export interface OriginAutomatorInfo {
   nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
   dateTime: number; // 净值产生的时间 (秒级时间戳)
   yieldPercentage: number | string; // 7D Yield(百分比)
-  creator: string; // 创建者
+  creator: string; // 主理人
   createTime: number; // automator创建时间, s
   vaultDepositCcy: string; // Automator 拿到客户的钱之后 用来申购 vault 的币种
   clientDepositCcy: string; // 用户存入的标的物

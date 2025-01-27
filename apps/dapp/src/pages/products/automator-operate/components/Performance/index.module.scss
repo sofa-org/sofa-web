@@ -82,6 +82,19 @@
   }
 }
 
+.percent {
+  @include bold;
+  @include gradient-txt(linear-gradient(to right, #e88947, #ffdec3));
+
+  display: inline-block;
+  padding: 0 0 0 6px;
+  margin: 0 0 0 6px;
+  font-size: min(0.8em, 12px);
+  line-height: 0.8em;
+  border-left: 1px dashed rgba(#000, 0.2);
+  opacity: 0.8;
+}
+
 .separator {
   @include regular;
 
@@ -171,6 +184,25 @@
   }
 }
 
+.creator-amount {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: min(24px, 3.2vw) 0 0;
+  padding: min(24px, 3.2vw) 0 0;
+  border-top: 1px dashed rgba(#000, 0.2);
+
+  .item {
+    @include flex-center;
+
+    justify-content: flex-start;
+
+    .label {
+      width: 200px;
+    }
+  }
+}
+
 .selector-wrapper {
   flex: none;
   width: 100%;
@@ -192,16 +224,6 @@
   background: currentcolor;
 }
 
-.percent {
-  display: inline-block;
-  padding: 0 0 0 6px;
-  margin: 0 0 0 6px;
-  font-size: min(0.8em, 12px);
-  line-height: 0.8em;
-  border-left: 1px dashed rgba(#000, 0.2);
-  opacity: 0.8;
-}
-
 .footer {
   position: relative;
   margin: 16px 0 0;
@@ -213,6 +235,10 @@
   position: absolute;
   top: 16px;
   right: 0;
+}
+
+.btn-deposit.btn-deposit,
+.btn-claim.btn-claim {
   min-width: 120px;
   padding: 0 min(24px, 3.2vw);
   height: 40px;

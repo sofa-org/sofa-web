@@ -96,7 +96,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         {data?.vaultInfo.creator && (
           <div className={styles['aum']}>
             <div className={styles['title']}>
-              {t({ enUS: `Optivisor Committed Assets`, zhCN: '创建者份额' })}
+              {t({ enUS: `Optivisor Committed Assets`, zhCN: '主理人份额' })}
             </div>
             <div className={styles['value']}>
               <AmountDisplay

@@ -16,8 +16,10 @@ import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
 import { CSelect } from '@/components/CSelect';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import ProgressBar from '@/components/ProgressBar';
 import { formatTime } from '@/components/TimezoneSelector/store';
 import { AutomatorPerformanceChart } from '@/pages/products/automator/components/PerformanceChart';
+import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 import { useGlobalState } from '@/store';
 
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
@@ -169,6 +171,8 @@ const PoolSize = () => {
     ];
   }, [automator, byCcy, prices, t]);
 
+  const [modal, modalController] = useAutomatorModal();
+
   return (
     <div className={styles['section']}>
       <div className={styles['title']}>
@@ -273,6 +277,50 @@ const PoolSize = () => {
           </div>
         ))}
       </div>
+      <div className={styles['creator-amount']}>
+        <div className={styles['item']}>
+          <span className={styles['label']}>
+            {t({ enUS: `Optivisor Committed Assets`, zhCN: '主理人份额' })}
+          </span>
+          <span className={styles['value']}>
+            <AmountDisplay
+              amount={
+                !automator?.vaultInfo
+                  ? ''
+                  : cvtAmountsInCcy(
+                      [
+                        [
+                          automator.vaultInfo.vaultDepositCcy,
+                          automator.creatorAmountByVaultDepositCcy,
+                        ],
+                      ],
+                      prices,
+                      automator.vaultInfo.vaultDepositCcy,
+                    )
+              }
+              ccy={automator?.vaultInfo?.vaultDepositCcy}
+            />
+            <span className={styles['unit']}>
+              {automator?.vaultInfo?.depositCcy}
+            </span>
+            <span className={styles['percent']}>
+              {displayPercentage(
+                Number(automator?.creatorAmountByVaultDepositCcy) /
+                  Number(automator?.aumByVaultDepositCcy),
+              )}
+            </span>
+          </span>
+        </div>
+        <AsyncButton
+          className={styles['btn-deposit']}
+          onClick={() =>
+            automator && modalController.open(automator.vaultInfo, 'deposit')
+          }
+        >
+          {t({ enUS: 'Deposit', zhCN: '铸造' })}
+        </AsyncButton>
+      </div>
+      {modal}
     </div>
   );
 };
@@ -316,7 +364,7 @@ const PnL = () => {
           <Tooltip
             content={t({
               enUS: 'Means the total profit and loss (PnL) accumulated by the Automator, after deducting platform fees and the profit share for the Optivisor, reflecting the actual realized returns for investors and creators.',
-              zhCN: '指 Automator 累积的总利润和亏损（PnL），扣除平台费用和 Optivisor 的利润分成后，反映投资者和创建者的实际实现收益。',
+              zhCN: '指 Automator 累积的总利润和亏损（PnL），扣除平台费用和 Optivisor 的利润分成后，反映投资者和主理人的实际实现收益。',
             })}
           >
             {t({ enUS: 'Historical Cumulative PnL', zhCN: '历史累计损益' })}

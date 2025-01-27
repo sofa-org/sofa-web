@@ -110,7 +110,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         <>
           <div className={styles['creator']}>
             <div className={styles['label']}>
-              {t({ enUS: `Optivisor's`, zhCN: '创建者份额' })}
+              {t({ enUS: `Optivisor's`, zhCN: '主理人份额' })}
             </div>
             <div className={styles['value']}>
               <AmountDisplay

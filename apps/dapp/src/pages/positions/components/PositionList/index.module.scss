@@ -51,9 +51,12 @@
   }
 
   &.btn-claim {
-    color: rgba(#000, 0.65);
+    @include bold;
+
+    padding: 0 20px;
+    color: rgba(#000, 0.85);
     background: #fff !important;
-    border: 1px solid rgba(#fff, 0.24) !important;
+    border: 1px solid #fff !important;
   }
 }
 
@@ -85,7 +88,10 @@
       }
 
       &.btn-claim {
-        color: rgba(#000, 0.65);
+        @include bold;
+
+        padding: 0 16px;
+        color: rgba(#000, 0.75);
         background: #fff !important;
         border: 1px solid rgba(#fff, 0.24) !important;
       }

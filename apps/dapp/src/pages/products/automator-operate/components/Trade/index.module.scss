@@ -1,3 +1,30 @@
+.btn-deposit-1.btn-deposit-1 {
+  position: absolute;
+  right: 12px;
+  top: 0;
+  min-width: 96px;
+  padding: 0 min(24px, 3.2vw);
+  height: 32px;
+  opacity: 0.8;
+  background: #000;
+  border-radius: 20px;
+
+  &:hover {
+    opacity: 1;
+    background: #000;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+
+  :global {
+    .semi-button-content {
+      color: #fff;
+    }
+  }
+}
+
 .form {
   width: $width-content;
   margin: 12px auto 18px;
@@ -160,12 +187,13 @@
     margin-top: 0;
 
     .amount {
+      position: relative;
       padding-bottom: 0;
       padding-top: 0;
       position: relative;
 
       &:first-child {
-        max-width: 270px;
+        max-width: 340px;
         border-right: 0.5px solid rgba($color: #000, $alpha: 10%);
       }
 
