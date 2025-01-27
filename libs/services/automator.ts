@@ -1,29 +1,22 @@
-import { cvtAmountsInCcy } from '@sofa/utils/amount';
-import { asyncCache } from '@sofa/utils/decorators';
+import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
-import { safeRun } from '@sofa/utils/fns';
+import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
-import Big from 'big.js';
-import { ethers } from 'ethers';
-import { get } from 'lodash-es';
+import { get, omitBy } from 'lodash-es';
 
-import AutomatorAbis from './abis/Automator.json';
+import AutomatorAbis from './abis/AAVEAutomatorBase.json';
 import {
   getCollateralDecimal,
   getDepositMinAmount,
   getDepositTickAmount,
 } from './vaults/utils';
+import type { AutomatorVaultInfo } from './base-type';
 import {
   AutomatorTransactionStatus,
-  AutomatorVaultInfo,
+  InterestType,
   ProjectType,
-  TransactionStatus,
 } from './base-type';
 import { ContractsService } from './contracts';
-import { MarketService } from './market';
-import { TransactionProgress } from './positions';
-import { PositionStatus } from './the-graph';
-import { WalletService } from './wallet';
 
 // server 返回的结构
 export interface OriginAutomatorInfo {
@@ -32,15 +25,16 @@ export interface OriginAutomatorInfo {
   automatorDescription?: string; // automator说明
   automatorVault: string; // Automator vault
   participantNum: number; // 参与者数量
-  aumInVaultDepositCcy: number | string; // aum
-  aumInClientDepositCcy: number | string; // aum
-  creatorAumInVaultDepositCcy: number | string; // creator 份额
-  creatorAumInClientDepositCcy: number | string; // aum
+  aumByVaultDepositCcy: number | string; // aum
+  aumByClientDepositCcy: number | string; // aum
+  aumBySharesToken: number | string; // aum
+  creatorAmountByVaultDepositCcy: number | string; // creator 份额
+  creatorAmountByClientDepositCcy: number | string; // aum
   nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
   dateTime: number; // 净值产生的时间 (秒级时间戳)
   yieldPercentage: number | string; // 7D Yield(百分比)
   creator: string; // 创建者
-  createTime: number; // automator创建时间
+  createTime: number; // automator创建时间, s
   vaultDepositCcy: string; // Automator 拿到客户的钱之后 用来申购 vault 的币种
   clientDepositCcy: string; // 用户存入的标的物
   sharesToken: string; // Automator 的份额代币
@@ -48,22 +42,7 @@ export interface OriginAutomatorInfo {
 }
 
 // server 返回的结构
-export interface OriginAutomatorDetail {
-  chainId: number; // 链代码
-  automatorName: string; // automator名称
-  automatorDescription: string; // automator说明 (可空)
-  automatorVault: string; // Automator vault
-  participantNum: number; // 参与者数量
-  amount: number | string; // 当前aum值
-  aumInVaultDepositCcy: number | string; // 当前aum值(vaultDepositCcy)
-  aumInClientDepositCcy: number | string; // 当前aum值(clientDepositCcy)
-  creatorAumInVaultDepositCcy: number | string; // 管理者的aum值(vaultDepositCcy)
-  creatorAumInClientDepositCcy: number | string; // 管理者的aum值(clientDepositCcy)
-  nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
-  dateTime: number; // 净值产生的时间 (秒级时间戳)
-  yieldPercentage: number | string; // 7D Yield (百分比) (基于clientDepositCcy)
-  creator: string; // 创建者
-  createTime: number; // automator创建时间
+export interface OriginAutomatorDetail extends OriginAutomatorInfo {
   feeRate: number | string; // 抽佣比率 (on vaultDepositCcy)
   totalTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (clientDepositCcy)
   totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息 (clientDepositCcy)
@@ -72,16 +51,21 @@ export interface OriginAutomatorDetail {
   totalRchAmount: number | string; // Rch的总PNL(RCH)
   totalPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
   pnlPercentage: number | string; // Yield (百分比) (基于clientDepositCcy)
-  vaultDepositCcy: string; // 交易币种 (vaultDepositCcy)
-  clientDepositCcy: string; // 用户存入的标的物 (clientDepositCcy)
   sharesToken: string; // 净值单位 (sharesToken)
-  availableBalance: number | string; // Available Balance (vaultDepositCcy)
-  profits: number | string; // totalTradingPnlByVaultDepositCcy * feeRate (vaultDepositCcy)
-  positionLockedAmount: number | string; // Active Position Locked (vaultDepositCcy)
-  unclaimedAmount: number | string; // Position unclaimed (vaultDepositCcy)
-  redeemedAmount: number | string; // To Be Redeemed (vaultDepositCcy)
-  availableAmount: number | string; // Available Balance (vaultDepositCcy)
+  totalOptivisorProfitByVaultDepositCcy: number | string; // 基金管理者累计获取的利润
+  unExpiredAmountByVaultDepositCcy: number | string; // Active Position Locked (vaultDepositCcy)
+  unclaimedAmountByVaultDepositCcy: number | string; // Position unclaimed (vaultDepositCcy)
+  redeemedAmountByVaultDepositCcy: number | string; // To Be Redeemed (vaultDepositCcy)
+  availableAmountByVaultDepositCcy: number | string; // Available Balance (vaultDepositCcy)
   redemptionPeriodDay: number; // 赎回观察时间 (单位：天)
+  positionSize?: number | string; // 当前未到期的头寸数量
+  pastAvailableBalanceExcludingPrincipal: number | string; // Available Balance Excluding Principal-vaultDepositCcy
+  historicalInterestPlusNetPnL: number | string; // Historical Interest Earned(The cumulative interest earned through Aave/Lido/Sofa/Curve)-vaultDepositCcy
+  lockedByUnclaimedPosition: number | string; // Current Position(Value of open & Unclaimed positions.)-vaultDepositCcy
+  estimatedFutureInterestByVaultCcy: number | string; // Estimated (estimatedTenorInDays)-Day Interest-vaultDepositCcy
+  estimatedTenorInDays: number | string; // estimated Tenor In Days-vaultDepositCcy
+  poolSizeForFutureInterestByVaultCcy: number | string; // Net PnL (RCH not included)-vaultDepositCcy
+  estimatedFundingApyPercentage: number | string; // Estimated Aave/Lido/Sofa/Curve Yield(百分比)
 }
 
 export interface AutomatorInfo
@@ -89,6 +73,12 @@ export interface AutomatorInfo
     OriginAutomatorInfo,
     | 'chainId'
     | 'automatorVault'
+    | 'automatorName'
+    | 'automatorDescription'
+    | 'feeRate'
+    | 'redemptionPeriodDay'
+    | 'creator'
+    | 'createTime'
     | 'vaultDepositCcy'
     | 'clientDepositCcy'
     | 'sharesToken'
@@ -101,6 +91,12 @@ export interface AutomatorDetail
     OriginAutomatorDetail,
     | 'chainId'
     | 'automatorVault'
+    | 'automatorName'
+    | 'automatorDescription'
+    | 'feeRate'
+    | 'redemptionPeriodDay'
+    | 'creator'
+    | 'createTime'
     | 'vaultDepositCcy'
     | 'clientDepositCcy'
     | 'sharesToken'
@@ -124,8 +120,8 @@ export interface AutomatorPosition {
 
 export interface AutomatorPerformance {
   dateTime: number; // 日期（秒级时间戳）
-  aumInVaultDepositCcy: number | string; // 期初aum值(scrvUSD)
-  aumInClientDepositCcy: number | string; // 期初aum值(crvUSD)
+  aumByVaultDepositCcy: number | string; // 期初aum值(scrvUSD)
+  aumByClientDepositCcy: number | string; // 期初aum值(crvUSD)
   incrRchAmount: number | string; // Rch的总PNL(RCH)
   incrTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (crvUSD)
   incrInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
@@ -134,44 +130,15 @@ export interface AutomatorPerformance {
   incrPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
 }
 
-// server 返回的结构
-export interface OriginAutomatorUserDetail {
-  chainId: number; // 链代码
-  automatorName: string; // automator名称
-  automatorVault: string; // Automator vault
-  wallet: string; // 用户钱包地址
-  amountInVaultDepositCcy: number | string; // 当前持有的总资产(scrvUSD)
-  amountInClientDepositCcy: number | string; // 当前持有的总资产(crvUSD)
-  share: number | string; // 当前持有的份额
-  totalTradingPnlByClientDepositCcy: number | string; // 通过交易产生的额外的VaultDepositCcy 总PNL (crvUSD)
-  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
-  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
-  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
-  rchTotalPnl: number | string; // Rch的总PNL(RCH)
-  totalRchAmount: number | string; // Rch的总PNL(RCH)
-  status: string; // ACTIVE/CLOSED
-  pnlPercentage: number | string; // Yield(百分比)
-  vaultDepositCcy: string; // USDC
-  clientDepositCcy: string; // 用户存入的标的物
-  sharesToken: string; // 净值单位
-  redemptionPeriodDay: number; // 赎回观察时间（单位：天）
-}
-
-export interface AutomatorUserDetail
-  extends Omit<OriginAutomatorUserDetail, 'chainId' | 'automatorVault'> {
-  vaultInfo: AutomatorVaultInfo;
-  depositTotalPnlPercentage?: number | string; // 标的币种的总PNL年化
-  rchTotalPnlPercentage?: number | string; // Rch的总PNL年化
-}
-
 export interface AutomatorTransactionsParams {
   wallet: string; // 用户钱包地址
   startDateTime?: number; // 对应的秒级时间戳，例如 1672387200
 }
 
 export interface AutomatorTransaction {
-  amountInVaultDepositCcy: number | string; // 转换的资产(scrvUSD)
-  amountInClientDepositCcy: number | string; // 转换的资产(crvUSD)
+  amountByVaultDepositCcy: number | string; // 转换的资产(scrvUSD)
+  amountByClientDepositCcy: number | string; // 转换的资产(crvUSD)
+  wallet?: string;
   share: number | string; // 转换的份额
   status: AutomatorTransactionStatus;
   action: string; // DEPOSIT/WITHDRAW/CLAIM/TRANSFER_IN/TRANSFER_OUT
@@ -183,53 +150,102 @@ export enum AutomatorDepositStatus {
   CLOSED = 'CLOSED',
 }
 
+export interface AutomatorCreateParams {
+  chainId: number; // 链ID
+  automatorAddress: string;
+  burnTransactionHash: string; // burn的transaction hash
+  automatorName: string; // automator名称
+  redemptionPeriodDay: number; // 赎回观察时间（单位：天）
+  feeRate: number | string; // 抽佣比率
+  description: string; // Automator描述
+  factoryAddress: string; // Factory地址
+  clientDepositCcy: string; // 用户存入的标的物
+}
+
+export interface AutomatorFollower {
+  wallet: string; // wallet
+  amountByVaultDepositCcy: number | string; // 当前持有的总资产(scrvUSD)
+  amountByClientDepositCcy: number | string; // 当前持有的总资产(crvUSD)
+  share: number | string; // 转换的份额
+  totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
+  totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
+  totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
+  totalRchAmount: number | string; // Rch的总PNL(RCH)
+  followDay: number; // 加入天数
+  pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
+}
+
 export class AutomatorService {
-  static cvtAutomatorInfo(it: OriginAutomatorInfo) {
+  static cvtAutomatorInfo<T extends OriginAutomatorInfo>(
+    it: T,
+  ): T extends OriginAutomatorDetail ? AutomatorDetail : AutomatorInfo {
     const collateralDecimal = getCollateralDecimal(
       it.chainId,
       it.clientDepositCcy,
     );
+    const vault = ContractsService.AutomatorVaults.find(
+      (item) =>
+        item.chainId === it.chainId &&
+        item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
+    );
     return {
       ...it,
-      vaultInfo: {
-        ...it,
-        vault: it.automatorVault,
-        name: get(it, 'automatorName') || it.clientDepositCcy,
-        desc: it.automatorDescription,
-        creatorFeeRate: get(it, 'creatorFeeRate') || 0,
-        depositCcy: it.clientDepositCcy,
-        vaultDepositCcy: it.vaultDepositCcy,
-        positionCcy: it.sharesToken,
-        redeemWaitPeriod: +it.redemptionPeriodDay * MsIntervals.day,
-        claimPeriod: MsIntervals.day * 3,
-        abis: AutomatorAbis,
-        collateralDecimal,
-        anchorPricesDecimal: 1e8,
-        depositMinAmount: getDepositMinAmount(
-          it.clientDepositCcy,
-          ProjectType.Automator,
-        ),
-        depositTickAmount: getDepositTickAmount(
-          it.clientDepositCcy,
-          ProjectType.Automator,
-        ),
-        ...ContractsService.AutomatorVaults.find(
-          (item) =>
-            item.chainId === it.chainId &&
-            item.vault.toLowerCase() === it.automatorVault.toLowerCase(),
-        ),
-      },
-    } as AutomatorInfo;
+      vaultInfo: omitBy(
+        {
+          ...Object.fromEntries(
+            Object.keys(ContractsService.AutomatorVaults[0]).map((k) => [
+              k,
+              it[k as never] || vault?.[k as never],
+            ]),
+          ),
+          vault: it.automatorVault,
+          name: get(it, 'automatorName') || vault?.name || it.clientDepositCcy,
+          desc: it.automatorDescription || vault?.desc,
+          creatorFeeRate: [
+            get(it, 'creatorFeeRate'),
+            get(it, 'feeRate'),
+            vault?.creatorFeeRate,
+            0,
+          ].find((x) => !Number.isNaN(x) && !isNullLike(x)),
+          depositCcy: it.clientDepositCcy,
+          vaultDepositCcy: it.vaultDepositCcy,
+          positionCcy: it.sharesToken,
+          redeemWaitPeriod: +it.redemptionPeriodDay * MsIntervals.day,
+          claimPeriod: MsIntervals.day * 3,
+          abis: AutomatorAbis,
+          collateralDecimal,
+          anchorPricesDecimal: 1e8,
+          depositMinAmount: getDepositMinAmount(
+            it.clientDepositCcy,
+            ProjectType.Automator,
+          ),
+          depositTickAmount: getDepositTickAmount(
+            it.clientDepositCcy,
+            ProjectType.Automator,
+          ),
+          interestType:
+            vault?.interestType ??
+            (() => {
+              if (it.vaultDepositCcy === 'scrvUSD') return InterestType.CURVE;
+              if (it.vaultDepositCcy === 'stRCH') return InterestType.SOFA;
+              if (it.vaultDepositCcy === 'zRCH') return InterestType.SOFA;
+              if (it.vaultDepositCcy.startsWith('st')) return InterestType.LIDO;
+              if (it.vaultDepositCcy.startsWith('a')) return InterestType.AAVE;
+              return undefined;
+            })(),
+          createTime: it.createTime * 1000 || vault?.createTime,
+        },
+        (it) => isNullLike(it),
+      ),
+    } as never;
   }
 
+  @applyMock('automatorList')
   @asyncCache({
     until: (it, createdAt) =>
       !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
   })
-  static async getAutomatorList(params: {
-    chainId: number;
-    depositCcy?: AutomatorVaultInfo['depositCcy'];
-  }) {
+  static async automatorList(params: { chainId: number }) {
     return http
       .get<unknown, HttpResponse<OriginAutomatorInfo[]>>(`/automator/list`, {
         params,
@@ -237,9 +253,9 @@ export class AutomatorService {
       .then((res) => res.value.map(AutomatorService.cvtAutomatorInfo));
   }
 
-  static async getInfo({ chainId, vault }: AutomatorVaultInfo) {
+  static async info({ chainId, vault }: AutomatorVaultInfo) {
     return http
-      .get<unknown, HttpResponse<OriginAutomatorInfo>>(`/automator/info`, {
+      .get<unknown, HttpResponse<OriginAutomatorDetail>>(`/automator/info`, {
         params: { chainId, automatorVault: vault },
       })
       .then((res) => AutomatorService.cvtAutomatorInfo(res.value));
@@ -263,81 +279,14 @@ export class AutomatorService {
     );
   }
 
-  static cvtUserPnl(
-    it: OriginAutomatorUserDetail,
-    vaults: AutomatorInfo[],
-    prices: Record<string, number | string>,
-  ) {
-    const vaultInfo = vaults.find(
-      (item) =>
-        item.vaultInfo.chainId === it.chainId &&
-        item.vaultInfo.vault.toLowerCase() === it.automatorVault.toLowerCase(),
-    )!.vaultInfo;
-    const rchValueInDepositCcy = cvtAmountsInCcy(
-      [['RCH', it.rchTotalPnl]],
-      prices,
-      vaultInfo.depositCcy,
-    );
-    const totalPnl =
-      Number(it.totalPnlByClientDepositCcy) + rchValueInDepositCcy;
-    const depositTotalPnlPercentage =
-      (Number(it.pnlPercentage) * Number(it.totalPnlByClientDepositCcy)) /
-      totalPnl;
-    const rchTotalPnlPercentage =
-      (Number(it.pnlPercentage) * rchValueInDepositCcy) / totalPnl;
-    return {
-      ...it,
-      depositTotalPnlPercentage,
-      rchTotalPnlPercentage,
-      vaultInfo,
-    } as AutomatorUserDetail;
-  }
-
-  static async getUserPnl(
-    { chainId, vault }: AutomatorVaultInfo,
-    wallet: string,
-  ) {
-    const [it, vaults, prices] = await Promise.all([
-      http
-        .get<unknown, HttpResponse<OriginAutomatorUserDetail>>(
-          `/automator/user/detail`,
-          {
-            params: { chainId, automatorVault: vault, wallet },
-          },
-        )
-        .then((res) => res.value),
-      AutomatorService.getAutomatorList({ chainId }),
-      MarketService.fetchIndexPx(),
-    ]);
-    return AutomatorService.cvtUserPnl(it, vaults, prices);
-  }
-
-  static async getUserPnlList(params: {
-    chainId: number;
-    wallet: string;
-    status: AutomatorDepositStatus;
-  }) {
-    const [list, vaults, prices] = await Promise.all([
-      http
-        .get<unknown, HttpResponse<OriginAutomatorUserDetail[]>>(
-          `/automator/user/list`,
-          { params },
-        )
-        .then((res) => res.value),
-      AutomatorService.getAutomatorList({ chainId: params.chainId }),
-      MarketService.fetchIndexPx(),
-    ]);
-    return list.map((it) => AutomatorService.cvtUserPnl(it, vaults, prices));
-  }
-
   static async transactions(
     { chainId, vault }: AutomatorVaultInfo,
-    params: AutomatorTransactionsParams,
+    params: Omit<AutomatorTransactionsParams, 'wallet'>,
     extraParams?: PageParams<'cursor', 'dateTime'>,
   ): Promise<PageResult<AutomatorTransaction, { hasMore: boolean }, 'cursor'>> {
     const limit = extraParams?.limit ?? 20;
     const res = await http.get<unknown, HttpResponse<AutomatorTransaction[]>>(
-      `/automator/user/transaction/list`,
+      `/optivisors/automator/transaction/list`,
       {
         params: {
           chainId,
@@ -356,162 +305,33 @@ export class AutomatorService {
     };
   }
 
-  static async getShares({ chainId, vault }: AutomatorVaultInfo) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
-    const [shareDecimals, sharesWithDecimals, pricePerShare] =
-      await Promise.all([
-        Automator.decimals().then((res) => Number(res)),
-        Automator.balanceOf(signer.address).then((res) => Number(res)),
-        Automator.getPricePerShare().then(
-          (res) => +ethers.formatUnits(res, 18),
-        ),
-      ]);
-    const shares = sharesWithDecimals / 10 ** shareDecimals;
-    return {
-      shareDecimals,
-      sharesWithDecimals,
-      shares,
-      pricePerShare,
-      amount: +(shares * pricePerShare).toFixed(6),
-    };
+  @applyMock('automatorFollowers')
+  static async followers(vault: AutomatorVaultInfo, params: PageParams) {
+    const pageSize = params.limit || 40;
+    const currentPage = Math.floor((params.offset || 0) / pageSize);
+    return http
+      .get<
+        unknown,
+        HttpResponse<{
+          pageCount: number;
+          totalCount: number;
+          values: AutomatorFollower[];
+        }>
+      >(`/optivisors/automator/user/list`, {
+        params: {
+          chainId: vault.chainId,
+          automatorVault: vault.vault,
+          pageSize,
+          currentPage,
+        },
+      })
+      .then((res) => {
+        return {
+          offset: res.value.pageCount * pageSize,
+          limit: pageSize,
+          total: res.value.totalCount,
+          list: res.value.values,
+        } as PageResult<AutomatorFollower>;
+      });
   }
-
-  private static progressWrap<Args extends unknown[]>(
-    transactionCall: (
-      vault: AutomatorVaultInfo,
-      ...args: Args
-    ) => Promise<string>,
-    statusMap: Record<'before' | 'failed' | 'success', PositionStatus>,
-  ) {
-    return (
-      cb: (progress: TransactionProgress) => void,
-      vault: AutomatorVaultInfo,
-      ...args: Args
-    ) => {
-      safeRun(cb, { status: 'Submitting' });
-      const key = `${vault.vault.toLowerCase()}-${vault.chainId}-${
-        vault.depositCcy
-      }`;
-      return transactionCall(vault, ...args)
-        .then(async (hash) => {
-          safeRun(cb, {
-            status: 'QueryResult',
-            details: [
-              [
-                key,
-                {
-                  status: statusMap.before,
-                  hash,
-                  ids: [],
-                },
-              ],
-            ],
-          });
-          const status = await WalletService.transactionResult(
-            hash,
-            vault.chainId,
-          ).then((res) =>
-            res === TransactionStatus.FAILED
-              ? statusMap.failed
-              : statusMap.success,
-          );
-          safeRun(cb, {
-            status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
-            details: [[key, { status, hash, ids: [] }]],
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          safeRun(cb, {
-            status: 'SubmitFailed',
-            details: [
-              [
-                key,
-                {
-                  status: statusMap.failed,
-                  error,
-                  ids: [],
-                },
-              ],
-            ],
-          });
-        });
-    };
-  }
-
-  private static async $deposit(
-    { chainId, vault }: AutomatorVaultInfo,
-    amount: string | number,
-  ) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
-    const [decimals, collateralAddress] = await Promise.all([
-      Automator.decimals(),
-      Automator.collateral(),
-    ]);
-    const amountWithDecimals = Big(amount)
-      .times(10 ** Number(decimals))
-      .toFixed(0);
-    await WalletService.$approve(
-      collateralAddress,
-      amountWithDecimals,
-      signer,
-      vault,
-    );
-    const genArgs = (gasLimit?: number) => [
-      String(amountWithDecimals),
-      { gasLimit },
-    ];
-    return ContractsService.dirtyCall(Automator, 'deposit', genArgs);
-  }
-
-  static deposit = AutomatorService.progressWrap(AutomatorService.$deposit, {
-    before: PositionStatus.PENDING,
-    failed: PositionStatus.FAILED,
-    success: PositionStatus.MINTED,
-  });
-
-  static async getRedemptionInfo({ chainId, vault }: AutomatorVaultInfo) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
-    return Automator.getRedemption().then((res) => {
-      return {
-        pendingSharesWithDecimals: Number(res[0]),
-        createTime: Number(res[1]),
-      };
-    });
-  }
-
-  private static async $redeem(
-    { chainId, vault }: AutomatorVaultInfo,
-    sharesWithDecimals: string | number,
-  ) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
-    const genArgs = (gasLimit?: number) => [
-      String(sharesWithDecimals),
-      { gasLimit },
-    ];
-    return ContractsService.dirtyCall(Automator, 'withdraw', genArgs);
-  }
-
-  static redeem = AutomatorService.progressWrap(AutomatorService.$redeem, {
-    before: PositionStatus.REDEEMING,
-    failed: PositionStatus.MINTED,
-    success: PositionStatus.REDEEMED,
-  });
-
-  private static async $claim({ chainId, vault }: AutomatorVaultInfo) {
-    const { signer } = await WalletService.connect(chainId);
-    const Automator = await ContractsService.AutomatorContract(vault, signer);
-    const genArgs = (gasLimit?: number) => [{ gasLimit }];
-    return ContractsService.dirtyCall(Automator, 'claimRedemptions', genArgs);
-  }
-
-  static claim = AutomatorService.progressWrap(AutomatorService.$claim, {
-    before: PositionStatus.CLAIMING,
-    failed: PositionStatus.REDEEMED,
-    success: PositionStatus.CLAIMED,
-  });
 }

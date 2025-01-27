@@ -7,6 +7,7 @@ import { formatDuration } from '@sofa/utils/time';
 
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import ProgressBar from '@/components/ProgressBar';
 
 import { Comp as IconCalendar } from '../../../automator-market/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../../automator-market/assets/icon-people.svg';
@@ -38,7 +39,16 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           <div className={styles['title']}>
             {t({ enUS: '7D Target Yield', zhCN: '7日年化收益率' })}
           </div>
-          <div className={styles['value']}>
+          <div
+            className={styles['value']}
+            style={{
+              color:
+                data?.yieldPercentage === undefined ||
+                +data?.yieldPercentage >= 0
+                  ? 'var(--color-rise)'
+                  : 'var(--color-fall)',
+            }}
+          >
             {displayPercentage(Number(data?.yieldPercentage) / 100)}
             <span className={styles['footnote']}>
               {t({ enUS: 'Est.', zhCN: '估算' })}
@@ -66,12 +76,29 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
           </div>
           <div className={styles['value']}>
             <AmountDisplay
-              amount={Number(data?.aumInVaultDepositCcy) / Number(data?.nav)}
+              amount={
+                data?.aumBySharesToken ||
+                Number(data?.aumByVaultDepositCcy) / Number(data?.nav)
+              }
               ccy={props.vault?.positionCcy}
             />
             <span className={styles['unit']}>{props.vault?.positionCcy}</span>
             <div className={styles['decorative']}>
               ≈{' '}
+              <AmountDisplay
+                amount={!props.vault ? '' : data?.aumByClientDepositCcy}
+                ccy={props.vault?.depositCcy}
+              />
+              <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+            </div>
+          </div>
+        </div>
+        {data?.vaultInfo.creator && (
+          <div className={styles['aum']}>
+            <div className={styles['title']}>
+              {t({ enUS: `Optivisor Committed Assets`, zhCN: '创建者份额' })}
+            </div>
+            <div className={styles['value']}>
               <AmountDisplay
                 amount={
                   !props.vault
@@ -80,51 +107,34 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                         [
                           [
                             props.vault.vaultDepositCcy,
-                            data?.aumInVaultDepositCcy,
+                            data?.creatorAmountByVaultDepositCcy,
                           ],
                         ],
-                        prices,
-                        props.vault.depositCcy,
-                      )
-                }
-                ccy={props.vault?.depositCcy}
-              />
-              <span className={styles['unit']}>{props.vault?.depositCcy}</span>
-            </div>
-          </div>
-        </div>
-        {/* {data?.creator && (
-          <div className={styles['aum']}>
-            <div className={styles['title']}>
-              {t({ enUS: `Creator's Lead Assets`, zhCN: '创建者份额' })}
-            </div>
-            <div className={styles['value']}>
-              <AmountDisplay
-                amount={
-                  !props.vault
-                    ? ''
-                    : cvtAmountsInCcy(
-                        [[props.vault.vaultDepositCcy, data?.creatorAmount]],
                         prices,
                         props.vault.vaultDepositCcy,
                       )
                 }
-                precision={0}
+                ccy={props.vault?.vaultDepositCcy}
               />
               <span className={styles['unit']}>{props.vault?.depositCcy}</span>
               <span className={styles['percentage']}>
                 {displayPercentage(
-                  Number(data?.creatorAmount) / Number(data?.amount),
+                  Number(data?.creatorAmountByVaultDepositCcy) /
+                    Number(data?.aumByVaultDepositCcy),
                 )}
               </span>
               <ProgressBar
                 type="3"
-                percent={Number(data?.creatorAmount) / Number(data?.amount)}
+                disabled
+                percent={
+                  Number(data?.creatorAmountByVaultDepositCcy) /
+                  Number(data?.aumByVaultDepositCcy)
+                }
                 minWidthPercentage={0.05}
               />
             </div>
           </div>
-        )} */}
+        )}
         {/* <div className={styles['nav']}>
         <div className={styles['title']}>
           1 {props.vault?.positionCcy} (
@@ -141,8 +151,8 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
             dangerouslySetInnerHTML={{
               __html: t(
                 {
-                  enUS: 'This product has a <span class="highlight">{{waitDuration}}</span> waiting period for redemptions.',
-                  zhCN: '此产品的赎回需经过 <span class="highlight">{{waitDuration}}</span> 的等待期。',
+                  enUS: 'This strategy has a <span class="highlight">{{waitDuration}}</span> waiting period for redemptions.',
+                  zhCN: '此策略的赎回需经过 <span class="highlight">{{waitDuration}}</span> 的等待期。',
                 },
                 {
                   waitDuration:
@@ -155,14 +165,14 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
       </div>
       <div className={styles['right']}>
-        {/* <div className={styles['item']}>
+        <div className={styles['item']}>
           <div className={styles['title']}>
-            {t({ enUS: 'Fee', zhCN: '手续费' })}
+            {t({ enUS: 'Fee', zhCN: '盈利抽成' })}
           </div>
           <div className={styles['value']}>
             {displayPercentage(props.vault?.creatorFeeRate, 0)}
           </div>
-        </div> */}
+        </div>
         <div className={styles['item']}>
           <div className={styles['title']}>
             <Tooltip

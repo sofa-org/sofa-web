@@ -344,9 +344,16 @@ declare global {
  */
 export function applyMock(id: keyof Window['mockData']) {
   return (_: unknown, name: string, descriptor: PropertyDescriptor) => {
-    if (!/apply-mock=1/.test(window.location.search)) return descriptor;
+    if (!/apply-mock=/i.test(window.location.search)) return descriptor;
     const oldRequest = descriptor.value;
     descriptor.value = function (...args: unknown[]) {
+      if (/apply-mock=always/i.test(window.location.search)) {
+        // 优先应用 mock 数据
+        if (window.mockData[id])
+          return Promise.resolve().then(() => window.mockData[id](...args));
+        return Promise.resolve().then(() => oldRequest(...args));
+      }
+      // 原 fn 失败时应用 mock
       return Promise.resolve()
         .then(() => oldRequest(...args))
         .catch((err) => {

@@ -23,6 +23,7 @@ import { AutomatorVaults } from './vaults/automator';
 import { earnVaults } from './vaults/earn';
 import { surgeVaults } from './vaults/surge';
 import {
+  AutomatorVaultInfo,
   ProductType,
   RiskType,
   TransactionStatus,
@@ -35,7 +36,13 @@ export { ProductType, RiskType, TransactionStatus };
 export type { VaultInfo };
 
 export class ContractsService {
-  static vaults = [...earnVaults, ...surgeVaults];
+  static vaults = [...earnVaults, ...surgeVaults].map((it) => ({
+    ...it,
+    tradeDisable: it.tradeDisable || undefined,
+    onlyForAutomator: it.onlyForAutomator || undefined,
+    interestType: it.interestType || undefined,
+    earlyClaimable: it.earlyClaimable || undefined,
+  }));
   static AutomatorVaults = AutomatorVaults;
 
   static rchAddress() {
@@ -235,8 +242,8 @@ export class ContractsService {
     return new ethers.Contract(vault, info.abis, signerOrProvider);
   }
 
-  static async AutomatorContract(
-    vault: string,
+  static async automatorContract(
+    vault: string | AutomatorVaultInfo,
     signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider, // 提供 provider 时无法调用 vault 的 mint, burn 和 burnBatch 方法
   ) {
     const network =
@@ -244,15 +251,18 @@ export class ContractsService {
         ? await signerOrProvider.provider._detectNetwork()
         : await signerOrProvider._detectNetwork();
     const chainId = Number(network.chainId);
-    const info = AutomatorVaults.find(
-      (it) =>
-        it.vault.toLowerCase() === vault.toLowerCase() &&
-        it.chainId === chainId,
-    );
+    const info =
+      typeof vault === 'string'
+        ? AutomatorVaults.find(
+            (it) =>
+              it.vault.toLowerCase() === vault.toLowerCase() &&
+              it.chainId === chainId,
+          )
+        : vault;
     if (!info) {
       throw new Error(`Automator vault ${vault} (${chainId}) not found`);
     }
-    return new ethers.Contract(vault, info.abis, signerOrProvider);
+    return new ethers.Contract(info.vault, info.abis, signerOrProvider);
   }
 
   static rchContract(
@@ -474,9 +484,13 @@ export class ContractsService {
     method: string,
     genArgs: (gasLimit?: number) => T,
   ) {
-    const gasEstimate = await contract[method].estimateGas(
-      ...genArgs(undefined),
-    );
+    const argsEst = genArgs(undefined);
+    console.info(`Est. gas for ${method}`, {
+      contract,
+      method,
+      argsEst,
+    });
+    const gasEstimate = await contract[method].estimateGas(...argsEst);
     const gasLimit =
       +Number(gasEstimate) +
       Math.min(Math.floor(+Number(gasEstimate) * 0.1), 40000); // 防止失败

@@ -1,16 +1,21 @@
 import { Toast } from '@douyinfe/semi-ui';
 import {
   AutomatorDepositStatus,
+  AutomatorDetail,
   AutomatorInfo,
   AutomatorPerformance,
   AutomatorPosition,
-  AutomatorUserDetail,
 } from '@sofa/services/automator';
 import { AutomatorService } from '@sofa/services/automator';
+import {
+  AutomatorUserPosition,
+  AutomatorUserService,
+} from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { arrToDict } from '@sofa/utils/object';
+import { isEqual } from 'lodash-es';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 type K = `${AutomatorVaultInfo['chainId']}-${AutomatorVaultInfo['vault']}-${
@@ -26,27 +31,36 @@ export interface AutomatorRedeemData {
 }
 
 export const useAutomatorStore = Object.assign(
-  createWithEqualityFn(() => ({
-    vaults: null as AutomatorVaultInfo[] | null,
-    vaultOverviews: {} as Record<K, AutomatorInfo>,
-    snapshots: {} as Record<K, AutomatorPosition[]>,
-    performances: {} as Record<K, AutomatorPerformance[]>,
-    userInfos: {} as Record<
-      K,
-      {
-        server?: AutomatorUserDetail;
-        shareInfo?: PromiseVal<ReturnType<typeof AutomatorService.getShares>>;
-        redemptionInfo?: PromiseVal<
-          ReturnType<typeof AutomatorService.getRedemptionInfo>
-        >;
-      }
-    >,
-    depositData: {} as Record<K, AutomatorDepositData>,
-    redeemData: {} as Record<K, AutomatorRedeemData>,
-  })),
+  createWithEqualityFn(
+    () => ({
+      vaults: {} as Record<
+        AutomatorVaultInfo['chainId'],
+        Record<AutomatorVaultInfo['vault'], AutomatorVaultInfo> | null
+      >,
+      vaultOverviews: {} as Record<K, AutomatorInfo & Partial<AutomatorDetail>>,
+      vaultDetails: {} as Record<K, AutomatorDetail>,
+      snapshots: {} as Record<K, AutomatorPosition[]>,
+      performances: {} as Record<K, AutomatorPerformance[]>,
+      userInfos: {} as Record<
+        K,
+        {
+          server?: AutomatorUserPosition;
+          shareInfo?: PromiseVal<
+            ReturnType<typeof AutomatorUserService.userShares>
+          >;
+          redemptionInfo?: PromiseVal<
+            ReturnType<typeof AutomatorUserService.userRedemptionInfo>
+          >;
+        }
+      >,
+      depositData: {} as Record<K, AutomatorDepositData>,
+      redeemData: {} as Record<K, AutomatorRedeemData>,
+    }),
+    isEqual,
+  ),
   {
     getAutomatorVaults: async (chainId: number) => {
-      return AutomatorService.getAutomatorList({ chainId }).then((res) => {
+      return AutomatorService.automatorList({ chainId }).then((res) => {
         const vaults = res.map((it) => it.vaultInfo);
         const vaultOverviews = arrToDict(
           res,
@@ -54,37 +68,67 @@ export const useAutomatorStore = Object.assign(
             `${it.vaultInfo.chainId}-${it.vaultInfo.vault.toLowerCase()}-`,
         );
         useAutomatorStore.setState((pre) => ({
-          vaults,
+          vaults: {
+            ...pre.vaults,
+            [chainId]: arrToDict(vaults, (it) => it.vault.toLowerCase()),
+          },
           vaultOverviews: { ...pre.vaultOverviews, ...vaultOverviews },
         }));
       });
     },
+    _subscribeVaultsTimer: null as ReturnType<typeof setInterval> | null,
     subscribeVaults: (chainId: number) => {
-      useAutomatorStore.getAutomatorVaults(chainId);
-      const timer = setInterval(
-        () => useAutomatorStore.getAutomatorVaults(chainId),
-        MsIntervals.min,
-      );
-      return () => clearInterval(timer);
+      if (!useAutomatorStore._subscribeVaultsTimer) {
+        useAutomatorStore.getAutomatorVaults(chainId);
+        useAutomatorStore._subscribeVaultsTimer = setInterval(
+          () => useAutomatorStore.getAutomatorVaults(chainId),
+          MsIntervals.min,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeVaultsTimer!);
+        useAutomatorStore._subscribeVaultsTimer = null;
+      };
     },
+    _subscribeOverviewTimer: null as ReturnType<typeof setInterval> | null,
     subscribeOverview: (vault: AutomatorVaultInfo) => {
       const sync = () =>
-        AutomatorService.getInfo(vault)
-          .then((overview) =>
+        AutomatorService.info(vault)
+          .then((overview) => {
             useAutomatorStore.setState((pre) => ({
+              vaults: {
+                ...pre.vaults,
+                [vault.chainId]: {
+                  ...pre.vaults[vault.chainId],
+                  [vault.vault.toLowerCase()]: overview.vaultInfo,
+                },
+              },
               vaultOverviews: {
                 ...pre.vaultOverviews,
                 [`${vault.chainId}-${vault.vault.toLowerCase()}-`]: overview,
               },
-            })),
-          )
+              vaultDetails: {
+                ...pre.vaultDetails,
+                [`${vault.chainId}-${vault.vault.toLowerCase()}-`]: overview,
+              },
+            }));
+          })
           .catch((err) =>
             Toast.error(`Failed to fetch overview: ${getErrorMsg(err)}`),
           );
-      sync();
-      const interval = setInterval(sync, MsIntervals.day);
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribeOverviewTimer) {
+        sync();
+        useAutomatorStore._subscribeOverviewTimer = setInterval(
+          sync,
+          MsIntervals.day,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeOverviewTimer!);
+        useAutomatorStore._subscribeOverviewTimer = null;
+      };
     },
+    _subscribeSnapshotsTimer: null as ReturnType<typeof setInterval> | null,
     subscribeSnapshots: (vault: AutomatorVaultInfo) => {
       const sync = () =>
         AutomatorService.positionsSnapshot(vault)
@@ -100,37 +144,54 @@ export const useAutomatorStore = Object.assign(
           .catch((err) =>
             Toast.error(`Failed to fetch snapshots: ${getErrorMsg(err)}`),
           );
-      sync();
-      const interval = setInterval(sync, MsIntervals.day);
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribeSnapshotsTimer) {
+        sync();
+        useAutomatorStore._subscribeSnapshotsTimer = setInterval(
+          sync,
+          MsIntervals.day,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeSnapshotsTimer!);
+        useAutomatorStore._subscribeSnapshotsTimer = null;
+      };
     },
+    _subscribePerformancesTimer: null as ReturnType<typeof setInterval> | null,
     subscribePerformances: (vault: AutomatorVaultInfo) => {
       const sync = () =>
         AutomatorService.performance(vault)
-          .then((weeklyPnlList) =>
+          .then((weeklyPnlList) => {
             useAutomatorStore.setState((pre) => ({
               performances: {
                 ...pre.performances,
                 [`${vault.chainId}-${vault.vault.toLowerCase()}-`]:
                   weeklyPnlList.value,
               },
-            })),
-          )
+            }));
+          })
           .catch((err) =>
             Toast.error(`Failed to fetch weekly pnl list: ${getErrorMsg(err)}`),
           );
-      sync();
-      const interval = setInterval(sync, MsIntervals.day);
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribePerformancesTimer) {
+        sync();
+        useAutomatorStore._subscribePerformancesTimer = setInterval(
+          sync,
+          MsIntervals.day,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribePerformancesTimer!);
+        useAutomatorStore._subscribePerformancesTimer = null;
+      };
     },
     getUserInfoList: async (chainId: number, wallet: string) => {
       return Promise.all([
-        AutomatorService.getUserPnlList({
+        AutomatorUserService.userPositionList({
           chainId,
           wallet,
           status: AutomatorDepositStatus.ACTIVE,
         }),
-        AutomatorService.getUserPnlList({
+        AutomatorUserService.userPositionList({
           chainId,
           wallet,
           status: AutomatorDepositStatus.CLOSED,
@@ -151,16 +212,22 @@ export const useAutomatorStore = Object.assign(
         });
       });
     },
+    _subscribeUserInfoListTimer: null as ReturnType<typeof setInterval> | null,
     subscribeUserInfoList: (chainId: number, wallet: string) => {
-      useAutomatorStore.getUserInfoList(chainId, wallet);
-      const timer = setInterval(
-        () => useAutomatorStore.getUserInfoList(chainId, wallet),
-        MsIntervals.min,
-      );
-      return () => clearInterval(timer);
+      if (!useAutomatorStore._subscribeUserInfoListTimer) {
+        useAutomatorStore.getUserInfoList(chainId, wallet);
+        useAutomatorStore._subscribeUserInfoListTimer = setInterval(
+          () => useAutomatorStore.getUserInfoList(chainId, wallet),
+          MsIntervals.min,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeUserInfoListTimer!);
+        useAutomatorStore._subscribeUserInfoListTimer = null;
+      };
     },
     updateUserInfo: (vault: AutomatorVaultInfo, address: string) => {
-      AutomatorService.getUserPnl(vault, address)
+      AutomatorUserService.userPosition(vault, address)
         .then((userInfo) =>
           useAutomatorStore.setState((pre) => ({
             userInfos: {
@@ -177,7 +244,7 @@ export const useAutomatorStore = Object.assign(
         .catch((err) =>
           Toast.error(`Failed to fetch user pnl: ${getErrorMsg(err)}`),
         );
-      AutomatorService.getShares(vault)
+      AutomatorUserService.userShares(vault)
         .then((shareInfo) =>
           useAutomatorStore.setState((pre) => ({
             userInfos: {
@@ -194,7 +261,7 @@ export const useAutomatorStore = Object.assign(
         .catch((err) =>
           Toast.error(`Failed to fetch share info: ${getErrorMsg(err)}`),
         );
-      AutomatorService.getRedemptionInfo(vault)
+      AutomatorUserService.userRedemptionInfo(vault)
         .then((redemptionInfo) =>
           useAutomatorStore.setState((pre) => ({
             userInfos: {
@@ -212,13 +279,19 @@ export const useAutomatorStore = Object.assign(
           Toast.error(`Failed to fetch redemption info: ${getErrorMsg(err)}`),
         );
     },
+    _subscribeUserInfoTimer: null as ReturnType<typeof setInterval> | null,
     subscribeUserInfo: (vault: AutomatorVaultInfo, address: string) => {
-      useAutomatorStore.updateUserInfo(vault, address);
-      const interval = setInterval(
-        () => useAutomatorStore.updateUserInfo(vault, address),
-        MsIntervals.min,
-      );
-      return () => clearInterval(interval);
+      if (!useAutomatorStore._subscribeUserInfoTimer) {
+        useAutomatorStore.updateUserInfo(vault, address);
+        useAutomatorStore._subscribeUserInfoTimer = setInterval(
+          () => useAutomatorStore.updateUserInfo(vault, address),
+          MsIntervals.min,
+        );
+      }
+      return () => {
+        clearInterval(useAutomatorStore._subscribeUserInfoTimer!);
+        useAutomatorStore._subscribeUserInfoTimer = null;
+      };
     },
     updateDepositData: (
       vault: AutomatorVaultInfo,

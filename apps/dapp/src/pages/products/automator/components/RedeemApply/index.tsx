@@ -1,7 +1,7 @@
 import { RefObject, useEffect } from 'react';
 import { Modal } from '@douyinfe/semi-ui';
 import { wait } from '@livelybone/promise-wait';
-import { AutomatorService } from '@sofa/services/automator';
+import { AutomatorUserService } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
@@ -10,6 +10,7 @@ import { formatDuration } from '@sofa/utils/time';
 import Big from 'big.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
+import { ethers } from 'ethers';
 
 import AmountInput from '@/components/AmountInput';
 import AsyncButton from '@/components/AsyncButton';
@@ -28,7 +29,7 @@ export const AutomatorRedeemApply = (props: {
   progressRef: RefObject<ProgressRef>;
   onSuccess?: () => void;
   claimableStartAt?: number;
-  pendingSharesWithDecimals?: number;
+  pendingSharesWithDecimals?: string | number;
 }) => {
   const [t] = useTranslation('Automator');
   const prices = useIndexPrices((s) => s.prices);
@@ -143,7 +144,7 @@ export const AutomatorRedeemApply = (props: {
           className={styles['button']}
           preparing={!vault}
           prepareText={t({ enUS: 'No vault', zhCN: '未找到产品' })}
-          insufficient={!!balance && balance < Number(redeemData?.shares)}
+          insufficient={!!balance && Big(balance).lt(redeemData?.shares || 0)}
           onSubmit={async () => {
             await wait(100);
             if (!vault) return;
@@ -154,13 +155,13 @@ export const AutomatorRedeemApply = (props: {
                   zhCN: '请输入申请金额',
                 }),
               );
-            if (Number(redeemData.shares) > Number(balance))
+            if (!Number(balance))
               throw new Error(
                 t({ enUS: 'No need apply', zhCN: '无需提交申请' }),
               );
-            const sharesWithDecimals = Big(redeemData.shares)
-              .times(10 ** shareDecimals)
-              .toFixed(0);
+            const sharesWithDecimals = ethers
+              .parseUnits(String(redeemData.shares), shareDecimals)
+              .toString();
             if (hasRedemption) {
               const pendingSharesWithDecimals =
                 useAutomatorStore.getState().userInfos[
@@ -168,7 +169,7 @@ export const AutomatorRedeemApply = (props: {
                     wallet.address
                   }`
                 ]?.redemptionInfo?.pendingSharesWithDecimals;
-              if (Number(pendingSharesWithDecimals) === +sharesWithDecimals) {
+              if (Big(pendingSharesWithDecimals || 0).eq(sharesWithDecimals)) {
                 throw new Error(
                   t({
                     enUS: 'The input shares is the same as the shares of pending redemption. No need to apply again!',
@@ -217,7 +218,7 @@ export const AutomatorRedeemApply = (props: {
                 onCancel: () => reject(),
               }),
             );
-            return AutomatorService.redeem(
+            return AutomatorUserService.redeem(
               (it) => {
                 props.progressRef.current?.update(it);
                 if (it.status === 'Success') {

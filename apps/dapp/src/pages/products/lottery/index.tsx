@@ -60,6 +60,7 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
         riskType,
         forCcy,
         depositCcy,
+        onlyForAutomator: false,
       }),
     [depositCcy, forCcy, productType, riskType, wallet.chainId],
   );

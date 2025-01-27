@@ -8,6 +8,7 @@ import { WalletService } from '@sofa/services/wallet';
 import { WalletConnect } from '@sofa/services/wallet-connect';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { addHttpErrorHandler, AuthToken } from '@sofa/utils/http';
+import { isEqual } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -104,6 +105,7 @@ export const useWalletStore = Object.assign(
       name: 'wallet-info',
       storage: createJSONStorage(() => localStorage),
     }),
+    isEqual,
   ),
   {
     disconnect: () => {

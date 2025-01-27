@@ -1,11 +1,13 @@
 import { useEffect, useMemo } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
-import { AutomatorInfo, AutomatorUserDetail } from '@sofa/services/automator';
+import { AutomatorInfo } from '@sofa/services/automator';
+import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { ContractsService } from '@sofa/services/contracts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
+import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
 import { useQuery } from '@sofa/utils/hooks';
 import { arrToDict } from '@sofa/utils/object';
@@ -28,7 +30,7 @@ const tabOptions = [
     value: 'all',
   },
   {
-    label: (t: TFunction) => t({ enUS: 'Holding', zhCN: '我参与的' }),
+    label: (t: TFunction) => t({ enUS: 'Portfolio', zhCN: '我参与的' }),
     value: 'holding',
   },
 ];
@@ -42,7 +44,9 @@ const Index = () => {
   }, [wallet.chainId]);
 
   const data = useAutomatorStore((state) => {
-    return state.vaults?.map(
+    const vaults = state.vaults[wallet.chainId];
+    if (!vaults) return undefined;
+    return Object.values(vaults).map(
       (it) => state.vaultOverviews[`${it.chainId}-${it.vault.toLowerCase()}-`],
     );
   });
@@ -67,8 +71,8 @@ const Index = () => {
       .filter(Boolean);
     if (!list) return undefined;
     return list.filter((it) =>
-      Number(it?.amountInVaultDepositCcy),
-    ) as AutomatorUserDetail[];
+      Number(it?.amountByVaultDepositCcy),
+    ) as AutomatorUserPosition[];
   });
 
   const lists = useMemo(() => {
@@ -80,11 +84,7 @@ const Index = () => {
       (pre, it) => {
         if (tab === 'holding' && !bool[it.vaultInfo.vault.toLowerCase()])
           return pre;
-        const vault = ContractsService.AutomatorVaults.find(
-          (item) =>
-            item.chainId === wallet.chainId &&
-            item.vault.toLowerCase() === it.vaultInfo.vault.toLowerCase(),
-        );
+        const vault = it.vaultInfo;
         if (!vault) return pre;
         if (!pre[vault.depositCcy]) pre[vault.depositCcy] = [];
         pre[vault.depositCcy].push(it);
@@ -93,7 +93,7 @@ const Index = () => {
       {} as Record<AutomatorVaultInfo['depositCcy'], AutomatorInfo[]>,
     );
     return Object.entries(map);
-  }, [data, holding, tab, wallet.chainId]);
+  }, [data, holding, tab]);
 
   const loading = (tab === 'holding' ? !holding : !data) && !lists?.length;
 
@@ -101,7 +101,7 @@ const Index = () => {
 
   const chains = useMemo(
     () =>
-      [...new Set(ContractsService.AutomatorVaults.map((it) => it.chainId))]
+      (Env.isDaily ? [421614] : [1, 42161])
         .map((it) => ChainMap[it]?.name)
         .filter(Boolean)
         .join(', '),
@@ -157,13 +157,17 @@ const Index = () => {
         {!lists?.length && !loading && (
           <CEmpty
             className="semi-always-dark"
-            description={t(
-              {
-                enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
-                zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
-              },
-              { chains },
-            )}
+            description={
+              tab === 'holding'
+                ? undefined
+                : t(
+                    {
+                      enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
+                      zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
+                    },
+                    { chains },
+                  )
+            }
           />
         )}
       </Spin>

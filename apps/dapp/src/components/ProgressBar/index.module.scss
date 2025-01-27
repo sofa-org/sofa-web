@@ -87,13 +87,13 @@
     height: 16px;
     margin: 0;
     border-radius: 8px;
-    background: #ffdec3;
+    background: #ffdec388;
 
     .progress-bar {
       position: relative;
       transform: none;
       border-radius: 8px;
-      background: #e88947;
+      background: linear-gradient(to right, #e88947, #ffdec3);
 
       &::after {
         content: none;

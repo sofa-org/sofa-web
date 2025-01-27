@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AutomatorUserDetail } from '@sofa/services/automator';
+import { useNavigate } from 'react-router-dom';
+import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
@@ -17,7 +17,7 @@ import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 import styles from './index.module.scss';
 
 export interface AutomatorCardProps {
-  info: AutomatorUserDetail;
+  info: AutomatorUserPosition;
   modalController: ReturnType<typeof useAutomatorModal>[1];
 }
 
@@ -73,7 +73,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t({ enUS: 'Holding', zhCN: '持仓' })}
+          {t({ enUS: 'Assets', zhCN: '持仓' })}
         </div>
         <div className={styles['value']}>
           <AmountDisplay amount={props.info?.share} />
@@ -87,7 +87,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
                 [
                   [
                     props.info.vaultInfo.vaultDepositCcy,
-                    props.info?.amountInVaultDepositCcy,
+                    props.info?.amountByVaultDepositCcy,
                   ],
                 ],
                 prices,
@@ -140,8 +140,11 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
                   : 'var(--color-fall)',
             }}
           >
-            {Number(props.info.pnlPercentage) >= 0 && '+'}
-            {displayPercentage(Number(props.info.pnlPercentage) / 100)}
+            {displayPercentage(
+              Number(props.info.pnlPercentage) / 100,
+              undefined,
+              true,
+            )}
           </span>
           {/* <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>

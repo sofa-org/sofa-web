@@ -3,7 +3,7 @@ import { http } from '@sofa/utils/http';
 import dayjs from 'dayjs';
 import { omit } from 'lodash-es';
 
-import { ChainMap } from './chains';
+import { ChainMap, defaultChain } from './chains';
 import { ContractsService } from './contracts';
 import { RiskType } from './products';
 
@@ -49,6 +49,15 @@ export interface TransactionInfoInGraph
   minter: string; // 申购者地址
   maker: string; // 做市商地址
   referral: string; // 推荐人地址（如果后面有这种功能的话）
+}
+
+export interface RchBurnRecordForAutomator {
+  id: string;
+  account: string;
+  chainId: string | number;
+  amount: string | number;
+  collateral: string;
+  transactionHash: string;
 }
 
 export class TheGraphService {
@@ -243,6 +252,34 @@ export class TheGraphService {
           `\n\r - BlockNumber: ${data.number}`,
         );
       });
+  }
+
+  static async rchBurnRecordsForAutomator(params: {
+    chainId: number;
+    wallet: string;
+  }) {
+    const graphUrl = defaultChain.rchBurnForAutomatorGraphUrl;
+    const where = { chainId: params.chainId, account: params.wallet };
+    const query = `
+    {
+      burneds(where: ${JSON.stringify(where).replace(/"([^"]+)":/g, '$1:')})  {
+          id
+          account
+          amount
+          chainId
+          collateral
+          transactionHash
+      }
+    }
+    `;
+    return http
+      .post<
+        unknown,
+        HttpResponse<{
+          data: { burneds: RchBurnRecordForAutomator[] };
+        }>
+      >(graphUrl, { query })
+      .then((res) => res.value.data.burneds);
   }
 }
 

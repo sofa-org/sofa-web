@@ -1,0 +1,130 @@
+.position-size {
+  display: inline-block;
+  padding: 0 0 0 6px;
+  margin: 0 0 0 6px;
+  line-height: 0.8em;
+  border-left: 1px dashed rgba(#fff, 0.2);
+}
+
+.head-title {
+  width: $width-content;
+  margin: 0 auto;
+  padding: 75px 0 30px;
+  font-size: min(24px, 5vw);
+  color: #fff;
+
+  .title {
+    @include flex-center;
+
+    display: none;
+    margin: 0;
+    font-size: min(24px, 5vw);
+    text-align: center;
+    color: #fff;
+  }
+
+  .infos {
+    @include flex-center;
+
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 16px 40px;
+    margin: 16px 0 0;
+    font-size: 16px;
+
+    .label {
+      @include regular;
+
+      margin: 0 4px 0 0;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+
+    .item > img,
+    .item > svg,
+    img.label,
+    svg.label {
+      flex: none;
+      width: 1.2em;
+      height: 1.2em;
+    }
+
+    .item {
+      @include flex-center;
+
+      gap: 4px;
+    }
+
+    .desc {
+      @include regular;
+
+      flex: none;
+      width: 100%;
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    :global {
+      .address {
+        padding: 0;
+      }
+    }
+  }
+
+  .selector {
+    width: 300px;
+  }
+}
+
+.container.container.container {
+  margin: 0 auto;
+  width: $width-content;
+  background: transparent;
+
+  :global {
+    .semi-empty {
+      @include flex-column-center;
+
+      height: 50vh;
+    }
+  }
+}
+
+@mixin rewrite {
+  .head-title.head-title {
+    width: 100%;
+    margin: 110px auto -1px;
+    padding: 12px 0 0;
+    background: #000;
+
+    .title {
+      display: flex;
+      margin: -56px 0 32px;
+    }
+
+    .infos {
+      width: $width-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .selector {
+      width: fit-content;
+      min-width: 150px;
+      height: 36px;
+      margin: 0 0 0 12px;
+      border-radius: 16px;
+      background-color: rgba(#fff, 0.12);
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  @include rewrite;
+}
+
+@media (width <=720px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

@@ -13,7 +13,7 @@
 
 .content {
   position: relative;
-  width: min(1160px, calc(100vw - 24px));
+  width: $width-content;
   min-height: calc(100vh - 200px);
   padding: 80px 0 0;
   margin: 0 auto;
@@ -49,6 +49,14 @@
     &:hover {
       background: rgba(#555, 1) !important;
       box-shadow: 0 5px 10px 0 rgba(#000, 0.5);
+    }
+  }
+}
+
+.tabs.tabs {
+  :global {
+    .tabs {
+      width: $width-content;
     }
   }
 }

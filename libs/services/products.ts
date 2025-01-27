@@ -172,7 +172,7 @@ export class ProductsService {
     },
   ) {
     if (!product) return '';
-    const vault = product.vault?.vault.toLowerCase();
+    const vault = product.vault?.vault?.toLowerCase();
     const prices = product.anchorPrices?.map(Number).join('-');
     const protectedApy =
       product.vault?.riskType === RiskType.LEVERAGE ||
@@ -218,13 +218,17 @@ export class ProductsService {
       const k = $k as keyof VaultInfo;
       if (isNullLike(filters[k])) continue;
       if (k === 'vault') {
-        if (vault.vault.toLowerCase() === filters.vault!.toLowerCase())
+        if (vault.vault?.toLowerCase() === filters.vault?.toLowerCase())
           continue;
         return false;
       }
       if (k.includes('forCcy')) {
         if (ProductsService.ccyEqual(vault.forCcy, filters.forCcy!)) continue;
         return false;
+      }
+      if (k === 'onlyForAutomator') {
+        if (!!vault[k] === !!filters[k]) continue;
+        else return false;
       }
       if (vault[k] !== filters[k]) return false;
     }
@@ -268,6 +272,10 @@ export class ProductsService {
         if (k.includes('forCcy')) {
           if (ProductsService.ccyEqual(it.forCcy, filters.forCcy!)) continue;
           return false;
+        }
+        if (k === 'onlyForAutomator') {
+          if (!!it[k] === !!filters[k]) continue;
+          else return false;
         }
         if (it[k] !== filters[k]) return false;
       }
@@ -319,7 +327,9 @@ export class ProductsService {
   }
 
   static TicketTypeOptions = uniqBy(
-    ContractsService.vaults.filter((v) => v.riskType === RiskType.RISKY),
+    ContractsService.vaults.filter(
+      (v) => v.riskType === RiskType.RISKY && !v.onlyForAutomator,
+    ),
     (it) => it.depositCcy,
   ).map((it) => ({
     ccy: it.depositCcy,

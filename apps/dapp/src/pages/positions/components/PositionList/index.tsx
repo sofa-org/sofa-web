@@ -1,7 +1,14 @@
 import { Fragment, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Modal, Spin, Toast } from '@douyinfe/semi-ui';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
+import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { PositionInfo, PositionsService } from '@sofa/services/positions';
+import {
+  PositionInfo,
+  PositionsService,
+  TransactionProgress,
+} from '@sofa/services/positions';
 import {
   ProductsService,
   ProductType,
@@ -10,6 +17,7 @@ import {
 import { PositionStatus } from '@sofa/services/the-graph';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
+import { joinUrl } from '@sofa/utils/url';
 import { useInfiniteScroll } from 'ahooks';
 import classNames from 'classnames';
 import { uniqBy } from 'lodash-es';
@@ -33,9 +41,15 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'PositionList');
 
-const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
+const List = (props: {
+  riskType?: RiskType;
+  productType?: ProductType;
+  automator?: AutomatorVaultInfo;
+}) => {
   const [t] = useTranslation('PositionList');
+  const navigate = useNavigate();
   const wallet = useWalletStore();
+  const address = props.automator?.vault || wallet.address;
 
   const {
     data: $data,
@@ -44,40 +58,35 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     reload: refresh,
   } = useInfiniteScroll(
     async (d) => {
-      if (!wallet.address) return { list: [], hasMore: false, limit: 300 };
+      if (!address) return { list: [], hasMore: false, limit: 300 };
       return PositionsService.history(
         {
           chainId: wallet.chainId,
-          owner: wallet.address,
+          owner: address,
           claimed: false,
           concealed: false,
-          riskType: props.riskType,
-          productType: props.productType,
+          riskType: props.automator ? undefined : props.riskType,
+          productType: props.automator ? undefined : props.productType,
         },
         { limit: 300, cursor: d?.cursor },
       ).then((res) => ({
         ...res,
         chainId: wallet.chainId,
-        owner: wallet.address,
+        owner: address,
       }));
     },
     {
       target: () => document.querySelector('#root'),
       isNoMore: (d) => !d?.hasMore,
       onError: (err) => Toast.error(getErrorMsg(err)),
-      reloadDeps: [
-        wallet.chainId,
-        wallet.address,
-        props.riskType,
-        props.productType,
-      ],
+      reloadDeps: [wallet.chainId, address, props.riskType, props.productType],
     },
   );
 
   const data = useMemo(() => {
     if (!$data) return undefined;
     if ($data?.chainId !== wallet.chainId) return undefined;
-    if ($data?.owner !== wallet.address) return undefined;
+    if ($data?.owner !== address) return undefined;
     const list = uniqBy(
       $data?.list,
       (it: PositionInfo) =>
@@ -85,7 +94,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     );
     console.info('Positions', list);
     return list as PositionInfo[];
-  }, [$data, wallet.chainId, wallet.address]);
+  }, [$data, wallet.chainId, address]);
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
 
@@ -110,43 +119,44 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
 
   const [claimAllList, setClaimAllList] = useState(unClaimedList);
   const claimAll = useLazyCallback(() => {
-    if (!wallet.address) return;
+    if (!address) return;
     setClaimAllList(unClaimedList);
-    return PositionsService.claimBatch(
-      (it) => {
-        claimProgressRef.current?.update(it);
-        if (['Success', 'Partial Failed'].includes(it.status)) {
-          const successIds = it.details?.flatMap((d) => {
-            if (d[1].status === PositionStatus.CLAIMED) return d[1].ids;
-            return [];
-          });
-          if (successIds) {
-            mutate(
-              (pre) =>
-                pre && {
-                  ...pre,
-                  list: pre?.list.map((it) =>
-                    successIds.includes(it.id) ? { ...it, claimed: true } : it,
-                  ),
-                },
-            );
-          }
+    const data = unClaimedList.map((it) => ({
+      positionId: it.id,
+      vault: it.product.vault.vault,
+      productType: it.product.vault.productType,
+      chainId: it.product.vault.chainId,
+      owner: it.wallet,
+      term: it.claimParams.term,
+      expiry: it.product.expiry,
+      anchorPrices: it.claimParams.anchorPrices,
+      collateralAtRiskPercentage: it.claimParams.collateralAtRiskPercentage,
+      isMaker: it.claimParams.maker,
+      redeemableAmount: it.amounts.redeemable || 0,
+    }));
+    const cb = (it: TransactionProgress) => {
+      claimProgressRef.current?.update(it);
+      if (['Success', 'Partial Failed'].includes(it.status)) {
+        const successIds = it.details?.flatMap((d) => {
+          if (d[1].status === PositionStatus.CLAIMED) return d[1].ids;
+          return [];
+        });
+        if (successIds) {
+          mutate(
+            (pre) =>
+              pre && {
+                ...pre,
+                list: pre?.list.map((it) =>
+                  successIds.includes(it.id) ? { ...it, claimed: true } : it,
+                ),
+              },
+          );
         }
-      },
-      unClaimedList.map((it) => ({
-        positionId: it.id,
-        vault: it.product.vault.vault,
-        productType: it.product.vault.productType,
-        chainId: it.product.vault.chainId,
-        owner: it.wallet,
-        term: it.claimParams.term,
-        expiry: it.product.expiry,
-        anchorPrices: it.claimParams.anchorPrices,
-        collateralAtRiskPercentage: it.claimParams.collateralAtRiskPercentage,
-        isMaker: it.claimParams.maker,
-        redeemableAmount: it.amounts.redeemable || 0,
-      })),
-    );
+      }
+    };
+    if (props.automator)
+      return AutomatorCreatorService.claimPositions(cb, props.automator, data);
+    return PositionsService.claimBatch(cb, data);
   });
 
   const [selectedPosition, setSelectedPosition] = useState<PositionInfo>();
@@ -174,7 +184,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     <>
       <Spin
         wrapperClassName={styles['list']}
-        spinning={loading || (!data && !!wallet.address)}
+        spinning={loading || (!data && !!address)}
       >
         {data?.map((it) =>
           it.claimed ? (
@@ -184,6 +194,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
               position={it}
               onStatusChange={(status) => handleStatusChange(status, it)}
               onClick={() => setSelectedPosition(it)}
+              isAutomator={!!props.automator}
               key={`${it.id}-${ProductsService.productKey(it.product)}`}
             />
           ),
@@ -251,21 +262,25 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           type="primary"
           className={classNames(styles['btn-bottom'], styles['btn-txt'])}
           onClick={() => {
-            const link = `/positions/orders${window.location.search}`;
-            window.location.href = link;
+            const link = joinUrl(
+              '/positions/orders',
+              window.location.search,
+              `?automator-vault=${!props.automator?.vault ? '' : address}`,
+            );
+            navigate(link);
           }}
         >
-          {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}
+          {t({ enUS: 'All History', zhCN: '全部历史' })}
         </Button>
         {!!unClaimedList.length && (
           <Button
             size="large"
             theme="solid"
             type="primary"
-            className={styles['btn-bottom']}
+            className={classNames(styles['btn-bottom'], styles['btn-claim'])}
             onClick={claimAll}
           >
-            {t('CLAIM ALL')} ({unClaimedList.length})
+            {t('Claim All')} ({unClaimedList.length})
           </Button>
         )}
       </div>
@@ -279,12 +294,12 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   );
 };
 
-const PositionList = () => {
+const PositionList = (props: { automator?: AutomatorVaultInfo }) => {
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
   return (
     <div className={styles['position-list']}>
-      <List riskType={riskType} />
+      <List riskType={riskType} {...props} />
     </div>
   );
 };

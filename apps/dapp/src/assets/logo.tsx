@@ -23,7 +23,7 @@ export const Comp = (
           y2="276.172"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#50D113" />
+          <stop stopColor="#44C476" />
           <stop offset="1" stopColor="#FFE600" />
         </linearGradient>
       </defs>

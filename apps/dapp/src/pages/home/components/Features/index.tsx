@@ -5,6 +5,7 @@ import { TFunction } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
+import { isEqual } from 'lodash-es';
 import { nanoid } from 'nanoid';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -98,11 +99,14 @@ The higher the protocol-use, the greater the fees, triggering more token buyback
   },
 ];
 
-const useHover = createWithEqualityFn(() => ({
-  currId: '',
-  className: '',
-  pos: undefined as undefined | { left: number; top: number },
-}));
+const useHover = createWithEqualityFn(
+  () => ({
+    currId: '',
+    className: '',
+    pos: undefined as undefined | { left: number; top: number },
+  }),
+  isEqual,
+);
 useHover.subscribe((state) => {
   const pageScroller = document.querySelector('#root') as HTMLDivElement;
   const header = document.querySelector('#header') as HTMLDivElement;

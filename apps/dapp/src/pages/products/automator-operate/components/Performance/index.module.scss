@@ -1,0 +1,327 @@
+.chart-section {
+  position: relative;
+  margin: min(24px, 3.2vw) 0;
+  background: #fff;
+  border-radius: min(24px, 3.2vw);
+
+  > h2 {
+    display: none;
+  }
+}
+
+.title {
+  @include flex-center;
+  @include bold;
+
+  position: absolute;
+  left: 0;
+  top: 28px;
+  width: 114px;
+  height: 28px;
+  margin: 0;
+  border-radius: 0 4px 4px 0;
+  background: rgba(#1a5b87, 0.16);
+}
+
+.label-1 {
+  @include gradient-txt(linear-gradient(to right, #e88947, #ffdec3));
+
+  margin: 0;
+}
+
+.item-1 {
+  @include flex-center;
+
+  margin: 0;
+}
+
+.label {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.5;
+
+  &.underline {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: #aaa;
+  }
+}
+
+.value {
+  @include bold;
+
+  margin: 0;
+
+  .cvt {
+    padding-left: 6px;
+  }
+
+  .weaken {
+    @include regular;
+
+    font-size: 0.9em;
+    opacity: 0.45;
+  }
+}
+
+.unit {
+  @include regular;
+
+  margin: 0;
+  padding: 0 0 0 3px;
+  font-size: min(0.8em, 12px);
+  opacity: 0.8;
+
+  &.icon-airdrop {
+    padding-right: 1em;
+    background: url("../../../../positions/automator/assets/icon-airdrop.svg")
+      no-repeat;
+    background-position: 100% 34%;
+    background-size: 0.9em 0.9em;
+    display: inline-block;
+  }
+}
+
+.separator {
+  @include regular;
+
+  display: inline-block;
+  padding: 0 6px;
+  font-size: 0.8em;
+  vertical-align: text-top;
+
+  &:first-child {
+    padding-left: 0;
+  }
+}
+
+.item {
+  @include flex-center;
+
+  font-size: 18px;
+  justify-content: flex-start;
+  flex: 1;
+  min-width: 45%;
+
+  .label {
+    width: 190px;
+  }
+
+  &.border {
+    display: block;
+    flex: none;
+    padding-bottom: min(min(24px, 3.2vw), 3.2vw);
+    margin-bottom: min(24px, 3.2vw);
+    border-bottom: 1px dashed #e0e0e0;
+  }
+}
+
+.tips {
+  @include gradient-border(
+    1px,
+    #fff,
+    4px,
+    linear-gradient(to right, #e88947, #ffdec3)
+  );
+  @include flex-center;
+
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  width: fit-content;
+  margin: 16px 0 0;
+  padding: 3px 8px;
+  font-size: 14px;
+
+  .arrow {
+    position: absolute;
+    left: 14px;
+    bottom: 100%;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #e88947;
+    border-left: 0;
+    border-bottom: 0;
+    background: #fff;
+    transform: translate(0, calc(50% - 1px)) rotate(-45deg);
+  }
+
+  .label {
+    width: auto;
+  }
+}
+
+.pool-size-infos {
+  @include flex-center;
+
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 0;
+
+  .item {
+    @include flex-center;
+
+    justify-content: flex-start;
+    flex: 1;
+    min-width: 45%;
+
+    .label {
+      width: 160px;
+    }
+  }
+}
+
+.selector-wrapper {
+  flex: none;
+  width: 100%;
+
+  .selector {
+    height: 24px;
+    font-size: 14px;
+    background: #f0f0f0;
+    border-radius: 12px;
+  }
+}
+
+.dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.percent {
+  display: inline-block;
+  padding: 0 0 0 6px;
+  margin: 0 0 0 6px;
+  font-size: min(0.8em, 12px);
+  line-height: 0.8em;
+  border-left: 1px dashed rgba(#000, 0.2);
+  opacity: 0.8;
+}
+
+.footer {
+  position: relative;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px dashed #e0e0e0;
+}
+
+.btn-claim.btn-claim {
+  position: absolute;
+  top: 16px;
+  right: 0;
+  min-width: 120px;
+  padding: 0 min(24px, 3.2vw);
+  height: 40px;
+  opacity: 0.8;
+  background: #000;
+  border-radius: 20px;
+
+  &:hover {
+    opacity: 1;
+    background: #000;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+
+  :global {
+    .semi-button-content {
+      color: #fff;
+    }
+  }
+}
+
+.section {
+  position: relative;
+  margin: min(24px, 3.2vw) 0;
+  padding: 28px 28px 28px 146px;
+  background: #fff;
+  border-radius: min(24px, 3.2vw);
+
+  &.pnl {
+    .item:not(:last-child) {
+      margin: 0 0 12px;
+    }
+  }
+}
+
+@mixin rewrite {
+  .title {
+    top: 0;
+    border-radius: 0 0 4px;
+  }
+
+  .value {
+    font-size: 16px;
+
+    .cvt {
+      display: block;
+      padding: 0;
+    }
+  }
+
+  .tips {
+    justify-content: flex-start;
+    padding: 6px 8px;
+    gap: 6px;
+
+    .label-1 {
+      flex: none;
+      width: 100%;
+    }
+
+    .item-1 {
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+      width: fit-content;
+      white-space: nowrap;
+
+      .label {
+        font-size: 10px;
+      }
+    }
+  }
+
+  .pool-size-infos,
+  .pnl {
+    gap: 12px;
+
+    .item {
+      flex-wrap: wrap;
+      flex: none;
+      gap: 4px;
+      width: 100%;
+
+      .label {
+        font-size: 12px;
+      }
+
+      .value {
+        flex: none;
+        width: 100%;
+      }
+    }
+  }
+
+  .section {
+    padding: min(44px, 11vw) min(28px, 4.2vw) min(28px, 4.2vw);
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <=720px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

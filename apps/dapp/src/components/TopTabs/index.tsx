@@ -1,6 +1,5 @@
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 import { RiskType } from '@sofa/services/base-type';
-import { useIsPortrait } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import { C_Select } from '../CSelect';
@@ -12,7 +11,12 @@ import styles from './index.module.scss';
 export interface TopTabsProps extends BaseInputProps<string | number> {
   banner: ReactNode;
   extraTopContent?: ReactNode;
-  options: { label: ReactNode; value: string | number }[];
+  options: {
+    label: ReactNode;
+    value: string | number;
+    className?: string;
+    style?: CSSProperties;
+  }[];
   type?: 'tab' | 'btn' | 'banner-expandable' | 'banner-expandable-tab';
   dark?: boolean;
   prefix?: ReactNode;
@@ -93,7 +97,9 @@ const TopTabs = (props: TopTabsProps) => {
                       [styles['active']]: it.value === props.value,
                       active: it.value === props.value,
                     },
+                    it.className,
                   )}
+                  style={it.style}
                   onClick={() => !props.disabled && props.onChange?.(it.value)}
                 >
                   {it.label}

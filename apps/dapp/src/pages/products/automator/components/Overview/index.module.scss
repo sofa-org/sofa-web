@@ -9,7 +9,7 @@
     border-radius: 8px;
     background: linear-gradient(
       125deg,
-      rgba(#50d113, 0.25) 0%,
+      rgba(#44c476, 0.25) 0%,
       rgba(#ffe500, 0.2) 100%
     );
   }
@@ -33,7 +33,7 @@
 .title {
   @include medium;
 
-  margin: 0 0 min(4px, 0.5vw);
+  margin: 0 0 min(6px, 0.8vw);
   opacity: 0.45;
   font-size: min(14px, 3vw);
 }
@@ -75,12 +75,8 @@
   padding: 24px;
 
   .aum {
-    width: 50%;
+    // width: 50%;
     margin: 0 0 min(24px, 3vw);
-
-    .title {
-      margin: 0;
-    }
   }
 
   .nav {
@@ -102,13 +98,13 @@
       @include bold;
 
       font-size: min(28px, 6.4vw);
-      color: #50d113;
+      color: #44c476;
     }
   }
 
   :global {
     .progress-wrapper {
-      width: 326px;
+      width: calc(100% - 24px);
       margin: 10px 0 0;
     }
   }

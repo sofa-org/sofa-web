@@ -26,9 +26,18 @@ export enum TransactionStatus {
 }
 
 export enum InterestType {
-  AAVE = 'AAVE',
-  LIDO = 'LIDO',
+  AAVE = 'Aave', // rebase 数量增加
+  LIDO = 'Lido', // rebase，数量增加
+  SOFA = 'Sofa', // 净值增加
+  CURVE = 'Curve', // 净值增加
 }
+
+export const InterestTypeRefs = {
+  [InterestType.AAVE]: { isRebase: true },
+  [InterestType.LIDO]: { isRebase: true },
+  [InterestType.SOFA]: { isRebase: false },
+  [InterestType.CURVE]: { isRebase: false },
+};
 
 export enum AutomatorTransactionStatus {
   PENDING = 'PENDING',
@@ -53,12 +62,13 @@ export interface VaultInfo {
   collateralDecimal: number; // 转换为合约入参的倍数
   observationStyle?: 'Continuous'; // Continuous 连续敲出 属于合约的属性
   rchMultiplier: number; // rch 空投乘数
-  tradeDisable?: boolean; // 是否不允许交易，但是允许查看头寸，交易记录，允许 claim
+  tradeDisable: boolean | undefined; // 是否不允许交易，但是允许查看头寸，交易记录，允许 claim
+  onlyForAutomator: boolean | undefined; // 只允许作为主理人为 automator 交易
   usePermit2: boolean; // 合约是否使用了 permit2 签名
   balanceDecimal: number; // 头寸余额的精度
-  interestType?: InterestType; // 生息方式，只有 PROTECTED 产品有
+  interestType: InterestType | undefined; // 生息方式，只有 PROTECTED 产品有
   abis: ethers.InterfaceAbi;
-  earlyClaimable?: boolean;
+  earlyClaimable: boolean | undefined;
 }
 
 export interface AutomatorVaultInfo {
@@ -75,7 +85,18 @@ export interface AutomatorVaultInfo {
   redeemWaitPeriod: number; // 赎回等待期
   claimPeriod: number; // 赎回有效期
   abis: ethers.InterfaceAbi;
-  creator?: string; // 一期 automator 没有
+  creator: string;
   creatorFeeRate: number | string; // 默认为 0
-  createTime: number | string; // 创建时间
+  createTime: number | string; // 创建时间, ms
+  interestType?: InterestType; // 生息方式，一期的没有
+}
+
+export interface AutomatorFactory {
+  chainId: number; // 链代码
+  chainName: string; // 链名称
+  factoryAddress: string; // Factory地址
+  vaultDepositCcy: string; // USDC
+  clientDepositCcy: string; // 用户存入的标的物
+  vaultDepositCcyAddress: string; // 地址
+  clientDepositCcyAddress: string; // 地址
 }

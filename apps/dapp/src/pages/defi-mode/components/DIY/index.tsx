@@ -120,11 +120,8 @@ const HowLong = () => {
   const config = useDIYConfigState((state) => state.configs[chainId]);
   const [min, max] = useMemo(() => {
     if (!formData) return [next8h(undefined, 2), next8h(undefined, 7)];
-    const options = useDIYConfigState.getConfig(
-      chainId,
-      formData,
-      config,
-    )?.expiryDateTimes;
+    const options = useDIYConfigState.getConfig(chainId, formData, config)
+      ?.expiryDateTimes;
     if (!options) return [next8h(undefined, 2), next8h(undefined, 7)];
     return [options[0] * 1000, options[options.length - 1] * 1000];
   }, [chainId, config, formData]);

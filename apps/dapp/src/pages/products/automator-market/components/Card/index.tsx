@@ -1,19 +1,21 @@
 import { useMemo } from 'react';
+import { Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorInfo } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
-import { formatDuration } from '@sofa/utils/time';
+import { displayPercentage } from '@sofa/utils/amount';
+import { useIsPortrait } from '@sofa/utils/hooks';
+import { formatDuration, MsIntervals } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
-import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../assets/icon-people.svg';
+import { Comp as IconWarning } from '../../assets/icon-warning.svg';
 
 import styles from './index.module.scss';
 
@@ -25,11 +27,11 @@ export interface AutomatorCardProps {
 export const AutomatorCard = (props: AutomatorCardProps) => {
   const [t] = useTranslation('AutomatorCard');
   const isMobileUI = useIsMobileUI();
-  const prices = useIndexPrices((s) => s.prices);
   const depositCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
     [props.info.vaultInfo.depositCcy],
   );
+  const isPortrait = useIsPortrait();
   return (
     <div
       className={classNames(
@@ -43,9 +45,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
       <div className={styles['header']}>
         <img src={depositCcyConfig?.icon} alt="" />
         <div className={styles['name']}>
-          {props.info.automatorName ||
-            props.info.vaultInfo.name ||
-            props.info.vaultInfo.depositCcy}
+          {props.info.vaultInfo.name || props.info.vaultInfo.depositCcy}
         </div>
         <Address
           address={props.info.vaultInfo.vault.toLowerCase()}
@@ -64,10 +64,32 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
               +props.info.yieldPercentage >= 0
                 ? 'var(--color-rise)'
                 : 'var(--color-fall)',
+            opacity:
+              Date.now() - +props.info.vaultInfo.createTime <=
+              MsIntervals.day * 7
+                ? 0.45
+                : 1,
           }}
         >
           {+props.info.yieldPercentage >= 0 && '+'}
           {displayPercentage(+props.info.yieldPercentage / 100)}
+          {Date.now() - +props.info.vaultInfo.createTime <=
+            MsIntervals.day * 7 && (
+            <Tooltip
+              content={t({
+                enUS: 'For Automators with fewer than 7 running days, the displayed APY may be skewed due to early large trades. Please exercise caution when evaluating performance.',
+                zhCN: '对于运行时间少于 7 天的 Automator，由于早期大额交易，显示的年化收益率（APY）可能存在偏差。请在评估表现时谨慎对待。',
+              })}
+              trigger={isPortrait ? 'click' : 'hover'}
+            >
+              <span
+                className={styles['warning']}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <IconWarning />
+              </span>
+            </Tooltip>
+          )}
         </div>
       </div>
       <div className={styles['size']}>
@@ -76,16 +98,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         </div>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={cvtAmountsInCcy(
-              [
-                [
-                  props.info.vaultInfo.vaultDepositCcy,
-                  +props.info.aumInVaultDepositCcy,
-                ],
-              ],
-              prices,
-              props.info.vaultInfo.depositCcy,
-            )}
+            amount={+props.info.aumByClientDepositCcy}
             ccy={props.info.vaultInfo.depositCcy}
           />
           <span className={styles['unit']}>
@@ -93,41 +106,30 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
           </span>
         </div>
       </div>
-      {/* {props.info.creator && (
+      {props.info.vaultInfo.creator && (
         <>
           <div className={styles['creator']}>
             <div className={styles['label']}>
-              {t({ enUS: `Creator's`, zhCN: '创建者份额' })}
+              {t({ enUS: `Optivisor's`, zhCN: '创建者份额' })}
             </div>
             <div className={styles['value']}>
               <AmountDisplay
-                amount={cvtAmountsInCcy(
-                  [
-                    [
-                      props.info.vaultInfo.vaultDepositCcy,
-                      Number(props.info.creatorAmount),
-                    ],
-                  ],
-                  prices,
-                  props.info.vaultInfo.depositCcy,
-                )}
+                amount={props.info.creatorAmountByClientDepositCcy || 0}
                 ccy={props.info.vaultInfo.depositCcy}
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.positionCcy}
+                {props.info.vaultInfo.depositCcy}
+              </span>
+              <span className={styles['percent']}>
+                {displayPercentage(
+                  Number(props.info?.creatorAmountByVaultDepositCcy) /
+                    Number(props.info?.aumByVaultDepositCcy),
+                )}
               </span>
             </div>
           </div>
-          <ProgressBar
-            type="3"
-            className={styles['progress']}
-            percent={
-              Number(props.info?.creatorAmount) / Number(props.info?.amount)
-            }
-            minWidthPercentage={0.05}
-          />
         </>
-      )} */}
+      )}
       <div className={styles['footer']}>
         <div className={styles['runtime']}>
           <IconCalendar />

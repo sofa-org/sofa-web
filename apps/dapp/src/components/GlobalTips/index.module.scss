@@ -8,6 +8,7 @@
 
 .tips-text {
   @include flex-center;
+
   line-height: 20px;
 }
 
@@ -20,6 +21,7 @@
 
 .tips-content {
   @include flex-center;
+
   gap: 12px;
   flex: 1;
   width: 1px;
@@ -41,6 +43,7 @@
 
   .icon-close {
     @include pointer;
+
     flex: none;
     width: 16px;
     height: 16px;

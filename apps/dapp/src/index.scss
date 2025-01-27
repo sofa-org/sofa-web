@@ -10,6 +10,7 @@
 @import "@/styles/rewrite/input";
 @import "@/styles/rewrite/dropdown";
 @import "@/styles/rewrite/spin";
+@import "@/styles/rewrite/tooltip";
 @import "locomotive-scroll/dist/locomotive-scroll.css";
 
 :root {
@@ -61,12 +62,12 @@ body[theme-mode="dark"] {
   --semi-color-primary: #000;
   --semi-color-primary-hover: #000c;
   --semi-color-primary-active: #000a;
-  --color-rise: #50d113;
+  --color-rise: #44c476;
   --color-fall: #eb4476;
   --color-gray: #666;
   --color-rch: #51acf1;
   --semi-color-fill-0: #f0f0f0;
-  --color-gradient: linear-gradient(96deg, #50d113 0.36%, #ffe500 100%);
+  --color-gradient: linear-gradient(96deg, #44c476 0.36%, #ffe500 100%);
   --color-gradient-1: linear-gradient(to right, #fffa00, #ffa82e);
   --color-gradient-2: linear-gradient(
     90deg,

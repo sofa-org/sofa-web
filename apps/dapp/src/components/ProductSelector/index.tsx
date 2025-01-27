@@ -1,4 +1,6 @@
 import { SetStateAction, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Radio, RadioGroup } from '@douyinfe/semi-ui';
 import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts.ts';
 import { useTranslation } from '@sofa/services/i18n';
@@ -28,7 +30,21 @@ export interface ProductSelectorProps extends BaseProps {
 }
 
 export function useProjectChange(defaultVal = ProjectType.Earn) {
-  const val = useQuery().project;
+  const location = useLocation();
+  const $val = useQuery((q) => q.project as string | null);
+  const val = location.pathname.includes('automator')
+    ? ProjectType.Automator
+    : $val || defaultVal;
+
+  useEffect(() => {
+    updateQuery({
+      project:
+        location.pathname.includes('automator') && val === ProjectType.Automator
+          ? undefined
+          : val,
+    });
+  }, [location.pathname, val]);
+
   const project = useMemo(() => {
     if (ProjectType[val as ProjectType]) return val as ProjectType;
 
@@ -132,34 +148,70 @@ export const ProductTypeSelector = (
   props: BaseProps & {
     dropdownClassName?: string;
     dark?: boolean;
+    localState?: ReturnType<typeof useProductSelect>;
+    useRadioCard?: boolean;
+    radioClassName?: string;
+    optionFilter?: (t: ProductType) => boolean;
+    optionDisabled?: (v: ProductType) => boolean;
+    label?: (
+      v: (typeof ProductTypeRefs)[ProductType],
+    ) => JSX.Element[] | JSX.Element | string;
   },
 ) => {
   const [t] = useTranslation('ProjectProductSelector');
   const chainId = useWalletStore((state) => state.chainId);
-  const [product, setProduct] = useProductSelect();
+  const globalState = useProductSelect();
+  const [product, setProduct] = props.localState || globalState;
   const options = useMemo(() => {
     const vaults = ContractsService.vaults.filter(
       (it) => it.chainId === chainId && !it.tradeDisable,
     );
     const productTypes = uniq(vaults.map((it) => it.productType));
     return Object.values(ProductTypeRefs)
-      .filter((it) => productTypes.includes(it.value))
+      .filter(
+        (it) =>
+          productTypes.includes(it.value) &&
+          (!props.optionFilter || props.optionFilter(it.value)),
+      )
       .map((it) => ({
-        label: (
+        label: props.label ? (
+          props.label(it)
+        ) : (
           <span className={classNames(styles['product-item'], 'product-item')}>
             {it.img}
             {it.label(t)}
           </span>
         ),
         value: it.value,
+        disabled: props.optionDisabled
+          ? props.optionDisabled(it.value)
+          : undefined,
       }));
-  }, [chainId, t]);
+  }, [chainId, t, props.optionDisabled, props.optionFilter]);
 
   useEffect(() => {
     if (options.length && !options.some((it) => it.value === product)) {
       setProduct(options[0].value);
     }
   }, [options, product, setProduct]);
+  if (props.useRadioCard) {
+    return (
+      <>
+        <RadioGroup
+          type="pureCard"
+          value={product}
+          direction="horizontal"
+          onChange={(v) => setProduct(v.target.value as ProductType)}
+        >
+          {options.map((o) => (
+            <Radio key={o.value} value={o.value} disabled={o.disabled}>
+              {o.label}
+            </Radio>
+          ))}
+        </RadioGroup>
+      </>
+    );
+  }
 
   return (
     <CSelect

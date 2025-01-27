@@ -23,7 +23,7 @@ const useAutomatorRedeemAwaitEl = (props: {
   vault?: AutomatorVaultInfo;
   redemptionInfo:
     | {
-        pendingSharesWithDecimals: number;
+        pendingSharesWithDecimals: string | number;
         createTime: number;
       }
     | undefined;

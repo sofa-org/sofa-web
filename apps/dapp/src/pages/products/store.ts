@@ -7,6 +7,7 @@ import {
 } from '@sofa/services/products';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { dirtyArrayOmit, toArray } from '@sofa/utils/object';
+import { isEqual } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
@@ -38,9 +39,12 @@ export const useProductsState = Object.assign(
         storage: createJSONStorage(() => sessionStorage),
       },
     ),
+    isEqual,
   ),
   {
-    updateRecommendedList: async (vault: VaultInfo) => {
+    updateRecommendedList: async (
+      vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType'>,
+    ) => {
       const list = await ProductsService.listRecommended(
         vault.productType,
         vault,
@@ -52,7 +56,7 @@ export const useProductsState = Object.assign(
         },
       }));
     },
-    clearCart: (vault: VaultInfo) => {
+    clearCart: (vault: Pick<VaultInfo, 'vault' | 'chainId'>) => {
       useProductsState.setState((pre) => ({
         cart: {
           ...pre.cart,

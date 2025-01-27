@@ -69,13 +69,19 @@ export function useDepositCcySelect() {
   return [ccy, setDepositCcy] as const;
 }
 
-export const CCYSelector = (props: CCYSelectorProps) => {
-  const [ccy, setCcy] = useForCcySelect();
+export const CCYSelector = (
+  props: CCYSelectorProps & {
+    localState?: ReturnType<typeof useForCcySelect>;
+    optionDisabled?: (v: ReturnType<typeof useForCcySelect>[0]) => boolean;
+  },
+) => {
+  const globalState = useForCcySelect();
+  const [ccy, setCcy] = props.localState || globalState;
   const options = useMemo(
     () =>
       [
-        { label: 'BTC', ccy: 'WBTC' },
-        { label: 'ETH', ccy: 'WETH' },
+        { label: 'BTC', ccy: 'WBTC' as const },
+        { label: 'ETH', ccy: 'WETH' as const },
       ].map((it) => ({
         label: (
           <span className={styles['ccy-item']}>
@@ -84,8 +90,11 @@ export const CCYSelector = (props: CCYSelectorProps) => {
           </span>
         ),
         value: it.ccy,
+        disabled: props.optionDisabled
+          ? props.optionDisabled(it.ccy)
+          : undefined,
       })),
-    [],
+    [props.optionDisabled],
   );
   return (
     <CSelect

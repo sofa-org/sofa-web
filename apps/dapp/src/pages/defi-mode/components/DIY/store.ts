@@ -110,7 +110,7 @@ const instant = createWithEqualityFn(
       >,
     }),
     {
-      name: 'diy-state',
+      name: 'diy-state-1',
       storage: createJSONStorage(() => localStorage),
     },
   ),

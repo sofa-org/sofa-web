@@ -69,7 +69,7 @@
   @include pointer;
 
   position: relative;
-  line-height: min(48px, 9vw);
+  line-height: min(44px, 9vw);
   font-size: 16px;
   color: #fff;
   opacity: 0.65;
@@ -139,11 +139,11 @@
 
 .nav-selector-item {
   max-width: none;
-  width: min($width-content, 520px);
+  width: min($width-content, 560px);
   position: relative;
   margin-bottom: 12px !important;
-  margin-left: 12px !important;
-  margin-right: 12px !important;
+  margin-left: 6px !important;
+  margin-right: 6px !important;
 
   &:hover,
   &:active {
@@ -153,7 +153,8 @@
   &::before {
     content: "";
     border-radius: 8px;
-    background: rgba(#fff, 0.16);
+
+    // background: rgba(#fff, 0.16);
 
     // border: 1px solid red;
     position: absolute;
@@ -203,12 +204,13 @@
     gap: 12px;
     width: 100%;
     white-space: initial;
+    margin-left: -10px;
 
     .icon {
       svg,
       img {
-        width: min(48px, 9vw);
-        height: min(48px, 9vw);
+        width: min(44px, 9vw);
+        height: min(44px, 9vw);
       }
     }
 
@@ -217,7 +219,7 @@
 
       .txt-label {
         display: block;
-        margin: 0 0 8px;
+        margin: 0 0 2px;
         font-size: min(18px, 3.6vw);
       }
 
@@ -232,15 +234,17 @@
 }
 
 .nav-selector {
-  padding: 18px 8px 8px;
-  border-radius: min(24px, 4vw);
+  padding: 10px 8px 0;
+  border-radius: min(16px, 4vw);
 
   :global(.semi-dropdown-title) {
-    margin: 16px 0 8px;
-    padding: 10px 10px 4px;
+    margin: 12px 10px 8px;
+    padding: 18px 0 4px;
+    border-top: 1px rgba(#fff, 0.08) dotted;
 
     &:first-child {
-      margin-top: -12px;
+      margin-top: -16px;
+      border-top: none;
     }
   }
 
@@ -313,7 +317,11 @@
 
       .nav-selector {
         .semi-dropdown-title {
-          padding: 4px 8px 3px;
+          padding: 12px 8px 3px;
+
+          &:first-child {
+            margin-top: -8px;
+          }
         }
       }
 

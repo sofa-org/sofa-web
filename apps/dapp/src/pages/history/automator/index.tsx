@@ -5,77 +5,92 @@ import {
   AutomatorService,
   AutomatorTransaction,
 } from '@sofa/services/automator';
-import { AutomatorTransactionStatus } from '@sofa/services/base-type';
-import { ContractsService } from '@sofa/services/contracts';
+import { AutomatorUserService } from '@sofa/services/automator-user';
+import {
+  AutomatorTransactionStatus,
+  AutomatorVaultInfo,
+} from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 import { getErrorMsg } from '@sofa/utils/fns';
-import { useQuery } from '@sofa/utils/hooks';
 import { useInfiniteScroll } from 'ahooks';
+import classNames from 'classnames';
 import { uniqBy } from 'lodash-es';
 
+import Address from '@/components/Address';
 import CEmpty from '@/components/Empty';
 import { Time } from '@/components/TimezoneSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
+import { useAutomatorMarketSelector } from '@/pages/products/automator-market/hooks';
 
 import styles from './index.module.scss';
 
-export const AutomatorHistory = () => {
-  {
-    const wallet = useWalletStore();
-    const [t] = useTranslation('AutomatorHistory');
-    const v = useQuery((q) => q['automator-vault'] as string);
-    const vault = useMemo(
-      () =>
-        ContractsService.AutomatorVaults.find(
-          (it) =>
-            it.chainId === wallet.chainId &&
-            (!v || v.toLowerCase() === it.vault.toLowerCase()),
-        ),
-      [v, wallet.chainId],
-    );
+export const AutomatorHistory = (props: {
+  automator?: AutomatorVaultInfo;
+  all?: boolean;
+  className?: string;
+}) => {
+  const wallet = useWalletStore();
+  const [t] = useTranslation('AutomatorHistory');
 
-    const { data: $data, loading } = useInfiniteScroll<
-      PromiseVal<ReturnType<typeof AutomatorService.transactions>>
-    >(
-      async (pre) => {
-        if (!wallet.address || !vault) return new Promise(() => {});
-        const params = {
-          wallet: wallet.address,
-        };
-        const limit = 20;
-        const page = {
-          cursor: pre?.cursor,
-          limit,
-        };
-        return AutomatorService.transactions(vault, params, page);
-      },
-      {
-        target: () => document.querySelector('#root'),
-        isNoMore: (d) => !d?.hasMore,
-        onError: (err) => Toast.error(getErrorMsg(err)),
-        reloadDeps: [wallet.chainId, wallet.address],
-      },
-    );
+  const market = useAutomatorMarketSelector();
+  const vault = 'automator' in props ? props.automator : market.automator;
 
-    const data = useMemo(() => {
-      if (!$data) return null;
-      return {
-        ...$data,
-        list: uniqBy(
-          $data.list,
-          (it: AutomatorTransaction) => `${it.dateTime}`,
-        ) as AutomatorTransaction[],
+  const { data: $data, loading } = useInfiniteScroll<
+    PromiseVal<ReturnType<typeof AutomatorUserService.userTransactions>>
+  >(
+    async (pre) => {
+      if (!vault) return new Promise(() => {});
+      const limit = 20;
+      const page = {
+        cursor: pre?.cursor,
+        limit,
       };
-    }, [$data]);
+      if (!props.all && wallet.address) {
+        const params = { wallet: wallet.address };
+        return AutomatorUserService.userTransactions(vault, params, page);
+      }
+      return AutomatorService.transactions(vault, {}, page);
+    },
+    {
+      target: () => document.querySelector('#root'),
+      isNoMore: (d) => !d?.hasMore,
+      onError: (err) => Toast.error(getErrorMsg(err)),
+      reloadDeps: [wallet.chainId, wallet.address, vault],
+    },
+  );
 
-    const columns = useMemo(
-      () =>
+  const data = useMemo(() => {
+    if (!$data) return null;
+    return {
+      ...$data,
+      list: uniqBy(
+        $data.list,
+        (it: AutomatorTransaction) => `${it.dateTime}`,
+      ) as AutomatorTransaction[],
+    };
+  }, [$data]);
+
+  const columns = useMemo(
+    () =>
+      (
         [
           {
             title: t({ enUS: 'Created Time', zhCN: '创建时间' }),
             render: (_, record) => (
               <Time time={record.dateTime * 1000} format="YYYY-MM-DD HH:mm" />
+            ),
+          },
+          {
+            title: t({ enUS: 'Wallet', zhCN: '钱包' }),
+            hide: !props.automator,
+            render: (_, record) => (
+              <Address
+                address={record.wallet!}
+                simple
+                linkBtn
+                className={styles['address']}
+              />
             ),
           },
           {
@@ -112,7 +127,7 @@ export const AutomatorHistory = () => {
                 '-'
               ) : (
                 <>
-                  {amountFormatter(record.amountInClientDepositCcy, 2)}
+                  {amountFormatter(record.amountByClientDepositCcy, 2)}
                   <span className={styles['unit']}>{vault?.depositCcy}</span>
                 </>
               ),
@@ -120,6 +135,7 @@ export const AutomatorHistory = () => {
           {
             title: t({ enUS: 'Status', zhCN: '状态' }),
             fixed: 'right',
+            hide: !!props.automator,
             render: (_, record) => {
               if (record.status === AutomatorTransactionStatus.PENDING) {
                 return (
@@ -173,20 +189,20 @@ export const AutomatorHistory = () => {
               );
             },
           },
-        ] as ColumnProps<AutomatorTransaction>[],
-      [t, vault],
-    );
+        ] as ColumnProps<AutomatorTransaction>[]
+      ).filter((it) => !it.hide),
+    [props.automator, t, vault?.depositCcy, vault?.positionCcy],
+  );
 
-    return (
-      <Table
-        className={styles['table']}
-        columns={columns}
-        dataSource={data?.list}
-        loading={loading}
-        pagination={false}
-        rowKey={(record) => String(record?.dateTime)}
-        empty={<CEmpty />}
-      />
-    );
-  }
+  return (
+    <Table
+      className={classNames(styles['table'], props.className)}
+      columns={columns}
+      dataSource={data?.list}
+      loading={loading && !data}
+      pagination={false}
+      rowKey={(record) => String(record?.dateTime)}
+      empty={<CEmpty />}
+    />
+  );
 };

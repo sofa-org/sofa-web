@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import { Button, Spin } from '@douyinfe/semi-ui';
+import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionsService } from '@sofa/services/positions';
 import { ProductType, RiskType } from '@sofa/services/products';
+import { joinUrl } from '@sofa/utils/url';
 import { useRequest } from 'ahooks';
 import classNames from 'classnames';
 
@@ -19,26 +22,28 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'WonderfulMoment');
 
-const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
+const List = (props: {
+  riskType?: RiskType;
+  productType?: ProductType;
+  automator?: AutomatorVaultInfo;
+}) => {
   const [t] = useTranslation('WonderfulMoment');
+  const navigate = useNavigate();
   const wallet = useWalletStore();
+  const address = props.automator?.vault || wallet.address;
+
   const { data: positions, loading } = useRequest(
     async () =>
-      !wallet.address
+      !address
         ? undefined
         : PositionsService.wonderful({
             chainId: wallet.chainId,
-            owner: wallet.address,
-            riskType: props.riskType,
-            productType: props.productType,
+            owner: address,
+            riskType: props.automator ? undefined : props.riskType,
+            productType: props.automator ? undefined : props.productType,
           }),
     {
-      refreshDeps: [
-        wallet.chainId,
-        wallet.address,
-        props.riskType,
-        props.productType,
-      ],
+      refreshDeps: [wallet.chainId, address, props.riskType, props.productType],
       onSuccess: (list) => console.info('WonderfulMoment', list),
     },
   );
@@ -46,7 +51,7 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
     <>
       <Spin
         wrapperClassName={styles['list']}
-        spinning={loading || (!positions && !!wallet.address)}
+        spinning={loading || (!positions && !!address)}
       >
         {positions?.map((it) => (
           <WonderfulMomentCard position={it} key={it.id} />
@@ -65,11 +70,15 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
           type="primary"
           className={classNames(styles['btn-bottom'], styles['btn-txt'])}
           onClick={() => {
-            const link = `/positions/orders${window.location.search}`;
-            window.location.href = link;
+            const link = joinUrl(
+              '/positions/orders',
+              window.location.search,
+              `?automator-vault=${!props.automator?.vault ? '' : address}`,
+            );
+            navigate(link);
           }}
         >
-          {t('ALL HISTORY')}
+          {t({ enUS: 'All History', zhCN: '全部历史' })}
         </Button>
         <RuleDescriptions />
       </div>
@@ -77,12 +86,12 @@ const List = (props: { riskType?: RiskType; productType?: ProductType }) => {
   );
 };
 
-const WonderfulMoment = () => {
+const WonderfulMoment = (props: { automator?: AutomatorVaultInfo }) => {
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
   return (
     <div className={styles['list-wrapper']}>
-      <List riskType={riskType} />
+      <List riskType={riskType} {...props} />
     </div>
   );
 };

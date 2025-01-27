@@ -69,17 +69,20 @@ const allMenuItems = (
         label: (t: TFunction) => t('Docs'),
         path: 'https://docs.sofa.org',
         type: 1,
+        target: '_blank',
       },
       {
         label: (t: TFunction) => t({ enUS: 'Blog', zhCN: '博客' }),
         path: 'https://blog.sofa.org/',
         type: 1,
+        target: '_blank',
       },
       {
         label: (t: TFunction) =>
           t({ enUS: 'Ambassador Program', zhCN: '宣传大使项目' }),
         path: 'https://blog.sofa.org/ambassador/',
         type: 1,
+        target: '_blank',
       },
     ],
     location,
@@ -90,32 +93,42 @@ function locationMatches(
   item: MenuItem,
   location: ReturnType<typeof useLocation>,
 ) {
-  let itemPath =
-    (item.path && item.path.replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
-    '';
-  if (!/^\w+:/.test(itemPath)) {
-    if (itemPath) {
-      itemPath = window.location.origin + '/' + itemPath;
-    } else {
-      itemPath = window.location.origin;
-    }
-  }
-  const itemSearch =
-    (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
-  const locationPath = (window.location.origin + location.pathname).replace(
-    /\/+$/g,
-    '',
-  );
-  return !!(
-    itemPath == locationPath &&
-    (!itemSearch || location.search.includes(itemSearch)) &&
-    (itemSearch ||
-      // this is to differentiate:
-      // Automator: /products?project=Automator
-      // Trade - Core Mode: /products
-      !/project=/.test(location.search))
-  );
+  if (!item.path.replace(/^\/+/, '') && location.pathname !== '/') return false;
+  const [, origin = '', path = '', search = '', hash = ''] =
+    item.path.match(/^(https?:\/\/[^/]+)?([^#?]+)?([^#]+)?(.*)?$/) || [];
+
+  if (origin && window.location.origin !== origin) return false;
+  if (!location.pathname.includes(path)) return false;
+  if (search.split(/[?&]/).some((it) => !location.search.includes(it)))
+    return false;
+  return location.hash === hash;
+  // let itemPath =
+  //   (item.path && item.path.replace(/\?.*/, '').replace(/(^\/+|\/+$)/g, '')) ||
+  //   '';
+  // if (!/^\w+:/.test(itemPath)) {
+  //   if (itemPath) {
+  //     itemPath = window.location.origin + '/' + itemPath;
+  //   } else {
+  //     itemPath = window.location.origin;
+  //   }
+  // }
+  // const itemSearch =
+  //   (item.path && /\?/.test(item.path) && item.path.replace(/^.*\?/, '')) || '';
+  // const locationPath = (window.location.origin + location.pathname).replace(
+  //   /\/+$/g,
+  //   '',
+  // );
+  // return !!(
+  //   itemPath == locationPath &&
+  //   (!itemSearch || location.search.includes(itemSearch)) &&
+  //   (itemSearch ||
+  //     // this is to differentiate:
+  //     // Automator: /products?project=Automator
+  //     // Trade - Core Mode: /products
+  //     !/project=/.test(location.search))
+  // );
 }
+
 export function markSelectedMenuItems(
   items: MenuItem[],
   location: ReturnType<typeof useLocation>,
@@ -157,7 +170,7 @@ export function useHeaderOpacity() {
 }
 export const RenderMenu = (it: MenuItem) => {
   const [t] = useTranslation('Header');
-  const [project] = useProjectChange(ProjectType.Surge);
+  const navigate = useNavigate();
   const isMobileUI = useIsMobileUI();
   const { selectedMenuItem, setSelectedMenuItem } = useMobileHeaderState();
   if (it.hide?.()) return <Fragment />;
@@ -178,7 +191,7 @@ export const RenderMenu = (it: MenuItem) => {
   if (!it.children?.length) {
     return (
       <a
-        href={joinUrl(it.path, `?project=${project}`)}
+        href={joinUrl(it.path, location.search)}
         className={classNames(styles['link'], 'link', {
           [styles['active']]: it.active,
           ['active']: it.active,
@@ -204,6 +217,7 @@ export const RenderMenu = (it: MenuItem) => {
   }
   const groups = it.children.reduce(
     (pre, it) => {
+      if (it.hide?.()) return pre;
       const group = String(it.group?.(t));
       if (!pre[group]) pre[group] = [];
       pre[group].push(it);
@@ -243,6 +257,7 @@ export const RenderMenu = (it: MenuItem) => {
           }
         }
       }}
+      clickToHide
       render={
         <Dropdown.Menu className={styles['nav-selector-items']}>
           {Object.entries(groups).map(([group, children], _, arr) => {
@@ -263,7 +278,10 @@ export const RenderMenu = (it: MenuItem) => {
                         },
                       )}
                       onClick={() => {
-                        window.location.href = m.path;
+                        const path = joinUrl(location.search, m.path);
+                        if (path.startsWith('http'))
+                          window.location.href = path;
+                        else navigate(path);
                       }}
                     >
                       <span className="semi-select-option-text">
@@ -348,7 +366,8 @@ export const CommonHeader = (props: {
   const { headerHidden } = useMobileHeaderState();
   const menusForRender = useMemo(
     () => props.menus(project, location),
-    [project, location],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [project, location, props.menus],
   );
 
   const [expanded, setExpanded] = useState(false);
@@ -382,9 +401,10 @@ export const CommonHeader = (props: {
               />
             </div>
 
-            {menusForRender.map((it, i) => (
-              <RenderMenu {...it} key={i} />
-            ))}
+            {menusForRender.map((it, i) => {
+              if (it.hide?.()) return <Fragment key={i} />;
+              return <RenderMenu {...it} key={i} />;
+            })}
           </nav>
           <aside className={styles['right']}>
             <LangSelector className={styles['lang-selector']} />
@@ -413,6 +433,7 @@ export const CommonHeader = (props: {
 };
 
 export const HomeHeader = () => {
+  const location = useLocation();
   const more = useMemo(
     () => /rch|points/.test(location.pathname),
     [location.pathname],

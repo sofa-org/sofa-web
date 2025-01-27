@@ -49,9 +49,11 @@ export const ChainMap: Record<
     bonusAirdropAddress: string;
     feeContractAddress: string;
     automatorFeeContractAddress: string; // 为 Automator 产品准备的 fee contract
+    rchBurnForAutomatorGraphUrl: string; // 为 Automator 产品准备的 fee contract
     hlPriceOracle: Record<'BTC' | 'ETH', string>;
     spotPriceOracle: Record<'BTC' | 'ETH', string>;
     stRCHAddress: string;
+    zRCHAddress: string;
   }
 > = omitBy(
   {
@@ -87,6 +89,8 @@ export const ChainMap: Record<
       bonusAirdropAddress: '0x1e833096089Df3F8E8BF15839683c17Ad7694888',
       feeContractAddress: '0x4140AB4AFc36B93270a9659BD8387660cC6509b5',
       automatorFeeContractAddress: '0x322665298cFa800518D4Ef7919893b59514BA9D1',
+      rchBurnForAutomatorGraphUrl:
+        'https://api.studio.thegraph.com/query/77961/sofa-automator-burner/version/latest',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/ethereum/{address}',
       hlPriceOracle: {
         BTC: '0x088dBBeEC1489c557f8D4fD6146E0590E303d7d9',
@@ -97,6 +101,7 @@ export const ChainMap: Record<
         ETH: '0x6417084B8Df644e1d7E32BE39B54F3a5BbEA645B',
       },
       stRCHAddress: '0x2B9aeA129B85F51A468274e7271434A83c3BB6b4',
+      zRCHAddress: '0x893B33977395642039de1b04A0cC788b4AF0bA08',
     },
     42161: {
       chainId: 42161,
@@ -128,6 +133,7 @@ export const ChainMap: Record<
       bonusAirdropAddress: '', // 只有 defaultChain 有
       feeContractAddress: '0x4Bd6bE959897631fbE5a8Aae01707219850e032f',
       automatorFeeContractAddress: '0xE2000D4631793BADe4cbA1b4f1B947C46Cf871a4',
+      rchBurnForAutomatorGraphUrl: '',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/arbitrum/{address}',
       hlPriceOracle: {
         BTC: '0x40144BC227f78A288FE9Ae6F4C7389C92C5aD9CF',
@@ -138,6 +144,7 @@ export const ChainMap: Record<
         ETH: '0xab08fF5dd91636fE556f692825Cadd7bA04A4c97',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     56: {
       chainId: 56,
@@ -169,6 +176,7 @@ export const ChainMap: Record<
       bonusAirdropAddress: '', // 只有 defaultChain 有
       feeContractAddress: '0xEC722a53Efee08ebFF8d2C61622991a33705fA79',
       automatorFeeContractAddress: '', // TODO
+      rchBurnForAutomatorGraphUrl: '',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/bnb/{address}',
       // TODO
       hlPriceOracle: {
@@ -180,6 +188,7 @@ export const ChainMap: Record<
         ETH: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     137: {
       chainId: 137,
@@ -212,6 +221,7 @@ export const ChainMap: Record<
       bonusAirdropAddress: '', // 只有 defaultChain 有
       feeContractAddress: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
       automatorFeeContractAddress: '', // TODO
+      rchBurnForAutomatorGraphUrl: '',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/polygon/{address}',
       // TODO
       hlPriceOracle: {
@@ -223,6 +233,7 @@ export const ChainMap: Record<
         ETH: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     11155111: {
       chainId: 11155111,
@@ -257,6 +268,8 @@ export const ChainMap: Record<
         'https://app.uniswap.org/swap?outputCurrency=0x703B35895b13E1b5CD4A62fd1a2B31783d37ce01&chain=sepolia',
       feeContractAddress: '0x1B487bC2F326F08397b0e6c5E861632B1515a118',
       automatorFeeContractAddress: '0xA0C1921F1c65d18E1Ef92C351183C6b3a6c46621',
+      rchBurnForAutomatorGraphUrl:
+        'https://api.studio.thegraph.com/query/62216/automator-burner-sepolia/version/latest',
       hlPriceOracle: {
         BTC: '0x3DD6A9d9bcB17Da01590b83577B4C7D27574F17C',
         ETH: '0x3D9a5ffBd25b17fA6CB34118Dbf9CEaAf18f261f',
@@ -266,6 +279,7 @@ export const ChainMap: Record<
         ETH: '0x8Daeb7DcB6a1103b7a601017a479B0e5D10402af',
       },
       stRCHAddress: '0x2845aD1636F2273687850108581E8Cf321AAbD6d',
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     421614: {
       chainId: 421614,
@@ -273,7 +287,7 @@ export const ChainMap: Record<
       name: 'Arbitrum Sepolia',
       currency: 'ETH',
       icon: IconSepoliaArb,
-      explorerUrl: 'https://sepolia.arbitrum.io',
+      explorerUrl: 'https://sepolia.arbiscan.io',
       rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
       rpcUrlsForAddNetwork: [
         'https://sepolia-rollup.arbitrum.io/rpc',
@@ -299,6 +313,7 @@ export const ChainMap: Record<
         'https://app.uniswap.org/swap?outputCurrency=0x703B35895b13E1b5CD4A62fd1a2B31783d37ce01&chain=sepolia',
       feeContractAddress: '0xB6D81aFC1033ad8B509438efcd3623005f05F4A0',
       automatorFeeContractAddress: '0xB6D81aFC1033ad8B509438efcd3623005f05F4A0',
+      rchBurnForAutomatorGraphUrl: '',
       hlPriceOracle: {
         BTC: '0x56a43EB56Da12C0dc1D972ACb089c06a5dEF8e69',
         ETH: '0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165',
@@ -308,6 +323,7 @@ export const ChainMap: Record<
         ETH: '0x097CF0BaC8EeB369e2dbCcf72bCb9e54bC7F5f09',
       },
       stRCHAddress: '',
+      zRCHAddress: '', // 只有 defaultChain 有
     },
   },
   (val) => (Env.isDaily ? !val.isTest : val.isTest),

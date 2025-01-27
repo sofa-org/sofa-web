@@ -1,0 +1,34 @@
+@import "../../../../history/automator/index.module";
+
+.table {
+  margin: 0;
+
+  :global {
+    .address {
+      justify-content: flex-start;
+      width: auto;
+      padding: 0;
+    }
+  }
+}
+
+.unit {
+  padding-left: 4px;
+}
+
+.separator {
+  padding: 0 6px;
+
+  &:first-child {
+    padding-left: 0;
+  }
+}
+
+.icon-airdrop {
+  padding-right: 1em;
+  background: url("../../../../positions/automator/assets/icon-airdrop.svg")
+    no-repeat;
+  background-position: 100% 34%;
+  background-size: 0.9em 0.9em;
+  display: inline-block;
+}
