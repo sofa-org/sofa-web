@@ -194,18 +194,18 @@ export class AutomatorUserService {
     const [shareDecimals, sharesWithDecimals, pricePerShare] =
       await Promise.all([
         Automator.decimals().then((res) => Number(res)),
-        Automator.balanceOf(signer.address).then((res) => Number(res)),
+        Automator.balanceOf(signer.address).then((res) => String(res)),
         Automator.getPricePerShare().then(
           (res) => +ethers.formatUnits(res, 18),
         ),
       ]);
-    const shares = sharesWithDecimals / 10 ** shareDecimals;
+    const shares = ethers.formatUnits(sharesWithDecimals, shareDecimals);
     return {
       shareDecimals,
       sharesWithDecimals,
       shares,
       pricePerShare,
-      amount: +(shares * pricePerShare).toFixed(6),
+      amount: +(+shares * pricePerShare).toFixed(6),
     };
   }
 
@@ -316,7 +316,7 @@ export class AutomatorUserService {
     );
     return Automator.getRedemption().then((res) => {
       return {
-        pendingSharesWithDecimals: Number(res[0]),
+        pendingSharesWithDecimals: String(res[0]),
         createTime: Number(res[1]),
       };
     });

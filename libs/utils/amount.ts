@@ -90,28 +90,26 @@ export function roundWith<T extends number | string | undefined>(
   minSize = tickSize,
   maxSize?: number | string,
   roundType: 'default' | 'upper' | 'lower' = 'default',
-): T extends number | undefined
-  ? number | undefined
-  : number | string | undefined {
-  if (isNullLike(num) || !isLegalNum(num)) return num as number | undefined;
+): string | undefined {
+  if (isNullLike(num) || !isLegalNum(num)) return undefined;
   if (Number(num) < Number(minSize)) {
-    return roundWith(minSize, tickSize, minSize, maxSize, 'upper') as number;
+    return roundWith(minSize, tickSize, minSize, maxSize, 'upper') as string;
   }
   if (!isNullLike(maxSize) && Number(num) > Number(maxSize)) {
-    return roundWith(maxSize, tickSize, minSize, maxSize, 'lower') as number;
+    return roundWith(maxSize, tickSize, minSize, maxSize, 'lower') as string;
   }
 
-  if (!tickSize) return num as number | undefined;
-
-  if (!isLegalNum(tickSize)) return num as number | undefined;
+  if (!tickSize || !isLegalNum(tickSize)) return String(num);
 
   const remainder = Big(num).mod(tickSize);
-  if (remainder.toNumber() === 0) return Number(num);
+  if (remainder.toNumber() === 0) return String(num);
   const half = Big(tickSize).div(2);
   if (roundType === 'upper' || (roundType !== 'lower' && remainder.gte(half))) {
-    return Big(num).minus(remainder).plus(tickSize).toNumber();
+    console.log(11112, Big(num).minus(remainder).plus(tickSize).toString());
+    return Big(num).minus(remainder).plus(tickSize).toString();
   }
-  return Big(num).minus(remainder).toNumber();
+  console.log(111121, Big(num).minus(remainder).plus(tickSize).toString());
+  return Big(num).minus(remainder).toString();
 }
 
 export function displayPercentage(
