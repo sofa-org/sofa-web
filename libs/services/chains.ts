@@ -53,6 +53,7 @@ export const ChainMap: Record<
     hlPriceOracle: Record<'BTC' | 'ETH', string>;
     spotPriceOracle: Record<'BTC' | 'ETH', string>;
     stRCHAddress: string;
+    zRCHAddress: string;
   }
 > = omitBy(
   {
@@ -100,6 +101,7 @@ export const ChainMap: Record<
         ETH: '0x6417084B8Df644e1d7E32BE39B54F3a5BbEA645B',
       },
       stRCHAddress: '0x2B9aeA129B85F51A468274e7271434A83c3BB6b4',
+      zRCHAddress: '0x893B33977395642039de1b04A0cC788b4AF0bA08',
     },
     42161: {
       chainId: 42161,
@@ -142,6 +144,7 @@ export const ChainMap: Record<
         ETH: '0xab08fF5dd91636fE556f692825Cadd7bA04A4c97',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     56: {
       chainId: 56,
@@ -185,6 +188,7 @@ export const ChainMap: Record<
         ETH: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     137: {
       chainId: 137,
@@ -229,6 +233,7 @@ export const ChainMap: Record<
         ETH: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     11155111: {
       chainId: 11155111,
@@ -274,6 +279,7 @@ export const ChainMap: Record<
         ETH: '0x8Daeb7DcB6a1103b7a601017a479B0e5D10402af',
       },
       stRCHAddress: '0x2845aD1636F2273687850108581E8Cf321AAbD6d',
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     421614: {
       chainId: 421614,
@@ -317,6 +323,7 @@ export const ChainMap: Record<
         ETH: '0x097CF0BaC8EeB369e2dbCcf72bCb9e54bC7F5f09',
       },
       stRCHAddress: '',
+      zRCHAddress: '', // 只有 defaultChain 有
     },
   },
   (val) => (Env.isDaily ? !val.isTest : val.isTest),

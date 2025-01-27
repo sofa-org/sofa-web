@@ -5,8 +5,11 @@ import { jsonSafeParse } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
+import Big from 'big.js';
 import { Contract, formatUnits } from 'ethers';
 
+import stRCHAbis from './abis/StRCH.json';
+import zRCHAbis from './abis/ZenRCH.json';
 import { defaultChain } from './chains';
 import { ContractsService, RiskType, VaultInfo } from './contracts';
 import { ApyDefinition } from './products';
@@ -181,6 +184,7 @@ export class MarketService {
   static fetchIndexPx<T extends CCY>(): Promise<Record<T | USDS, number>> {
     return Promise.all([
       MarketService.getPPSOfScrv().catch(() => 1),
+      MarketService.getPPSOfZRCH().catch(() => 1),
       MarketService.$fetchIndexPx(),
       MarketService.getRchPriceInUsd().then((price) => ({ RCH: price })),
       MarketService.fetchPxFromCoinGecko('crvUSD')
@@ -192,12 +196,13 @@ export class MarketService {
       MarketService.fetchPxFromCoinGecko('USDC')
         .catch(() => 1)
         .then((price) => ({ USDC: price })),
-    ]).then(([scrvPPS, ...prices]) => {
+    ]).then(([scrvPPS, zrchPPS, ...prices]) => {
       const obj = prices.reduce(
         (pre, it) => Object.assign(pre, it),
         {} as Record<string, number>,
       );
-      obj.scrvUSD = obj.crvUSD * scrvPPS;
+      obj.scrvUSD = obj.crvUSD * +scrvPPS;
+      obj.zRCH = obj.RCH * +zrchPPS;
       if ('ETH' in obj) {
         obj.WETH = obj.ETH;
         obj.stETH = obj.ETH;
@@ -322,6 +327,29 @@ export class MarketService {
     const contractAddress = '0x0655977FEb2f289A4aB78af67BAB0d17aAb84367';
     const abi = ['function pricePerShare() public view returns (uint256)'];
     const contract = new Contract(contractAddress, abi, provider);
-    return +formatUnits(await contract.pricePerShare(), 18);
+    return formatUnits(await contract.pricePerShare(), 18);
+  }
+
+  private static async getPPSOfZRCH() {
+    if (!defaultChain.zRCHAddress) return 1;
+    const provider = await WalletConnect.getProvider(defaultChain.chainId);
+    const zRCHContract = new Contract(
+      defaultChain.zRCHAddress,
+      zRCHAbis,
+      provider,
+    );
+    const stRCHContract = new Contract(
+      defaultChain.stRCHAddress,
+      stRCHAbis,
+      provider,
+    );
+    const [zRCHTotalSupply, balanceOfStRCH] = await Promise.all([
+      zRCHContract.totalSupply().then((res) => String(res)),
+      stRCHContract
+        .balanceOf(defaultChain.zRCHAddress)
+        .then((res) => String(res)),
+    ]);
+    if (!+zRCHTotalSupply) return 1;
+    return Big(balanceOfStRCH).div(zRCHTotalSupply).toString();
   }
 }
