@@ -105,10 +105,8 @@ export function roundWith<T extends number | string | undefined>(
   if (remainder.toNumber() === 0) return String(num);
   const half = Big(tickSize).div(2);
   if (roundType === 'upper' || (roundType !== 'lower' && remainder.gte(half))) {
-    console.log(11112, Big(num).minus(remainder).plus(tickSize).toString());
     return Big(num).minus(remainder).plus(tickSize).toString();
   }
-  console.log(111121, Big(num).minus(remainder).plus(tickSize).toString());
   return Big(num).minus(remainder).toString();
 }
 

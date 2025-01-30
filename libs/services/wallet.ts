@@ -116,7 +116,8 @@ export class WalletService {
       [CommonAbis.symbol],
       provider,
     );
-    const symbol = await collateralContract.symbol();
+    const $symbol = await collateralContract.symbol();
+    const symbol = $symbol === 'USD₮0' ? 'USDT' : $symbol;
     return { symbol, address };
   }
 
@@ -681,7 +682,7 @@ export class WalletService {
       await tokenContract.balanceOf(address),
       decimal,
     );
-    return { [symbol]: Number(balance) };
+    return { [symbol === 'USD₮0' ? 'USDT' : symbol]: Number(balance) };
   }
 
   private static web3NameInstance: ReturnType<typeof createWeb3Name>;
