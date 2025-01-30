@@ -117,7 +117,9 @@ export const CCYSelector = (
 };
 
 export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
+  const [project] = useProjectChange();
   const [productType] = useProductSelect();
+  const [riskType] = useRiskSelect(project);
   const chainId = useWalletStore((state) => state.chainId);
   const [ccy, setCcy] = useDepositCcySelect();
   const [t] = useTranslation();
@@ -128,6 +130,7 @@ export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
           (it) =>
             it.chainId === chainId &&
             it.productType === productType &&
+            it.riskType === riskType &&
             !it.tradeDisable,
         ),
         (it) => it.depositCcy,
