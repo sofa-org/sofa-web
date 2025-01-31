@@ -1,4 +1,4 @@
-import { applyMock, asyncCache } from '@sofa/utils/decorators';
+import { applyMock, asyncCache, asyncShare } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
@@ -253,6 +253,13 @@ export class AutomatorService {
       .then((res) => res.value.map(AutomatorService.cvtAutomatorInfo));
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   static async info({ chainId, vault }: AutomatorVaultInfo) {
     return http
       .get<unknown, HttpResponse<OriginAutomatorDetail>>(`/automator/info`, {
@@ -270,6 +277,13 @@ export class AutomatorService {
     );
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   static async performance({ chainId, vault }: AutomatorVaultInfo) {
     return http.get<unknown, HttpResponse<AutomatorPerformance[]>>(
       `/automator/performance`,
@@ -279,6 +293,13 @@ export class AutomatorService {
     );
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   static async transactions(
     { chainId, vault }: AutomatorVaultInfo,
     params: Omit<AutomatorTransactionsParams, 'wallet'>,
@@ -305,6 +326,13 @@ export class AutomatorService {
     };
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   @applyMock('automatorFollowers')
   static async followers(vault: AutomatorVaultInfo, params: PageParams) {
     const pageSize = params.limit || 40;

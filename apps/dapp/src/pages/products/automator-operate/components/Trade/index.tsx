@@ -24,7 +24,6 @@ import { useAutomatorStore } from '@/pages/products/automator/store';
 import { useGlobalState } from '@/store';
 
 import { useProductsState } from '../../../automator-store';
-import { useTicketType } from '../../../components/TicketTypeSelector';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 import CustomTickets from '../CustomTickets';
 import InvestButton from '../InvestButton';
