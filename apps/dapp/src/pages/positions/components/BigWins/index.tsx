@@ -84,6 +84,12 @@ const BigWins = () => {
             const ticketMeta = ProductsService.TicketTypeOptions.find(
               ($it) => $it.value === it.product.vault.depositCcy,
             )!;
+            console.log(
+              1111,
+              ProductsService.TicketTypeOptions,
+              ticketMeta,
+              it.product.vault,
+            );
             const count = +it.amounts.own / ticketMeta.per;
             return (
               <span className={styles['earning']}>

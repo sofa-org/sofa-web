@@ -190,6 +190,7 @@ export class PositionsService {
       concealed?: boolean;
       positiveReturn?: boolean;
       positiveProfit?: boolean;
+      onlyForAutomator?: boolean;
     },
     extra?: PageParams<'cursor', 'createdAt' | 'return'>,
   ): Promise<PageResult<PositionInfo, { hasMore: boolean }, 'cursor'>> {
@@ -606,6 +607,7 @@ export class PositionsService {
         riskType: RiskType.RISKY,
         chainId: params.chainId,
         productType: params.productType,
+        onlyForAutomator: false,
       },
       { ...pageParams },
     ).then((res) => res.list.filter((it) => !it.claimParams.maker));
@@ -622,6 +624,7 @@ export class PositionsService {
         riskType: RiskType.RISKY,
         chainId: params.chainId,
         positiveReturn: true,
+        onlyForAutomator: false,
       },
       { ...pageParams, orderBy: 'return' },
     ).then((res) => res.list.filter((it) => !it.claimParams.maker));
