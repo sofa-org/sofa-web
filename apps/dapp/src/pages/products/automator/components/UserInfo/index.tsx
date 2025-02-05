@@ -32,15 +32,16 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
         ]
       : undefined,
   );
-  const desc = useAutomatorStore(
-    (state) =>
+  const desc = useAutomatorStore((state) => {
+    const str =
       (props.vault &&
         address &&
         state.vaultOverviews[
           `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-`
         ]?.vaultInfo.desc) ||
-      props.vault?.desc,
-  );
+      props.vault?.desc;
+    return str?.replace(/\n|\r/g, '<br/>');
+  });
   useEffect(() => {
     if (props.vault && address)
       return useAutomatorStore.subscribeUserInfo(props.vault, address);

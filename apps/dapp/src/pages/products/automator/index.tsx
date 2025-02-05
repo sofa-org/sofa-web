@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Tabs } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
-import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';

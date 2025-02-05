@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIsMobileUI } from '@/components/MobileOnly';
+import { MsgDisplay } from '@/components/MsgDisplay';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
@@ -45,7 +46,9 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
       <div className={styles['header']}>
         <img src={depositCcyConfig?.icon} alt="" />
         <div className={styles['name']}>
-          {props.info.vaultInfo.name || props.info.vaultInfo.depositCcy}
+          <MsgDisplay expandDisabled>
+            {props.info.vaultInfo.name || props.info.vaultInfo.depositCcy}
+          </MsgDisplay>
         </div>
         <Address
           address={props.info.vaultInfo.vault.toLowerCase()}
