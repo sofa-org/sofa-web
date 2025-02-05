@@ -1,14 +1,14 @@
 .semi-table-wrapper {
-  background: #fff;
+  // background: #fff;
 
-  .semi-table-body tr:nth-child(2n + 1) {
-    background-color: #f5f5f5;
+  // .semi-table-body tr:nth-child(2n + 1) {
+  //   background-color: #f5f5f5;
 
-    .semi-table-cell-fixed-left-first,
-    .semi-table-cell-fixed-right-first {
-      background-color: #f5f5f5;
-    }
-  }
+  //   .semi-table-cell-fixed-left-first,
+  //   .semi-table-cell-fixed-right-first {
+  //     background-color: #f5f5f5;
+  //   }
+  // }
 
   .semi-table-thead > .semi-table-row > .semi-table-row-head,
   .semi-table-tbody > .semi-table-row > .semi-table-row-cell {

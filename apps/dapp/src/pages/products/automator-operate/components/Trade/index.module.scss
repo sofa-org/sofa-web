@@ -1,7 +1,4 @@
 .btn-deposit-1.btn-deposit-1 {
-  position: absolute;
-  right: 12px;
-  top: 0;
   min-width: 96px;
   padding: 0 min(24px, 3.2vw);
   height: 32px;
@@ -35,8 +32,7 @@
 
 .content {
   @include flex-center;
-
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   position: relative;
@@ -44,7 +40,11 @@
   margin: min(20px, 2vw);
 
   > div:first-child {
-    flex: 3;
+    @include flex-center;
+    // flex: 3;
+    // max-width: 340px;
+    padding-right: 12px;
+    border-right: 0.5px solid rgba($color: #000, $alpha: 10%);
   }
 
   .kline {
@@ -58,6 +58,14 @@
   :global(#kline-2) {
     width: 100%;
     max-height: calc(100vh - 48px - 80px - 40px);
+  }
+
+  .right {
+    @include flex-center;
+
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 }
 
@@ -91,7 +99,7 @@
 }
 
 .amount {
-  flex: 1;
+  // flex: 1;
   padding: 12px;
   line-height: 14px;
   color: rgba(#000, 0.65);
@@ -191,11 +199,6 @@
       padding-bottom: 0;
       padding-top: 0;
       position: relative;
-
-      &:first-child {
-        max-width: 340px;
-        border-right: 0.5px solid rgba($color: #000, $alpha: 10%);
-      }
 
       .unit {
         font-size: 12px;

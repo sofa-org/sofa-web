@@ -111,7 +111,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           </span>
           <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
-            <AmountDisplay amount={props.info.rchTotalPnl} />
+            <AmountDisplay amount={props.info.totalRchAmount} />
             <span
               className={classNames(styles['unit'], styles['icon-airdrop'])}
             >

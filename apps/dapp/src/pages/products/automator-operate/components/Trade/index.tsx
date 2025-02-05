@@ -211,240 +211,105 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
     <>
       <div className={classNames(styles['form'], styles['header'])}>
         <div className={styles['content']}>
-          <div className={styles['amount']}>
-            <span className={styles['label']}>
-              {t({
-                enUS: 'Available Balance (Total)',
-                zhCN: '可用余额 (总计)',
-              })}
-            </span>
-            <span className={styles['value']}>
-              {automator ? (
-                <>
-                  <span className={styles['digi']}>
-                    {amountFormatter(
-                      automator.availableAmountByVaultDepositCcy,
-                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                        ?.precision || undefined,
-                    )}
-                  </span>
+          <div className={styles['left']}>
+            <div className={styles['amount']}>
+              <span className={styles['label']}>
+                {t({
+                  enUS: 'Available Balance (Total)',
+                  zhCN: '可用余额 (总计)',
+                })}
+              </span>
+              <span className={styles['value']}>
+                {automator ? (
+                  <>
+                    <span className={styles['digi']}>
+                      {amountFormatter(
+                        automator.availableAmountByVaultDepositCcy,
+                        CCYService.ccyConfigs[
+                          automator.vaultInfo.vaultDepositCcy
+                        ]?.precision || undefined,
+                      )}
+                    </span>
 
-                  <span className={styles['unit']}>
-                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                      ?.name || automator.vaultInfo.vaultDepositCcy}
-                  </span>
-                </>
-              ) : (
-                '-'
-              )}
-              <AsyncButton
-                className={styles['btn-deposit-1']}
-                onClick={() =>
-                  automator &&
-                  modalController.open(automator.vaultInfo, 'deposit')
-                }
-              >
-                {t({ enUS: 'Deposit', zhCN: '铸造' })}
-              </AsyncButton>
-            </span>
+                    <span className={styles['unit']}>
+                      {CCYService.ccyConfigs[
+                        automator.vaultInfo.vaultDepositCcy
+                      ]?.name || automator.vaultInfo.vaultDepositCcy}
+                    </span>
+                  </>
+                ) : (
+                  '-'
+                )}
+              </span>
+            </div>
+            <AsyncButton
+              className={styles['btn-deposit-1']}
+              onClick={() =>
+                automator &&
+                modalController.open(automator.vaultInfo, 'deposit')
+              }
+            >
+              {t({ enUS: 'Deposit', zhCN: '铸造' })}
+            </AsyncButton>
           </div>
-          <div className={styles['amount']}>
-            <span className={styles['label']}>
-              {t({
-                enUS: 'Available Balance (Use Interest-Only)',
-                zhCN: '可用余额 (只用利息交易)',
-              })}
-            </span>
-            <span className={styles['value']}>
-              {automator ? (
-                <>
-                  <span className={styles['digi']}>
-                    {amountFormatter(
-                      automator.pastAvailableBalanceExcludingPrincipal,
-                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                        ?.precision || undefined,
-                    )}
-                  </span>
+          <div className={styles['right']}>
+            <div className={styles['amount']}>
+              <span className={styles['label']}>
+                {t({
+                  enUS: 'Available Balance (Use Interest-Only)',
+                  zhCN: '可用余额 (只用利息交易)',
+                })}
+              </span>
+              <span className={styles['value']}>
+                {automator ? (
+                  <>
+                    <span className={styles['digi']}>
+                      {amountFormatter(
+                        automator.pastAvailableBalanceExcludingPrincipal,
+                        CCYService.ccyConfigs[
+                          automator.vaultInfo.vaultDepositCcy
+                        ]?.precision || undefined,
+                      )}
+                    </span>
 
-                  <span className={styles['unit']}>
-                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                      ?.name || automator.vaultInfo.vaultDepositCcy}
-                  </span>
+                    <span className={styles['unit']}>
+                      {CCYService.ccyConfigs[
+                        automator.vaultInfo.vaultDepositCcy
+                      ]?.name || automator.vaultInfo.vaultDepositCcy}
+                    </span>
 
-                  <Tooltip
-                    className={styles['automator-number-tooltip']}
-                    content={
-                      <div className={styles['automator-details']}>
-                        <div
-                          className={styles['desc']}
-                          dangerouslySetInnerHTML={{
-                            __html: t({
-                              enUS: 'This shows the balance made up of the interest earned by your Automator and net PnL from trading, excluding the principal. It is the amount available for trading without affecting your initial investment.',
-                              zhCN: '这里显示的是您的Automator赚取的利息和交易净PnL组成的余额，不包括本金。这是不会让您初始本金受损的可用余额。',
-                            }).replace(/\n/g, '<br />'),
-                          }}
-                        />
-                        <div className={styles['amount']}>
-                          <span
-                            className={styles['label']}
+                    <Tooltip
+                      className={styles['automator-number-tooltip']}
+                      content={
+                        <div className={styles['automator-details']}>
+                          <div
+                            className={styles['desc']}
                             dangerouslySetInnerHTML={{
                               __html: t({
-                                enUS: 'Historical Interest Earned & Net PnL\n(without RCH)',
-                                zhCN: '历史已赚取利息 & 净利润\n（不包括RCH）',
+                                enUS: 'This shows the balance made up of the interest earned by your Automator and net PnL from trading, excluding the principal. It is the amount available for trading without affecting your initial investment.',
+                                zhCN: '这里显示的是您的Automator赚取的利息和交易净PnL组成的余额，不包括本金。这是不会让您初始本金受损的可用余额。',
                               }).replace(/\n/g, '<br />'),
                             }}
                           />
-                          <span className={styles['desc']}>
-                            {t({
-                              enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
-                              zhCN: '通过Aave/Lido/Sofa/Curve的累积收益',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            {amountFormatter(
-                              automator.historicalInterestPlusNetPnL,
-                              CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.precision || undefined,
-                            )}
-                            <span className={styles['unit']}>
-                              {CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.name || automator.vaultInfo.vaultDepositCcy}
+                          <div className={styles['amount']}>
+                            <span
+                              className={styles['label']}
+                              dangerouslySetInnerHTML={{
+                                __html: t({
+                                  enUS: 'Historical Interest Earned & Net PnL\n(without RCH)',
+                                  zhCN: '历史已赚取利息 & 净利润\n（不包括RCH）',
+                                }).replace(/\n/g, '<br />'),
+                              }}
+                            />
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
+                                zhCN: '通过Aave/Lido/Sofa/Curve的累积收益',
+                              })}
                             </span>
-                          </span>
-                        </div>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({ enUS: 'Current Position', zhCN: '当前头寸' })}
-                          </span>
-                          <span className={styles['desc']}>
-                            {t({
-                              enUS: 'Value of open & Unclaimed positions.',
-                              zhCN: '未平仓及未认领头寸的价值。',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            {amountFormatter(
-                              automator.lockedByUnclaimedPosition,
-                              CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.precision || undefined,
-                            )}
-                            <span className={styles['unit']}>
-                              {CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.name || automator.vaultInfo.vaultDepositCcy}
-                            </span>
-                          </span>
-                        </div>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({
-                              enUS: 'Available Balance (Use Interest-Only)',
-                              zhCN: '可用余额 (只用利息交易)',
-                            })}
-                          </span>
-                          <span className={styles['desc']}>
-                            {t({
-                              enUS: 'Historical Interest Earned + Net PnL - Current Position.',
-                              zhCN: '历史已赚取利息 + 净利润 - 当前头寸。',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            {amountFormatter(
-                              automator.pastAvailableBalanceExcludingPrincipal,
-                              CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.precision || undefined,
-                            )}
-                            <span className={styles['unit']}>
-                              {CCYService.ccyConfigs[
-                                automator.vaultInfo.vaultDepositCcy
-                              ]?.name || automator.vaultInfo.vaultDepositCcy}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    }
-                  >
-                    <IconDetail className={styles['icon-detail']} />
-                  </Tooltip>
-                </>
-              ) : (
-                '-'
-              )}
-            </span>
-          </div>
-
-          <div className={styles['amount']} style={{ flex: 0 }}>
-            <span className={styles['label']}>&nbsp;</span>
-            <span className={styles['value']}>+</span>
-          </div>
-          <div className={styles['amount']}>
-            <span className={styles['label']}>
-              {t({ enUS: 'Estimated 7-Day Interest', zhCN: '预估7天利息' })}
-            </span>
-            <span className={styles['value']}>
-              {automator && apy ? (
-                <>
-                  {interest.byVaultDepositCcy !== interest.byDepositCcy && (
-                    <>
-                      <span className={styles['digi']}>
-                        {amountFormatter(
-                          interest.byVaultDepositCcy,
-                          CCYService.ccyConfigs[
-                            automator.vaultInfo.vaultDepositCcy
-                          ]?.precision || undefined,
-                        )}
-                      </span>
-                      <span className={styles['unit']}>
-                        {CCYService.ccyConfigs[
-                          automator.vaultInfo.vaultDepositCcy
-                        ]?.name || automator.vaultInfo.vaultDepositCcy}
-                      </span>
-                      <span className={styles['separator']}>≈</span>
-                    </>
-                  )}
-                  <span className={styles['digi']}>
-                    {amountFormatter(
-                      interest.byVaultDepositCcy,
-                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                        ?.precision || undefined,
-                    )}
-                  </span>
-                  <span className={styles['unit']}>
-                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                      ?.name || automator.vaultInfo.vaultDepositCcy}
-                  </span>
-
-                  <Tooltip
-                    className={styles['automator-number-tooltip']}
-                    content={
-                      <div>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({ enUS: 'Pool Size', zhCN: '池子大小' })}
-                          </span>
-                          {!InterestTypeRefs[automator.vaultInfo.interestType!]
-                            .isRebase ? (
                             <span className={styles['value']}>
                               {amountFormatter(
-                                automator.aumByClientDepositCcy,
-                                CCYService.ccyConfigs[
-                                  automator.vaultInfo.depositCcy
-                                ]?.precision || undefined,
-                              )}
-                              <span className={styles['unit']}>
-                                {CCYService.ccyConfigs[
-                                  automator.vaultInfo.depositCcy
-                                ]?.name || automator.vaultInfo.depositCcy}
-                              </span>
-                            </span>
-                          ) : (
-                            <span className={styles['value']}>
-                              {amountFormatter(
-                                automator.aumByVaultDepositCcy,
+                                automator.historicalInterestPlusNetPnL,
                                 CCYService.ccyConfigs[
                                   automator.vaultInfo.vaultDepositCcy
                                 ]?.precision || undefined,
@@ -455,82 +320,235 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                                 ]?.name || automator.vaultInfo.vaultDepositCcy}
                               </span>
                             </span>
-                          )}
+                          </div>
+                          <div className={styles['amount']}>
+                            <span className={styles['label']}>
+                              {t({
+                                enUS: 'Current Position',
+                                zhCN: '当前头寸',
+                              })}
+                            </span>
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: 'Value of open & Unclaimed positions.',
+                                zhCN: '未平仓及未认领头寸的价值。',
+                              })}
+                            </span>
+                            <span className={styles['value']}>
+                              {amountFormatter(
+                                automator.lockedByUnclaimedPosition,
+                                CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.precision || undefined,
+                              )}
+                              <span className={styles['unit']}>
+                                {CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.name || automator.vaultInfo.vaultDepositCcy}
+                              </span>
+                            </span>
+                          </div>
+                          <div className={styles['amount']}>
+                            <span className={styles['label']}>
+                              {t({
+                                enUS: 'Available Balance (Use Interest-Only)',
+                                zhCN: '可用余额 (只用利息交易)',
+                              })}
+                            </span>
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: 'Historical Interest Earned + Net PnL - Current Position.',
+                                zhCN: '历史已赚取利息 + 净利润 - 当前头寸。',
+                              })}
+                            </span>
+                            <span className={styles['value']}>
+                              {amountFormatter(
+                                automator.pastAvailableBalanceExcludingPrincipal,
+                                CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.precision || undefined,
+                              )}
+                              <span className={styles['unit']}>
+                                {CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.name || automator.vaultInfo.vaultDepositCcy}
+                              </span>
+                            </span>
+                          </div>
                         </div>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({
-                              enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
-                              zhCN: '预估Aave/Lido/Sofa/Curve收益',
-                            })}
-                          </span>
-                          <span className={styles['desc']}>
-                            {t({
-                              enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
-                              zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve年化)。 （Aave/Lido/Sofa/Curve年化）',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            {amountFormatter(apy.apyUsed, 2)}%
-                          </span>
-                        </div>
-                        <div className={styles['amount']}>
-                          <span className={styles['label']}>
-                            {t({
-                              enUS: 'Estimated Aave/Lido/Sofa/Curve Interest',
-                              zhCN: '预估Aave/Lido/Sofa/Curve利息',
-                            })}
-                          </span>
-                          <span className={styles['desc']}>
-                            {t({
-                              enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Pool Size)',
-                              zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve年化预估) ^ (期限 / 365) - 池子大小）',
-                            })}
-                          </span>
-                          <span className={styles['value']}>
-                            {amountFormatter(
-                              interest.byVaultDepositCcy,
-                              CCYService.ccyConfigs[
-                                automator.vaultInfo.positionCcy
-                              ]?.precision || undefined,
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    }
-                  >
-                    <IconDetail className={styles['icon-detail']} />
-                  </Tooltip>
-                </>
-              ) : (
-                '-'
-              )}
-            </span>
-          </div>
-          <div className={styles['amount']}>
-            <span className={styles['label']}>&nbsp;</span>
-            <span className={styles['value']}>
-              {automator ? (
-                <>
-                  <span className={styles['digi']}>
-                    =&nbsp;
-                    {amountFormatter(
-                      Number(automator.pastAvailableBalanceExcludingPrincipal) +
-                        interest.byVaultDepositCcy,
-                      CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                        ?.precision || undefined,
-                    )}
-                  </span>
+                      }
+                    >
+                      <IconDetail className={styles['icon-detail']} />
+                    </Tooltip>
+                  </>
+                ) : (
+                  '-'
+                )}
+              </span>
+            </div>
 
-                  <span className={styles['unit']}>
-                    {CCYService.ccyConfigs[automator.vaultInfo.vaultDepositCcy]
-                      ?.name || automator.vaultInfo.vaultDepositCcy}
-                  </span>
-                </>
-              ) : (
-                '-'
-              )}
-            </span>
+            <div className={styles['amount']} style={{ flex: 0 }}>
+              <span className={styles['label']}>&nbsp;</span>
+              <span className={styles['value']}>+</span>
+            </div>
+            <div className={styles['amount']}>
+              <span className={styles['label']}>
+                {t({ enUS: 'Estimated 7-Day Interest', zhCN: '预估7天利息' })}
+              </span>
+              <span className={styles['value']}>
+                {automator && apy ? (
+                  <>
+                    {interest.byVaultDepositCcy !== interest.byDepositCcy && (
+                      <>
+                        <span className={styles['digi']}>
+                          {amountFormatter(
+                            interest.byVaultDepositCcy,
+                            CCYService.ccyConfigs[
+                              automator.vaultInfo.vaultDepositCcy
+                            ]?.precision || undefined,
+                          )}
+                        </span>
+                        <span className={styles['unit']}>
+                          {CCYService.ccyConfigs[
+                            automator.vaultInfo.vaultDepositCcy
+                          ]?.name || automator.vaultInfo.vaultDepositCcy}
+                        </span>
+                        <span className={styles['separator']}>≈</span>
+                      </>
+                    )}
+                    <span className={styles['digi']}>
+                      {amountFormatter(
+                        interest.byVaultDepositCcy,
+                        CCYService.ccyConfigs[
+                          automator.vaultInfo.vaultDepositCcy
+                        ]?.precision || undefined,
+                      )}
+                    </span>
+                    <span className={styles['unit']}>
+                      {CCYService.ccyConfigs[
+                        automator.vaultInfo.vaultDepositCcy
+                      ]?.name || automator.vaultInfo.vaultDepositCcy}
+                    </span>
+
+                    <Tooltip
+                      className={styles['automator-number-tooltip']}
+                      content={
+                        <div>
+                          <div className={styles['amount']}>
+                            <span className={styles['label']}>
+                              {t({ enUS: 'Pool Size', zhCN: '池子大小' })}
+                            </span>
+                            {!InterestTypeRefs[
+                              automator.vaultInfo.interestType!
+                            ].isRebase ? (
+                              <span className={styles['value']}>
+                                {amountFormatter(
+                                  automator.aumByClientDepositCcy,
+                                  CCYService.ccyConfigs[
+                                    automator.vaultInfo.depositCcy
+                                  ]?.precision || undefined,
+                                )}
+                                <span className={styles['unit']}>
+                                  {CCYService.ccyConfigs[
+                                    automator.vaultInfo.depositCcy
+                                  ]?.name || automator.vaultInfo.depositCcy}
+                                </span>
+                              </span>
+                            ) : (
+                              <span className={styles['value']}>
+                                {amountFormatter(
+                                  automator.aumByVaultDepositCcy,
+                                  CCYService.ccyConfigs[
+                                    automator.vaultInfo.vaultDepositCcy
+                                  ]?.precision || undefined,
+                                )}
+                                <span className={styles['unit']}>
+                                  {CCYService.ccyConfigs[
+                                    automator.vaultInfo.vaultDepositCcy
+                                  ]?.name ||
+                                    automator.vaultInfo.vaultDepositCcy}
+                                </span>
+                              </span>
+                            )}
+                          </div>
+                          <div className={styles['amount']}>
+                            <span className={styles['label']}>
+                              {t({
+                                enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
+                                zhCN: '预估Aave/Lido/Sofa/Curve收益',
+                              })}
+                            </span>
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
+                                zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve年化)。 （Aave/Lido/Sofa/Curve年化）',
+                              })}
+                            </span>
+                            <span className={styles['value']}>
+                              {amountFormatter(apy.apyUsed, 2)}%
+                            </span>
+                          </div>
+                          <div className={styles['amount']}>
+                            <span className={styles['label']}>
+                              {t({
+                                enUS: 'Estimated Aave/Lido/Sofa/Curve Interest',
+                                zhCN: '预估Aave/Lido/Sofa/Curve利息',
+                              })}
+                            </span>
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Pool Size)',
+                                zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve年化预估) ^ (期限 / 365) - 池子大小）',
+                              })}
+                            </span>
+                            <span className={styles['value']}>
+                              {amountFormatter(
+                                interest.byVaultDepositCcy,
+                                CCYService.ccyConfigs[
+                                  automator.vaultInfo.positionCcy
+                                ]?.precision || undefined,
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <IconDetail className={styles['icon-detail']} />
+                    </Tooltip>
+                  </>
+                ) : (
+                  '-'
+                )}
+              </span>
+            </div>
+            <div className={styles['amount']}>
+              <span className={styles['label']}>&nbsp;</span>
+              <span className={styles['value']}>
+                {automator ? (
+                  <>
+                    <span className={styles['digi']}>
+                      =&nbsp;
+                      {amountFormatter(
+                        Number(
+                          automator.pastAvailableBalanceExcludingPrincipal,
+                        ) + interest.byVaultDepositCcy,
+                        CCYService.ccyConfigs[
+                          automator.vaultInfo.vaultDepositCcy
+                        ]?.precision || undefined,
+                      )}
+                    </span>
+
+                    <span className={styles['unit']}>
+                      {CCYService.ccyConfigs[
+                        automator.vaultInfo.vaultDepositCcy
+                      ]?.name || automator.vaultInfo.vaultDepositCcy}
+                    </span>
+                  </>
+                ) : (
+                  '-'
+                )}
+              </span>
+            </div>
           </div>
         </div>
       </div>
