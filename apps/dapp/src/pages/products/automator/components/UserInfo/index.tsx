@@ -150,7 +150,7 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
             </span>
             <span className={styles['separator']}>+</span>
             <span className={classNames(styles['amount'], styles['rch'])}>
-              <AmountDisplay amount={data?.server?.rchTotalPnl} />{' '}
+              <AmountDisplay amount={data?.server?.totalRchAmount} />{' '}
               <span className={styles['unit']}>RCH</span>
             </span>
           </div>

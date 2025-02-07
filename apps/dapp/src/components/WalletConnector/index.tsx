@@ -58,6 +58,7 @@ const WalletConnector = (
                 address={wallet.address!}
                 simple
                 style={{ padding: 0 }}
+                noWeb3Name={false}
               />
             </>
           );
@@ -74,11 +75,7 @@ const WalletConnector = (
         title={t('title')}
         footer={null}
       >
-        <Address
-          address={wallet.address!}
-          className={styles['address']}
-          noWeb3Name
-        />
+        <Address address={wallet.address!} className={styles['address']} />
         <AsyncButton
           size={'large'}
           block

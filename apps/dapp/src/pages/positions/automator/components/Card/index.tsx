@@ -37,7 +37,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
             props.info.vaultInfo.depositCcy,
             props.info.totalPnlByClientDepositCcy,
           ],
-          ['RCH', props.info.rchTotalPnl],
+          ['RCH', props.info.totalRchAmount],
         ],
         prices,
         props.info.vaultInfo.depositCcy,
@@ -45,7 +45,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
     [
       prices,
       props.info.totalPnlByClientDepositCcy,
-      props.info.rchTotalPnl,
+      props.info.totalRchAmount,
       props.info.vaultInfo.depositCcy,
     ],
   );

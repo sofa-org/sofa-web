@@ -29,7 +29,6 @@ export interface OriginAutomatorUserPosition {
   totalInterestPnlByClientDepositCcy: number | string; // Client申购币种产生的利息
   totalPnlByClientDepositCcy: number | string; // Client申购币种的总PnL (crvUSD)
   totalRchPnlByClientDepositCcy: number | string; // Rch的总PNL(crvUSD)
-  rchTotalPnl: number | string; // Rch的总PNL(RCH)
   totalRchAmount: number | string; // Rch的总PNL(RCH)
   status: string; // ACTIVE/CLOSED
   pnlPercentage: number | string; // Yield(百分比)
@@ -73,7 +72,7 @@ export class AutomatorUserService {
         item.vaultInfo.vault.toLowerCase() === it.automatorVault.toLowerCase(),
     )!.vaultInfo;
     const rchValueInDepositCcy = cvtAmountsInCcy(
-      [['RCH', it.rchTotalPnl]],
+      [['RCH', it.totalRchAmount]],
       prices,
       vaultInfo.depositCcy,
     );

@@ -32,7 +32,7 @@ const Address = memo<{
   const [t] = useTranslation('Address');
 
   const web3name = useAsyncMemo(async () => {
-    if (props.noWeb3Name) return undefined;
+    if (props.noWeb3Name !== false) return undefined;
     return WalletService.web3name(props.address);
   }, []);
 
