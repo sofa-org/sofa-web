@@ -3,6 +3,7 @@
 
   flex: 1;
   max-width: 258px;
+  min-width: calc(100% / 4 - 16px * 3);
   margin: 0;
   padding: 16px;
   border-radius: 16px;
