@@ -130,7 +130,7 @@ export const useDIYState = Object.assign(instant, {
     );
     const genKey = (it: VaultInfo) => fields.map((k) => it[k]).join('-');
     return ContractsService.vaults
-      .filter((it) => it.chainId === filters.chainId)
+      .filter((it) => it.chainId === filters.chainId && !it.onlyForAutomator)
       .reduce(
         (pre, it) => {
           const key = genKey(it);
