@@ -21,6 +21,7 @@ import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 import { useAutomatorStore } from '@/pages/products/automator/store';
+import { calcAvailableBalance } from '@/pages/products/automator-create/util';
 import { useGlobalState } from '@/store';
 
 import { useProductsState } from '../../../automator-store';
@@ -215,8 +216,8 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
             <div className={styles['amount']}>
               <span className={styles['label']}>
                 {t({
-                  enUS: 'Available Balance (Total)',
-                  zhCN: '可用余额 (总计)',
+                  enUS: 'Available Balance (Risk Limited)',
+                  zhCN: '可用余额 (风险限制)',
                 })}
               </span>
               <span className={styles['value']}>
@@ -224,13 +225,12 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                   <>
                     <span className={styles['digi']}>
                       {amountFormatter(
-                        automator.availableAmountByVaultDepositCcy,
+                        calcAvailableBalance(automator),
                         CCYService.ccyConfigs[
                           automator.vaultInfo.vaultDepositCcy
                         ]?.precision || undefined,
                       )}
                     </span>
-
                     <span className={styles['unit']}>
                       {CCYService.ccyConfigs[
                         automator.vaultInfo.vaultDepositCcy

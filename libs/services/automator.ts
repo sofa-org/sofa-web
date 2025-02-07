@@ -39,6 +39,7 @@ export interface OriginAutomatorInfo {
   clientDepositCcy: string; // 用户存入的标的物
   sharesToken: string; // Automator 的份额代币
   redemptionPeriodDay: number | string; // 赎回观察时间
+  riskExposure: number | string; // 最多能亏损多少比例的本金
 }
 
 // server 返回的结构
@@ -234,6 +235,7 @@ export class AutomatorService {
               return undefined;
             })(),
           createTime: it.createTime * 1000 || vault?.createTime,
+          riskExposure: it.riskExposure || 0,
         },
         (it) => isNullLike(it),
       ),

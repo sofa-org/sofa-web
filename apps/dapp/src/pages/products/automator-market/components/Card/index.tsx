@@ -13,9 +13,11 @@ import AmountDisplay from '@/components/AmountDisplay';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { MsgDisplay } from '@/components/MsgDisplay';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
+import { AutomatorRiskExposureMap } from '@/pages/products/automator-create/util';
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../assets/icon-people.svg';
+import { Comp as IconRisk } from '../../assets/icon-risk.svg';
 import { Comp as IconWarning } from '../../assets/icon-warning.svg';
 
 import styles from './index.module.scss';
@@ -134,6 +136,19 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         </>
       )}
       <div className={styles['footer']}>
+        <div className={styles['risk']}>
+          <IconRisk />
+          <span
+            style={{
+              color:
+                AutomatorRiskExposureMap[props.info.vaultInfo.riskExposure!]
+                  ?.color || 'inherit',
+            }}
+          >
+            {AutomatorRiskExposureMap[props.info.vaultInfo.riskExposure!]
+              ?.label || 'R-'}
+          </span>
+        </div>
         <div className={styles['runtime']}>
           <IconCalendar />
           {props.info.vaultInfo.createTime

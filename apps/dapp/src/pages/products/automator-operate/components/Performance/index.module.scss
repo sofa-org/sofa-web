@@ -170,13 +170,16 @@
   justify-content: space-between;
   flex-wrap: wrap;
   margin: 0;
+  padding-right: 50%;
 
   .item {
     @include flex-center;
 
-    justify-content: flex-start;
-    flex: 1;
-    min-width: 45%;
+    justify-content: space-between;
+    flex: none;
+    position: relative;
+    width: 100%;
+    padding: 0 0 0 16px;
 
     .label {
       width: 160px;
@@ -216,6 +219,9 @@
 }
 
 .dot {
+  position: absolute;
+  left: 0;
+  top: 8px;
   display: block;
   width: 8px;
   height: 8px;
@@ -291,6 +297,23 @@
     }
   }
 
+  .dot {
+    top: 4px;
+  }
+
+  .creator-amount {
+    .item {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .label {
+        width: auto;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+    }
+  }
+
   .tips {
     justify-content: flex-start;
     padding: 6px 8px;
@@ -312,6 +335,10 @@
         font-size: 10px;
       }
     }
+  }
+
+  .pool-size-infos {
+    padding-right: 0;
   }
 
   .pool-size-infos,

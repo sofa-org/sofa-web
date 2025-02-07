@@ -89,6 +89,7 @@ export interface AutomatorVaultInfo {
   creatorFeeRate: number | string; // 默认为 0
   createTime: number | string; // 创建时间, ms
   interestType?: InterestType; // 生息方式，一期的没有
+  riskExposure?: string | number; // 最多亏损多少比例的本金
 }
 
 export interface AutomatorFactory {

@@ -20,6 +20,7 @@ import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import { isMockEnabled } from '@sofa/services/mock';
+import { displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
@@ -41,6 +42,7 @@ import {
   getNameForChain,
   useAutomatorCreateStore,
 } from './store';
+import { AutomatorRiskExposures } from './util';
 
 import styles from './index-model.module.scss';
 
@@ -416,24 +418,13 @@ const StepForm = () => {
                 },
               ]}
             >
-              <Form.Select.Option value={'R0'}>
-                【R0 - Ultra-Safe】Max Risk Exposure: 0.1%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R1'}>
-                【R1 - Minimal Risk】Max Risk Exposure: 5%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R2'}>
-                【R2 - Low Risk】Max Risk Exposure: 10%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R3'}>
-                【R3 - Moderate Risk】Max Risk Exposure: 20%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R4'}>
-                【R4 - High Risk】Max Risk Exposure: 35%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R5'}>
-                【R5 - Very High Risk】Max Risk Exposure: 50%
-              </Form.Select.Option>
+              {AutomatorRiskExposures.map((it) => (
+                <Form.Select.Option value={it.label} key={it.value}>
+                  【{it.label} - {it.desc(t)}】
+                  {t({ enUS: 'Max Risk Exposure', zhCN: '最大风险敞口' })}:{' '}
+                  {displayPercentage(it.value)}
+                </Form.Select.Option>
+              ))}
             </Form.Select>
           </Col>
         </Row>
