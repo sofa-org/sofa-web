@@ -50,6 +50,7 @@ const InvestButton = (
         riskType: RiskType.RISKY,
         // for automator, there is no recommended list, so the value of productType doesn't matter
         productType: ProductType.BearSpread,
+        onlyForAutomator: true,
       }}
       mint={async (cb, data) => {
         const a = getCurrentCreatorAutomator();

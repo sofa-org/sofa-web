@@ -15,7 +15,7 @@ import {
 } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { MsIntervals } from '@sofa/utils/expiry';
-import { getErrorMsg, isNullLike } from '@sofa/utils/fns';
+import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback, useTime } from '@sofa/utils/hooks';
 import { arrToDict, simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
@@ -99,7 +99,10 @@ export interface ProductInvestButtonProps extends BaseProps {
   chainId: number;
   autoQuote?: boolean;
   afterInvest?(): void;
-  vaultInfo?: Pick<VaultInfo, 'depositCcy' | 'riskType' | 'productType'>;
+  vaultInfo?: Pick<
+    VaultInfo,
+    'depositCcy' | 'riskType' | 'productType' | 'onlyForAutomator'
+  >;
   useProductsState: ProductsStateType;
   products: PartialRequired<ProductQuoteParams, 'id' | 'vault'>[];
   quoteInfos: (ProductQuoteResult | undefined)[];
@@ -255,7 +258,8 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
             delRfq(it[0]);
           }
         });
-        if (vault.riskType === RiskType.RISKY) pokerRightsReminder();
+        if (vault.riskType === RiskType.RISKY && !vault.onlyForAutomator)
+          pokerRightsReminder();
         useWalletStore.updateBalanceByVault(props.vault);
       }
       if (/Success/i.test(progress.status)) {
