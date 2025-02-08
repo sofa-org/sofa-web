@@ -4,6 +4,7 @@ import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { ProductType, RiskType } from '@sofa/services/contracts';
 import { ProductsService } from '@sofa/services/products';
 
+import { calcAvailableBalance } from '@/pages/products/automator-create/util';
 import { useProductsState } from '@/pages/products/automator-store';
 import {
   ProductInvestButton,
@@ -40,6 +41,11 @@ const InvestButton = (
     products.map((it) => state.quoteInfos[ProductsService.productKey(it)]),
   );
 
+  const availableBalance = useMemo(
+    () => calcAvailableBalance(automator),
+    [automator],
+  );
+
   return (
     <ProductInvestButton
       products={products}
@@ -64,10 +70,7 @@ const InvestButton = (
           data,
         );
       }}
-      isInsufficientBalance={(amount) =>
-        !automator?.availableAmountByVaultDepositCcy ||
-        +automator.availableAmountByVaultDepositCcy < +amount
-      }
+      isInsufficientBalance={(amount) => availableBalance < +amount}
       {...props}
     />
   );

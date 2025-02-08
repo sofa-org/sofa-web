@@ -16,7 +16,6 @@ import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
 import { CSelect } from '@/components/CSelect';
 import { useIndexPrices } from '@/components/IndexPrices/store';
-import ProgressBar from '@/components/ProgressBar';
 import { formatTime } from '@/components/TimezoneSelector/store';
 import { AutomatorPerformanceChart } from '@/pages/products/automator/components/PerformanceChart';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
@@ -153,21 +152,21 @@ const PoolSize = () => {
         ),
         percent: Number(automator?.unclaimedAmountByVaultDepositCcy) / total,
       },
-      {
-        color: '#46B8A6',
-        label: t({ enUS: 'Available Balance', zhCN: '可交易资金' }),
-        value: cvtAmountsInCcy(
-          [
-            [
-              String(automator?.vaultInfo.vaultDepositCcy),
-              automator?.availableAmountByVaultDepositCcy,
-            ],
-          ],
-          prices,
-          String(automator?.vaultInfo[byCcy]),
-        ),
-        percent: Number(automator?.availableAmountByVaultDepositCcy) / total,
-      },
+      // {
+      //   color: '#46B8A6',
+      //   label: t({ enUS: 'Available Balance', zhCN: '可交易资金' }),
+      //   value: cvtAmountsInCcy(
+      //     [
+      //       [
+      //         String(automator?.vaultInfo.vaultDepositCcy),
+      //         automator?.availableAmountByVaultDepositCcy,
+      //       ],
+      //     ],
+      //     prices,
+      //     String(automator?.vaultInfo[byCcy]),
+      //   ),
+      //   percent: Number(automator?.availableAmountByVaultDepositCcy) / total,
+      // },
     ];
   }, [automator, byCcy, prices, t]);
 

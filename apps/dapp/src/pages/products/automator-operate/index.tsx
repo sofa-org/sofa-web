@@ -14,8 +14,10 @@ import TopTabs from '@/components/TopTabs';
 import { addI18nResources } from '@/locales';
 
 import { useAutomatorStore } from '../automator/store';
+import { AutomatorRiskExposureMap } from '../automator-create/util';
 import { Comp as IconCalendar } from '../automator-mine/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../automator-mine/assets/icon-people.svg';
+import { Comp as IconRisk } from '../automator-mine/assets/icon-risk.svg';
 
 import {
   CreatorAutomatorSelector,
@@ -166,6 +168,36 @@ const Index = () => {
               <div className={styles['item']}>
                 <IconPeople className={styles['label']} />
                 {automator?.participantNum || '-'}
+              </div>
+              <div className={styles['item']}>
+                <IconRisk className={styles['label']} />
+                {automator &&
+                  (() => {
+                    const ref =
+                      AutomatorRiskExposureMap[
+                        automator.vaultInfo.riskExposure!
+                      ];
+                    return ref ? (
+                      <>
+                        <span
+                          style={{
+                            color: ref?.color || 'inherit',
+                          }}
+                        >
+                          {ref.label} - {ref.desc(t)}
+                        </span>
+                        <span className={styles['risk-desc']}>
+                          {t({
+                            enUS: 'Max Risk Exposure',
+                            zhCN: '最大风险敞口',
+                          })}
+                          : {displayPercentage(ref.value)}
+                        </span>
+                      </>
+                    ) : (
+                      'R-'
+                    );
+                  })()}
               </div>
               <div className={styles['desc']}>
                 <MsgDisplay>

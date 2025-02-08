@@ -8,9 +8,11 @@ import { formatDuration } from '@sofa/utils/time';
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import ProgressBar from '@/components/ProgressBar';
+import { AutomatorRiskExposureMap } from '@/pages/products/automator-create/util';
 
 import { Comp as IconCalendar } from '../../../automator-market/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../../automator-market/assets/icon-people.svg';
+import { Comp as IconRisk } from '../../../automator-market/assets/icon-risk.svg';
 import { useAutomatorStore } from '../../store';
 
 import styles from './index.module.scss';
@@ -165,6 +167,30 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
       </div>
       <div className={styles['right']}>
+        <div className={styles['item']}>
+          <div className={styles['title']}>
+            <Tooltip
+              content={t({
+                enUS: 'Automator Running Days',
+                zhCN: 'Automator 运行天数',
+              })}
+            >
+              <IconRisk tabIndex={-1} />
+            </Tooltip>
+          </div>
+          <div
+            className={styles['value']}
+            style={{
+              color:
+                props.vault &&
+                AutomatorRiskExposureMap[props.vault.riskExposure!]?.color,
+            }}
+          >
+            {(props.vault &&
+              AutomatorRiskExposureMap[props.vault.riskExposure!]?.label) ||
+              'R-'}
+          </div>
+        </div>
         <div className={styles['item']}>
           <div className={styles['title']}>
             {t({ enUS: 'Fee', zhCN: '盈利抽成' })}

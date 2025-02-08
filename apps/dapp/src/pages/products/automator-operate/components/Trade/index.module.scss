@@ -64,6 +64,7 @@
     @include flex-center;
 
     flex-wrap: wrap;
+    gap: 0 6px;
     align-items: flex-start;
     justify-content: flex-start;
   }
@@ -208,10 +209,10 @@
   }
 
   .icon-detail {
-    // display: none;
-    width: 16px;
-    height: 16px;
-    margin: -4px 0 0 2px;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin: -4px 0 0 6px;
   }
 }
 
