@@ -87,7 +87,7 @@ export function amountFormatter(
 export function roundWith<T extends number | string | undefined>(
   num: T,
   tickSize?: number | string,
-  minSize = tickSize,
+  minSize?: number | string,
   maxSize?: number | string,
   roundType: 'default' | 'upper' | 'lower' = 'default',
 ): string | undefined {
