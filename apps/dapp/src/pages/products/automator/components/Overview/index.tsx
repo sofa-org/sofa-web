@@ -167,30 +167,32 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
       </div>
       <div className={styles['right']}>
-        <div className={styles['item']}>
-          <div className={styles['title']}>
-            <Tooltip
-              content={t({
-                enUS: 'Automator Running Days',
-                zhCN: 'Automator 运行天数',
-              })}
+        {props.vault && (
+          <div className={styles['item']}>
+            <div className={styles['title']}>
+              <Tooltip
+                content={`${t({
+                  enUS: 'Risk Level - Max Exposure: ',
+                  zhCN: '风险等级 - 最大风向敞口：',
+                })}${displayPercentage(
+                  AutomatorRiskExposureMap[props.vault.riskExposure!]?.value,
+                )}`}
+              >
+                <IconRisk tabIndex={-1} />
+              </Tooltip>
+            </div>
+            <div
+              className={styles['value']}
+              style={{
+                color:
+                  AutomatorRiskExposureMap[props.vault.riskExposure!]?.color,
+              }}
             >
-              <IconRisk tabIndex={-1} />
-            </Tooltip>
+              {AutomatorRiskExposureMap[props.vault.riskExposure!]?.label ||
+                'R-'}
+            </div>
           </div>
-          <div
-            className={styles['value']}
-            style={{
-              color:
-                props.vault &&
-                AutomatorRiskExposureMap[props.vault.riskExposure!]?.color,
-            }}
-          >
-            {(props.vault &&
-              AutomatorRiskExposureMap[props.vault.riskExposure!]?.label) ||
-              'R-'}
-          </div>
-        </div>
+        )}
         <div className={styles['item']}>
           <div className={styles['title']}>
             {t({ enUS: 'Fee', zhCN: '盈利抽成' })}
