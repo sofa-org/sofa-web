@@ -10,6 +10,7 @@ import {
   amountFormatter,
   cvtAmountsInCcy,
   cvtAmountsInUsd,
+  displayPercentage,
 } from '@sofa/utils/amount';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { simplePlus } from '@sofa/utils/object';
@@ -236,6 +237,100 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                         automator.vaultInfo.vaultDepositCcy
                       ]?.name || automator.vaultInfo.vaultDepositCcy}
                     </span>
+                    <Tooltip
+                      className={styles['automator-number-tooltip']}
+                      content={
+                        <div className={styles['automator-details']}>
+                          <div
+                            className={styles['desc']}
+                            dangerouslySetInnerHTML={{
+                              __html: t({
+                                enUS: 'This shows the maximum balance available for trading, capped by the Automator’s risk exposure limit.',
+                                zhCN: '这显示了可用于交易的最大余额，并受 Automator 的风险敞口上限限制。',
+                              }).replace(/\n/g, '<br />'),
+                            }}
+                          />
+                          <div className={styles['amount']}>
+                            <span
+                              className={styles['label']}
+                              dangerouslySetInnerHTML={{
+                                __html: t({
+                                  enUS: 'Risk Exposure%',
+                                  zhCN: '风险敞口%',
+                                }).replace(/\n/g, '<br />'),
+                              }}
+                            />
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: 'Your Selected Risk Exposure %',
+                                zhCN: '你选择的风险敞口%',
+                              })}
+                            </span>
+                            <span className={styles['value']}>
+                              {displayPercentage(
+                                automator.vaultInfo.riskExposure,
+                              )}
+                            </span>
+                          </div>
+                          <div className={styles['amount']}>
+                            <span className={styles['label']}>
+                              {t({
+                                enUS: 'Current Position',
+                                zhCN: '当前头寸',
+                              })}
+                            </span>
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: 'Value of open & Unclaimed positions.',
+                                zhCN: '未平仓及未认领头寸的价值。',
+                              })}
+                            </span>
+                            <span className={styles['value']}>
+                              {amountFormatter(
+                                automator.lockedByUnclaimedPosition,
+                                CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.precision || undefined,
+                              )}
+                              <span className={styles['unit']}>
+                                {CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.name || automator.vaultInfo.vaultDepositCcy}
+                              </span>
+                            </span>
+                          </div>
+                          <div className={styles['amount']}>
+                            <span className={styles['label']}>
+                              {t({
+                                enUS: 'Available Balance [Risk-Limited]',
+                                zhCN: '可用余额 (风险限制)',
+                              })}
+                            </span>
+                            <span className={styles['desc']}>
+                              {t({
+                                enUS: '(Pool Size -  To Be Redeemed) * Risk Exposure % - Current Position',
+                                zhCN: '(总资金 - 待赎回资金) * 允许的风险敞口% - 当前头寸占用资金',
+                              })}
+                            </span>
+                            <span className={styles['value']}>
+                              {amountFormatter(
+                                calcAvailableBalance(automator),
+                                CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.precision || undefined,
+                              )}
+                              <span className={styles['unit']}>
+                                {CCYService.ccyConfigs[
+                                  automator.vaultInfo.vaultDepositCcy
+                                ]?.name || automator.vaultInfo.vaultDepositCcy}
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <IconDetail className={styles['icon-detail']} />
+                    </Tooltip>
                   </>
                 ) : (
                   '-'
