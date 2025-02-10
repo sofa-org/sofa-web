@@ -19,7 +19,7 @@ import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { min as lodashMin } from 'lodash-es';
+import { max as lodashMax, min as lodashMin } from 'lodash-es';
 import { nanoid } from 'nanoid';
 
 import { Comp as IconDel } from '@/assets/icon-del.svg';
@@ -171,24 +171,16 @@ const TicketEditor = (props: CustomTicketProps) => {
     //   min,
     // );
 
-    const max = next8h(
+    let max = next8h(
       undefined,
       Math.round(automatorDetail.vaultInfo.redeemWaitPeriod / MsIntervals.day) +
         1,
     );
 
-    // const max = Math.min(
-    //   quoteConfig.expiryDateTimes?.length
-    //     ? quoteConfig.expiryDateTimes[quoteConfig.expiryDateTimes.length - 1] *
-    //         1000
-    //     : _next8h + MsIntervals.month,
-    //   next8h(
-    //     undefined,
-    //     Math.round(
-    //       automatorDetail.vaultInfo.redeemWaitPeriod / MsIntervals.day,
-    //     ) + 1,
-    //   ),
-    // );
+    if (quoteConfig.expiryDateTimes?.length) {
+      max = Math.min(max, lodashMax(quoteConfig.expiryDateTimes)! * 1000);
+    }
+
     return {
       min,
       max,
