@@ -63,7 +63,7 @@ export default {
     Term: '期限',
     Strikes: '执行价',
     'Basic PnL': '基本损益',
-    'RCH PnL': 'RCH 损益',
+    'RCH PnL': 'RCH 空投',
     'Created Time': '创建时间',
     'Settlement Time': '结算时间',
     Details: '详情',

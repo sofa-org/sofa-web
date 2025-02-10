@@ -5,7 +5,7 @@ import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
 import { useIsPortrait, useQuery } from '@sofa/utils/hooks';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 
 import Address from '@/components/Address';
 import { MsgDisplay } from '@/components/MsgDisplay';
@@ -38,7 +38,7 @@ const PositionTab = () => {
   const { automator } = useCreatorAutomatorSelector();
   return (
     <span>
-      {t({ enUS: 'Positions', zhCN: '头寸' })}
+      {t({ enUS: 'Positions', zhCN: '头寸&交易历史' })}
       {!!automator?.positionSize && (
         <span className={styles['position-size']}>
           {automator?.positionSize || '1'}
@@ -76,7 +76,7 @@ const $options: {
     content: () => <AutomatorFollowers />,
   },
   {
-    label: (t) => t({ enUS: 'Subscription History', zhCN: '交易记录' }),
+    label: (t) => t({ enUS: 'Subscription History', zhCN: '铸造赎回记录' }),
     value: 'transactions',
     content: () => <AutomatorTransactions />,
   },
@@ -158,10 +158,8 @@ const Index = () => {
               <div className={styles['item']}>
                 <IconCalendar className={styles['label']} />
                 {automator?.vaultInfo.createTime
-                  ? formatDuration(
+                  ? formatDurationToDay(
                       Date.now() - +automator?.vaultInfo.createTime,
-                      1,
-                      true,
                     )
                   : '-'}
               </div>

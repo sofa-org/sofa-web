@@ -3,7 +3,7 @@ import { AutomatorUserService } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 import { useCountDown } from 'ahooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -91,7 +91,7 @@ export const AutomatorClaim = (props: {
       >
         {t({ enUS: 'Claim', zhCN: '赎回' })}
         <span className={classNames('txt-gradient', styles['duration'])}>
-          {t({ enUS: 'Remaining', zhCN: '剩余' })}: {formatDuration(time)}
+          {t({ enUS: 'Remaining', zhCN: '剩余' })}: {formatDurationToDay(time)}
         </span>
       </AsyncButton>
       <div className={styles['tips']}>

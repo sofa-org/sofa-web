@@ -101,12 +101,13 @@ const List = (props: {
   const unClaimedList = useMemo(
     () =>
       data?.filter((it) => {
-        if (!Number(it.amounts.redeemable) || it.claimed) return false;
+        if ((!props.automator && !Number(it.amounts.redeemable)) || it.claimed)
+          return false;
         if (judgeSettled(it)) return true;
         if (it.claimParams.maker && it.triggerPrice) return true;
         return false;
       }) || [],
-    [data],
+    [data, props.automator],
   );
 
   const loseList = useMemo(
@@ -213,7 +214,7 @@ const List = (props: {
         />
       </Spin>
       <div className={styles['btn-bottom-wrapper']}>
-        {!!loseList.length && (
+        {!!loseList.length && !props.automator && (
           <AsyncButton
             size="large"
             theme="solid"

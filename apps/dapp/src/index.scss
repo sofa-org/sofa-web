@@ -40,6 +40,10 @@
   line-height: calc(1em + 6px);
 }
 
+*:focus-visible {
+  outline: none;
+}
+
 html {
   height: 100%;
 }

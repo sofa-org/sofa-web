@@ -4,7 +4,7 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { displayExpiry } from '@sofa/utils/expiry';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
@@ -97,15 +97,15 @@ export const AutomatorProjectDesc = (props: { vault?: AutomatorVaultInfo }) => {
               __html: t(
                 {
                   enUS: '· Users can mint {{positionCcy}} by converting {{depositCcy}} at the current {{positionCcy}} price. Minting allocates shares proportionally based on the size of the current pool. <br/>· To redeem, users will burn {{positionCcy}} to receive {{depositCcy}}, with a {{waitDuration}} waiting period. <br/>· Redemptions must be claimed within {{claimDuration}} following the waiting period, otherwise the request will expire and a new redemption process must be re-submitted.',
-                  zhCN: '	•	用户可以通过当前的 {{positionCcy}} 价格将 {{depositCcy}} 转换为 {{positionCcy}}，从而进行铸造。铸造的份额将根据当前资金池的规模按比例分配。<br/>•	赎回时，用户需销毁 {{positionCcy}} 以换取 {{depositCcy}}，并需经历 7 天的等待期。<br/>•	在等待期结束后的 3 天内必须完成领取，否则请求将过期，需重新提交新的赎回流程。',
+                  zhCN: '	•	用户可以通过当前的 {{positionCcy}} 价格将 {{depositCcy}} 转换为 {{positionCcy}}，从而进行铸造。铸造的份额将根据当前资金池的规模按比例分配。<br/>•	赎回时，用户需销毁 {{positionCcy}} 以换取 {{depositCcy}}，并需经历 {{waitDuration}} 的等待期。<br/>•	在等待期结束后的 3 天内必须完成领取，否则请求将过期，需重新提交新的赎回流程。',
                 },
                 {
                   waitDuration:
                     props.vault?.redeemWaitPeriod &&
-                    formatDuration(props.vault?.redeemWaitPeriod, 1, true),
+                    formatDurationToDay(props.vault?.redeemWaitPeriod),
                   claimDuration:
                     props.vault?.claimPeriod &&
-                    formatDuration(props.vault?.claimPeriod, 1, true),
+                    formatDurationToDay(props.vault?.claimPeriod),
                   ...props.vault,
                 },
               ),

@@ -9,7 +9,7 @@ import {
   cvtAmountsInCcy,
   displayPercentage,
 } from '@sofa/utils/amount';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
@@ -71,10 +71,8 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
               <div className={styles['runtime']}>
                 <IconCalendar />
                 {props.info.vaultInfo.createTime
-                  ? formatDuration(
+                  ? formatDurationToDay(
                       Date.now() - +props.info.vaultInfo.createTime,
-                      1,
-                      true,
                     )
                   : '-'}
               </div>

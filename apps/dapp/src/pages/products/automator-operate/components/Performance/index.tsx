@@ -109,7 +109,7 @@ const PoolSize = () => {
     return [
       {
         color: '#8C8C8C',
-        label: t({ enUS: 'Active Position Locked', zhCN: '持仓锁定资金' }),
+        label: t({ enUS: 'Active Position Locked', zhCN: '未到期持仓' }),
         value: cvtAmountsInCcy(
           [
             [
@@ -124,7 +124,7 @@ const PoolSize = () => {
       },
       {
         color: '#77B6F0',
-        label: t({ enUS: 'To Be Redeemed', zhCN: '待回收资金' }),
+        label: t({ enUS: 'To Be Redeemed', zhCN: '用户申请赎回' }),
         value: cvtAmountsInCcy(
           [
             [
@@ -139,7 +139,7 @@ const PoolSize = () => {
       },
       {
         color: '#D89614',
-        label: t({ enUS: 'Unclaimed', zhCN: '待提现资金' }),
+        label: t({ enUS: 'Unclaimed', zhCN: '已到期持仓' }),
         value: cvtAmountsInCcy(
           [
             [

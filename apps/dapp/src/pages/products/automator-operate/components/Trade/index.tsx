@@ -309,7 +309,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             <span className={styles['desc']}>
                               {t({
                                 enUS: '(Pool Size -  To Be Redeemed) * Risk Exposure % - Current Position',
-                                zhCN: '(总资金 - 待赎回资金) * 允许的风险敞口% - 当前头寸占用资金',
+                                zhCN: '(总资金 - 用户申请赎回资金) * 允许的风险敞口% - 当前头寸占用资金',
                               })}
                             </span>
                             <span className={styles['value']}>
