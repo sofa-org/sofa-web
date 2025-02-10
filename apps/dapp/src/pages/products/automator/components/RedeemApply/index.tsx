@@ -6,7 +6,7 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 import Big from 'big.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -196,10 +196,10 @@ export const AutomatorRedeemApply = (props: {
                       {
                         waitDuration:
                           vault?.redeemWaitPeriod &&
-                          formatDuration(vault?.redeemWaitPeriod, 1, true),
+                          formatDurationToDay(vault?.redeemWaitPeriod),
                         claimDuration:
                           vault?.claimPeriod &&
-                          formatDuration(vault?.claimPeriod, 1, true),
+                          formatDurationToDay(vault?.claimPeriod),
                       },
                     )}
                     redemptionInfo={

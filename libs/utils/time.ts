@@ -63,6 +63,11 @@ export function formatDuration(value: number, length = 3, noPad?: boolean) {
   return result || '0s';
 }
 
+export function formatDurationToDay(value: number) {
+  if (!isLegalNum(value)) return '-';
+  return `${Math.floor(value / MsIntervals.day)}d`;
+}
+
 // 根据 interval 按照 orderDirection 分割时间
 export function separateTimeByInterval(
   params: { startTime: number; endTime?: number },

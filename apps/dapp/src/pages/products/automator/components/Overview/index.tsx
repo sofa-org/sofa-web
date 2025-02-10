@@ -3,7 +3,7 @@ import { Spin, Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { cvtAmountsInCcy, displayPercentage } from '@sofa/utils/amount';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIndexPrices } from '@/components/IndexPrices/store';
@@ -159,7 +159,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                 {
                   waitDuration:
                     props.vault?.redeemWaitPeriod &&
-                    formatDuration(props.vault.redeemWaitPeriod, 1, true),
+                    formatDurationToDay(props.vault.redeemWaitPeriod),
                 },
               ),
             }}
@@ -178,7 +178,8 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                   AutomatorRiskExposureMap[props.vault.riskExposure!]?.value,
                 )}`}
               >
-                <IconRisk tabIndex={-1} />
+                {t({ enUS: 'Risk Level', zhCN: '风险等级' })}
+                {/* <IconRisk tabIndex={-1} /> */}
               </Tooltip>
             </div>
             <div
@@ -209,12 +210,13 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                 zhCN: 'Automator 运行天数',
               })}
             >
-              <IconCalendar tabIndex={-1} />
+              {t({ enUS: 'Running', zhCN: '运行天数' })}
+              {/* <IconCalendar tabIndex={-1} /> */}
             </Tooltip>
           </div>
           <div className={styles['value']}>
             {props.vault?.createTime
-              ? formatDuration(Date.now() - +props.vault.createTime, 1, true)
+              ? formatDurationToDay(Date.now() - +props.vault.createTime)
               : '-'}
           </div>
         </div>
@@ -226,7 +228,8 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                 zhCN: '参与钱包数',
               })}
             >
-              <IconPeople tabIndex={-1} />
+              {t({ enUS: 'Followers', zhCN: '订阅用户' })}
+              {/* <IconPeople tabIndex={-1} /> */}
             </Tooltip>
           </div>
           <div className={styles['value']}>{data?.participantNum || '-'}</div>

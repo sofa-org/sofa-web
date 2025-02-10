@@ -5,7 +5,7 @@ import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { useIsPortrait } from '@sofa/utils/hooks';
-import { formatDuration, MsIntervals } from '@sofa/utils/time';
+import { formatDurationToDay, MsIntervals } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
@@ -152,11 +152,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         <div className={styles['runtime']}>
           <IconCalendar />
           {props.info.vaultInfo.createTime
-            ? formatDuration(
-                Date.now() - +props.info.vaultInfo.createTime,
-                1,
-                true,
-              )
+            ? formatDurationToDay(Date.now() - +props.info.vaultInfo.createTime)
             : '-'}
         </div>
         <div className={styles['people']}>
