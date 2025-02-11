@@ -123,8 +123,8 @@ const FAQ = (t: TFunction) => {
         zhCN: '$RCH 代币空投如何生成并分发到用户账户?',
       }),
       desc: t({
-        enUS: '$RCH tokens are earned through the Optivisor\'s trading activities and can be claimed by users afterward, just like in other SOFA Vaults. You can check the $RCH airdrop info here: <a href="_blank" href="https://docs.sofa.org/tokenomics/">https://docs.sofa.org/tokenomics/</a>',
-        zhCN: '$RCH 代币通过 Optivisor 的交易活动赚取，随后用户可认领，类似于其他 SOFA Vaults。您可以在这里查看 $RCH 空投信息：<a href="_blank" href="https://docs.sofa.org/tokenomics/">https://docs.sofa.org/tokenomics/</a>',
+        enUS: '$RCH tokens are earned through the Optivisor\'s trading activities and can be claimed by users afterward, just like in other SOFA Vaults. You can check the $RCH airdrop info here: <a target="_blank" href="https://docs.sofa.org/tokenomics/">https://docs.sofa.org/tokenomics/</a>',
+        zhCN: '$RCH 代币通过 Optivisor 的交易活动赚取，随后用户可认领，类似于其他 SOFA Vaults。您可以在这里查看 $RCH 空投信息：<a target="_blank" href="https://docs.sofa.org/tokenomics/">https://docs.sofa.org/tokenomics/</a>',
       }),
     },
   ];
