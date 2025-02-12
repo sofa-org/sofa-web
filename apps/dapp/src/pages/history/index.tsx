@@ -193,7 +193,7 @@ const OrderHistory = () => {
               className={styles['icon-details']}
               onClick={() =>
                 setExpandedRowKeys((pre) => {
-                  const id = String(record?.id);
+                  const id = `${record?.product.vault.productType}-${record?.id}`;
                   if (id === pre[0]) return [];
                   return [id];
                 })
@@ -212,7 +212,7 @@ const OrderHistory = () => {
       dataSource={data?.list}
       loading={loading}
       pagination={false}
-      rowKey={(record) => String(record?.id)}
+      rowKey={(record) => `${record?.product.vault.productType}-${record?.id}`}
       empty={<CEmpty />}
       expandedRowKeys={expandedRowKeys}
       expandedRowRender={(record) => {
