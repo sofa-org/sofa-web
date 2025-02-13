@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ProductType, RiskType } from '@sofa/services/base-type';
+import { ProductType, RiskType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
+import { getDualDepositCcy } from '@sofa/services/vaults/dual';
 import { displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
@@ -23,6 +24,56 @@ import { useDIYConfigState, useDIYState } from './store';
 
 import styles from './index.module.scss';
 
+const configDualFormData: (
+  config: boolean,
+  data: Pick<VaultInfo, 'forCcy' | 'domCcy'>,
+) => Partial<
+  Pick<
+    VaultInfo,
+    | 'forCcy'
+    | 'domCcy'
+    | 'trackingSource'
+    | 'depositCcy'
+    | 'productType'
+    | 'riskType'
+  >
+> = (config, data) => {
+  const currentForm =
+    useDIYState.getState().formData?.[useWalletStore.getState().chainId];
+  if (config) {
+    const res = {
+      riskType: RiskType.DUAL,
+      productType:
+        !currentForm?.productType ||
+        ![ProductType.BearSpread, ProductType.BullSpread].includes(
+          currentForm.productType,
+        )
+          ? ProductType.BullSpread
+          : currentForm.productType,
+    };
+    (res as ReturnType<typeof configDualFormData>).depositCcy =
+      getDualDepositCcy({
+        ...data,
+        ...res,
+      });
+    return {
+      ...data,
+      ...res,
+    };
+  } else {
+    // unconfig dual
+    if (currentForm?.riskType != RiskType.DUAL) {
+      return {
+        ...data,
+      };
+    }
+    return {
+      ...data,
+      riskType: undefined,
+    };
+  }
+};
+
 const BettingOn = () => {
   const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
@@ -30,12 +81,19 @@ const BettingOn = () => {
   const options = useMemo(
     () =>
       useDIYState
-        .getVaultOptions({ chainId, ...formData }, [
-          'forCcy',
-          'domCcy',
-          'trackingSource',
-        ])
+        .getVaultOptions(
+          { chainId, ...formData },
+          ['forCcy', 'domCcy', 'trackingSource'],
+          {
+            onReduce: ({ it, vault }) =>
+              (it['hasDual'] =
+                it['hasDual'] || vault.riskType == RiskType.DUAL),
+            disabled: ({ originDisabled, it }) =>
+              originDisabled && !it['hasDual'],
+          },
+        )
         .map((it) => ({
+          ...it,
           label: t(
             { enUS: '{{forCcy}} Price', zhCN: '{{forCcy}} 价格' },
             { forCcy: it.data.forCcy?.replace(/^w/i, '') },
@@ -66,7 +124,20 @@ const BettingOn = () => {
             formData &&
             `${formData.forCcy}-${formData.domCcy}-${formData.trackingSource}`
           }
-          onChange={(_, it) => useDIYState.updateVaultOptions(chainId, it.data)}
+          onChange={(_, it) => {
+            if (it['hasDual']) {
+              // 目前双币的 forCcy 和其他是互斥的，我们可以认为有双币则不是 Earn/Surge/DNT，也不需要显示风险
+              useDIYState.updateVaultOptions(
+                chainId,
+                configDualFormData(true, it.data),
+              );
+            } else {
+              useDIYState.updateVaultOptions(
+                chainId,
+                configDualFormData(false, it.data),
+              );
+            }
+          }}
         />
       </div>
     </div>
@@ -120,8 +191,11 @@ const HowLong = () => {
   const config = useDIYConfigState((state) => state.configs[chainId]);
   const [min, max] = useMemo(() => {
     if (!formData) return [next8h(undefined, 2), next8h(undefined, 7)];
-    const options = useDIYConfigState.getConfig(chainId, formData, config)
-      ?.expiryDateTimes;
+    const options = useDIYConfigState.getConfig(
+      chainId,
+      formData,
+      config,
+    )?.expiryDateTimes;
     if (!options) return [next8h(undefined, 2), next8h(undefined, 7)];
     return [options[0] * 1000, options[options.length - 1] * 1000];
   }, [chainId, config, formData]);

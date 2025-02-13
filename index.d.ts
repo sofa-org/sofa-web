@@ -9,7 +9,7 @@ declare interface HttpResponse<T = unknown> {
   message?: string;
 }
 
-declare type CCY = 'BTC' | 'ETH' | 'RCH' | 'WBTC' | 'WETH' | 'stETH';
+declare type CCY = 'BTC' | 'ETH' | 'RCH' | 'WBTC' | 'WETH' | 'stETH' | 'CRV';
 declare type USDS = 'USD' | 'USDC' | 'USDT' | 'crvUSD' | 'scrvUSD' | string;
 
 declare type PRecord<K, V> = Partial<Record<K, V>>;

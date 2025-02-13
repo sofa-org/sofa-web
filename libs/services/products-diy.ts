@@ -24,10 +24,10 @@ export class ProductsDIYService {
   @applyMock('diyConfig')
   static config(params: ProductsDIYConfigRequest) {
     return http
-      .get<unknown, HttpResponse<ProductsDIYConfig[]>>(
-        '/rfq/diy/configuration',
-        { params },
-      )
+      .get<
+        unknown,
+        HttpResponse<ProductsDIYConfig[]>
+      >('/rfq/diy/configuration', { params })
       .then((res) => res.value);
   }
 
@@ -48,12 +48,13 @@ export class ProductsDIYService {
         [ProductType.DNT]: '/rfq/diy/dnt/recommended-list',
         [ProductType.BearSpread]: '/rfq/diy/smart-trend/recommended-list',
         [ProductType.BullSpread]: '/rfq/diy/smart-trend/recommended-list',
+        // TODO: dual api endpoint
       };
       return http
-        .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(
-          urls[vaultInfo.productType],
-          { params },
-        )
+        .get<
+          unknown,
+          HttpResponse<OriginProductQuoteResult[]>
+        >(urls[vaultInfo.productType], { params })
         .then((res) =>
           res.value.map((it) => ProductsService.dealOriginQuote(it)),
         );

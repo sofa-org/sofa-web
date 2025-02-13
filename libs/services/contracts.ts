@@ -20,6 +20,7 @@ import MerkleAirdropAbis from './abis/MerkleAirdrop.json';
 import RCHAbis from './abis/RCH.json';
 import SpotOracleAbis from './abis/SpotOracle.json';
 import { AutomatorVaults } from './vaults/automator';
+import { dualVaults } from './vaults/dual';
 import { earnVaults } from './vaults/earn';
 import { surgeVaults } from './vaults/surge';
 import {
@@ -36,7 +37,7 @@ export { ProductType, RiskType, TransactionStatus };
 export type { VaultInfo };
 
 export class ContractsService {
-  static vaults = [...earnVaults, ...surgeVaults].map((it) => ({
+  static vaults = [...earnVaults, ...surgeVaults, ...dualVaults].map((it) => ({
     ...it,
     tradeDisable: it.tradeDisable || undefined,
     onlyForAutomator: it.onlyForAutomator || undefined,

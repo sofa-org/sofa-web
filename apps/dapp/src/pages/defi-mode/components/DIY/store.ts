@@ -121,6 +121,28 @@ export const useDIYState = Object.assign(instant, {
   getVaultOptions: (
     filters: Partial<VaultInfo>,
     fields: (keyof VaultInfo)[],
+    options?: {
+      disabled?: (o: {
+        vaults: VaultInfo[];
+        genKey: (it: VaultInfo) => string;
+        originDisabled: boolean;
+        it: {
+          key: string;
+          data: Partial<VaultInfo>;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          [k: string]: any;
+        };
+      }) => boolean;
+      onReduce?: (o: {
+        it: {
+          key: string;
+          data: Partial<VaultInfo>;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          [k: string]: any;
+        };
+        vault: VaultInfo;
+      }) => void;
+    },
   ) => {
     const vaults = ProductsService.filterVaults(
       ContractsService.vaults,
@@ -134,16 +156,29 @@ export const useDIYState = Object.assign(instant, {
       .reduce(
         (pre, it) => {
           const key = genKey(it);
-          if (pre.every((it) => it.key !== key))
-            pre.push({ key, data: pick(it, fields) });
+          const matching = pre.find((it) => it.key === key);
+          if (!matching) pre.push({ key, data: pick(it, fields) });
+          else {
+            if (options?.onReduce) {
+              options.onReduce({
+                it: matching,
+                vault: it,
+              });
+            }
+          }
           return pre;
         },
         [] as { key: string; data: Partial<VaultInfo> }[],
       )
-      .map((it) => ({
-        ...it,
-        disabled: vaults.every(($it) => genKey($it) !== it.key),
-      }));
+      .map((it) => {
+        const originDisabled = vaults.every(($it) => genKey($it) !== it.key);
+        return {
+          ...it,
+          disabled: options?.disabled
+            ? options.disabled({ vaults, genKey, originDisabled, it })
+            : originDisabled,
+        };
+      });
   },
   validateFormData: (
     formData?: Partial<DIYFormData>,

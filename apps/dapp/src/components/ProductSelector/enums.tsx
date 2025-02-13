@@ -1,4 +1,4 @@
-import { ProjectType } from '@sofa/services/base-type';
+import { ProjectType, VisibleRiskType } from '@sofa/services/base-type';
 import { TFunction } from '@sofa/services/i18n';
 import {
   ProductType,
@@ -108,6 +108,15 @@ export const RiskTypeRefs = {
     icon: <img src={IconHighYield} width="24px" />,
     value: RiskType.RISKY,
   },
+  [RiskType.DUAL]: {
+    label: (t: TFunction) => t('Dual'),
+    label2: (t: TFunction) => t('[DUAL]All-or-None'),
+    label3: (t: TFunction) => t('Dual'),
+    desc: (t: TFunction) =>
+      t({ enUS: '[DUAL]Risking it all', zhCN: '[DUAL]能接受全部损失' }),
+    icon: <img src={IconHighYield} width="24px" />,
+    value: RiskType.DUAL,
+  },
 };
 
 export const ProductTypeRefs = {
@@ -161,7 +170,7 @@ export const ProductTypeRefs = {
     alias: 'Bull Trend',
     value: ProductType.BullSpread,
     img: <ImgBullSpread />,
-    icon: (riskType: RiskType, inverse: boolean) =>
+    icon: (riskType: VisibleRiskType, inverse: boolean) =>
       ({
         [`${RiskType.PROTECTED}-false`]: {
           icon: iconSpreadProtected,
@@ -270,7 +279,7 @@ export const ProductTypeRefs = {
     alias: 'Rangebound',
     value: ProductType.DNT,
     img: <ImgDNT />,
-    icon: (riskType: RiskType, inverse: boolean) =>
+    icon: (riskType: VisibleRiskType, inverse: boolean) =>
       ({
         [`${RiskType.PROTECTED}-false`]: {
           icon: iconDntProtected,
@@ -380,7 +389,7 @@ export const ProductTypeRefs = {
     alias: 'Bear Trend',
     value: ProductType.BearSpread,
     img: <ImgBearSpread />,
-    icon: (riskType: RiskType, inverse: boolean) =>
+    icon: (riskType: VisibleRiskType, inverse: boolean) =>
       ({
         [`${RiskType.PROTECTED}-false`]: {
           icon: iconSpreadProtected,

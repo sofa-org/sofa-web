@@ -17,6 +17,7 @@ export function getCollateralDecimal(chainId: number, depositCcy: string) {
     WETH: 1e18,
     stETH: 1e18,
     WBTC: 1e18,
+    CRV: 1e18,
   }[depositCcy];
   if (!decimal) throw new Error(`Cannot configure the ${depositCcy} vault`);
   return decimal;
@@ -39,8 +40,10 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
       WETH: 0.000015,
       stETH: 0.000015,
       WBTC: 0.000001,
+      CRV: 0.05,
     }[depositCcy];
   }
+  // TODO: Dual values
   return project === ProjectType.Surge
     ? {
         RCH: 20,
@@ -93,6 +96,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
       WBTC: 0.000001,
     }[depositCcy];
   }
+  // TODO: Dual values
   return project === ProjectType.Surge
     ? {
         RCH: 20,
@@ -124,4 +128,24 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
         stETH: 0.0001,
         WBTC: 0.0001,
       }[depositCcy];
+}
+
+export function getTickPrice(domCcy: string, project: ProjectType) {
+  return (
+    {
+      RCH: 0.05,
+      stRCH: 0.05,
+      zRCH: 0.05,
+      USDT: 0.05,
+      aUSDT: 0.05,
+      USDC: 0.05,
+      aArbSepUSDC: 0.05,
+      aUSDC: 0.05,
+      crvUSD: 0.05,
+      scrvUSD: 0.05,
+      WETH: 0.000001,
+      stETH: 0.000001,
+      WBTC: 0.000001,
+    }[domCcy] || 1
+  );
 }

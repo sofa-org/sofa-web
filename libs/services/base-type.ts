@@ -4,6 +4,7 @@ export enum ProjectType {
   Earn = 'Earn',
   Surge = 'Surge',
   Automator = 'Automator',
+  Dual = 'Dual', // 双币交易
 }
 
 export enum ProductType {
@@ -17,7 +18,13 @@ export enum RiskType {
   PROTECTED = 'PROTECTED',
   LEVERAGE = 'LEVERAGE',
   RISKY = 'RISKY',
+  DUAL = 'DUAL',
 }
+
+export type VisibleRiskType =
+  | RiskType.PROTECTED
+  | RiskType.LEVERAGE
+  | RiskType.RISKY;
 
 export enum TransactionStatus {
   PENDING = 0,
@@ -52,7 +59,7 @@ export interface VaultInfo {
   chainId: number;
   productType: ProductType;
   riskType: RiskType; // 风险类型：PROTECTED, LEVERAGE, RISKY
-  forCcy: Exclude<CCY, 'RCH' | 'stETH'>; // 标的物币种
+  forCcy: Exclude<CCY, 'stETH'>; // 标的物币种
   domCcy: USDS; // 标的物币种的币对
   trackingSource: string; // 追踪指数源
   depositCcy: CCY | USDS; // 申购币种
@@ -69,6 +76,7 @@ export interface VaultInfo {
   interestType: InterestType | undefined; // 生息方式，只有 PROTECTED 产品有
   abis: ethers.InterfaceAbi;
   earlyClaimable: boolean | undefined;
+  tickPrice: number; // Dual: 价格的布增
 }
 
 export interface AutomatorVaultInfo {
