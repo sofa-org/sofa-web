@@ -92,12 +92,16 @@ const allMenuItems = (
 function locationMatches(
   item: MenuItem,
   location: ReturnType<typeof useLocation>,
+  options?: {
+    strict?: boolean;
+  },
 ) {
   if (!item.path.replace(/^\/+/, '') && location.pathname !== '/') return false;
   const [, origin = '', path = '', search = '', hash = ''] =
     item.path.match(/^(https?:\/\/[^/]+)?([^#?]+)?([^#]+)?(.*)?$/) || [];
 
   if (origin && window.location.origin !== origin) return false;
+  if (options?.strict && location.pathname != path) return false;
   if (!location.pathname.includes(path)) return false;
   if (search.split(/[?&]/).some((it) => !location.search.includes(it)))
     return false;
@@ -133,17 +137,23 @@ export function markSelectedMenuItems(
   items: MenuItem[],
   location: ReturnType<typeof useLocation>,
 ): MenuItem[] {
-  for (const item of items) {
-    let selected = locationMatches(item, location);
-    if (item.children) {
-      markSelectedMenuItems(item.children, location);
-      // if any of my children is selected, the parent menu item is selected
-      if (!selected && item.children?.filter((c) => c.active)?.length) {
-        selected = true;
+  const matchSelection = (strict: boolean) => {
+    let anySelected = false;
+    for (const item of items) {
+      let selected = locationMatches(item, location, { strict });
+      if (item.children) {
+        markSelectedMenuItems(item.children, location);
+        // if any of my children is selected, the parent menu item is selected
+        if (!selected && item.children?.filter((c) => c.active)?.length) {
+          selected = true;
+        }
       }
+      item.active = selected;
+      anySelected = anySelected || selected;
     }
-    item.active = selected;
-  }
+    return anySelected;
+  };
+  matchSelection(true) || matchSelection(false);
   return items;
 }
 export function useHeaderOpacity() {
