@@ -13,7 +13,7 @@ import styles from './index.module.scss';
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
-  const [data, setData] = useLocalStorageState('global-modal-4', {
+  const [data, setData] = useLocalStorageState('global-modal-5', {
     defaultValue: { closedAt: 0, count: 0 },
   });
   const visible = useMemo(() => {
@@ -48,33 +48,16 @@ export const GlobalModal = () => {
         className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: '1. The OKX Web3 Joint Campaign has officially ended!',
-            zhCN: '1. OKX Web3 联合活动已结束',
+            enUS: '1. Poker Museum Temporarily Closed',
+            zhCN: '1. 扑克博物馆暂时下线',
           }),
         }}
       />
       <p
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: 'Starting today, all $RCH airdrop rewards are available for you on SOFA.org - head over now and place your orders! ',
-            zhCN: '即日起，$RCH 空投奖励已统一回归 SOFA.org，欢迎大家在 SOFA.org 下单！',
-          }),
-        }}
-      />
-      <p
-        className={styles['head']}
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: '2. Big News: Earn and Surge purchases are now both eligible for the Poker Museum event!',
-            zhCN: '2. Earn / Surge 都可参与扑克博物馆',
-          }),
-        }}
-      />
-      <p
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: 'Simply make a purchase of either Earn or Surge products to score exclusive poker cards, each redeemable for up to 100 $RCH.',
-            zhCN: '新规调整：购买 Earn 产品也能参与活动！购买一笔 Earn 或 Surge 即可赢扑克，每张扑克最高兑换 100 $RCH！',
+            enUS: `The Poker Museum will be temporarily closed from 8 AM UTC on February 15, 2025. Please make sure to draw all your cards before then, as any undrawn cards will be forfeited. We're planning a new event, so stay tuned for updates!`,
+            zhCN: '扑克博物馆将于 2025年2月15日 16:00 (UTC+8) 暂时下线。请在截止时间前完成抽卡，逾期未抽取的卡片将作废。新活动正在筹划中，敬请期待！',
           }),
         }}
       />
@@ -82,16 +65,16 @@ export const GlobalModal = () => {
         className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: '3. SOFA.org Automator is officially live!',
-            zhCN: '3. SOFA.org 全新产品 Automator 正式上线！',
+            enUS: '2. Automator Follow-Up Feature Now Available',
+            zhCN: '2. Automator 跟单功能上线',
           }),
         }}
       />
       <p
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: 'Delegate your funds to high-performing Automator traders & strategies. Funds will be utilized and continuously re-invested in optimized return strategies until user redemption. (Switch to the Arbitrum One network to access Automator.)',
-            zhCN: '将资金托管给高绩效的 Automator 交易者及策略。资金将被充分利用，持续再投资以实现最佳回报，直至用户赎回。（切换至 Arbitrum One 链，即可进入 Automator）',
+            enUS: 'The Automator follow-up feature is here! You can now entrust your funds to top-performing Automator traders and strategies. Your funds will be automatically reinvested, harnessing the power of compound interest to help you easily implement volatility arbitrage strategies.',
+            zhCN: 'Automator 跟单功能现已上线！将资金托管给高绩效的 Automator 交易者和策略，资金将自动循环投资，充分发挥复利效应，助你轻松执行波动率套利策略！',
           }),
         }}
       />
