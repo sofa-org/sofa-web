@@ -11,9 +11,10 @@ import {
 } from '../utils';
 
 import vaults_1 from './1';
+import vaults_421614 from './421614';
 import vaults_11155111 from './11155111';
 
-const vaults = [...vaults_1, ...vaults_11155111];
+const vaults = [...vaults_1, ...vaults_421614, ...vaults_11155111];
 
 function getDualAbis(
   vault: Pick<VaultInfo, 'forCcy' | 'domCcy' | 'depositCcy'>,
@@ -24,22 +25,30 @@ function getDualAbis(
 export function getDualDepositCcy(
   vault: Pick<VaultInfo, 'forCcy' | 'domCcy' | 'productType'>,
 ) {
-  if (vault.productType == ProductType.BullSpread) {
+  if (vault.productType == ProductType.BearSpread) {
     return vault.forCcy;
   } else {
     return vault.domCcy;
   }
 }
 
+export function getDualProductType(
+  vault: Pick<VaultInfo, 'forCcy' | 'depositCcy'>,
+) {
+  if (vault.forCcy == vault.depositCcy) {
+    return ProductType.BearSpread;
+  }
+  return ProductType.BullSpread;
+}
+
 export const dualVaults = vaults.map((it) => {
   const collateralDecimal = getCollateralDecimal(it.chainId, it.depositCcy);
   return {
     ...it,
-    productType:
-      it.depositCcy == it.forCcy
-        ? ProductType.BullSpread
-        : ProductType.BearSpread,
-    riskType: RiskType.DUAL,
+    productType: getDualProductType({
+      forCcy: it.forCcy as VaultInfo['forCcy'],
+      depositCcy: it.depositCcy,
+    }),
     trackingSource: 'COINBASE',
     depositMinAmount: getDepositMinAmount(it.depositCcy, ProjectType.Dual),
     depositTickAmount: getDepositTickAmount(it.depositCcy, ProjectType.Dual),

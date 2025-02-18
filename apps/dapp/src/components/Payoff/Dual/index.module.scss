@@ -1,0 +1,72 @@
+// TODO
+.payoff {
+  padding: 0 40px;
+
+  .dual-flex {
+    @include bold;
+    @include flex-center;
+
+    font-size: 18px;
+  }
+
+  &.buy-low {
+    .payoff-chart {
+      margin: 16px 0 32px;
+      height: 61px;
+      background: url("./assets/payoff-chart-buy-low.svg") no-repeat center
+        center / contain;
+    }
+  }
+
+  &.sell-high {
+    .payoff-chart {
+      margin: 8px 0 32px;
+      height: 69px;
+      background: url("./assets/payoff-chart-sell-high.svg") no-repeat center
+        bottom / contain;
+      background-size: auto 45px;
+    }
+  }
+
+  .payoff-infos {
+    height: min(251px);
+    min-width: min(300px);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #fcfdeb;
+    text-align: center;
+    padding: 24px;
+
+    .apy {
+      color: #50d113;
+      font-size: 32px;
+      display: inline-block;
+
+      span {
+        margin-left: 5px;
+        font-size: 20px;
+      }
+    }
+
+    .payoff-chart {
+      font-size: 16px;
+      color: #50d113;
+    }
+
+    .ccys {
+      @include flex-center;
+
+      img {
+        height: 48px;
+        width: 48px;
+      }
+
+      .icon-arrow {
+        height: 32px;
+        width: 32px;
+        background: url("./assets/icon-arrow.png") no-repeat center / contain;
+        margin: 0 24px;
+      }
+    }
+  }
+}

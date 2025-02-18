@@ -116,7 +116,11 @@ const instant = createWithEqualityFn(
   ),
   isEqual,
 );
-
+type AggreatedVault = {
+  key: string;
+  data: Partial<VaultInfo>;
+  isDual?: 'all' | 'partial';
+};
 export const useDIYState = Object.assign(instant, {
   getVaultOptions: (
     filters: Partial<VaultInfo>,
@@ -126,22 +130,8 @@ export const useDIYState = Object.assign(instant, {
         vaults: VaultInfo[];
         genKey: (it: VaultInfo) => string;
         originDisabled: boolean;
-        it: {
-          key: string;
-          data: Partial<VaultInfo>;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          [k: string]: any;
-        };
+        it: AggreatedVault;
       }) => boolean;
-      onReduce?: (o: {
-        it: {
-          key: string;
-          data: Partial<VaultInfo>;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          [k: string]: any;
-        };
-        vault: VaultInfo;
-      }) => void;
     },
   ) => {
     const vaults = ProductsService.filterVaults(
@@ -153,23 +143,23 @@ export const useDIYState = Object.assign(instant, {
     const genKey = (it: VaultInfo) => fields.map((k) => it[k]).join('-');
     return ContractsService.vaults
       .filter((it) => it.chainId === filters.chainId && !it.onlyForAutomator)
-      .reduce(
-        (pre, it) => {
-          const key = genKey(it);
-          const matching = pre.find((it) => it.key === key);
-          if (!matching) pre.push({ key, data: pick(it, fields) });
-          else {
-            if (options?.onReduce) {
-              options.onReduce({
-                it: matching,
-                vault: it,
-              });
+      .reduce((pre, it) => {
+        const key = genKey(it);
+        const matching = pre.find((it) => it.key === key);
+        if (!matching) pre.push({ key, data: pick(it, fields) });
+        else {
+          if (it.riskType == RiskType.DUAL) {
+            if (!matching.isDual) {
+              matching.isDual = 'all';
+            }
+          } else {
+            if (matching.isDual === 'all') {
+              matching.isDual = 'partial';
             }
           }
-          return pre;
-        },
-        [] as { key: string; data: Partial<VaultInfo> }[],
-      )
+        }
+        return pre;
+      }, [] as AggreatedVault[])
       .map((it) => {
         const originDisabled = vaults.every(($it) => genKey($it) !== it.key);
         return {

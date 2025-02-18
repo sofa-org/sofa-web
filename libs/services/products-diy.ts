@@ -1,7 +1,12 @@
 import { applyMock } from '@sofa/utils/decorators';
 import { http } from '@sofa/utils/http';
 
-import { ContractsService, ProductType, VaultInfo } from './contracts';
+import {
+  ContractsService,
+  ProductType,
+  RiskType,
+  VaultInfo,
+} from './contracts';
 import { OriginProductQuoteResult, ProductsService } from './products';
 
 export interface ProductsDIYConfigRequest {
@@ -44,17 +49,19 @@ export class ProductsDIYService {
       .filter(Boolean) as VaultInfo[];
     if (!vaultInfoList.length) throw new Error('Invalid vault');
     const fetch = (vaultInfo: VaultInfo) => {
-      const urls = {
-        [ProductType.DNT]: '/rfq/diy/dnt/recommended-list',
-        [ProductType.BearSpread]: '/rfq/diy/smart-trend/recommended-list',
-        [ProductType.BullSpread]: '/rfq/diy/smart-trend/recommended-list',
-        // TODO: dual api endpoint
-      };
+      let url: string;
+      if (vaultInfo.riskType == RiskType.DUAL) {
+        url = '/rfq/diy/dual/recommended-list';
+      } else {
+        url = {
+          [ProductType.DNT]: '/rfq/diy/dnt/recommended-list',
+          [ProductType.BearSpread]: '/rfq/diy/smart-trend/recommended-list',
+          [ProductType.BullSpread]: '/rfq/diy/smart-trend/recommended-list',
+          // TODO: dual api endpoint
+        }[vaultInfo.productType];
+      }
       return http
-        .get<
-          unknown,
-          HttpResponse<OriginProductQuoteResult[]>
-        >(urls[vaultInfo.productType], { params })
+        .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(url, { params })
         .then((res) =>
           res.value.map((it) => ProductsService.dealOriginQuote(it)),
         );

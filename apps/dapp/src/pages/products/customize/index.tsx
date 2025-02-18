@@ -60,6 +60,7 @@ import ProductBanner, { ProductBrief } from '../components/ProductBanner';
 import ProductDesc from '../components/ProductDesc';
 import { ProfitsRender } from '../components/ProfitsRender';
 import { QuoteExplain } from '../components/QuoteExplain';
+import ProductDual from '../dual';
 import ProductLottery from '../lottery';
 import { useProductsState } from '../store';
 
@@ -76,7 +77,9 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
   const prices = useIndexPrices((state) => state.prices);
   const [productType] = useProductSelect();
   const [riskType] = useRiskSelect(ProjectType.Earn);
-  const [forCcy] = useForCcySelect();
+  const [forCcy] = useForCcySelect({
+    acceptance: ['WBTC', 'WETH'],
+  });
   const [depositCcy, setDepositCcy] = useDepositCcySelect();
   const [leverageVault, $setLeverageVault] = useState<string>();
   const isMobileUI = useIsMobileUI();
@@ -536,7 +539,9 @@ const Comp = (props: BaseProps & { onlyForm?: boolean }) => {
     );
   }
 
-  return project !== ProjectType.Surge ? (
+  return project === ProjectType.Dual ? (
+    <ProductDual {...props} />
+  ) : project !== ProjectType.Surge ? (
     <ProductCustomize {...props} />
   ) : (
     <ProductLottery {...props} />

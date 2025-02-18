@@ -97,7 +97,11 @@ export const DIYProductDisplay = () => {
             : t({ enUS: 'Day', zhCN: '天' })}
         </span>
       </div>
-      <div className={styles['charts']}>
+      <div
+        className={classNames(styles['charts'], {
+          [styles['dual']]: quote?.vault.riskType == RiskType.DUAL,
+        })}
+      >
         {quote && (
           <RecommendedCardItem
             it={quote}

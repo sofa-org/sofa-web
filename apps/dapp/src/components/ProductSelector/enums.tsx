@@ -16,6 +16,7 @@ import iconDntRisky from './assets/dnt-risky.png';
 import iconDntRiskyInverse from './assets/dnt-risky-inverse.png';
 import IconAutomator from './assets/icon-automator.png';
 import { Comp as IconDown } from './assets/icon-down.svg';
+import IconDual from './assets/icon-dual.png';
 import { Comp as IconFlat } from './assets/icon-flat.svg';
 import IconHighYield from './assets/icon-high-yield.png';
 import IconLowRisk from './assets/icon-low-risk.png';
@@ -77,6 +78,21 @@ export const ProjectTypeRefs = {
     icon: <img src={IconAutomator} width="24px" />,
     value: ProjectType.Automator,
     link: EnvLinks.config.VITE_AUTOMATOR_LINK,
+  },
+  [ProjectType.Dual]: {
+    label: (t: TFunction) => t({ enUS: 'DualFlex', zhCN: '双币交易' }),
+    desc: (t: TFunction) =>
+      t({
+        enUS: 'DualFlex: Buy Low, Sell High',
+      }),
+    desc1: (t: TFunction) =>
+      t({
+        enUS: `Buy Low & Sell High.
+Designed for users confident in market trends and seeking dynamic opportunities.`,
+      }),
+    icon: <img src={IconDual} width="24px" />,
+    value: ProjectType.Dual,
+    link: EnvLinks.config.VITE_DUAL_LINK,
   },
 };
 

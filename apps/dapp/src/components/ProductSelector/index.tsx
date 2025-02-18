@@ -53,6 +53,7 @@ export function useProjectChange(defaultVal = ProjectType.Earn) {
     if (val === RiskType.LEVERAGE) return ProjectType.Earn;
     // 兼容旧的 riskType 类型：RISKY -> Surge
     if (val === RiskType.RISKY) return ProjectType.Surge;
+    if (val == RiskType.DUAL) return ProjectType.Dual;
 
     const project = Object.values(ProjectTypeRefs).find((it) => {
       if (Env.isDev) return false;

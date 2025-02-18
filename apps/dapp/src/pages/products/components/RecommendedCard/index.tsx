@@ -22,6 +22,7 @@ import { nanoid } from 'nanoid';
 import { parse, stringify } from 'qs';
 
 import Payoff from '@/components/Payoff';
+import DualPayoff from '@/components/Payoff/Dual/Payoff';
 import {
   useProductSelect,
   useProjectChange,
@@ -89,7 +90,24 @@ export const RecommendedCardItem = (props: {
       )}
       onClick={onClick}
     >
-      {it.vault.riskType !== RiskType.RISKY ? (
+      {it.vault.riskType === RiskType.DUAL ? (
+        <DualPayoff
+          domCcy={it.vault.domCcy}
+          riskType={it.vault.riskType}
+          productType={it.vault.productType}
+          forCcy={it.vault.forCcy}
+          depositCcy={it.vault.depositCcy}
+          depositAmount={+it.amounts.own}
+          positionAmount={positionAmount(it)}
+          refMs={next8h(it.timestamp * 1000)}
+          expMs={it.expiry * 1000}
+          rchYield={Number(it.apyInfo?.rch)}
+          anchorPrices={it.anchorPrices}
+          protectedYield={Number(it.apyInfo?.min)}
+          enhancedYield={simplePlus(it.apyInfo?.max, -(it.apyInfo?.min || 0))}
+          {...props.extraPayoffProps}
+        />
+      ) : it.vault.riskType !== RiskType.RISKY ? (
         <Payoff
           riskType={it.vault.riskType}
           productType={it.vault.productType}

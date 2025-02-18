@@ -1,0 +1,62 @@
+.head-title {
+  @include flex-center;
+
+  margin: 0;
+  padding: 75px 0 30px;
+  font-size: min(24px, 5vw);
+  text-align: center;
+  color: #fff;
+}
+
+.form {
+  width: $width-content;
+  margin: 24px auto 40px;
+  background: #2c2f34;
+  border-radius: 40px 40px 24px 24px;
+
+  .sub-title {
+    min-height: 46px;
+
+    @include flex-center;
+
+    color: #fff;
+  }
+}
+
+.content {
+  @include flex-center;
+
+  align-items: stretch;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0;
+  background: #fff;
+  border-radius: 24px;
+}
+
+.current-price {
+  > .amount {
+    @include bold;
+  }
+}
+
+.quotes-table {
+  .change-to-current-price {
+    > .amount {
+      @include bold;
+
+      &.increased {
+        &::before {
+          content: "↑";
+        }
+      }
+
+      &.decreased {
+        &::before {
+          content: "↓";
+        }
+      }
+    }
+  }
+}

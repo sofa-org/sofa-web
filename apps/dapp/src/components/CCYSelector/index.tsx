@@ -31,15 +31,34 @@ export interface DepositCCYSelectorProps
   dark?: boolean;
 }
 
-export function useForCcySelect() {
+export function useForCcySelect(options?: {
+  defaultValue?: VaultInfo['forCcy'];
+  acceptance?:
+    | VaultInfo['forCcy'][]
+    | ((forCcy: VaultInfo['forCcy']) => boolean);
+}) {
   const query = useQuery();
-  const setForCcy = useLazyCallback(
-    (v: VaultInfo['forCcy']) => updateQuery?.({ 'for-ccy': v }),
+  const setForCcy = useLazyCallback((v: VaultInfo['forCcy']) =>
+    updateQuery?.({ 'for-ccy': v }),
   );
-  return [
-    (query['for-ccy'] as VaultInfo['forCcy']) || 'WETH',
-    setForCcy,
-  ] as const;
+  const rawV = useMemo(
+    () => query['for-ccy'] as VaultInfo['forCcy'],
+    [query['for-ccy']],
+  );
+  const currentV = useMemo(() => {
+    if (options?.acceptance) {
+      const accept =
+        typeof options.acceptance == 'function'
+          ? options.acceptance(rawV)
+          : options.acceptance.includes(rawV);
+      if (accept) {
+        return rawV;
+      }
+      return options?.defaultValue || 'WETH';
+    }
+    return rawV || options?.defaultValue || 'WETH';
+  }, [options?.defaultValue, options?.acceptance, rawV]);
+  return [currentV, setForCcy] as const;
 }
 
 export function useDepositCcySelect() {
@@ -48,8 +67,8 @@ export function useDepositCcySelect() {
   const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const chainId = useWalletStore((state) => state.chainId);
-  const setDepositCcy = useLazyCallback(
-    (v: VaultInfo['depositCcy']) => updateQuery?.({ 'deposit-ccy': v }),
+  const setDepositCcy = useLazyCallback((v: VaultInfo['depositCcy']) =>
+    updateQuery?.({ 'deposit-ccy': v }),
   );
   const $ccy = (query['deposit-ccy'] as VaultInfo['depositCcy']) || 'USDT';
   const ccy = useMemo(
@@ -75,7 +94,9 @@ export const CCYSelector = (
     optionDisabled?: (v: ReturnType<typeof useForCcySelect>[0]) => boolean;
   },
 ) => {
-  const globalState = useForCcySelect();
+  const globalState = useForCcySelect({
+    acceptance: ['WBTC', 'WETH'],
+  });
   const [ccy, setCcy] = props.localState || globalState;
   const options = useMemo(
     () =>

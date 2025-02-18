@@ -88,6 +88,10 @@
   margin: -5px 0 20px;
   padding: 0 12px;
 
+  &.dual {
+    height: min(251px, 35.8vw);
+  }
+
   .quote-infos {
     height: min(180px, 30vw);
     background: transparent;

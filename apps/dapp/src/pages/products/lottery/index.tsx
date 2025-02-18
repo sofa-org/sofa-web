@@ -45,7 +45,9 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('ProductLottery');
   const wallet = useWalletStore();
   const prices = useIndexPrices((state) => state.prices);
-  const [forCcy] = useForCcySelect();
+  const [forCcy] = useForCcySelect({
+    acceptance: ['WBTC', 'WETH'],
+  });
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();

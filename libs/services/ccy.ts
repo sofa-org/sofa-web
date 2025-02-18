@@ -1,4 +1,5 @@
 import IconBTC from './assets/icon-btc.svg?url';
+import IconCRV from './assets/icon-crv.svg?url';
 import IconCrvUSD from './assets/icon-crvusd.png';
 import IconETH from './assets/icon-eth.svg?url';
 import IconRCH from './assets/icon-rch.png';
@@ -81,6 +82,12 @@ export class CCYService {
       icon: IconBTC,
       color: '#FFA800',
       precision: 5,
+    },
+    CRV: {
+      name: 'CRV',
+      icon: IconCRV,
+      color: '#FFA800',
+      precision: 4,
     },
   };
 }

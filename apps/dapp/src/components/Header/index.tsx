@@ -89,6 +89,17 @@ const allMenuItems = (
             path: joinUrl(EnvLinks.config.VITE_SURGE_LINK, '/customize'),
           },
           {
+            icon: ProjectTypeRefs[ProjectType.Dual].icon,
+            group: (t: TFunction) => t({ enUS: 'Professional', zhCN: '专业' }),
+            label: (t: TFunction) => (
+              <span className={styles['txt-gradient-2']}>
+                {ProjectTypeRefs[ProjectType.Dual].label(t)}
+              </span>
+            ),
+            desc: (t: TFunction) => ProjectTypeRefs[ProjectType.Dual].desc1(t),
+            path: joinUrl(EnvLinks.config.VITE_DUAL_LINK, '/customize'),
+          },
+          {
             icon: <IconPos />,
             group: (t: TFunction) => t({ enUS: 'Position', zhCN: '持仓' }),
             label: (t: TFunction) => t({ enUS: 'Position', zhCN: '持仓' }),

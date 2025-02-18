@@ -1,36 +1,11 @@
-import { ProductType, RiskType } from '../../base-type';
-
-const CRVVaults = [
-  // buy low
-  {
-    chainId: 11155111,
-    vault: '0x0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    riskType: RiskType.PROTECTED,
-    forCcy: 'CRV',
-    domCcy: 'crvUSD',
-    depositCcy: 'crvUSD',
-    rchMultiplier: 1,
-    usePermit2: false,
-  },
-  // sell high
-  {
-    chainId: 11155111,
-    vault: '0x0BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-    riskType: RiskType.PROTECTED,
-    forCcy: 'CRV',
-    domCcy: 'crvUSD',
-    depositCcy: 'CRV',
-    rchMultiplier: 1,
-    usePermit2: false,
-  },
-];
+import { RiskType } from '../../base-type';
 
 const RCHVaults = [
   // buy low
   {
     chainId: 11155111,
-    vault: '0x0CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
-    riskType: RiskType.PROTECTED,
+    vault: '0xd8d1335589C53bFFc6B84ffc7bf6c8655321A8eb',
+    riskType: RiskType.DUAL,
     forCcy: 'RCH',
     domCcy: 'USDT',
     depositCcy: 'USDT',
@@ -40,8 +15,8 @@ const RCHVaults = [
   // sell high
   {
     chainId: 11155111,
-    vault: '0x0DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
-    riskType: RiskType.PROTECTED,
+    vault: '0xEC3bc82cc30Be386B86D1976C5E7FAE2A5D26905',
+    riskType: RiskType.DUAL,
     forCcy: 'RCH',
     domCcy: 'USDT',
     depositCcy: 'RCH',
@@ -50,6 +25,6 @@ const RCHVaults = [
   },
 ];
 
-const vaults = [...CRVVaults, ...RCHVaults];
+const vaults = [...RCHVaults];
 
 export default vaults;

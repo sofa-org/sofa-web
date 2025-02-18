@@ -276,6 +276,7 @@ export const RenderMenu = (it: MenuItem) => {
                 {arr.length > 1 && <Dropdown.Title>{group}</Dropdown.Title>}
                 {children.map((m) => {
                   if (it.hide?.()) return <Fragment key={m.path} />;
+                  const desc = m.desc?.(t);
                   return (
                     <Dropdown.Item
                       key={m.path}
@@ -314,8 +315,15 @@ export const RenderMenu = (it: MenuItem) => {
                               styles['txt-desc'],
                               'txt-desc',
                             )}
+                            dangerouslySetInnerHTML={
+                              typeof desc === 'string'
+                                ? {
+                                    __html: desc.replace('\n', '<br />'),
+                                  }
+                                : undefined
+                            }
                           >
-                            {m.desc?.(t)}
+                            {typeof desc === 'string' ? undefined : desc}
                           </span>
                         </span>
                       </span>

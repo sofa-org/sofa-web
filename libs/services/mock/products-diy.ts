@@ -37,19 +37,20 @@ function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
         chainId: params.chainId,
       });
       if (!vaultInfo) return undefined;
-      return [...Array(2)].map(() => mockProductQuote(vaultInfo));
+      return [...Array(2)].map(() => mockProductQuote(vaultInfo, params));
     })
     .filter(Boolean);
 }
 
 function mockProductQuote(
-  params: PartialRequired<VaultInfo, 'forCcy' | 'riskType'>,
+  vaultInfo: PartialRequired<VaultInfo, 'forCcy' | 'riskType'>,
+  params: ProductsDIYRecommendRequest,
 ): ProductQuoteResult {
   return {
     rfqId: '',
     anchorPrices: [2000, 3000],
-    vault: ProductsService.findVault(ContractsService.vaults, params)!, // 合约地址
-    expiry: next8h(undefined, 18) / 1000, // 到期日对应的秒级时间戳，例如 1672387200
+    vault: ProductsService.findVault(ContractsService.vaults, vaultInfo)!, // 合约地址
+    expiry: params.expiryDateTime || next8h(undefined, 18) / 1000, // 到期日对应的秒级时间戳，例如 1672387200
     timestamp: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前定价对应的触发时间；下一个观察开始时间基于此逻辑计算
     observationStart: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前产品根据timestamp预估的开始观察敲入敲出时间
     quote: {
