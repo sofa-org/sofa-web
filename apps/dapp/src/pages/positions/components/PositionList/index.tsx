@@ -64,7 +64,7 @@ const List = (props: {
           chainId: wallet.chainId,
           owner: address,
           claimed: false,
-          concealed: false,
+          concealed: props.automator ? undefined : false,
           riskType: props.automator ? undefined : props.riskType,
           productType: props.automator ? undefined : props.productType,
         },
