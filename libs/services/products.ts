@@ -157,6 +157,9 @@ export interface ProductQuoteResult
     CalculatedInfo,
     Pick<OriginProductQuoteResult, 'rfqId' | 'quote' | 'timestamp'> {
   pricesForCalculation: Record<string, number | undefined>;
+
+  // 对于存入之后没有利息的 earn 的 vault（比如 sUSDa 的几个 Earn 合约）来讲，需要计算以底层价值币种来转换数据
+  convertedCalculatedInfoByDepositBaseCcy?: CalculatedInfo;
 }
 
 export class ProductsService {
@@ -192,8 +195,23 @@ export class ProductsService {
   static dealOriginQuote(
     it: OriginProductQuoteResult,
     fixProtectedApy?: string | number,
+    ppsMap?: Record<VaultInfo['depositCcy'], number>,
   ): ProductQuoteResult {
     const vault = ContractsService.getVaultInfo(it.vault, it.chainId);
+    const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
+      ? (() => {
+          if (!ppsMap?.[vault.depositCcy]) return undefined;
+          const pps = {
+            atTrade: ppsMap[vault.depositCcy],
+            now: ppsMap[vault.depositCcy],
+          };
+          return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
+            vault,
+            it,
+            pps,
+          );
+        })()
+      : undefined;
     return {
       ...it,
       vault,
@@ -210,6 +228,7 @@ export class ProductsService {
         (pre, it) => ({ ...pre, [it.ccy]: it.price }),
         {},
       ),
+      convertedCalculatedInfoByDepositBaseCcy,
     };
   }
 
@@ -470,5 +489,14 @@ export class ProductsService {
   static delRfq(rfqId: string) {
     if (!rfqId) return;
     return http.post<unknown, HttpResponse<unknown>>('/rfq/remove', { rfqId });
+  }
+
+  static cvtCalculatedInfoToDepositBaseCcy(
+    vault: VaultInfo,
+    data: CalculatedInfo,
+    pps: { atTrade: number; now: number }, // depositCcy 和 depositBaseCcy 的汇率
+  ): CalculatedInfo {
+    // TODO 转换，先返回原数据了
+    return data;
   }
 }

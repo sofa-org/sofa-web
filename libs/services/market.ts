@@ -352,4 +352,14 @@ export class MarketService {
     if (!+zRCHTotalSupply) return 1;
     return Big(balanceOfStRCH).div(zRCHTotalSupply).toString();
   }
+
+  static async getPPS(
+    ccy: string,
+    timeList: number[],
+  ): Promise<Record<(typeof timeList)[0] | 'now', number>> {
+    // TODO 找服务端要接口
+    throw new Error('No pps');
+
+    // TODO 需要将现在的价格的 key 转成 now
+  }
 }

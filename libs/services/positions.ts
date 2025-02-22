@@ -2,8 +2,14 @@ import { safeRun } from '@sofa/utils/fns';
 import { http, pollingUntil } from '@sofa/utils/http';
 import { UserStorage } from '@sofa/utils/storage';
 
-import { ContractsService, ProductType, TransactionStatus } from './contracts';
+import {
+  ContractsService,
+  ProductType,
+  TransactionStatus,
+  VaultInfo,
+} from './contracts';
 import { TFunction } from './i18n';
+import { MarketService } from './market';
 import { CalculatedInfo, ProductInfo, ProductsService } from './products';
 import { RiskType } from './products';
 import { BindTradeInfo, ReferralService } from './referral';
@@ -85,6 +91,9 @@ export interface OriginTransactionInfo
 
 export interface TransactionInfo extends OriginTransactionInfo {
   pricesForCalculation: Record<string, number | undefined>;
+
+  // 对于存入之后没有利息的 earn 的 vault（比如 sUSDa 的几个 Earn 合约）来讲，需要计算以底层价值币种来转换数据
+  convertedCalculatedInfoByDepositBaseCcy?: CalculatedInfo;
 }
 
 export interface TransactionProgress {
@@ -178,6 +187,46 @@ export class PositionsService {
       );
   }
 
+  static cvtPosition<
+    T extends CalculatedInfo &
+      Pick<OriginPositionInfo, 'product' | 'createdAt'>,
+  >(
+    it: T,
+    ppsMap?: Record<
+      VaultInfo['depositCcy'],
+      Record<number /* timestamp */ | 'now', number>
+    >,
+  ) {
+    const vault = ContractsService.getVaultInfo(
+      it.product.vault.vault,
+      it.product.vault.chainId,
+    );
+    const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
+      ? (() => {
+          if (!ppsMap?.[vault.depositCcy]) return undefined;
+          const pps = {
+            atTrade: ppsMap[vault.depositCcy][it.createdAt * 1000],
+            now: ppsMap[vault.depositCcy]['now'],
+          };
+          if (!pps.atTrade || !pps.now) return undefined;
+          return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
+            vault,
+            it,
+            pps,
+          );
+        })()
+      : undefined;
+    return {
+      ...it,
+      vault,
+      pricesForCalculation: it.relevantDollarPrices.reduce(
+        (pre, it) => ({ ...pre, [it.ccy]: it.price }),
+        {},
+      ),
+      convertedCalculatedInfoByDepositBaseCcy,
+    };
+  }
+
   static async history(
     params: {
       chainId: number;
@@ -218,23 +267,41 @@ export class PositionsService {
       } as PositionParams,
     );
 
+    const timeList = res.value.reduce(
+      (pre, it) => {
+        const vault = ContractsService.getVaultInfo(
+          it.product.vault.vault,
+          it.product.vault.chainId,
+        );
+        // 没有 depositBaseCcy 表示不需要转换，也就不需要历史的 pps
+        if (!vault.depositBaseCcy) return pre;
+        if (!pre[vault.depositCcy]) pre[vault.depositCcy] = [];
+        pre[vault.depositCcy].push(it.createdAt * 1000);
+        return pre;
+      },
+      {} as Record<VaultInfo['depositCcy'], number /* ms */[]>,
+    );
+
+    const ppsMap = await Promise.all(
+      Object.entries(timeList).map(async ([ccy, list]) => [
+        ccy,
+        await MarketService.getPPS(ccy, list),
+      ]),
+    ).then(
+      (res) =>
+        Object.fromEntries(res) as Record<
+          VaultInfo['depositCcy'],
+          Record<number /* timestamp */ | 'now', number>
+        >,
+    );
+
     return {
       cursor:
         extra?.orderBy === 'return'
           ? undefined
           : res.value[res.value.length - 1]?.createdAt,
       limit,
-      list: res.value.map((it) => ({
-        ...it,
-        vault: ContractsService.getVaultInfo(
-          it.product.vault.vault,
-          it.product.vault.chainId,
-        ),
-        pricesForCalculation: it.relevantDollarPrices.reduce(
-          (pre, it) => ({ ...pre, [it.ccy]: it.price }),
-          {},
-        ),
-      })),
+      list: res.value.map((it) => PositionsService.cvtPosition(it, ppsMap)),
       hasMore: res.value.length >= limit,
     };
   }
@@ -283,17 +350,7 @@ export class PositionsService {
     return {
       cursor: res.value[res.value.length - 1]?.createdAt,
       limit,
-      list: res.value.map((it) => ({
-        ...it,
-        vault: ContractsService.getVaultInfo(
-          it.product.vault.vault,
-          it.product.vault.chainId,
-        ),
-        pricesForCalculation: it.relevantDollarPrices.reduce(
-          (pre, it) => ({ ...pre, [it.ccy]: it.price }),
-          {},
-        ),
-      })),
+      list: res.value.map((it) => PositionsService.cvtPosition(it)),
     };
   }
 
