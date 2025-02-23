@@ -45,28 +45,36 @@
       border-radius: 10px;
       border: 1px solid #f0f0f0;
       padding: 10px 0 10px 16px;
-
-      &.selected {
-        border: 2px solid #79dc2d;
-        background: #fafafa;
-        border-radius: 10px;
-        border-image: $color-main-gradient 1;
-        position: relative;
-      }
+      position: relative;
 
       &.selected::before {
         content: "";
+        border-radius: 10px;
+        margin: -1px;
         position: absolute;
-        inset: -4px; /* 边框宽度 */ /* 边框宽度 */ /* 边框宽度 */ /* 边框宽度 */
-        background: linear-gradient(45deg, #ff7e5f, #feb47b); /* 渐变色 */
-        border-radius: 24px; /* 圆角，比容器大一些 */
-        z-index: -1; /* 将伪元素放在容器后面 */
+        inset: -1px;
+        z-index: 2;
+        background: linear-gradient(to right, #79dc2d, #d7f943);
+      }
+
+      &.selected::after {
+        content: "";
+        border-radius: 8px;
+        background: #fafafa;
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+      }
+
+      .ccy-infos {
+        z-index: 4;
       }
 
       img {
         width: 40px;
         height: 40px;
         margin-right: 6px;
+        z-index: 4;
       }
 
       .name {

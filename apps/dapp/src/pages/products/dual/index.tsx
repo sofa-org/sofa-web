@@ -133,7 +133,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                   onClick={() => setForCcy(i.forCcy)}
                 >
                   <img src={CCYService.ccyConfigs[i.forCcy]?.icon} />
-                  <div>
+                  <div className={styles['ccy-infos']}>
                     <div className={styles['name']}>
                       {CCYService.ccyConfigs[i.forCcy]?.name || i.forCcy}
                     </div>
