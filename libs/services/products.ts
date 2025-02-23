@@ -43,6 +43,19 @@ export interface OriginProductQuoteParams {
   takerWallet?: string; // 询价方钱包公共地址信息
 }
 
+export interface OriginProductQuoteParamsDual {
+  vault: string; // 合约信息
+  chainId: number; // int 链 ID
+  expiry: number; // 到期日对应的秒级时间戳，例如 1672387200
+  strike: string | number; // 价格
+  depositAmount: string | number; // rfq申购金额
+  takerWallet?: string; // 询价方钱包公共地址信息
+}
+
+export type OriginProductQuoteParamsAll =
+  | OriginProductQuoteParams
+  | OriginProductQuoteParamsDual;
+
 export interface QuoteInfo {
   quoteId?: string | number;
   anchorPrices: string[]; // 20000000000,30000000000
@@ -124,6 +137,9 @@ export interface OriginProductQuoteResult extends CalculatedInfo {
   timestamp: number; // 目前定价对应的触发时间；下一个观察开始时间基于此逻辑计算
   observationStart: number; // 目前产品根据 timestamp 预估的开始观察敲入敲出时间，需要持续观测的产品有这个
   quote: QuoteInfo & { quoteId: string | number };
+
+  // Dual 的部分
+  strike?: number;
 }
 
 export type ProductQuoteParams = Omit<
@@ -135,6 +151,30 @@ export type ProductQuoteParams = Omit<
   anchorPrices: (string | number)[];
 };
 
+export type ProductQuoteParamsDual = Omit<
+  OriginProductQuoteParamsDual,
+  'vault' | 'chainId'
+> & {
+  id: string; // UI 交互层生成的，用于标识产品
+  vault: VaultInfo;
+};
+export type ProductQuoteParamsAll = ProductQuoteParams | ProductQuoteParamsDual;
+export function isDualQuoteParams<T extends Partial<ProductQuoteParamsAll>>(
+  params?: T,
+): params is T & ProductQuoteParamsDual {
+  return params?.vault?.riskType === RiskType.DUAL;
+}
+export function isCommonQuoteParams<T extends Partial<ProductQuoteParamsAll>>(
+  params?: T,
+): params is T & ProductQuoteParams {
+  return (
+    (params?.vault?.riskType &&
+      [RiskType.LEVERAGE, RiskType.PROTECTED, RiskType.RISKY].includes(
+        params.vault.riskType,
+      )) ||
+    false
+  );
+}
 export interface ProductInfo {
   vault: VaultInfo; // 合约信息
   anchorPrices: (string | number)[];
@@ -159,40 +199,86 @@ export interface ProductQuoteResult
   pricesForCalculation: Record<string, number | undefined>;
 }
 
+export interface ProductQuoteResultDual
+  extends ProductInfo,
+    CalculatedInfo,
+    Pick<OriginProductQuoteResult, 'rfqId' | 'quote' | 'timestamp'> {
+  pricesForCalculation: Record<string, number | undefined>;
+  // 双币报价的额外参数
+  strike: number;
+}
+
+export type ProductQuoteResultAll = ProductQuoteResult | ProductQuoteResultDual;
+
+export interface ProductsRecommendRequest {
+  productType: ProductType;
+  riskType: RiskType;
+  chainId: number;
+  vault: string; // 合约地址
+}
+
 export class ProductsService {
   static ccyEqual(ccy1: CCY | USDS, ccy2: CCY | USDS) {
     return ccy1 === ccy2 || `W${ccy1}` === ccy2 || ccy1 === `W${ccy2}`;
   }
-
+  static readyForQuote(params: Partial<ProductQuoteParamsAll>) {
+    if (isDualQuoteParams(params)) {
+      if (
+        !params.depositAmount ||
+        !params.expiry ||
+        !params.strike ||
+        !params.vault
+      )
+        return false;
+      return true;
+    }
+    if (isCommonQuoteParams(params)) {
+      if (
+        !params.depositAmount ||
+        !params.expiry ||
+        !params.anchorPrices?.length ||
+        !params.vault
+      )
+        return false;
+    }
+    return true;
+  }
   static productKey(
-    product?: Partial<ProductQuoteParams> & {
+    product?: PartialRequired<ProductQuoteParamsAll, 'vault'> & {
       protectedReturnApy?: number;
-      amounts?: ProductQuoteResult['amounts'];
+      amounts?: ProductQuoteResultAll['amounts'];
       apyInfo?: CalculatedInfo['apyInfo'];
     },
   ) {
     if (!product) return '';
-    const vault = product.vault?.vault?.toLowerCase();
-    const prices = product.anchorPrices?.map(Number).join('-');
-    const protectedApy =
-      product.vault?.riskType === RiskType.LEVERAGE ||
-      product.vault?.riskType === RiskType.RISKY
-        ? 0
-        : (() => {
-            const v =
-              product.protectedApy ??
-              product.protectedReturnApy ??
-              product.apyInfo?.min;
-            return +(!v ? 0 : Number(v)).toFixed(3);
-          })();
-    const depositAmount = product.depositAmount || product.amounts?.own;
-    return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
+    if (isDualQuoteParams(product)) {
+      const depositAmount = product.depositAmount || product.amounts?.own;
+      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${(product as ProductQuoteParamsDual).strike}-${depositAmount}`;
+    }
+    if (isCommonQuoteParams(product)) {
+      const vault = product.vault?.vault?.toLowerCase();
+      const prices = product.anchorPrices?.map(Number).join('-');
+      const protectedApy =
+        product.vault?.riskType === RiskType.LEVERAGE ||
+        product.vault?.riskType === RiskType.RISKY
+          ? 0
+          : (() => {
+              const v =
+                product.protectedApy ??
+                product.protectedReturnApy ??
+                product.apyInfo?.min;
+              return +(!v ? 0 : Number(v)).toFixed(3);
+            })();
+      const depositAmount = product.depositAmount || product.amounts?.own;
+      return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
+    }
+    throw new Error('not implemented yet');
   }
 
   static dealOriginQuote(
     it: OriginProductQuoteResult,
     fixProtectedApy?: string | number,
-  ): ProductQuoteResult {
+  ): ProductQuoteResultAll {
     const vault = ContractsService.getVaultInfo(it.vault, it.chainId);
     return {
       ...it,
@@ -304,22 +390,22 @@ export class ProductsService {
   }
 
   @applyMock('listRecommended')
-  static async listRecommended(
-    type: ProductType,
-    params: {
-      chainId: number;
-      vault: string; // 合约地址
-    },
-  ) {
-    const urls: PartialRecord<ProductType, string> = {
-      [ProductType.DNT]: '/rfq/dnt/recommended-list',
-      [ProductType.BullSpread]: '/rfq/smart-trend/recommended-list',
-      [ProductType.BearSpread]: '/rfq/smart-trend/recommended-list',
-    };
-    if (!urls[type]) return [];
+  static async listRecommended(req: ProductsRecommendRequest) {
+    let url: string;
+    if (req.riskType === RiskType.DUAL) {
+      url = '/rfq/dual/recommended-list';
+    } else {
+      const urls: Record<ProductType, string> = {
+        [ProductType.DNT]: '/rfq/dnt/recommended-list',
+        [ProductType.BullSpread]: '/rfq/smart-trend/recommended-list',
+        [ProductType.BearSpread]: '/rfq/smart-trend/recommended-list',
+      };
+      if (!urls[req.productType]) return [];
+      url = urls[req.productType];
+    }
     return http
-      .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(urls[type]!, {
-        params: pick(params, ['chainId', 'vault']),
+      .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(url, {
+        params: pick(req, ['chainId', 'vault']),
       })
       .then((res) =>
         res.value.map((it) => ProductsService.dealOriginQuote(it)),
@@ -340,47 +426,77 @@ export class ProductsService {
 
   @applyMock('productQuote')
   private static async $quote(
-    type: ProductType,
-    params: OriginProductQuoteParams,
+    product: {
+      productType: ProductType;
+      riskType: RiskType;
+    },
+    params: OriginProductQuoteParamsAll,
   ) {
-    const urls: PartialRecord<ProductType, string> = {
-      [ProductType.DNT]: '/rfq/dnt/quote',
-      [ProductType.BullSpread]: '/rfq/smart-trend/quote',
-      [ProductType.BearSpread]: '/rfq/smart-trend/quote',
-    };
-    if (!urls[type]) return Promise.reject();
-    return http.get<unknown, HttpResponse<OriginProductQuoteResult>>(
-      urls[type]!,
-      { params },
-    );
+    let url: string;
+    if (product.riskType == RiskType.DUAL) {
+      url = '/rfq/dual/quote';
+    } else {
+      url = {
+        [ProductType.DNT]: '/rfq/dnt/quote',
+        [ProductType.BullSpread]: '/rfq/smart-trend/quote',
+        [ProductType.BearSpread]: '/rfq/smart-trend/quote',
+      }[product.productType];
+    }
+    if (!url) return Promise.reject();
+    return http.get<unknown, HttpResponse<OriginProductQuoteResult>>(url, {
+      params,
+    });
   }
 
   @asyncCache({
     until: (_, createdAt) => !createdAt || Date.now() - createdAt >= 30000,
   })
-  static async quote(type: ProductType, data: ProductQuoteParams) {
-    if (data.vault.riskType === RiskType.LEVERAGE) {
-      delete data.fundingApy;
-      delete data.protectedApy;
+  static async quote(data: ProductQuoteParamsAll) {
+    if (isCommonQuoteParams(data)) {
+      if (data.vault.riskType === RiskType.LEVERAGE) {
+        delete data.fundingApy;
+        delete data.protectedApy;
+      }
+
+      return ProductsService.$quote(
+        {
+          productType: data.vault.productType,
+          riskType: data.vault.riskType,
+        },
+        {
+          ...pick(data, [
+            'expiry',
+            'depositAmount',
+            'protectedApy',
+            'fundingApy',
+            'takerWallet',
+          ]),
+          vault: data.vault.vault,
+          chainId: data.vault.chainId,
+          inputApyDefinition: ApyDefinition.AaveLendingAPY,
+          lowerBarrier: data.anchorPrices[0],
+          upperBarrier: data.anchorPrices[1],
+          lowerStrike: data.anchorPrices[0],
+          upperStrike: data.anchorPrices[1],
+        },
+      ).then((res) =>
+        ProductsService.dealOriginQuote(res.value, data.protectedApy),
+      );
     }
-    return ProductsService.$quote(type, {
-      ...pick(data, [
-        'expiry',
-        'depositAmount',
-        'protectedApy',
-        'fundingApy',
-        'takerWallet',
-      ]),
-      vault: data.vault.vault,
-      chainId: data.vault.chainId,
-      inputApyDefinition: ApyDefinition.AaveLendingAPY,
-      lowerBarrier: data.anchorPrices[0],
-      upperBarrier: data.anchorPrices[1],
-      lowerStrike: data.anchorPrices[0],
-      upperStrike: data.anchorPrices[1],
-    }).then((res) =>
-      ProductsService.dealOriginQuote(res.value, data.protectedApy),
-    );
+    if (isDualQuoteParams(data)) {
+      return ProductsService.$quote(
+        {
+          productType: data.vault.productType,
+          riskType: data.vault.riskType,
+        },
+        {
+          ...pick(data, ['expiry', 'depositAmount', 'strike', 'takerWallet']),
+          vault: data.vault.vault,
+          chainId: data.vault.chainId,
+        },
+      ).then((res) => ProductsService.dealOriginQuote(res.value, undefined));
+    }
+    throw new Error('unimplemented');
   }
 
   @asyncCache({
@@ -448,10 +564,10 @@ export class ProductsService {
 
   static async genExpiries(vault: VaultInfo) {
     return http
-      .get<unknown, HttpResponse<{ timestamp: number; expiries: number[] }>>(
-        '/rfq/expiry-list',
-        { params: { chainId: vault.chainId, vault: vault.vault } },
-      )
+      .get<
+        unknown,
+        HttpResponse<{ timestamp: number; expiries: number[] }>
+      >('/rfq/expiry-list', { params: { chainId: vault.chainId, vault: vault.vault } })
       .then((res) => res.value?.expiries.map((it) => it * 1000));
   }
 

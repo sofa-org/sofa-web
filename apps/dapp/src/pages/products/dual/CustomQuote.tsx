@@ -5,6 +5,7 @@ import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { next8h } from '@sofa/utils/expiry';
+import { currQuery } from '@sofa/utils/history';
 import classNames from 'classnames';
 
 import AmountInput from '@/components/AmountInput';
@@ -18,10 +19,11 @@ addI18nResources(locale, 'ProductDual');
 
 export const CustomQuote = (props: {
   vault: VaultInfo;
-  date?: number;
+  expiry?: number;
   price?: number;
-  onChangedDate: (v?: number) => void;
+  onChangedExpiry: (v?: number) => void;
   onChangedPrice: (v?: number) => void;
+  onClickDeposit: () => Promise<void>;
   apy?: number;
 }) => {
   const [t] = useTranslation('ProductDual');
@@ -32,7 +34,6 @@ export const CustomQuote = (props: {
       max: Date.now() + 20 * 86400 * 1000,
     };
   }, []);
-  const [price, setPrice] = useState<number | undefined>(undefined);
 
   return (
     <>
@@ -58,9 +59,11 @@ export const CustomQuote = (props: {
               return curr8h < dateRange.min || curr8h > dateRange.max;
             }}
             presetPosition="top"
-            value={props.date}
+            value={props.expiry === undefined ? undefined : props.expiry * 1000}
             onChange={(v) =>
-              props.onChangedDate(v === undefined ? undefined : Number(v))
+              props.onChangedExpiry(
+                v === undefined ? undefined : Number(v) / 1000,
+              )
             }
           />
         </span>
@@ -74,7 +77,7 @@ export const CustomQuote = (props: {
         <span className={styles['value']}>
           <AmountInput
             className={styles['amount-input']}
-            value={price}
+            value={props.price}
             onChange={(v) =>
               props.onChangedPrice(
                 v === undefined || v === '' ? undefined : Number(v),
@@ -101,7 +104,10 @@ export const CustomQuote = (props: {
         </span>
         <span className={styles['value']}>{displayPercentage(props.apy)}</span>
       </div>
-      <AsyncButton className={styles['deposit-btn']}>
+      <AsyncButton
+        className={styles['deposit-btn']}
+        onClick={() => props.onClickDeposit()}
+      >
         {t({ enUS: 'Deposit' })}
       </AsyncButton>
     </>

@@ -1,6 +1,8 @@
 import {
-  ProductQuoteParams,
-  ProductQuoteResult,
+  isCommonQuoteParams,
+  isDualQuoteParams,
+  ProductQuoteParamsAll,
+  ProductQuoteResultAll,
   ProductsService,
   RiskType,
   VaultInfo,
@@ -19,15 +21,15 @@ export const useProductsState = Object.assign(
       () => ({
         recommendedList: {} as Record<
           `${VaultInfo['vault']}-${VaultInfo['chainId']}`,
-          ProductQuoteResult[]
+          ProductQuoteResultAll[]
         >,
         cart: {} as PartialRecord<
           `${VaultInfo['vault']}-${VaultInfo['chainId']}`, // 按照 vault+chainId 来区分购物车
-          PartialRequired<ProductQuoteParams, 'id' | 'vault'>[]
+          PartialRequired<ProductQuoteParamsAll, 'id' | 'vault'>[]
         >,
         quoteInfos: {} as PartialRecord<
           ReturnType<typeof ProductsService.productKey>,
-          ProductQuoteResult
+          ProductQuoteResultAll
         >,
         hoverTicketIds: {} as Record<
           `${VaultInfo['vault']}-${VaultInfo['chainId']}`,
@@ -43,12 +45,9 @@ export const useProductsState = Object.assign(
   ),
   {
     updateRecommendedList: async (
-      vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType'>,
+      vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType' | 'riskType'>,
     ) => {
-      const list = await ProductsService.listRecommended(
-        vault.productType,
-        vault,
-      );
+      const list = await ProductsService.listRecommended(vault);
       useProductsState.setState((pre) => ({
         recommendedList: {
           ...pre.recommendedList,
@@ -66,11 +65,16 @@ export const useProductsState = Object.assign(
     },
     // 彩票产品的 depositAmount 为 undefined 或者 0 时，表示删除
     updateCart: (
-      params: PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
+      params: PartialRequired<ProductQuoteParamsAll, 'id' | 'vault'>,
     ) => {
       const vault = params.vault;
       const key = `${vault.vault.toLowerCase()}-${vault.chainId}` as const;
-      if ([RiskType.PROTECTED, RiskType.LEVERAGE].includes(vault.riskType)) {
+      if (
+        [RiskType.PROTECTED, RiskType.LEVERAGE, RiskType.DUAL].includes(
+          vault.riskType,
+        )
+      ) {
+        // 同时只允许一条 product quote
         useProductsState.setState((pre) => {
           return {
             cart: {
@@ -102,23 +106,31 @@ export const useProductsState = Object.assign(
       }
     },
     productValidator: (
-      params: PartialRequired<ProductQuoteParams, 'vault'>,
+      params: PartialRequired<ProductQuoteParamsAll, 'vault'>,
     ) => {
       if (!params.depositAmount)
         return new Error('Please enter deposit amount');
       if (!params.expiry) return new Error('Please select expiry');
-      if (!params.anchorPrices?.length || params.anchorPrices.some((it) => !it))
-        return new Error('Please select the prices');
       const vault = params.vault;
       if (!vault) return new Error('Please switch deposit currency');
-      if (vault.riskType === RiskType.PROTECTED && !params.fundingApy)
-        return new Error(
-          'Please wait for the yield from Aave/Lido/Sofa/Curve to be successfully retrieved',
-        );
+      if (isCommonQuoteParams(params)) {
+        if (
+          !params.anchorPrices?.length ||
+          params.anchorPrices.some((it) => !it)
+        )
+          return new Error('Please select the prices');
+        if (vault.riskType === RiskType.PROTECTED && !params.fundingApy)
+          return new Error(
+            'Please wait for the yield from Aave/Lido/Sofa/Curve to be successfully retrieved',
+          );
+      }
+      if (isDualQuoteParams(params)) {
+        if (!params.strike) return new Error('Please input the price');
+      }
       return null;
     },
     updateQuotes: (
-      quote: ProductQuoteResult | ProductQuoteResult[],
+      quote: ProductQuoteResultAll | ProductQuoteResultAll[],
       replaceAll?: boolean,
     ) => {
       useProductsState.setState((pre) => ({
@@ -139,34 +151,29 @@ export const useProductsState = Object.assign(
         },
       }));
     },
-    quote: async (params: PartialRequired<ProductQuoteParams, 'vault'>) => {
+    quote: async (params: PartialRequired<ProductQuoteParamsAll, 'vault'>) => {
       const error = useProductsState.productValidator(params);
       if (error) throw error;
-      const vault = params.vault;
-      return ProductsService.quote(vault.productType, {
+      return ProductsService.quote({
         ...params,
         takerWallet: useWalletStore.getState().address,
-      } as ProductQuoteParams).then((res) => {
+      } as ProductQuoteParamsAll).then((res) => {
         useProductsState.updateQuotes(res);
         return res;
       });
     },
-    delQuote: (quoteInfo: ProductQuoteResult) => {
+    delQuote: (quoteInfo: ProductQuoteResultAll) => {
       useProductsState.setState((pre) => {
         const quoteInfos = { ...pre.quoteInfos };
         delete quoteInfos[ProductsService.productKey(quoteInfo)];
         return { quoteInfos };
       });
     },
-    isQuoting: (params: Partial<ProductQuoteParams>) => {
-      if (
-        !params.depositAmount ||
-        !params.expiry ||
-        !params.anchorPrices?.length ||
-        !params.vault
-      )
+    isQuoting: (params: Partial<ProductQuoteParamsAll>) => {
+      if (!ProductsService.readyForQuote(params)) {
         return false;
-      const key = ProductsService.productKey(params as ProductQuoteParams);
+      }
+      const key = ProductsService.productKey(params as ProductQuoteParamsAll);
       return !useProductsState.getState().quoteInfos[key];
     },
     updateHoverTicket: (vault: VaultInfo, id?: string) => {

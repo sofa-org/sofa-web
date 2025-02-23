@@ -1,7 +1,11 @@
 import { ReactNode } from 'react';
 import { Tabs } from '@douyinfe/semi-ui';
 import { t } from '@sofa/services/i18n';
-import { ProductQuoteResult, RiskType } from '@sofa/services/products';
+import {
+  ProductQuoteResult,
+  ProductQuoteResultDual,
+  RiskType,
+} from '@sofa/services/products';
 import classNames from 'classnames';
 
 import { ClaimWithdrawDesc } from '../ClaimWithdrawDesc';
@@ -12,6 +16,8 @@ import { RiskDisclosures } from '../RiskDisclosures';
 import { SuitableMarketScenario } from '../SuitableMarketScenario';
 import { VaultDesc } from '../VaultDesc';
 import { YieldTower } from '../YieldTower';
+
+import { DualDesc } from './Dual/DualDesc';
 
 import styles from './index.module.scss';
 
@@ -41,13 +47,16 @@ const ProductDesc = (
         <Tabs.TabPane itemKey="return" tab={t('More Info')}>
           {props.product.vault.riskType === RiskType.RISKY ? (
             <OptionTrading {...props.product} />
+          ) : props.product.vault.riskType === RiskType.DUAL ? (
+            <DualDesc {...(props.product as ProductQuoteResultDual)} />
           ) : (
             <YieldTower {...props.product} />
           )}
           <SuitableMarketScenario {...props.product} />
-          {props.product.vault.riskType !== RiskType.RISKY && (
-            <ProductStrategy {...props.product} />
-          )}
+          {props.product.vault.riskType !== RiskType.RISKY &&
+            props.product.vault.riskType !== RiskType.DUAL && (
+              <ProductStrategy {...props.product} />
+            )}
           <FeeStructure {...props.product} />
           <VaultDesc {...props.product} />
           <ClaimWithdrawDesc {...props.product} />

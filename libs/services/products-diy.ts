@@ -51,7 +51,7 @@ export class ProductsDIYService {
     const fetch = (vaultInfo: VaultInfo) => {
       let url: string;
       if (vaultInfo.riskType == RiskType.DUAL) {
-        url = '/rfq/diy/dual/recommended-list';
+        url = '/rfq/dual/diy/recommended-list';
       } else {
         url = {
           [ProductType.DNT]: '/rfq/diy/dnt/recommended-list',

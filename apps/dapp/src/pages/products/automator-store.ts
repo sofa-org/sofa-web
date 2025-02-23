@@ -138,9 +138,8 @@ export const useProductsState = Object.assign(
     quote: async (params: PartialRequired<ProductQuoteParams, 'vault'>) => {
       const error = useProductsState.productValidator(params);
       if (error) throw error;
-      const vault = params.vault;
       const { automator } = getCurrentCreatorAutomator();
-      return ProductsService.quote(vault.productType, {
+      return ProductsService.quote({
         ...params,
         takerWallet: automator?.vaultInfo?.vault,
       } as ProductQuoteParams).then((res) => {

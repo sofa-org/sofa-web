@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spin, Toast } from '@douyinfe/semi-ui';
-import { RiskType } from '@sofa/services/base-type';
+import { ProductType, RiskType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
@@ -15,6 +15,7 @@ import AsyncButton from '@/components/AsyncButton';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import {
   ProductTypeRefs,
+  ProjectTypeRefs,
   RiskTypeRefs,
 } from '@/components/ProductSelector/enums';
 import { useWalletStore } from '@/components/WalletConnector/store';
@@ -79,24 +80,43 @@ export const DIYProductDisplay = () => {
           )}
         </span>
       </div>
-      <div className={styles['risk-type']}>
-        {riskRef?.icon}
-        {riskRef?.label3(t) || '-'}
-        {/* {riskRef?.value === RiskType.LEVERAGE && (
-          <span className={styles['badge-leverage']}>Lev.</span>
-        )} */}
-      </div>
-      <div className={styles['product']}>
-        {productRef?.label(t)}{' '}
-        {quote?.expiry && displayExpiry(quote.expiry * 1000)}{' '}
-        {anchorPrices?.join('-') || '-'}
-        <span className={styles['badge']}>
-          {term || '-'}{' '}
-          {term && term > 1
-            ? t({ enUS: 'Days', zhCN: '天' })
-            : t({ enUS: 'Day', zhCN: '天' })}
-        </span>
-      </div>
+      {quote?.vault.riskType == RiskType.DUAL ? (
+        <>
+          <div className={styles['risk-type']}>
+            {ProjectTypeRefs.Dual.label(t)}{' '}
+            {quote?.vault.productType == ProductType.BullSpread
+              ? t({ enUS: 'Buy Low' })
+              : t({ enUS: 'Sell High' })}
+            {' - '}
+            {quote?.vault.depositCcy}/
+            {quote?.vault.productType == ProductType.BearSpread
+              ? quote?.vault.domCcy
+              : quote?.vault.forCcy}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={styles['risk-type']}>
+            {riskRef?.icon}
+            {riskRef?.label3(t) || '-'}
+            {/* {riskRef?.value === RiskType.LEVERAGE && (
+                <span className={styles['badge-leverage']}>Lev.</span>
+              )} */}
+          </div>
+          <div className={styles['product']}>
+            {productRef?.label(t)}{' '}
+            {quote?.expiry && displayExpiry(quote.expiry * 1000)}{' '}
+            {anchorPrices?.join('-') || '-'}
+            <span className={styles['badge']}>
+              {term || '-'}{' '}
+              {term && term > 1
+                ? t({ enUS: 'Days', zhCN: '天' })
+                : t({ enUS: 'Day', zhCN: '天' })}
+            </span>
+          </div>
+        </>
+      )}
+
       <div
         className={classNames(styles['charts'], {
           [styles['dual']]: quote?.vault.riskType == RiskType.DUAL,

@@ -3,6 +3,7 @@ import { Spin } from '@douyinfe/semi-ui';
 import { VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
+  isCommonQuoteParams,
   ProductQuoteParams,
   ProductQuoteResult,
   ProductsService,
@@ -132,7 +133,10 @@ const RecommendedTickets = (props: TicketsProps) => {
                       }`
                     ];
                   const $id = currProducts?.find(
-                    (it) => !it.anchorPrices?.every(Boolean) && !it.expiry,
+                    (it) =>
+                      isCommonQuoteParams(it) &&
+                      !it.anchorPrices?.every(Boolean) &&
+                      !it.expiry,
                   )?.id;
                   const obj = {
                     id: $id || nanoid(),

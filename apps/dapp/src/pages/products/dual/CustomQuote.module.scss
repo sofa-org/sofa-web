@@ -1,62 +1,48 @@
-.head-title {
-  @include flex-center;
-
-  margin: 0;
-  padding: 75px 0 30px;
-  font-size: min(24px, 5vw);
-  text-align: center;
-  color: #fff;
+.caption {
+  margin-right: 9px;
 }
 
-.form {
-  width: $width-content;
-  margin: 24px auto 40px;
-  background: #2c2f34;
-  border-radius: 40px 40px 24px 24px;
+.field {
+  margin-right: 20px;
+}
 
-  .sub-title {
-    min-height: 46px;
-
-    @include flex-center;
-
-    color: #fff;
+.settlement-date {
+  .label {
+    opacity: 0.65;
+    margin-right: 9px;
   }
 }
 
-.content {
-  @include flex-center;
-
-  align-items: stretch;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0;
-  margin: 0;
-  background: #fff;
-  border-radius: 24px;
-}
-
-.current-price {
-  > .amount {
-    @include bold;
+.target-price {
+  .label {
+    opacity: 0.65;
+    margin-right: 12px;
   }
-}
 
-.quotes-table {
-  .change-to-current-price {
-    > .amount {
-      @include bold;
-
-      &.increased {
-        &::before {
-          content: "↑";
-        }
-      }
-
-      &.decreased {
-        &::before {
-          content: "↓";
-        }
+  .value {
+    :global {
+      .amount-input-wrapper {
+        height: 30px;
+        width: 200px;
       }
     }
   }
+}
+
+.extra-reward {
+  flex-direction: column;
+
+  span {
+    display: block;
+  }
+}
+
+.deposit-btn {
+  padding: 8px 32px;
+  font-size: 16px;
+  border-radius: 30px;
+  border: 1px solid rgb(255 255 255 / 30%);
+  color: #fff !important;
+  opacity: 0.35;
+  background: #2c2f34;
 }

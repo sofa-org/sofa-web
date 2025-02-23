@@ -12,7 +12,9 @@ import { Modal, Spin } from '@douyinfe/semi-ui';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  ProductQuoteResult,
+  isCommonQuoteParams,
+  ProductQuoteResultAll,
+  ProductQuoteResultDual,
   ProductsService,
   ProductType,
   RiskType,
@@ -23,7 +25,6 @@ import { isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { displayTenor } from '@sofa/utils/time';
-import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { omit } from 'lodash-es';
 import { nanoid } from 'nanoid';
@@ -45,13 +46,13 @@ import { useProductsState } from '../../store';
 import { Calculation } from '../Calculation';
 import { CheckboxBorrow } from '../CheckboxBorrow';
 import InvestButton from '../InvestButton';
-import ProductDesc from '../ProductDesc';
 import { ProfitsRender } from '../ProfitsRender';
 import { QuoteExplain } from '../QuoteExplain';
 
-import { Comp as IconArrow } from './assets/icon-arrow.svg';
 import { Comp as IconEdit } from './assets/icon-edit.svg';
+import { DualDepositModalContent } from './Dual/DualDepositModalContent';
 import locale from './locale';
+import { ModalWrapper } from './ModalWrapper';
 
 import styles from './index.module.scss';
 
@@ -63,16 +64,16 @@ export interface InvestModalPropsRef {
 }
 
 export interface InvestModalProps {
-  product: ProductQuoteResult;
+  product: ProductQuoteResultAll;
 }
 
-const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
+const DepositModalContent = (
+  props: InvestModalProps & { setVisible: Dispatch<boolean> },
+) => {
   const wallet = useWalletStore();
   const navigate = useNavigate();
 
   const [t] = useTranslation('InvestModal');
-
-  const [expanded, setExpanded] = useState(false);
 
   const prices = useIndexPrices((state) => state.prices);
 
@@ -121,7 +122,12 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
       ...(!v ? { riskType: $vault?.riskType } : { vault: v }),
     })!;
     const protectedApy = (() => {
-      if ($vault.riskType === RiskType.PROTECTED) return product?.protectedApy;
+      if (
+        isCommonQuoteParams(product) &&
+        $vault.riskType === RiskType.PROTECTED
+      ) {
+        return product.protectedApy;
+      }
       if (nextVault.riskType === RiskType.LEVERAGE) return undefined;
       const interestRate =
         useGlobalState.getState().interestRate[nextVault.chainId]?.[
@@ -140,7 +146,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
     $setVaultAddress(v);
   });
 
-  const preDataRef = useRef<ProductQuoteResult>();
+  const preDataRef = useRef<ProductQuoteResultAll>();
   const data = useProductsState((state) => {
     const val =
       product && state.quoteInfos[ProductsService.productKey(product)];
@@ -158,7 +164,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
 
   return (
     <>
-      <div className={styles['form']}>
+      <ModalWrapper setVisible={props.setVisible} product={data}>
         <div className={styles['left']}>
           <Spin wrapperClassName={styles['chart']} spinning={loading}>
             <div className={styles['item']}>
@@ -269,16 +275,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
             afterInvest={() => props.setVisible(false)}
           />
         </div>
-        <div
-          className={classNames(styles['expand-widget'], {
-            [styles['expanded']]: expanded,
-          })}
-          onClick={() => setExpanded((pre) => !pre)}
-        >
-          {t('details')} <IconArrow />
-        </div>
-      </div>
-      {expanded && <ProductDesc product={data} />}
+      </ModalWrapper>
     </>
   );
 };
@@ -357,7 +354,17 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
         lazyRender
         closeOnEsc={false}
       >
-        <El {...props} setVisible={setVisible} />
+        {props.product.vault.riskType === RiskType.DUAL ? (
+          <DualDepositModalContent
+            product={props.product as ProductQuoteResultDual}
+            setVisible={setVisible}
+          />
+        ) : (
+          <DepositModalContent
+            product={props.product}
+            setVisible={setVisible}
+          />
+        )}
       </Modal>
     );
   },

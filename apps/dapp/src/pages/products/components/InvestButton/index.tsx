@@ -8,8 +8,8 @@ import {
   TransactionProgress,
 } from '@sofa/services/positions';
 import {
-  ProductQuoteParams,
-  ProductQuoteResult,
+  ProductQuoteParamsAll,
+  ProductQuoteResultAll,
   ProductsService,
   RiskType,
 } from '@sofa/services/products';
@@ -104,19 +104,19 @@ export interface ProductInvestButtonProps extends BaseProps {
     'depositCcy' | 'riskType' | 'productType' | 'onlyForAutomator'
   >;
   useProductsState: ProductsStateType;
-  products: PartialRequired<ProductQuoteParams, 'id' | 'vault'>[];
-  quoteInfos: (ProductQuoteResult | undefined)[];
+  products: PartialRequired<ProductQuoteParamsAll, 'id' | 'vault'>[];
+  quoteInfos: (ProductQuoteResultAll | undefined)[];
   mint: (
     cb: (progress: TransactionProgress) => void,
-    data: ProductQuoteResult[],
+    data: ProductQuoteResultAll[],
   ) => Promise<void>;
   isInsufficientBalance: (amount: string | number) => boolean;
 }
 
 function useShouldQuote(
   wallet: { address?: string },
-  products: PartialRequired<ProductQuoteParams, 'vault' | 'id'>[],
-  quoteInfos: (ProductQuoteResult | undefined)[],
+  products: PartialRequired<ProductQuoteParamsAll, 'vault' | 'id'>[],
+  quoteInfos: (ProductQuoteResultAll | undefined)[],
   _useProductsState: ProductsStateType,
 ) {
   // 每三秒触发一次检查，如果性能差可以再放宽些
@@ -275,7 +275,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       progressRef.current?.update(it);
       judgeConsumed(it);
       judgeSuccess(it);
-    }, quoteInfos as ProductQuoteResult[]);
+    }, quoteInfos as ProductQuoteResultAll[]);
   });
 
   if (!vault) return <></>;
@@ -346,7 +346,10 @@ const InvestButton = (
         if (data.length === 1) {
           return PositionsService.deposit(cb, data[0]!);
         }
-        return PositionsService.batchDeposit(cb, data as ProductQuoteResult[]);
+        return PositionsService.batchDeposit(
+          cb,
+          data as ProductQuoteResultAll[],
+        );
       }}
       isInsufficientBalance={(amount) =>
         !vault ||

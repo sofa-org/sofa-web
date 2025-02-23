@@ -24,8 +24,6 @@
 }
 
 .content {
-  @include flex-center;
-
   align-items: stretch;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -33,30 +31,64 @@
   margin: 0;
   background: #fff;
   border-radius: 24px;
-}
+  padding: 24px 40px 0;
 
-.current-price {
-  > .amount {
-    @include bold;
-  }
-}
+  .for-ccy-select {
+    display: flex;
+    gap: 16px;
 
-.quotes-table {
-  .change-to-current-price {
-    > .amount {
-      @include bold;
+    .ccy {
+      @include flex-center;
 
-      &.increased {
-        &::before {
-          content: "▲";
-        }
+      width: 212px;
+      height: 62px;
+      border-radius: 10px;
+      border: 1px solid #f0f0f0;
+      padding: 10px 0 10px 16px;
+
+      &.selected {
+        border: 2px solid #79dc2d;
+        background: #fafafa;
+        border-radius: 10px;
+        border-image: $color-main-gradient 1;
+        position: relative;
       }
 
-      &.decreased {
-        &::before {
-          content: "▼";
-        }
+      &.selected::before {
+        content: "";
+        position: absolute;
+        inset: -4px; /* 边框宽度 */ /* 边框宽度 */ /* 边框宽度 */ /* 边框宽度 */
+        background: linear-gradient(45deg, #ff7e5f, #feb47b); /* 渐变色 */
+        border-radius: 24px; /* 圆角，比容器大一些 */
+        z-index: -1; /* 将伪元素放在容器后面 */
+      }
+
+      img {
+        width: 40px;
+        height: 40px;
+        margin-right: 6px;
+      }
+
+      .name {
+        @include bold;
+
+        font-size: 14px;
+      }
+
+      .apy {
+        color: #50d113;
       }
     }
   }
+}
+
+.custom-quote {
+  display: flex;
+  align-items: center;
+  background-color: #2c2f34;
+  margin: 0 -40px;
+  border-radius: 0 0 12px 12px;
+  color: #fff;
+  padding: 20px 40px;
+  font-size: 14px;
 }

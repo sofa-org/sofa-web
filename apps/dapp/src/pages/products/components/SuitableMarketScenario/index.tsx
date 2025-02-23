@@ -1,5 +1,5 @@
 import { useTranslation } from '@sofa/services/i18n';
-import { ProductQuoteResult } from '@sofa/services/products';
+import { ProductQuoteResult, RiskType } from '@sofa/services/products';
 
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
@@ -13,6 +13,9 @@ export const SuitableMarketScenario = (
   product: PartialRequired<ProductQuoteResult, 'vault'>,
 ) => {
   const [t] = useTranslation('SuitableMarketScenario');
+  if (product.vault.riskType == RiskType.DUAL) {
+    return undefined;
+  }
   const ref = ProductTypeRefs[product.vault.productType];
   return (
     <section className={styles['section']}>

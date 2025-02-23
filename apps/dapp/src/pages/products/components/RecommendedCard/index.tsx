@@ -5,7 +5,9 @@ import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
+  isCommonQuoteParams,
   ProductQuoteResult,
+  ProductQuoteResultDual,
   ProductsService,
   RiskType,
   VaultInfo,
@@ -180,11 +182,14 @@ export async function handleRecommendCardClick(
           }) == ProductsService.productKey(it),
       );
       if (!product) {
-        const id = currProducts?.find(
-          ($it) => !$it.anchorPrices?.every(Boolean) && !$it.expiry,
+        const emptyId = currProducts?.find(
+          ($it) =>
+            isCommonQuoteParams($it) &&
+            !$it.anchorPrices?.every(Boolean) &&
+            !$it.expiry,
         )?.id;
         useProductsState.updateCart({
-          id: id || nanoid(),
+          id: emptyId || nanoid(),
           ...it,
         });
       }
@@ -209,11 +214,20 @@ export async function handleRecommendCardClick(
         project:
           vault.riskType === RiskType.RISKY
             ? ProjectType.Surge
-            : ProjectType.Earn,
+            : vault.riskType == RiskType.DUAL
+              ? ProjectType.Dual
+              : ProjectType.Earn,
         'risk-type': it.vault.riskType || '',
         'product-type': it.vault.productType || '',
         'for-ccy': it.vault.forCcy,
         'deposit-ccy': it.vault.depositCcy,
+        // 2 extra params for dual
+        ...(vault.riskType === RiskType.DUAL
+          ? {
+              expiry: it.expiry,
+              strike: (it as ProductQuoteResultDual).strike,
+            }
+          : undefined),
         expanded: 1,
       }),
     });

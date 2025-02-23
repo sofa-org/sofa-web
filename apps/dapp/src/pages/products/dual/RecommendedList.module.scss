@@ -1,0 +1,150 @@
+.current-infos {
+  display: flex;
+  justify-content: space-between;
+  margin: 24px 0 17px;
+
+  .current-price {
+    font-size: 16px;
+    line-height: 20px;
+
+    img {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    > .amount {
+      @include bold;
+    }
+  }
+
+  .settlement-dates {
+    display: flex;
+    gap: 8px;
+
+    .date {
+      border-radius: 30px;
+      background: #f0f0f0;
+      height: 32px;
+      padding: 3px 12px;
+      line-height: 26px;
+      font-size: 14px;
+
+      &.selected {
+        color: #fff;
+        background-color: #092038;
+
+        @include bold;
+      }
+    }
+
+    .diff {
+      margin-left: 5px;
+    }
+  }
+}
+
+.quotes-table {
+  overflow: scroll;
+  max-height: 400px;
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+
+  td:nth-child(3n) {
+    text-align: center;
+  }
+
+  :global {
+    .semi-table-row {
+      position: relative;
+    }
+
+    .semi-table-row-head {
+      color: rgb(0 0 0 / 85%) !important;
+      font-size: 14px;
+      height: 40px;
+      font-weight: 400 !important;
+    }
+
+    .semi-table-row-cell {
+      height: min(60px, 9.9vw);
+    }
+  }
+
+  .target-price {
+    @include bold;
+
+    font-size: 20px;
+  }
+
+  .change-to-current-price {
+    color: #bbb;
+    font-size: 10px;
+
+    > .amount {
+      color: #999;
+
+      &.increased {
+        &::before {
+          content: "▲";
+        }
+      }
+
+      &.decreased {
+        &::before {
+          content: "▼";
+        }
+      }
+    }
+  }
+
+  .reward-column {
+    color: rgb(0 0 0 / 85%);
+    font-size: 14px;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      vertical-align: middle;
+      margin-top: -3px;
+      width: 22px;
+      height: 21px;
+      background: url("./assets/icon-reward.png") no-repeat center center /
+        contain;
+    }
+  }
+
+  .reward {
+    @include bold;
+
+    color: #50d113;
+    font-size: 20px;
+  }
+
+  .operate {
+    text-align: center;
+  }
+
+  .deposit-btn {
+    @include bold;
+
+    height: auto;
+    font-size: 16px;
+    line-height: 21px;
+    border-radius: 30px;
+    background-color: #121212;
+    padding: 8px 32px;
+
+    > span {
+      line-height: 21px;
+      background: $color-main-gradient;
+      background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
