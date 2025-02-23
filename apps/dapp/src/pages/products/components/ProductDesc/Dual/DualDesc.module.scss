@@ -1,1 +1,43 @@
-// TODO
+.title {
+  @include bold;
+
+  margin: min(35px, 3.3vw) 0 min(40px, 4vw);
+  font-size: min(24px, 3.6vw);
+  text-align: center;
+}
+
+.content {
+  @include flex-center;
+
+  gap: min(40px, 4vw);
+  padding: min(40px, 5vw);
+  border-radius: min(24px, 2.4vw);
+  border: 1px solid $color-border;
+}
+
+.full-width {
+  max-width: min(100%, 1030px);
+}
+.desc-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: min(32px, 3vw);
+  padding: min(32px, 3vw) min(64px, 7vw) 0;
+}
+.desc {
+  position: relative;
+  margin: 0;
+  font-size: 14px;
+
+  p {
+    margin: 0 0 12px;
+  }
+
+  &::before {
+    content: "✦";
+    position: absolute;
+    top: 0;
+    left: max(-34px, -3.4vw);
+  }
+}
