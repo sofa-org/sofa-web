@@ -1,5 +1,5 @@
-import { calc_yield } from '@sofa/alg';
-import { getPrecision } from '@sofa/utils/amount';
+import { calc_apy, calc_yield } from '@sofa/alg';
+import { cvtAmountsInUsd, getPrecision } from '@sofa/utils/amount';
 import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
@@ -253,6 +253,8 @@ export class ProductsService {
           return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
             vault,
             it,
+            Date.now(),
+            it.expiry * 1000,
             pps,
           );
         })()
@@ -537,9 +539,77 @@ export class ProductsService {
   static cvtCalculatedInfoToDepositBaseCcy(
     vault: VaultInfo,
     data: CalculatedInfo,
+    createdAt: number, // ms
+    expiredAt: number, // ms
     pps: { atTrade: number; afterExpire: number }, // depositCcy 与 depositBaseCcy 的汇率
   ): CalculatedInfo {
-    // TODO 转换，先返回原数据了
-    return data;
+    const amounts = {
+      counterparty: +data.amounts.counterparty * pps.atTrade,
+      own: +data.amounts.counterparty * pps.atTrade,
+      premium: +data.amounts.premium * pps.atTrade,
+      forRchAirdrop: +data.amounts.premium * pps.atTrade,
+      rchAirdrop: data.amounts.rchAirdrop,
+      totalInterest: +data.amounts.totalInterest * pps.afterExpire,
+      minRedeemable: +data.amounts.minRedeemable * pps.afterExpire,
+      maxRedeemable: +data.amounts.maxRedeemable * pps.afterExpire,
+      redeemable: Number(data.amounts.redeemable) * pps.afterExpire,
+      tradingFee: +data.amounts.tradingFee * pps.afterExpire,
+      settlementFee: +data.amounts.settlementFee * pps.afterExpire,
+      maxSettlementFee: +data.amounts.maxSettlementFee * pps.afterExpire,
+      borrow: +data.amounts.borrow * pps.afterExpire,
+      borrowCost: +data.amounts.borrowCost * pps.afterExpire,
+      spreadCost: +data.amounts.spreadCost * pps.afterExpire,
+    };
+
+    const prices = Object.fromEntries(
+      data.relevantDollarPrices.map((it) => [it.ccy, it.price]),
+    );
+
+    const rchValueInUSD = cvtAmountsInUsd(
+      [['RCH', amounts.rchAirdrop]],
+      prices,
+    );
+
+    const oddsInfo = {
+      rch: rchValueInUSD / amounts.own,
+      min: amounts.minRedeemable / amounts.own,
+      max: amounts.maxRedeemable / amounts.own,
+    };
+
+    const rchApy = calc_apy(rchValueInUSD, amounts.own, createdAt, expiredAt);
+    const minApy = calc_apy(
+      amounts.minRedeemable - amounts.own + rchValueInUSD,
+      amounts.own,
+      createdAt,
+      expiredAt,
+    );
+    const maxApy = calc_apy(
+      amounts.maxRedeemable - amounts.own + rchValueInUSD,
+      amounts.own,
+      createdAt,
+      expiredAt,
+    );
+    const apyInfo = {
+      // Earn 产品
+      outputApyDefinition: ApyDefinition.AaveLendingAPY,
+      interest: calc_apy(
+        amounts.totalInterest,
+        amounts.counterparty + amounts.own,
+        createdAt,
+        expiredAt,
+      ),
+      rch: rchApy,
+      min: minApy - rchApy,
+      max: maxApy - minApy,
+    };
+
+    return {
+      amounts,
+      feeRate: data.feeRate,
+      leverageInfo: data.leverageInfo,
+      apyInfo,
+      oddsInfo,
+      relevantDollarPrices: data.relevantDollarPrices,
+    };
   }
 }

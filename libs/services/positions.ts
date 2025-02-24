@@ -190,7 +190,7 @@ export class PositionsService {
 
   static cvtPosition<
     T extends CalculatedInfo &
-      Pick<OriginPositionInfo, 'product' | 'createdAt'>,
+      Pick<OriginPositionInfo, 'product' | 'createdAt'> & { claimed?: boolean },
   >(
     it: T,
     ppsMap?: Record<
@@ -209,12 +209,17 @@ export class PositionsService {
           const hasExpired = Date.now() > expiry;
           const pps = {
             atTrade: ppsMap[vault.depositCcy][it.createdAt * 1000],
-            afterExpire: ppsMap[vault.depositCcy][hasExpired ? 'now' : expiry],
+            afterExpire:
+              ppsMap[vault.depositCcy][
+                !it.claimed && hasExpired ? 'now' : expiry
+              ],
           };
           if (!pps.atTrade || !pps.afterExpire) return undefined;
           return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
             vault,
             it,
+            it.createdAt * 1000,
+            !it.claimed && hasExpired ? Date.now() : expiry,
             pps,
           );
         })()
