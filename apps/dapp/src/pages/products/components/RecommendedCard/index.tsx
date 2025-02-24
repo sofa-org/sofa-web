@@ -103,6 +103,14 @@ export const RecommendedCardItem = (props: {
           anchorPrices={it.anchorPrices}
           protectedYield={Number(it.apyInfo?.min)}
           enhancedYield={simplePlus(it.apyInfo?.max, -(it.apyInfo?.min || 0))}
+          alterBaseCcyConfig={
+            it.vault.depositBaseCcy
+              ? {
+                  baseCcy: it.vault.depositBaseCcy,
+                  calcInfo: it.convertedCalculatedInfoByDepositBaseCcy!,
+                }
+              : undefined
+          }
           {...props.extraPayoffProps}
         />
       ) : (
