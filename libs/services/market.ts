@@ -138,6 +138,7 @@ export class MarketService {
         'https://api.coingecko.com/api/v3/coins/crvusd/market_chart?vs_currency=usd&days=0',
       USDT: 'https://api.coingecko.com/api/v3/coins/tether/market_chart?vs_currency=usd&days=0',
       USDC: 'https://api.coingecko.com/api/v3/coins/usd-coin/market_chart?vs_currency=usd&days=0',
+      CRV: 'https://api.coingecko.com/api/v3/coins/curve-dao-token/market_chart?vs_currency=usd&days=0',
     };
     if (!fallbackUrls[ccy]) return [ccy, undefined];
     return http
