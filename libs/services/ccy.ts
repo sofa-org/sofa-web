@@ -3,6 +3,7 @@ import IconCrvUSD from './assets/icon-crvusd.png';
 import IconETH from './assets/icon-eth.svg?url';
 import IconRCH from './assets/icon-rch.png';
 import IconSTETH from './assets/icon-steth.svg?url';
+import IconsUSDa from './assets/icon-susda.png?url';
 import IconUSD from './assets/icon-usd.svg?url';
 import IconUSDC from './assets/icon-usdc.svg?url';
 import IconUSDT from './assets/icon-usdt.svg?url';
@@ -81,6 +82,12 @@ export class CCYService {
       icon: IconBTC,
       color: '#FFA800',
       precision: 5,
+    },
+    sUSDa: {
+      name: 'sUSDa',
+      icon: IconsUSDa,
+      color: '#FFA800',
+      precision: 4,
     },
   };
 }
