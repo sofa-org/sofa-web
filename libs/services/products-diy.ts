@@ -70,11 +70,17 @@ export class ProductsDIYService {
   static getSupportMatrix(v: Partial<VaultInfo>): {
     skipCurrentOptionValue?: boolean;
     skipOption?: 'riskType'[];
+    calcApyBasedOn?: CCY | USDS;
   } {
-    if (v.chainId === 1329) {
+    const vaults = ProductsService.filterVaults(ContractsService.vaults, {
+      chainId: v.chainId,
+      forCcy: v.forCcy,
+    });
+    if (vaults.length && vaults.every((v) => v.depositBaseCcy)) {
       return {
         skipCurrentOptionValue: v.productType === ProductType.DNT,
         skipOption: ['riskType'],
+        calcApyBasedOn: vaults[0].depositBaseCcy,
       };
     }
     return {};

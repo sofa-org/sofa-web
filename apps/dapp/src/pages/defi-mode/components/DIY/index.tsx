@@ -278,10 +278,24 @@ const ApyTarget = () => {
       color: '#CD8E8E',
     };
   }, [formData?.apyTarget, max, min, t, rchApy]);
+
+  const calcApyBasedOn = useMemo(
+    () =>
+      ProductsDIYService.getSupportMatrix({ ...formData, chainId })
+        .calcApyBasedOn,
+    [formData, chainId],
+  );
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
         {t({ enUS: 'APY target', zhCN: '目标年化收益' })}
+        {(calcApyBasedOn && (
+          <>
+            {' '}
+            <span className={styles['apy-base-ccy']}>({calcApyBasedOn})</span>
+          </>
+        )) ||
+          undefined}
       </div>
       <div className={styles['input-wrapper']}>
         <ProgressBar
