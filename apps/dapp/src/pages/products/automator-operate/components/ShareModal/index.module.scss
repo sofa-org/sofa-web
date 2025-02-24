@@ -1,0 +1,17 @@
+.form {
+  @include flex-center;
+
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 40px;
+  position: relative;
+  margin: -24px -24px 0;
+  padding: 24px 24px 60px;
+  background: #fff;
+  border-radius: 0 0 24px 24px;
+  overflow: hidden;
+}
+
+.automator-share-modal {
+  font-size: 12px;
+}
