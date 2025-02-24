@@ -1,4 +1,5 @@
-import { safeRun } from '@sofa/utils/fns';
+import { calc_yield } from '@sofa/alg';
+import { isNullLike, safeRun } from '@sofa/utils/fns';
 import { http, pollingUntil } from '@sofa/utils/http';
 import { UserStorage } from '@sofa/utils/storage';
 
@@ -204,11 +205,13 @@ export class PositionsService {
     const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
       ? (() => {
           if (!ppsMap?.[vault.depositCcy]) return undefined;
+          const expiry = it.product.expiry * 1000;
+          const hasExpired = Date.now() > expiry;
           const pps = {
             atTrade: ppsMap[vault.depositCcy][it.createdAt * 1000],
-            now: ppsMap[vault.depositCcy]['now'],
+            afterExpire: ppsMap[vault.depositCcy][hasExpired ? 'now' : expiry],
           };
-          if (!pps.atTrade || !pps.now) return undefined;
+          if (!pps.atTrade || !pps.afterExpire) return undefined;
           return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
             vault,
             it,
@@ -267,33 +270,62 @@ export class PositionsService {
       } as PositionParams,
     );
 
-    const timeList = res.value.reduce(
+    const now = Date.now();
+    const list = res.value.map((it) => ({
+      position: it,
+      vault: ContractsService.getVaultInfo(
+        it.product.vault.vault,
+        it.product.vault.chainId,
+      ),
+    }));
+    const timeList = list.reduce(
       (pre, it) => {
-        const vault = ContractsService.getVaultInfo(
-          it.product.vault.vault,
-          it.product.vault.chainId,
-        );
+        const vault = it.vault;
         // 没有 depositBaseCcy 表示不需要转换，也就不需要历史的 pps
         if (!vault.depositBaseCcy) return pre;
         if (!pre[vault.depositCcy]) pre[vault.depositCcy] = [];
-        pre[vault.depositCcy].push(it.createdAt * 1000);
+        if (!pre[vault.depositCcy].includes(it.position.createdAt * 1000))
+          pre[vault.depositCcy].push(it.position.createdAt * 1000);
+        if (!pre[vault.depositCcy].includes(now))
+          pre[vault.depositCcy].push(now);
         return pre;
       },
       {} as Record<VaultInfo['depositCcy'], number /* ms */[]>,
     );
 
-    const ppsMap = await Promise.all(
-      Object.entries(timeList).map(async ([ccy, list]) => [
-        ccy,
-        await MarketService.getPPS(ccy, list),
-      ]),
-    ).then(
-      (res) =>
-        Object.fromEntries(res) as Record<
-          VaultInfo['depositCcy'],
-          Record<number /* timestamp */ | 'now', number>
-        >,
-    );
+    const [pps, apyMap] = await Promise.all([
+      Promise.all(
+        Object.entries(timeList).map(async ([ccy, list]) => [
+          ccy,
+          await MarketService.getPPS(ccy, list),
+        ]),
+      ).then(
+        (res) =>
+          Object.fromEntries(res) as Record<
+            VaultInfo['depositCcy'],
+            Record<number /* timestamp */ | 'now', number>
+          >,
+      ),
+      MarketService.interestRate(params.chainId),
+    ]);
+
+    const ppsMap = list.reduce((pre, { position, vault }) => {
+      const expiry = position.product.expiry * 1000;
+      const hasExpired = Date.now() > expiry;
+      if (!vault.depositBaseCcy || hasExpired) return pre;
+      const apy = apyMap[vault.depositBaseCcy];
+      if (isNullLike(apy))
+        throw new Error(`Can not find apy of ${vault.depositBaseCcy}`);
+      if (!pre[vault.depositCcy][expiry]) {
+        pre[vault.depositCcy][expiry] = calc_yield(
+          apy.apyUsed,
+          pre[vault.depositCcy]['now'],
+          Date.now(),
+          expiry,
+        );
+      }
+      return pre;
+    }, pps);
 
     return {
       cursor:

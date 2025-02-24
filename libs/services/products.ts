@@ -1,3 +1,4 @@
+import { calc_yield } from '@sofa/alg';
 import { getPrecision } from '@sofa/utils/amount';
 import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { next8h } from '@sofa/utils/expiry';
@@ -12,6 +13,7 @@ import {
   RiskType,
   VaultInfo,
 } from './contracts';
+import { MarketService } from './market';
 import { WalletService } from './wallet';
 
 export { ProductType };
@@ -192,19 +194,62 @@ export class ProductsService {
     return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
   }
 
+  static async dealOriginQuotes(
+    quotes: OriginProductQuoteResult[],
+    fixProtectedApy?: string | number,
+  ) {
+    const list = quotes.map((it) => ({
+      quote: it,
+      vault: ContractsService.getVaultInfo(it.vault, it.chainId),
+    }));
+    const depositCcyList = uniq(
+      list.map((it) => it.vault.depositBaseCcy && it.vault.depositCcy),
+    ).filter(Boolean) as string[];
+    const [ppsMapAtNow, apyMap] = await Promise.all([
+      Promise.all(
+        depositCcyList.map((c) =>
+          MarketService.getPPS(c, [Date.now()]).then(
+            (prices) => [c, prices] as const,
+          ),
+        ),
+      ).then((res) => Object.fromEntries(res)),
+      MarketService.interestRate(quotes[0].chainId),
+    ]);
+    const ppsMap = list.reduce((pre, it) => {
+      const expiry = it.quote.expiry * 1000;
+      if (!it.vault.depositBaseCcy) return pre;
+      const apy = apyMap[it.vault.depositBaseCcy];
+      if (isNullLike(apy))
+        throw new Error(`Can not find apy of ${it.vault.depositBaseCcy}`);
+      if (!pre[it.vault.depositCcy][expiry]) {
+        pre[it.vault.depositCcy][expiry] = calc_yield(
+          apy.apyUsed,
+          pre[it.vault.depositCcy]['now'],
+          Date.now(),
+          expiry,
+        );
+      }
+      return pre;
+    }, ppsMapAtNow);
+    return list.map((it) =>
+      ProductsService.dealOriginQuote(it.quote, fixProtectedApy, ppsMap),
+    );
+  }
+
   static dealOriginQuote(
     it: OriginProductQuoteResult,
     fixProtectedApy?: string | number,
-    ppsMap?: Record<VaultInfo['depositCcy'], number>,
+    ppsMap?: Record<VaultInfo['depositCcy'], Record<number | 'now', number>>,
   ): ProductQuoteResult {
     const vault = ContractsService.getVaultInfo(it.vault, it.chainId);
     const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
       ? (() => {
           if (!ppsMap?.[vault.depositCcy]) return undefined;
           const pps = {
-            atTrade: ppsMap[vault.depositCcy],
-            now: ppsMap[vault.depositCcy],
+            atTrade: ppsMap[vault.depositCcy]['now'],
+            afterExpire: ppsMap[vault.depositCcy][it.expiry * 1000],
           };
+          if (!pps.atTrade || !pps.afterExpire) return undefined;
           return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
             vault,
             it,
@@ -340,9 +385,7 @@ export class ProductsService {
       .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(urls[type]!, {
         params: pick(params, ['chainId', 'vault']),
       })
-      .then((res) =>
-        res.value.map((it) => ProductsService.dealOriginQuote(it)),
-      );
+      .then((res) => ProductsService.dealOriginQuotes(res.value));
   }
 
   static TicketTypeOptions = uniqBy(
@@ -494,7 +537,7 @@ export class ProductsService {
   static cvtCalculatedInfoToDepositBaseCcy(
     vault: VaultInfo,
     data: CalculatedInfo,
-    pps: { atTrade: number; now: number }, // depositCcy 和 depositBaseCcy 的汇率
+    pps: { atTrade: number; afterExpire: number }, // depositCcy 与 depositBaseCcy 的汇率
   ): CalculatedInfo {
     // TODO 转换，先返回原数据了
     return data;

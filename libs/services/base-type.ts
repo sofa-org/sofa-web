@@ -58,7 +58,7 @@ export interface VaultInfo {
   domCcy: USDS; // 标的物币种的币对
   trackingSource: string; // 追踪指数源
   depositCcy: CCY | USDS; // 申购币种
-  depositBaseCcy?: CCY | USDS; // 申购币种销毁时能得到的币种，比如 scrvUSD 销毁得到 crvUSD，sUSDa 销毁得到 USDa
+  depositBaseCcy?: CCY | USDS; // 净值成长类的申购币种销毁时能得到的币种，比如 scrvUSD 销毁得到 crvUSD，sUSDa 销毁得到 USDa
   depositMinAmount: number; // 申购币种数量的最小数量
   depositTickAmount: number; // 申购币种数量的步增
   anchorPricesDecimal: number; // 转换为合约入参的倍数
