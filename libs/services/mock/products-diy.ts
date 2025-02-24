@@ -37,19 +37,71 @@ function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
         chainId: params.chainId,
       });
       if (!vaultInfo) return undefined;
-      return [...Array(2)].map(() => mockProductQuote(vaultInfo));
+      if (params.expiryDateTime) {
+        return [...Array(2)].map(() => mockProductQuote(vaultInfo, params));
+      } else {
+        const result: ProductQuoteResult[] = [];
+        for (const expiryDateTime of [
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+        ]) {
+          result.push(
+            mockProductQuote(vaultInfo, {
+              ...params,
+              expiryDateTime,
+            }),
+          );
+        }
+        return result;
+      }
     })
     .filter(Boolean);
 }
 
 function mockProductQuote(
-  params: PartialRequired<VaultInfo, 'forCcy' | 'riskType'>,
+  vaultInfo: PartialRequired<VaultInfo, 'forCcy' | 'riskType'>,
+  params: ProductsDIYRecommendRequest,
 ): ProductQuoteResult {
+  const prices: PartialRecord<CCY, number> = {
+    RCH: Math.random() * 10,
+    WBTC: Math.random() * 10000,
+  };
   return {
     rfqId: '',
     anchorPrices: [2000, 3000],
-    vault: ProductsService.findVault(ContractsService.vaults, params)!, // 合约地址
-    expiry: next8h(undefined, 18) / 1000, // 到期日对应的秒级时间戳，例如 1672387200
+    vault: ProductsService.findVault(ContractsService.vaults, vaultInfo)!, // 合约地址
+    expiry: params.expiryDateTime || next8h(undefined, 18) / 1000, // 到期日对应的秒级时间戳，例如 1672387200
     timestamp: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前定价对应的触发时间；下一个观察开始时间基于此逻辑计算
     observationStart: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前产品根据timestamp预估的开始观察敲入敲出时间
     quote: {
@@ -99,8 +151,11 @@ function mockProductQuote(
       min: 0, // 对赌输了的情况对应的赔率
       max: Math.random() * 10, // 对赌全赢的情况对应的赔率
     },
-    relevantDollarPrices: [{ ccy: 'RCH', price: Math.random() * 10 }], // 计算 RCH 年化时的币种价格
-    pricesForCalculation: { RCH: Math.random() * 10 },
+    relevantDollarPrices: Object.entries(prices).map((e) => ({
+      ccy: e[0],
+      price: e[1],
+    })), // 计算 RCH 年化时的币种价格
+    pricesForCalculation: prices,
   };
 }
 

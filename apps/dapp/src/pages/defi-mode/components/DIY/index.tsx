@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ProductType, RiskType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
+import { ProductsDIYService } from '@sofa/services/products-diy';
 import { displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
@@ -79,24 +80,29 @@ const MarketView = () => {
   const formData = useDIYState((state) => state.formData[chainId]);
   const options = useMemo(() => {
     const options = useDIYState.getVaultOptions({ chainId }, ['productType']);
-    return [
-      ProductType.BullSpread,
-      ProductType.BearSpread,
-      ProductType.DNT,
-    ].map((productType) => ({
-      label: (
-        <>
-          {ProductTypeRefs[productType].icon1}
-          {ProductTypeRefs[productType].label1(t)}
-        </>
-      ),
-      value: productType,
-      disabled: options.every(
-        (it) => it.data.productType !== productType || it.disabled,
-      ),
-      data: { productType },
-    }));
-  }, [chainId, t]);
+    return [ProductType.BullSpread, ProductType.BearSpread, ProductType.DNT]
+      .filter(
+        (productType) =>
+          !ProductsDIYService.getSupportMatrix({
+            ...formData,
+            chainId,
+            productType,
+          }).skipCurrentOptionValue,
+      )
+      .map((productType) => ({
+        label: (
+          <>
+            {ProductTypeRefs[productType].icon1}
+            {ProductTypeRefs[productType].label1(t)}
+          </>
+        ),
+        value: productType,
+        disabled: options.every(
+          (it) => it.data.productType !== productType || it.disabled,
+        ),
+        data: { productType },
+      }));
+  }, [chainId, t, formData?.forCcy]);
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
@@ -120,8 +126,11 @@ const HowLong = () => {
   const config = useDIYConfigState((state) => state.configs[chainId]);
   const [min, max] = useMemo(() => {
     if (!formData) return [next8h(undefined, 2), next8h(undefined, 7)];
-    const options = useDIYConfigState.getConfig(chainId, formData, config)
-      ?.expiryDateTimes;
+    const options = useDIYConfigState.getConfig(
+      chainId,
+      formData,
+      config,
+    )?.expiryDateTimes;
     if (!options) return [next8h(undefined, 2), next8h(undefined, 7)];
     return [options[0] * 1000, options[options.length - 1] * 1000];
   }, [chainId, config, formData]);
@@ -412,7 +421,14 @@ export const DIY = () => {
         <MarketView />
         <HowLong />
         <DepositToken />
-        <RiskTolerance />
+        {ProductsDIYService.getSupportMatrix({
+          ...formData,
+          chainId,
+        }).skipOption?.includes('riskType') ? (
+          <></>
+        ) : (
+          <RiskTolerance />
+        )}
         {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>
       <MobileOnly display="block">

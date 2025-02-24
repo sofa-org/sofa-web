@@ -5,6 +5,7 @@ import './products-diy';
 import './points';
 import './auth';
 import './automator';
+import './market';
 
 export function isMockEnabled(): false | 'always' | 'whenError' {
   if (!Env.isDaily) return false;
