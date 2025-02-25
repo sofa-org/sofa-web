@@ -24,19 +24,15 @@ export class ProductsDIYService {
   @applyMock('diyConfig')
   static config(params: ProductsDIYConfigRequest) {
     return http
-      .get<unknown, HttpResponse<ProductsDIYConfig[]>>(
-        '/rfq/diy/configuration',
-        { params },
-      )
+      .get<
+        unknown,
+        HttpResponse<ProductsDIYConfig[]>
+      >('/rfq/diy/configuration', { params })
       .then((res) => res.value);
   }
 
   @applyMock('diyRecommendedList')
   static async recommendList(params: ProductsDIYRecommendRequest) {
-    if (params.chainId == 1329) {
-      // TODO: remove this block when server supports SEI
-      throw new Error('SEI(1329) chain not supported by server');
-    }
     const vaultInfoList = params.vaults
       .split(',')
       .map((vault) =>
@@ -54,15 +50,20 @@ export class ProductsDIYService {
         [ProductType.BullSpread]: '/rfq/diy/smart-trend/recommended-list',
       };
       return http
-        .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(
-          urls[vaultInfo.productType],
-          { params },
-        )
+        .get<
+          unknown,
+          HttpResponse<OriginProductQuoteResult[]>
+        >(urls[vaultInfo.productType], { params })
         .then((res) => ProductsService.dealOriginQuotes(res.value));
     };
-    return Promise.all(vaultInfoList.map((it) => fetch(it))).then((res) =>
-      res.flat(),
-    );
+    return Promise.all(vaultInfoList.map((it) => fetch(it))).then((res) => {
+      const result = res.flat();
+      if (params.chainId == 1329 && result.length == 0) {
+        // TODO: remove this block when server supports SEI
+        throw new Error('SEI(1329) chain not supported by server');
+      }
+      return result;
+    });
   }
 
   static getSupportMatrix(v: Partial<VaultInfo>): {

@@ -15,3 +15,20 @@ if (!window.mockData) window.mockData = {};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 window.mockData.marketInterestRate = mockMarketInterestRate as any;
+window.mockData.getPPS = async function (
+  ccy: string,
+  timeList: number[],
+): Promise<Record<(typeof timeList)[0] | 'now', number>> {
+  let r = 2.0;
+  const result = {
+    now: 1,
+  } as Record<(typeof timeList)[0] | 'now', number>;
+
+  for (const t of timeList) {
+    r *= 0.94;
+    result[t] = 1; //Math.max(0.5, r);
+  }
+  return result;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any;

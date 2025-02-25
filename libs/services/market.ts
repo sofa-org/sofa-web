@@ -1,5 +1,5 @@
 import { singleton } from '@livelybone/singleton';
-import { asyncCache, asyncRetry } from '@sofa/utils/decorators';
+import { applyMock, asyncCache, asyncRetry } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { jsonSafeParse } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
@@ -118,9 +118,10 @@ export class MarketService {
       ETH: 'ETH-USDT',
     };
     return http
-      .get<unknown, HttpResponse<{ price: string }>>(
-        `https://api.exchange.coinbase.com/products/${map[ccy]}/ticker`,
-      )
+      .get<
+        unknown,
+        HttpResponse<{ price: string }>
+      >(`https://api.exchange.coinbase.com/products/${map[ccy]}/ticker`)
       .then((res) => +res.value.price);
   }
 
@@ -140,9 +141,10 @@ export class MarketService {
     };
     if (!fallbackUrls[ccy]) return [ccy, undefined];
     return http
-      .get<unknown, HttpResponse<{ prices: [number, number][] }>>(
-        fallbackUrls[ccy],
-      )
+      .get<
+        unknown,
+        HttpResponse<{ prices: [number, number][] }>
+      >(fallbackUrls[ccy])
       .then((res) => res.value.prices[0][1]);
   }
 
@@ -354,6 +356,7 @@ export class MarketService {
     return Big(balanceOfStRCH).div(zRCHTotalSupply).toString();
   }
 
+  @applyMock('getPPS')
   static async getPPS(
     ccy: string,
     timeList: number[],

@@ -205,10 +205,12 @@ export class ProductsService {
     const depositCcyList = uniq(
       list.map((it) => it.vault.depositBaseCcy && it.vault.depositCcy),
     ).filter(Boolean) as string[];
+    const expiryList = uniq(list.map((it) => it.quote.expiry * 1000));
+    const now = Date.now();
     const [ppsMapAtNow, apyMap] = await Promise.all([
       Promise.all(
         depositCcyList.map((c) =>
-          MarketService.getPPS(c, [Date.now()]).then(
+          MarketService.getPPS(c, [now, ...expiryList]).then(
             (prices) => [c, prices] as const,
           ),
         ),
@@ -512,10 +514,10 @@ export class ProductsService {
 
   static async genExpiries(vault: VaultInfo) {
     return http
-      .get<unknown, HttpResponse<{ timestamp: number; expiries: number[] }>>(
-        '/rfq/expiry-list',
-        { params: { chainId: vault.chainId, vault: vault.vault } },
-      )
+      .get<
+        unknown,
+        HttpResponse<{ timestamp: number; expiries: number[] }>
+      >('/rfq/expiry-list', { params: { chainId: vault.chainId, vault: vault.vault } })
       .then((res) => res.value?.expiries.map((it) => it * 1000));
   }
 

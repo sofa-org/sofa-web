@@ -21,7 +21,7 @@ import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { parse, stringify } from 'qs';
 
-import Payoff from '@/components/Payoff';
+import Payoff, { PayoffProps } from '@/components/Payoff';
 import {
   useProductSelect,
   useProjectChange,
@@ -75,6 +75,57 @@ export const RecommendedCardItem = (props: {
     );
   });
 
+  const earnPayoffProps = useMemo(() => {
+    if (![RiskType.LEVERAGE, RiskType.PROTECTED].includes(it.vault.riskType)) {
+      return undefined;
+    }
+    const res: Partial<PayoffProps> = {
+      ...it.vault,
+      positionAmount: positionAmount(it),
+      refMs: next8h(it.timestamp * 1000),
+      expMs: it.expiry * 1000,
+      depositAmount: +it.amounts.own,
+      rchYield: Number(it.apyInfo?.rch),
+      anchorPrices: it.anchorPrices,
+      protectedYield: Number(it.apyInfo?.min),
+      enhancedYield: simplePlus(it.apyInfo?.max, -(it.apyInfo?.min || 0)),
+      depositBaseCcyConfig: undefined,
+    };
+
+    if (
+      !it.vault.depositBaseCcy ||
+      !it.convertedCalculatedInfoByDepositBaseCcy
+    ) {
+      return {
+        ...res,
+      } as PayoffProps;
+    }
+    return {
+      ...res,
+      depositCcy: it.vault.depositBaseCcy,
+
+      depositAmount: +it.convertedCalculatedInfoByDepositBaseCcy.amounts.own,
+      rchYield: Number(it.convertedCalculatedInfoByDepositBaseCcy.apyInfo?.rch),
+      protectedYield: Number(
+        it.convertedCalculatedInfoByDepositBaseCcy.apyInfo?.min,
+      ),
+      enhancedYield: simplePlus(
+        it.convertedCalculatedInfoByDepositBaseCcy.apyInfo?.max,
+        -(it.convertedCalculatedInfoByDepositBaseCcy.apyInfo?.min || 0),
+      ),
+
+      depositBaseCcyConfig: {
+        depositBaseCcy: it.vault.depositBaseCcy,
+        depositCcy: it.vault.depositCcy,
+        maxApy: simplePlus(it.apyInfo?.rch, it.apyInfo?.max),
+      },
+    } as PayoffProps;
+  }, [
+    it.vault.riskType,
+    it.vault.depositBaseCcy,
+    it.convertedCalculatedInfoByDepositBaseCcy,
+  ]);
+
   return (
     <div
       className={classNames(
@@ -90,29 +141,7 @@ export const RecommendedCardItem = (props: {
       onClick={onClick}
     >
       {it.vault.riskType !== RiskType.RISKY ? (
-        <Payoff
-          riskType={it.vault.riskType}
-          productType={it.vault.productType}
-          forCcy={it.vault.forCcy}
-          depositCcy={it.vault.depositCcy}
-          depositAmount={+it.amounts.own}
-          positionAmount={positionAmount(it)}
-          refMs={next8h(it.timestamp * 1000)}
-          expMs={it.expiry * 1000}
-          rchYield={Number(it.apyInfo?.rch)}
-          anchorPrices={it.anchorPrices}
-          protectedYield={Number(it.apyInfo?.min)}
-          enhancedYield={simplePlus(it.apyInfo?.max, -(it.apyInfo?.min || 0))}
-          alterBaseCcyConfig={
-            it.vault.depositBaseCcy
-              ? {
-                  baseCcy: it.vault.depositBaseCcy,
-                  calcInfo: it.convertedCalculatedInfoByDepositBaseCcy!,
-                }
-              : undefined
-          }
-          {...props.extraPayoffProps}
-        />
+        <Payoff {...earnPayoffProps!} {...props.extraPayoffProps} />
       ) : (
         <div className={styles['infos']}>
           <div className={styles['info-item']}>

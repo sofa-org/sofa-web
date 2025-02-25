@@ -46,9 +46,10 @@ export interface PayoffProps extends PayoffChartProps {
   refMs: number; // 开始投资时间
   expMs: number; // 到期时间
 
-  alterBaseCcyConfig?: {
-    baseCcy: CCY | USDS;
-    calcInfo: CalculatedInfo;
+  depositBaseCcyConfig?: {
+    depositCcy: CCY | USDS;
+    depositBaseCcy: CCY | USDS;
+    maxApy: number;
   };
 }
 
@@ -384,18 +385,10 @@ export const PayoffChart = (props: PayoffChartProps) => {
 const Payoff = (props: PayoffProps) => {
   const [t] = useTranslation('Payoff');
 
-  const maxApyOrigin = useMemo(
+  const maxApy = useMemo(
     () =>
       simplePlus(props.rchYield, props.protectedYield, props.enhancedYield)!,
     [props.enhancedYield, props.protectedYield, props.rchYield],
-  );
-  const maxApyAlter = useMemo(
-    () =>
-      simplePlus(
-        props.alterBaseCcyConfig?.calcInfo?.apyInfo?.max,
-        props.alterBaseCcyConfig?.calcInfo?.apyInfo?.rch,
-      ),
-    [props.alterBaseCcyConfig],
   );
   const atm = useIndexPrices((state) => state.prices[props.forCcy]);
 
@@ -403,25 +396,23 @@ const Payoff = (props: PayoffProps) => {
     <div className={classNames(styles['payoff'], 'payoff')}>
       <div className={classNames(styles['max-apy'], 'max-apy')}>
         <span>
-          {displayPercentage(
-            props.alterBaseCcyConfig ? maxApyAlter : maxApyOrigin,
-          ).replace('%', '')}
+          {displayPercentage(maxApy).replace('%', '')}
           <span>%</span>
           {props.riskType === RiskType.LEVERAGE && (
             <span className={styles['badge-leverage']}>Lev.</span>
           )}
         </span>
         <ApyDesc>
-          {props.alterBaseCcyConfig ? (
+          {props.depositBaseCcyConfig ? (
             <>
               <span className={styles['base-ccy']}>
-                {props.alterBaseCcyConfig.baseCcy}
+                {props.depositBaseCcyConfig.depositBaseCcy}
               </span>{' '}
             </>
           ) : undefined}
           {t('type')}
 
-          {props.alterBaseCcyConfig ? (
+          {props.depositBaseCcyConfig ? (
             <>
               <div className={styles['origin-ccy']}>
                 {t(
@@ -430,8 +421,8 @@ const Payoff = (props: PayoffProps) => {
                     zhCN: '({{depositCcy}} 潜在年化收益: {{apy}})',
                   },
                   {
-                    apy: displayPercentage(maxApyOrigin),
-                    depositCcy: props.depositCcy,
+                    apy: displayPercentage(props.depositBaseCcyConfig.maxApy),
+                    depositCcy: props.depositBaseCcyConfig.depositCcy,
                   },
                 )}
               </div>
