@@ -78,6 +78,9 @@ export interface OriginPositionInfo extends CalculatedInfo, SettlementInfo {
 
 export interface PositionInfo extends OriginPositionInfo {
   pricesForCalculation: Record<string, number | undefined>;
+
+  // 对于存入之后没有利息的 earn 的 vault（比如 sUSDa 的几个 Earn 合约）来讲，需要计算以底层价值币种来转换数据
+  convertedCalculatedInfoByDepositBaseCcy?: CalculatedInfo;
 }
 
 export interface OriginTransactionInfo
@@ -92,9 +95,6 @@ export interface OriginTransactionInfo
 
 export interface TransactionInfo extends OriginTransactionInfo {
   pricesForCalculation: Record<string, number | undefined>;
-
-  // 对于存入之后没有利息的 earn 的 vault（比如 sUSDa 的几个 Earn 合约）来讲，需要计算以底层价值币种来转换数据
-  convertedCalculatedInfoByDepositBaseCcy?: CalculatedInfo;
 }
 
 export interface TransactionProgress {
