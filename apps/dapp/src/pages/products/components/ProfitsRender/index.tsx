@@ -1,7 +1,9 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { Radio, RadioGroup } from '@douyinfe/semi-ui';
 import { RiskType, VaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';
+import { ProductQuoteResult } from '@sofa/services/products';
 import {
   amountFormatter,
   cvtAmountsInCcy,
@@ -16,7 +18,6 @@ import { addI18nResources } from '@/locales';
 import locale from './locale';
 
 import styles from './index.module.scss';
-
 addI18nResources(locale, 'ProfitsRenders');
 
 export interface ProfitRenderProps extends BaseProps {
@@ -100,7 +101,7 @@ const ProfitRender = (props: ProfitRenderProps) => {
   );
 };
 
-export const ProfitsRender = (
+export const ProfitsRenderNoBaseCcySelect = (
   props: BaseProps & { data: Partial<PositionInfo> },
 ) => {
   const [t] = useTranslation('ProfitsRenders');
@@ -184,5 +185,50 @@ export const ProfitsRender = (
         </div>
       )}
     </div>
+  );
+};
+
+export const ProfitsRender = (
+  props: BaseProps & { data: ProductQuoteResult },
+) => {
+  const data = props.data;
+  const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
+  useEffect(() => {
+    if (!basedCcy && data.vault.depositBaseCcy) {
+      setBasedCcy(data.vault.depositBaseCcy);
+    }
+  }, [basedCcy, data]);
+  return (
+    <>
+      {basedCcy ? (
+        <>
+          <RadioGroup
+            type="button"
+            buttonSize="small"
+            value={basedCcy}
+            className={styles['base-ccy-select']}
+            onChange={(v) => setBasedCcy(v.target.value)}
+          >
+            <Radio value={data.vault.depositBaseCcy}>
+              {data.vault.depositBaseCcy}
+            </Radio>
+            <Radio value={data.vault.depositCcy}>{data.vault.depositCcy}</Radio>
+          </RadioGroup>
+          {basedCcy == data.vault.depositBaseCcy ? (
+            <ProfitsRenderNoBaseCcySelect
+              data={{
+                ...data,
+                product: data,
+                ...data.convertedCalculatedInfoByDepositBaseCcy,
+              }}
+            />
+          ) : (
+            <ProfitsRenderNoBaseCcySelect data={{ ...data, product: data }} />
+          )}
+        </>
+      ) : (
+        <ProfitsRenderNoBaseCcySelect data={{ ...data, product: data }} />
+      )}
+    </>
   );
 };

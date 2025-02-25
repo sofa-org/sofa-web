@@ -455,7 +455,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                     atm={prices?.[quoteInfo.vault.forCcy]}
                   />
                   <ProfitsRender
-                    data={{ ...quoteInfo, product: quoteInfo } as never}
+                    data={quoteInfo}
                     style={{ marginBottom: 40 }}
                   />
                   <QuoteExplain

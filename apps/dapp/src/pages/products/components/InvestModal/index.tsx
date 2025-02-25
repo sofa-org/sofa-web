@@ -260,7 +260,7 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
             wrapperClassName={styles['estimated-profits']}
             spinning={loading}
           >
-            <ProfitsRender data={{ ...data, product: data }} />
+            <ProfitsRender data={data} />
             <Calculation quote={data} className={styles['calculation']} />
           </Spin>
           <InvestButton
