@@ -178,8 +178,6 @@
 
 .skeleton-card,
 .product {
-  @include pointer;
-
   position: relative;
   flex: 1;
   min-width: 180px;

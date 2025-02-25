@@ -420,23 +420,24 @@ const Payoff = (props: PayoffProps) => {
             </>
           ) : undefined}
           {t('type')}
+
+          {props.alterBaseCcyConfig ? (
+            <>
+              <div className={styles['origin-ccy']}>
+                {t(
+                  {
+                    enUS: '({{depositCcy}} Potential Yield: {{apy}} APY)',
+                    zhCN: '({{depositCcy}} 潜在年化收益: {{apy}})',
+                  },
+                  {
+                    apy: displayPercentage(maxApyOrigin),
+                    depositCcy: props.depositCcy,
+                  },
+                )}
+              </div>
+            </>
+          ) : undefined}
         </ApyDesc>
-        {props.alterBaseCcyConfig ? (
-          <>
-            <div className={styles['origin-ccy']}>
-              {t(
-                {
-                  enUS: '({{depositCcy}} Potential Yield: {{apy}} APY)',
-                  zhCN: '({{depositCcy}} 潜在年化收益: {{apy}})',
-                },
-                {
-                  apy: displayPercentage(maxApyOrigin),
-                  depositCcy: props.depositCcy,
-                },
-              )}
-            </div>
-          </>
-        ) : undefined}
       </div>
       <PayoffChart atm={atm} {...props} affectByOther />
     </div>
