@@ -109,7 +109,6 @@
   &:first-child {
     @include bold;
 
-    margin: 0 0 min(12px, 2vw);
     line-height: min(30px, 6vw);
     font-size: min(24px, 5vw);
   }
@@ -129,7 +128,17 @@
     justify-content: flex-start;
   }
 }
+.base-ccy-amount-own {
+  color: rgba(#000, 0.65);
+  font-size: min(14px, 2.8vw);
+  margin: 0 0 min(12px, 2vw);
+}
 
+.base-ccy-amount {
+  color: rgba(#000, 0.45);
+  font-size: min(12px, 2.8vw);
+  text-align: right;
+}
 .infos {
   @include flex-center;
 
@@ -310,6 +319,9 @@
 
   &.has-rch-amount {
     padding: 0 0 min(32px, 5vw);
+  }
+  &.has-deposit-base-ccy {
+    min-height: min(66vw, 358px);
   }
 }
 
