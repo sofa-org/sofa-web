@@ -15,6 +15,30 @@
       gap: min(13px, 2vw);
     }
   }
+  .deposit-ccy-section {
+    @include flex-center;
+
+    justify-content: flex-start;
+    width: 100%;
+    color: #fff;
+
+    > img {
+      width: 20px;
+      height: 20px;
+    }
+    > span {
+      line-height: 20px;
+    }
+  }
+  .deposit-ccy-group {
+    @include flex-center;
+
+    width: 100%;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: min(13px, 2vw);
+  }
 }
 
 .list-wrapper {

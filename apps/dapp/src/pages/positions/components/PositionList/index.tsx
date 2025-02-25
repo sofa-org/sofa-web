@@ -2,7 +2,8 @@ import { Fragment, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Modal, Spin, Toast } from '@douyinfe/semi-ui';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
-import { AutomatorVaultInfo } from '@sofa/services/base-type';
+import { AutomatorVaultInfo, VaultInfo } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionInfo,
@@ -180,26 +181,59 @@ const List = (props: {
       );
     },
   );
-
+  const dataGroupByDepositCcy = useMemo(
+    () =>
+      data?.reduce(
+        (prev, it) => {
+          if (!prev[it.product.vault.depositCcy]) {
+            prev[it.product.vault.depositCcy] = [];
+          }
+          prev[it.product.vault.depositCcy].push(it);
+          return prev;
+        },
+        {} as Record<VaultInfo['depositCcy'], PositionInfo[]>,
+      ) || {},
+    [data],
+  );
   return (
     <>
       <Spin
         wrapperClassName={styles['list']}
         spinning={loading || (!data && !!address)}
       >
-        {data?.map((it) =>
-          it.claimed ? (
-            <Fragment key={it.id} />
-          ) : (
-            <PositionCard
-              position={it}
-              onStatusChange={(status) => handleStatusChange(status, it)}
-              onClick={() => setSelectedPosition(it)}
-              isAutomator={!!props.automator}
-              key={`${it.id}-${ProductsService.productKey(it.product)}`}
-            />
-          ),
-        )}
+        {Object.entries(dataGroupByDepositCcy).map((e) => (
+          <>
+            <div
+              className={classNames(
+                styles['deposit-ccy-section'],
+                e[0].toLowerCase(),
+              )}
+            >
+              <img
+                className={styles['logo']}
+                src={CCYService.ccyConfigs[e[0]]?.icon}
+                alt=""
+              />
+              <span>{CCYService.ccyConfigs[e[0]]?.name || e[0]}</span>
+            </div>
+            <div className={styles['deposit-ccy-group']}>
+              {e[1]?.map((it) =>
+                it.claimed ? (
+                  <Fragment key={it.id} />
+                ) : (
+                  <PositionCard
+                    position={it}
+                    onStatusChange={(status) => handleStatusChange(status, it)}
+                    onClick={() => setSelectedPosition(it)}
+                    isAutomator={!!props.automator}
+                    key={`${it.id}-${ProductsService.productKey(it.product)}`}
+                  />
+                ),
+              )}
+            </div>
+          </>
+        ))}
+
         {!data?.length && !loading && (
           <CEmpty
             className={styles['empty']}
