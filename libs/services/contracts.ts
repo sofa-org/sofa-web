@@ -35,6 +35,12 @@ import { WalletConnect } from './wallet-connect';
 export { ProductType, RiskType, TransactionStatus };
 export type { VaultInfo };
 
+export class InvalidVaultError extends Error {
+  constructor() {
+    super('InvalidVaultError');
+  }
+}
+
 export class ContractsService {
   static vaults = [...earnVaults, ...surgeVaults].map((it) => ({
     ...it,
@@ -72,7 +78,7 @@ export class ContractsService {
         it.vault.toLowerCase() === vault.toLowerCase() &&
         it.chainId === chainId,
     );
-    if (!vaultInfo) throw new Error('Invalid vault');
+    if (!vaultInfo) throw new InvalidVaultError();
     return vaultInfo;
   }
 

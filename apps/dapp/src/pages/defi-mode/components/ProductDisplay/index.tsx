@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spin, Toast } from '@douyinfe/semi-ui';
 import { RiskType } from '@sofa/services/base-type';
+import { InvalidVaultError } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
@@ -45,7 +46,17 @@ export const DIYProductDisplay = () => {
     refreshDeps: [chainId, formData],
     pollingInterval: 5 * MsIntervals.min,
     debounceWait: 500,
-    onError: (err) => Toast.error(`Fetch error: ${getErrorMsg(err)}`),
+    onError: (err) => {
+      if (err instanceof InvalidVaultError) {
+        try {
+          useDIYState.resetFormData();
+        } catch (e) {
+          Toast.error(`Fetch error: ${getErrorMsg(e)}`);
+        }
+        return;
+      }
+      Toast.error(`Fetch error: ${getErrorMsg(err)}`);
+    },
   });
 
   const riskRef = quote?.vault.riskType && RiskTypeRefs[quote.vault.riskType];

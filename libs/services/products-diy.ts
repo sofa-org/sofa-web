@@ -1,7 +1,12 @@
 import { applyMock } from '@sofa/utils/decorators';
 import { http } from '@sofa/utils/http';
 
-import { ContractsService, ProductType, VaultInfo } from './contracts';
+import {
+  ContractsService,
+  InvalidVaultError,
+  ProductType,
+  VaultInfo,
+} from './contracts';
 import { OriginProductQuoteResult, ProductsService } from './products';
 
 export interface ProductsDIYConfigRequest {
@@ -42,7 +47,7 @@ export class ProductsDIYService {
         }),
       )
       .filter(Boolean) as VaultInfo[];
-    if (!vaultInfoList.length) throw new Error('Invalid vault');
+    if (!vaultInfoList.length) throw new InvalidVaultError();
     const fetch = (vaultInfo: VaultInfo) => {
       const urls = {
         [ProductType.DNT]: '/rfq/diy/dnt/recommended-list',
