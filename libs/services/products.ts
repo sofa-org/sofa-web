@@ -222,8 +222,8 @@ export class ProductsService {
       Promise.all(
         depositCcyList.map((c) =>
           MarketService.getPPS({
-            forCcy: extractFromPPSKey(c).depositCcy,
-            domCcy: extractFromPPSKey(c).depositBaseCcy,
+            fromCcy: extractFromPPSKey(c).depositCcy,
+            toCcy: extractFromPPSKey(c).depositBaseCcy,
             includeNow: true,
             timeList: expiryList,
           }).then((prices) => [c, prices] as const),

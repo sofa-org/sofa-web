@@ -31,9 +31,9 @@ export interface CandleInfo {
   volume?: number;
 }
 
-export interface PPSEntry {
-  forCcy: string;
-  domCcy: string;
+interface PPSEntry {
+  fromCcy: string;
+  toCcy: string;
   dateTime: number;
   exchangeRate: number;
 }
@@ -368,7 +368,7 @@ export class MarketService {
     until: (it, createdAt) =>
       !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
   })
-  static async $getPPSNow(params: { forCcy: string; domCcy: string }) {
+  static async $getPPSNow(params: { fromCcy: string; toCcy: string }) {
     return http
       .post<unknown, HttpResponse<PPSEntry>>(`/rfq/exchange-rate`, params)
       .then((res) => res.value);
@@ -379,8 +379,8 @@ export class MarketService {
       !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
   })
   static async $getPPSHistory(params: {
-    forCcy: string;
-    domCcy: string;
+    fromCcy: string;
+    toCcy: string;
     endDateTime: number;
     startDateTime: number;
   }) {
@@ -394,8 +394,8 @@ export class MarketService {
 
   @applyMock('getPPS')
   static async getPPS(params: {
-    forCcy: string;
-    domCcy: string;
+    fromCcy: string;
+    toCcy: string;
     timeList?: number[];
     includeNow: boolean;
   }): Promise<Record<number | 'now', number>> {
@@ -406,7 +406,7 @@ export class MarketService {
     await Promise.all(
       [
         params.includeNow
-          ? MarketService.$getPPSNow(pick(params, ['domCcy', 'forCcy'])).then(
+          ? MarketService.$getPPSNow(pick(params, ['toCcy', 'fromCcy'])).then(
               (res) => {
                 result.now = res.exchangeRate;
                 result[res.dateTime * 1000] = res.exchangeRate;
@@ -415,14 +415,14 @@ export class MarketService {
           : undefined,
         params.timeList && params.timeList.length
           ? MarketService.$getPPSHistory({
-              forCcy: params.forCcy,
-              domCcy: params.domCcy,
+              fromCcy: params.fromCcy,
+              toCcy: params.toCcy,
               startDateTime: min(params.timeList)! / 1000,
               endDateTime: max(params.timeList)! / 1000,
             }).then((res) => {
               if (!res.length) {
                 console.error(
-                  `Cannot get any exchange-rate for ${params.domCcy}/${params.forCcy} between ${min(params.timeList)! / 1000} & ${max(params.timeList)! / 1000}`,
+                  `Cannot get any exchange-rate from ${params.fromCcy} to ${params.toCcy} between ${min(params.timeList)! / 1000} & ${max(params.timeList)! / 1000}`,
                 );
                 return;
               }

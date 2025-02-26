@@ -309,8 +309,8 @@ export class PositionsService {
         Object.entries(timeList).map(async ([k, list]) => [
           k,
           await MarketService.getPPS({
-            forCcy: extractFromPPSKey(k as PPSKey).depositCcy,
-            domCcy: extractFromPPSKey(k as PPSKey).depositBaseCcy,
+            fromCcy: extractFromPPSKey(k as PPSKey).depositCcy,
+            toCcy: extractFromPPSKey(k as PPSKey).depositBaseCcy,
             includeNow: true,
             timeList: list,
           }),
