@@ -354,7 +354,7 @@ export const useDIYState = Object.assign(instant, {
     const allVaults = ContractsService.vaults.filter(
       (v) => v.chainId == chainId,
     );
-    if (!allVaults) {
+    if (!allVaults?.length) {
       throw new Error(
         `No products available on chain ${ChainMap[chainId]?.name || chainId}, please switch to other chain.`,
       );
