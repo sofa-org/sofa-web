@@ -11,7 +11,15 @@ import {
 } from './contracts';
 import { TFunction } from './i18n';
 import { MarketService } from './market';
-import { CalculatedInfo, ProductInfo, ProductsService } from './products';
+import {
+  CalculatedInfo,
+  extractFromPPSKey,
+  genPPSKey,
+  PPSKey,
+  PPSValue as PPSValue,
+  ProductInfo,
+  ProductsService,
+} from './products';
 import { RiskType } from './products';
 import { BindTradeInfo, ReferralService } from './referral';
 import {
@@ -275,7 +283,6 @@ export class PositionsService {
       } as PositionParams,
     );
 
-    const now = Date.now();
     const list = res.value.map((it) => ({
       position: it,
       vault: ContractsService.getVaultInfo(
@@ -288,29 +295,27 @@ export class PositionsService {
         const vault = it.vault;
         // 没有 depositBaseCcy 表示不需要转换，也就不需要历史的 pps
         if (!vault.depositBaseCcy) return pre;
-        if (!pre[vault.depositCcy]) pre[vault.depositCcy] = [];
-        if (!pre[vault.depositCcy].includes(it.position.createdAt * 1000))
-          pre[vault.depositCcy].push(it.position.createdAt * 1000);
-        if (!pre[vault.depositCcy].includes(now))
-          pre[vault.depositCcy].push(now);
+        const key = genPPSKey(vault);
+        if (!pre[key]) pre[key] = [];
+        if (!pre[key].includes(it.position.createdAt * 1000))
+          pre[key].push(it.position.createdAt * 1000);
         return pre;
       },
-      {} as Record<VaultInfo['depositCcy'], number /* ms */[]>,
+      {} as Record<PPSKey, number /* ms */[]>,
     );
 
     const [pps, apyMap] = await Promise.all([
       Promise.all(
-        Object.entries(timeList).map(async ([ccy, list]) => [
-          ccy,
-          await MarketService.getPPS(ccy, list),
+        Object.entries(timeList).map(async ([k, list]) => [
+          k,
+          await MarketService.getPPS({
+            forCcy: extractFromPPSKey(k as PPSKey).depositCcy,
+            domCcy: extractFromPPSKey(k as PPSKey).depositBaseCcy,
+            includeNow: true,
+            timeList: list,
+          }),
         ]),
-      ).then(
-        (res) =>
-          Object.fromEntries(res) as Record<
-            VaultInfo['depositCcy'],
-            Record<number /* timestamp */ | 'now', number>
-          >,
-      ),
+      ).then((res) => Object.fromEntries(res) as Record<PPSKey, PPSValue>),
       MarketService.interestRate(params.chainId),
     ]);
 
@@ -321,10 +326,11 @@ export class PositionsService {
       const apy = apyMap[vault.depositBaseCcy];
       if (isNullLike(apy))
         throw new Error(`Can not find apy of ${vault.depositBaseCcy}`);
-      if (!pre[vault.depositCcy][expiry]) {
-        pre[vault.depositCcy][expiry] = calc_yield(
+      const key = genPPSKey(vault);
+      if (!pre[key][expiry]) {
+        pre[key][expiry] = calc_yield(
           apy.apyUsed,
-          pre[vault.depositCcy]['now'],
+          pre[key]['now'],
           Date.now(),
           expiry,
         );
@@ -443,9 +449,7 @@ export class PositionsService {
     ...[params]: Parameters<typeof WalletService.mint>
   ) {
     safeRun(cb, { status: 'Submitting' });
-    const key = `${params.vault.vault.toLowerCase()}-${params.vault.chainId}-${
-      params.depositCcy
-    }`;
+    const key = `${params.vault.vault.toLowerCase()}-${params.vault.chainId}-${params.depositCcy}`;
     return WalletService.mint(params)
       .then(async (hash) => {
         ReferralService.bind([

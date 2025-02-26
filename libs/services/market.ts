@@ -7,6 +7,7 @@ import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
 import Big from 'big.js';
 import { Contract, formatUnits } from 'ethers';
+import { max, min, pick, uniq } from 'lodash-es';
 
 import stRCHAbis from './abis/StRCH.json';
 import zRCHAbis from './abis/ZenRCH.json';
@@ -28,6 +29,13 @@ export interface CandleInfo {
   open: number;
   close: number;
   volume?: number;
+}
+
+export interface PPSEntry {
+  forCcy: string;
+  domCcy: string;
+  dateTime: number;
+  exchangeRate: number;
 }
 
 export class MarketService {
@@ -356,14 +364,94 @@ export class MarketService {
     return Big(balanceOfStRCH).div(zRCHTotalSupply).toString();
   }
 
-  @applyMock('getPPS')
-  static async getPPS(
-    ccy: string,
-    timeList: number[],
-  ): Promise<Record<(typeof timeList)[0] | 'now', number>> {
-    // TODO 找服务端要接口
-    throw new Error('No pps');
+  @asyncCache({
+    until: (it, createdAt) =>
+      !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
+  })
+  static async $getPPSNow(params: { forCcy: string; domCcy: string }) {
+    return http
+      .post<unknown, HttpResponse<PPSEntry>>(`/rfq/exchange-rate`, params)
+      .then((res) => res.value);
+  }
 
-    // TODO 需要将现在的价格的 key 转成 now
+  @asyncCache({
+    until: (it, createdAt) =>
+      !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
+  })
+  static async $getPPSHistory(params: {
+    forCcy: string;
+    domCcy: string;
+    endDateTime: number;
+    startDateTime: number;
+  }) {
+    return http
+      .post<
+        unknown,
+        HttpResponse<PPSEntry[]>
+      >(`/rfq/exchange-rate/history-list`, params)
+      .then((res) => res.value);
+  }
+
+  @applyMock('getPPS')
+  static async getPPS(params: {
+    forCcy: string;
+    domCcy: string;
+    timeList?: number[];
+    includeNow: boolean;
+  }): Promise<Record<number | 'now', number>> {
+    if (!params.timeList && !params.includeNow) {
+      throw new Error('Either timeList/includeNow must be non-empty');
+    }
+    const result = {} as Record<number | 'now', number>;
+    await Promise.all(
+      [
+        params.includeNow
+          ? MarketService.$getPPSNow(pick(params, ['domCcy', 'forCcy'])).then(
+              (res) => {
+                result.now = res.exchangeRate;
+                result[res.dateTime * 1000] = res.exchangeRate;
+              },
+            )
+          : undefined,
+        params.timeList && params.timeList.length
+          ? MarketService.$getPPSHistory({
+              forCcy: params.forCcy,
+              domCcy: params.domCcy,
+              startDateTime: min(params.timeList)! / 1000,
+              endDateTime: max(params.timeList)! / 1000,
+            }).then((res) => {
+              if (!res.length) {
+                console.error(
+                  `Cannot get any exchange-rate for ${params.domCcy}/${params.forCcy} between ${min(params.timeList)! / 1000} & ${max(params.timeList)! / 1000}`,
+                );
+                return;
+              }
+              const sorttedRes = res.sort((a, b) => a.dateTime - b.dateTime);
+              let startIndex = 0;
+              for (const it of uniq(params.timeList!).sort()) {
+                const itInSec = it / 1000;
+                /* eslint-disable no-constant-condition */
+                while (true) {
+                  const tHead = sorttedRes[startIndex].dateTime;
+                  const tNext = sorttedRes[startIndex + 1]?.dateTime;
+                  if (
+                    tNext === undefined ||
+                    tHead == itInSec ||
+                    Math.abs(itInSec - tHead) <= Math.abs(itInSec - tNext)
+                  ) {
+                    // 距离 tHead 更近
+                    result[it] = sorttedRes[startIndex].exchangeRate;
+                    break;
+                  }
+                  // 距离 tNext 更近
+                  // 更新 startIndex
+                  startIndex += 1;
+                }
+              }
+            })
+          : undefined,
+      ].filter(Boolean),
+    );
+    return result;
   }
 }

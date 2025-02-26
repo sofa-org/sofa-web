@@ -164,6 +164,18 @@ export interface ProductQuoteResult
   convertedCalculatedInfoByDepositBaseCcy?: CalculatedInfo;
 }
 
+export type PPSKey = `${CCY | USDS}-${CCY | USDS}`;
+export type PPSValue = Record<number /* timestamp */ | 'now', number>;
+export function genPPSKey(v: VaultInfo) {
+  return `${v.depositCcy}-${v.depositBaseCcy}` as PPSKey;
+}
+export function extractFromPPSKey(key: PPSKey) {
+  return {
+    depositCcy: key.split('-')[0] as CCY | USDS,
+    depositBaseCcy: key.split('-')[1] as CCY | USDS,
+  };
+}
+
 export class ProductsService {
   static ccyEqual(ccy1: CCY | USDS, ccy2: CCY | USDS) {
     return ccy1 === ccy2 || `W${ccy1}` === ccy2 || ccy1 === `W${ccy2}`;
@@ -203,16 +215,18 @@ export class ProductsService {
       vault: ContractsService.getVaultInfo(it.vault, it.chainId),
     }));
     const depositCcyList = uniq(
-      list.map((it) => it.vault.depositBaseCcy && it.vault.depositCcy),
-    ).filter(Boolean) as string[];
+      list.map((it) => (it.vault.depositBaseCcy ? genPPSKey(it.vault) : false)),
+    ).filter(Boolean) as PPSKey[];
     const expiryList = uniq(list.map((it) => it.quote.expiry * 1000));
-    const now = Date.now();
     const [ppsMapAtNow, apyMap] = await Promise.all([
       Promise.all(
         depositCcyList.map((c) =>
-          MarketService.getPPS(c, [now, ...expiryList]).then(
-            (prices) => [c, prices] as const,
-          ),
+          MarketService.getPPS({
+            forCcy: extractFromPPSKey(c).depositCcy,
+            domCcy: extractFromPPSKey(c).depositBaseCcy,
+            includeNow: true,
+            timeList: expiryList,
+          }).then((prices) => [c, prices] as const),
         ),
       ).then((res) => Object.fromEntries(res)),
       MarketService.interestRate(quotes[0].chainId),
@@ -223,10 +237,11 @@ export class ProductsService {
       const apy = apyMap[it.vault.depositBaseCcy];
       if (isNullLike(apy))
         throw new Error(`Can not find apy of ${it.vault.depositBaseCcy}`);
-      if (!pre[it.vault.depositCcy][expiry]) {
-        pre[it.vault.depositCcy][expiry] = calc_yield(
+      const key = genPPSKey(it.vault);
+      if (!pre[key][expiry]) {
+        pre[key][expiry] = calc_yield(
           apy.apyUsed,
-          pre[it.vault.depositCcy]['now'],
+          pre[key]['now'],
           Date.now(),
           expiry,
         );
@@ -241,15 +256,16 @@ export class ProductsService {
   static dealOriginQuote(
     it: OriginProductQuoteResult,
     fixProtectedApy?: string | number,
-    ppsMap?: Record<VaultInfo['depositCcy'], Record<number | 'now', number>>,
+    ppsMap?: Record<PPSKey, PPSValue>,
   ): ProductQuoteResult {
     const vault = ContractsService.getVaultInfo(it.vault, it.chainId);
     const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
       ? (() => {
-          if (!ppsMap?.[vault.depositCcy]) return undefined;
+          const key = genPPSKey(vault);
+          if (!ppsMap?.[key]) return undefined;
           const pps = {
-            atTrade: ppsMap[vault.depositCcy]['now'],
-            afterExpire: ppsMap[vault.depositCcy][it.expiry * 1000],
+            atTrade: ppsMap[key]['now'],
+            afterExpire: ppsMap[key][it.expiry * 1000],
           };
           if (!pps.atTrade || !pps.afterExpire) return undefined;
           return ProductsService.cvtCalculatedInfoToDepositBaseCcy(

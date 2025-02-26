@@ -99,8 +99,8 @@ function mockProductQuote(
   params: ProductsDIYRecommendRequest,
 ): OriginProductQuoteResult {
   const prices: PartialRecord<CCY, number> = {
-    RCH: Math.random() * 10,
-    WBTC: Math.random() * 10000,
+    RCH: 0.3,
+    WBTC: 95000,
   };
   const vault = ProductsService.findVault(ContractsService.vaults, vaultInfo)!;
   const origin: OriginProductQuoteResult = {
