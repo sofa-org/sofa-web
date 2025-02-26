@@ -1,5 +1,7 @@
 .caption {
+  margin-top: -1px;
   margin-right: 9px;
+  line-height: 32px;
 }
 
 .field {
@@ -10,27 +12,65 @@
   .label {
     opacity: 0.65;
     margin-right: 9px;
+    line-height: 32px;
+    display: inline-block;
+  }
+  .value {
+    position: relative;
+    .date-picker {
+      width: 200px;
+      height: 32px;
+    }
+    :global {
+      .semi-input-wrapper {
+        border-radius: 40px;
+      }
+      .semi-input-wrapper:hover {
+        background-color: #f0f0f0;
+        border-color: transparent;
+      }
+    }
+    .term {
+      color: #000;
+      font-size: 12px;
+      opacity: 0.5;
+      position: absolute;
+      right: 34px;
+      top: 11px;
+      transform: translate(0, -50%);
+    }
   }
 }
 
 .target-price {
+  margin-right: 50px;
   .label {
     opacity: 0.65;
     margin-right: 12px;
+    line-height: 32px;
+    display: inline-block;
   }
 
   .value {
     :global {
       .amount-input-wrapper {
-        height: 30px;
+        height: 32px;
         width: 200px;
       }
+    }
+    .amount-input {
+      font-size: 20px;
+    }
+    .unit-in-input {
+      color: #000;
+      font-size: 14px;
     }
   }
 }
 
 .extra-reward {
   flex-direction: column;
+  margin-right: 29px;
 
   span {
     display: block;
@@ -42,7 +82,13 @@
   font-size: 16px;
   border-radius: 30px;
   border: 1px solid rgb(255 255 255 / 30%);
-  color: #fff !important;
+  color: #fff;
   opacity: 0.35;
   background: #2c2f34;
+
+  &:hover {
+    color: #2c2f34;
+    background: linear-gradient(95deg, #67d629 -6.67%, #eaff48 109.97%);
+    opacity: 1;
+  }
 }

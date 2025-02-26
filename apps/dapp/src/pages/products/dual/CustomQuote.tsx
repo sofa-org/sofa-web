@@ -7,6 +7,7 @@ import { displayPercentage } from '@sofa/utils/amount';
 import { next8h } from '@sofa/utils/expiry';
 import { currQuery } from '@sofa/utils/history';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 
 import AmountInput from '@/components/AmountInput';
 import AsyncButton from '@/components/AsyncButton';
@@ -66,6 +67,11 @@ export const CustomQuote = (props: {
               )
             }
           />
+          {!!props.expiry && ( //有疑问,少了一天
+            <span className={styles['term']}>
+              {Math.abs(dayjs().diff(props.expiry * 1000, 'day'))}d
+            </span>
+          )}
         </span>
       </div>
       <div className={classNames(styles['field'], styles['target-price'])}>

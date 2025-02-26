@@ -75,6 +75,9 @@
         height: 40px;
         margin-right: 6px;
         z-index: 4;
+        &.rch {
+          margin-top: -3px;
+        }
       }
 
       .name {
@@ -99,4 +102,10 @@
   color: #fff;
   padding: 20px 40px;
   font-size: 14px;
+}
+.mobile {
+  .custom-quote {
+    flex-direction: column;
+    align-items: start;
+  }
 }

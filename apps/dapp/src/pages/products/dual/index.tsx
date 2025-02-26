@@ -14,6 +14,7 @@ import classNames from 'classnames';
 import { uniq } from 'lodash-es';
 
 import { useForCcySelect } from '@/components/CCYSelector';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { useProductSelect } from '@/components/ProductSelector';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
@@ -34,6 +35,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('ProductDual');
   const [product, setProduct] = useProductSelect();
   const { chainId } = useWalletStore();
+  const isMobileUI = useIsMobileUI();
   const defaultInput = useMemo(() => {
     const q = currQuery();
     return {
@@ -87,7 +89,9 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
     <>
       <TopTabs
         bannerClassName={styles['banner']}
-        className={styles['container']}
+        className={classNames(styles['container'], {
+          [styles['mobile']]: isMobileUI,
+        })}
         banner={
           <>
             <h1 className={styles['head-title']}>
@@ -132,7 +136,13 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                   })}
                   onClick={() => setForCcy(i.forCcy)}
                 >
-                  <img src={CCYService.ccyConfigs[i.forCcy]?.icon} />
+                  <img
+                    src={CCYService.ccyConfigs[i.forCcy]?.icon}
+                    className={classNames({
+                      [styles['rch']]:
+                        i.forCcy == CCYService.ccyConfigs['RCH']?.name,
+                    })}
+                  />
                   <div className={styles['ccy-infos']}>
                     <div className={styles['name']}>
                       {CCYService.ccyConfigs[i.forCcy]?.name || i.forCcy}

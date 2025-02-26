@@ -157,7 +157,12 @@ export const RecommendedList = (props: {
             styles[props.vault.forCcy.toLowerCase()],
           )}
         >
-          <img src={forCcyConfig?.icon} />
+          <img
+            src={forCcyConfig?.icon}
+            className={classNames({
+              [styles['rch']]: forCcyConfig?.name == 'RCH',
+            })}
+          />
           {formatHighlightedText(
             t(
               {
