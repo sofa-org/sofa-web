@@ -285,11 +285,13 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       <BaseInvestButton
         shouldPrepare={shouldQuote || !products.length}
         preparing={
-          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+          vault.riskType === RiskType.PROTECTED &&
+          interestRate?.apyUsed === undefined
         }
         prepare={quote}
         prepareText={
-          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+          vault.riskType === RiskType.PROTECTED &&
+          interestRate?.apyUsed === undefined
             ? t('In Preparation...')
             : t('Request For Quote')
         }

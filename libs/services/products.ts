@@ -249,11 +249,11 @@ export class ProductsService {
       return pre;
     }, ppsMapAtNow);
     return list.map((it) =>
-      ProductsService.dealOriginQuote(it.quote, fixProtectedApy, ppsMap),
+      ProductsService.$dealOriginQuote(it.quote, fixProtectedApy, ppsMap),
     );
   }
 
-  static dealOriginQuote(
+  static $dealOriginQuote(
     it: OriginProductQuoteResult,
     fixProtectedApy?: string | number,
     ppsMap?: Record<PPSKey, PPSValue>,
@@ -460,9 +460,11 @@ export class ProductsService {
       upperBarrier: data.anchorPrices[1],
       lowerStrike: data.anchorPrices[0],
       upperStrike: data.anchorPrices[1],
-    }).then((res) =>
-      ProductsService.dealOriginQuote(res.value, data.protectedApy),
-    );
+    })
+      .then((res) =>
+        ProductsService.dealOriginQuotes([res.value], data.protectedApy),
+      )
+      .then((res) => res[0]);
   }
 
   @asyncCache({

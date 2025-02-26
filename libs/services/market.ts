@@ -370,7 +370,7 @@ export class MarketService {
   })
   static async $getPPSNow(params: { fromCcy: string; toCcy: string }) {
     return http
-      .post<unknown, HttpResponse<PPSEntry>>(`/rfq/exchange-rate`, params)
+      .get<unknown, HttpResponse<PPSEntry>>(`/rfq/exchange-rate`, { params })
       .then((res) => res.value);
   }
 
@@ -385,10 +385,10 @@ export class MarketService {
     startDateTime: number;
   }) {
     return http
-      .post<
+      .get<
         unknown,
         HttpResponse<PPSEntry[]>
-      >(`/rfq/exchange-rate/history-list`, params)
+      >(`/rfq/exchange-rate/history-list`, { params })
       .then((res) => res.value);
   }
 

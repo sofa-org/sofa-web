@@ -218,8 +218,11 @@ export const ProfitsRender = (
             <ProfitsRenderNoBaseCcySelect
               data={{
                 ...data,
-                product: data,
                 ...data.convertedCalculatedInfoByDepositBaseCcy,
+                product: {
+                  ...data,
+                  ...data.convertedCalculatedInfoByDepositBaseCcy,
+                },
               }}
             />
           ) : (
