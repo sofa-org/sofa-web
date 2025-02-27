@@ -12,6 +12,7 @@ import { useLazyCallback } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
 import { useRequest } from 'ahooks';
 import classNames from 'classnames';
+import { copy } from 'clipboard';
 import * as htmlToImage from 'html-to-image';
 import { resolve } from 'path';
 
@@ -83,6 +84,8 @@ const AutomatorShareModal = forwardRef<
     AutomatorService.topFollowers(props.automatorDetail.vaultInfo),
   );
 
+  const shareLink = `${location.protocol}//${location.host}/a?v=${props.automatorDetail.vaultInfo.vault}`;
+
   return (
     <Modal
       modalContentClass={styles['automator-share-modal']}
@@ -119,7 +122,7 @@ const AutomatorShareModal = forwardRef<
       footer={
         <>
           <div className={styles['modal-footer']}>
-            <div
+            <a
               className={classNames(styles['btn'], styles['copy-img'])}
               onClick={() =>
                 copyImage().catch((e) => Toast.error(getErrorMsg(e)))
@@ -129,16 +132,29 @@ const AutomatorShareModal = forwardRef<
               {t({
                 enUS: 'Copy Image',
               })}
-            </div>
-            <div
+            </a>
+            <a
               className={classNames(styles['btn'], styles['copy-link'])}
-              onClick={() => alert('TODO')}
+              href={shareLink}
+              onClick={(e) => {
+                e.preventDefault();
+                Promise.resolve()
+                  .then(() => copy(shareLink))
+                  .then(() =>
+                    Toast.success(
+                      t({
+                        enUS: 'Copy successful',
+                        zhCN: '复制成功',
+                      }),
+                    ),
+                  );
+              }}
             >
               <span className={styles['icon']} />
               {t({
                 enUS: 'Copy Link',
               })}
-            </div>
+            </a>
           </div>
         </>
       }
