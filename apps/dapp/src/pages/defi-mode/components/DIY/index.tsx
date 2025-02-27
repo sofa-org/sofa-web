@@ -258,8 +258,11 @@ const ApyTarget = () => {
     return (log - logMin) / (logMax - logMin);
   }, [formData?.apyTarget, logMax, logMin]);
 
-  const rchApy = useDIYState((state) => state.selectedQuote[0]?.apyInfo?.rch);
+  const selectedQuote = useDIYState((state) => state.selectedQuote[0]);
   const probabilityDesc = useMemo(() => {
+    const rchApy = selectedQuote?.convertedCalculatedInfoByDepositBaseCcy
+      ? selectedQuote.convertedCalculatedInfoByDepositBaseCcy.apyInfo?.rch
+      : selectedQuote?.apyInfo?.rch;
     if (!formData?.apyTarget || !rchApy) return undefined;
     const low = Math.min(min + (max - min) * 0.2, 0.5 + +rchApy);
     const high = Math.min(min + (max - min) * 0.8, 2 + +rchApy);
@@ -277,22 +280,18 @@ const ApyTarget = () => {
       txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
       color: '#CD8E8E',
     };
-  }, [formData?.apyTarget, max, min, t, rchApy]);
+  }, [formData?.apyTarget, max, min, t, selectedQuote]);
 
-  const calcApyBasedOn = useMemo(
-    () =>
-      ProductsDIYService.getSupportMatrix({ ...formData, chainId })
-        .calcApyBasedOn,
-    [formData, chainId],
-  );
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
         {t({ enUS: 'APY target', zhCN: '目标年化收益' })}
-        {(calcApyBasedOn && (
+        {(selectedQuote?.convertedCalculatedInfoByDepositBaseCcy && (
           <>
             {' '}
-            <span className={styles['apy-base-ccy']}>({calcApyBasedOn})</span>
+            <span className={styles['apy-base-ccy']}>
+              ({selectedQuote.vault.depositBaseCcy})
+            </span>
           </>
         )) ||
           undefined}

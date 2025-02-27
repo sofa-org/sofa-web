@@ -221,17 +221,23 @@ export const useDIYState = Object.assign(instant, {
                 oddsRange: [Infinity, 0],
               };
             pre[key].keys.push(ProductsService.productKey(it));
+            const apyInfo = it.convertedCalculatedInfoByDepositBaseCcy
+              ? it.convertedCalculatedInfoByDepositBaseCcy.apyInfo
+              : it.apyInfo;
             const apy = (() => {
-              const v = simplePlus(it.apyInfo?.rch, it.apyInfo?.max);
+              const v = simplePlus(apyInfo?.rch, apyInfo?.max);
               if (!v) return v;
               return Math.round(v * 100) / 100;
             })();
+            const oddsInfo = it.convertedCalculatedInfoByDepositBaseCcy
+              ? it.convertedCalculatedInfoByDepositBaseCcy.oddsInfo
+              : it.oddsInfo;
             if (isLegalNum(apy)) {
               pre[key].apyRange[0] = Math.min(pre[key].apyRange[0], apy);
               pre[key].apyRange[1] = Math.max(pre[key].apyRange[1], apy);
             }
             const odds = (() => {
-              const v = simplePlus(it.oddsInfo?.rch, it.oddsInfo?.max);
+              const v = simplePlus(oddsInfo?.rch, oddsInfo?.max);
               if (!v) return v;
               return +v.toFixed(2);
             })();

@@ -74,7 +74,6 @@ export class ProductsDIYService {
   static getSupportMatrix(v: Partial<VaultInfo>): {
     skipCurrentOptionValue?: boolean;
     skipOption?: 'riskType'[];
-    calcApyBasedOn?: CCY | USDS;
   } {
     const vaults = ProductsService.filterVaults(ContractsService.vaults, {
       chainId: v.chainId,
@@ -84,7 +83,6 @@ export class ProductsDIYService {
       return {
         skipCurrentOptionValue: v.productType === ProductType.DNT,
         skipOption: ['riskType'],
-        calcApyBasedOn: vaults[0].depositBaseCcy,
       };
     }
     return {};
