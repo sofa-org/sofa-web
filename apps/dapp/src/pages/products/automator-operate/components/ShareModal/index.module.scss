@@ -34,3 +34,18 @@
     display: none !important;
   }
 }
+
+.automator-size {
+  .bar-bg {
+    position: relative;
+    height: 30px;
+    background-color: #000;
+    > .bar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-color: red;
+    }
+  }
+}
