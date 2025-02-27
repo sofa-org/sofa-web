@@ -251,7 +251,16 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
       anchorPrices: product.anchorPrices,
     });
   }, [product]);
-
+  const [baseCcy, setBaseCcy] = useState<CCY | USDS | undefined>(undefined);
+  useEffect(() => {
+    if (
+      !baseCcy &&
+      product?.vault.depositBaseCcy &&
+      quoteInfo?.convertedCalculatedInfoByDepositBaseCcy
+    ) {
+      setBaseCcy(product.vault.depositBaseCcy);
+    }
+  }, [baseCcy, product, quoteInfo]);
   return (
     <div
       className={classNames(styles['customize'], {
@@ -457,6 +466,8 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                   <ProfitsRender
                     data={quoteInfo}
                     style={{ marginBottom: 40 }}
+                    baseCcy={baseCcy}
+                    setBaseCcy={setBaseCcy}
                   />
                   <QuoteExplain
                     riskType={quoteInfo.vault.riskType}

@@ -189,32 +189,30 @@ export const ProfitsRenderNoBaseCcySelect = (
 };
 
 export const ProfitsRender = (
-  props: BaseProps & { data: ProductQuoteResult },
+  props: BaseProps & {
+    data: ProductQuoteResult;
+    baseCcy?: CCY | USDS;
+    setBaseCcy: (ccy: CCY | USDS) => void;
+  },
 ) => {
   const data = props.data;
-  const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
-  useEffect(() => {
-    if (!basedCcy && data.vault.depositBaseCcy) {
-      setBasedCcy(data.vault.depositBaseCcy);
-    }
-  }, [basedCcy, data]);
   return (
     <>
-      {basedCcy ? (
+      {props.baseCcy ? (
         <>
           <RadioGroup
             type="button"
             buttonSize="small"
-            value={basedCcy}
+            value={props.baseCcy}
             className={styles['base-ccy-select']}
-            onChange={(v) => setBasedCcy(v.target.value)}
+            onChange={(v) => props.setBaseCcy(v.target.value)}
           >
             <Radio value={data.vault.depositBaseCcy}>
               {data.vault.depositBaseCcy}
             </Radio>
             <Radio value={data.vault.depositCcy}>{data.vault.depositCcy}</Radio>
           </RadioGroup>
-          {basedCcy == data.vault.depositBaseCcy ? (
+          {props.baseCcy == data.vault.depositBaseCcy ? (
             <ProfitsRenderNoBaseCcySelect
               data={{
                 ...data,
@@ -222,6 +220,10 @@ export const ProfitsRender = (
                 product: {
                   ...data,
                   ...data.convertedCalculatedInfoByDepositBaseCcy,
+                  vault: {
+                    ...data.vault,
+                    depositCcy: data.vault.depositBaseCcy,
+                  },
                 },
               }}
             />
