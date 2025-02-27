@@ -4,6 +4,7 @@ import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
+import { simplePlus } from '@sofa/utils/object';
 import Big from 'big.js';
 import { omit, pick, uniq, uniqBy } from 'lodash-es';
 
@@ -239,12 +240,10 @@ export class ProductsService {
         throw new Error(`Can not find apy of ${it.vault.depositBaseCcy}`);
       const key = genPPSKey(it.vault);
       if (!pre[key][expiry]) {
-        pre[key][expiry] = calc_yield(
-          apy.apyUsed,
+        pre[key][expiry] = simplePlus(
           pre[key]['now'],
-          Date.now(),
-          expiry,
-        );
+          calc_yield(apy.apyUsed, pre[key]['now'], Date.now(), expiry),
+        )!;
       }
       return pre;
     }, ppsMapAtNow);
@@ -519,7 +518,8 @@ export class ProductsService {
     // 1. 保证用户 1% 的保底年化
     // 2. 至少让用户拿 3% 的年化去赌
     // 2. 保证用户 3% 的保底年化
-    if (!apy) return [];
+    if (isNullLike(apy)) return [];
+    if (!apy) return [-0.01];
     const max = Math.max(Math.floor(apy * 100) - 3, 1);
     const min = Math.min(1, max);
     if (min === max) return [max / 100];
@@ -532,10 +532,10 @@ export class ProductsService {
 
   static async genExpiries(vault: VaultInfo) {
     return http
-      .get<
-        unknown,
-        HttpResponse<{ timestamp: number; expiries: number[] }>
-      >('/rfq/expiry-list', { params: { chainId: vault.chainId, vault: vault.vault } })
+      .get<unknown, HttpResponse<{ timestamp: number; expiries: number[] }>>(
+        '/rfq/expiry-list',
+        { params: { chainId: vault.chainId, vault: vault.vault } },
+      )
       .then((res) => res.value?.expiries.map((it) => it * 1000));
   }
 
@@ -565,9 +565,9 @@ export class ProductsService {
   ): CalculatedInfo {
     const amounts = {
       counterparty: +data.amounts.counterparty * pps.atTrade,
-      own: +data.amounts.counterparty * pps.atTrade,
+      own: +data.amounts.own * pps.atTrade,
       premium: +data.amounts.premium * pps.atTrade,
-      forRchAirdrop: +data.amounts.premium * pps.atTrade,
+      forRchAirdrop: +data.amounts.forRchAirdrop * pps.atTrade,
       rchAirdrop: data.amounts.rchAirdrop,
       totalInterest: +data.amounts.totalInterest * pps.afterExpire,
       minRedeemable: +data.amounts.minRedeemable * pps.afterExpire,
@@ -619,8 +619,8 @@ export class ProductsService {
         expiredAt,
       ),
       rch: rchApy,
-      min: minApy - rchApy,
-      max: maxApy - minApy,
+      min: minApy,
+      max: maxApy,
     };
 
     return {

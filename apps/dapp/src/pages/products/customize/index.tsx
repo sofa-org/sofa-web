@@ -16,7 +16,7 @@ import {
 } from '@sofa/services/products';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { day8h, displayExpiry, next8h, pre8h } from '@sofa/utils/expiry';
-import { calcVal } from '@sofa/utils/fns';
+import { calcVal, isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
@@ -169,20 +169,24 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
     (state) => state.interestRate[wallet.chainId]?.[depositCcy],
   );
   useEffect(() => {
-    if (interestRate?.apyUsed)
+    if (!isNullLike(interestRate?.apyUsed))
       updateProduct({ fundingApy: interestRate.apyUsed });
   }, [vault, interestRate?.apyUsed, updateProduct]);
 
-  const protectedApyOptions = useMemo(
-    () =>
-      ProductsService.genProtectedApyList(interestRate?.apyUsed, customDev).map(
-        (value) => ({
-          label: `${displayPercentage(value)} Yield`,
-          value,
-        }),
-      ),
-    [customDev, interestRate?.apyUsed],
-  );
+  const protectedApyOptions = useMemo(() => {
+    const apyList = ProductsService.genProtectedApyList(
+      interestRate?.apyUsed,
+      customDev,
+    );
+    if (apyList.length === 1 && apyList[0] === -0.01) {
+      // sUSDa 这类产品的特殊逻辑
+      return [{ label: '1% yield', value: -0.01 }];
+    }
+    return apyList.map((value) => ({
+      label: `${displayPercentage(value)} Yield`,
+      value,
+    }));
+  }, [customDev, interestRate?.apyUsed]);
   useEffect(() => {
     if (
       protectedApyOptions.length &&

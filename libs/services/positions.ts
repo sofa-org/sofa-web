@@ -1,6 +1,7 @@
 import { calc_yield } from '@sofa/alg';
 import { isNullLike, safeRun } from '@sofa/utils/fns';
 import { http, pollingUntil } from '@sofa/utils/http';
+import { simplePlus } from '@sofa/utils/object';
 import { UserStorage } from '@sofa/utils/storage';
 
 import {
@@ -328,12 +329,10 @@ export class PositionsService {
         throw new Error(`Can not find apy of ${vault.depositBaseCcy}`);
       const key = genPPSKey(vault);
       if (!pre[key][expiry]) {
-        pre[key][expiry] = calc_yield(
-          apy.apyUsed,
+        pre[key][expiry] = simplePlus(
           pre[key]['now'],
-          Date.now(),
-          expiry,
-        );
+          calc_yield(apy.apyUsed, pre[key]['now'], Date.now(), expiry),
+        )!;
       }
       return pre;
     }, pps);
@@ -449,7 +448,9 @@ export class PositionsService {
     ...[params]: Parameters<typeof WalletService.mint>
   ) {
     safeRun(cb, { status: 'Submitting' });
-    const key = `${params.vault.vault.toLowerCase()}-${params.vault.chainId}-${params.depositCcy}`;
+    const key = `${params.vault.vault.toLowerCase()}-${params.vault.chainId}-${
+      params.depositCcy
+    }`;
     return WalletService.mint(params)
       .then(async (hash) => {
         ReferralService.bind([
