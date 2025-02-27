@@ -1,22 +1,27 @@
 import { Dispatch, forwardRef, useImperativeHandle, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Toast } from '@douyinfe/semi-ui';
-import { AutomatorDetail } from '@sofa/services/automator';
+import { AutomatorDetail, AutomatorService } from '@sofa/services/automator';
+import { CCYService } from '@sofa/services/ccy';
+import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult } from '@sofa/services/products';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
+import { useRequest } from 'ahooks';
 import classNames from 'classnames';
 import * as htmlToImage from 'html-to-image';
 import { resolve } from 'path';
 
+import AmountDisplay from '@/components/AmountDisplay';
+import { MsgDisplay } from '@/components/MsgDisplay';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import { AutomatorRiskExposureMap } from '@/pages/products/automator-create/util';
 
-import { Comp as IconRisk } from '../../automator-mine/assets/icon-risk.svg';
+import { Comp as IconRisk } from '../../../automator-mine/assets/icon-risk.svg';
 import locale from '../../locale';
 
 import styles from './index.module.scss';
@@ -73,6 +78,10 @@ const AutomatorShareModal = forwardRef<
     downloadLink.setAttribute('href', url);
     downloadLink.click();
   });
+
+  const { data } = useRequest(() =>
+    AutomatorService.topFollowers(props.automatorDetail.vaultInfo),
+  );
 
   return (
     <Modal
@@ -172,6 +181,152 @@ const AutomatorShareModal = forwardRef<
         </div>
         <div className={styles['automator-address']}>
           {props.automatorDetail.vaultInfo.vault.toLowerCase() || ''}
+
+          <img
+            className={styles['logo']}
+            src={ChainMap[props.automatorDetail.vaultInfo.chainId].icon}
+            alt=""
+          />
+        </div>
+
+        <div className={styles['automator-desc']}>
+          <MsgDisplay>
+            {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
+            {(props.automatorDetail.vaultInfo.desc || '...')
+              .split('\n')
+              .map((line, idx) => (
+                <>
+                  {idx > 0 ? <br key={`lb-${idx}`} /> : undefined}
+                  {line}
+                </>
+              ))}
+          </MsgDisplay>
+        </div>
+        <div className={styles['automator-performance']}>
+          <span className={styles['label']}>
+            {t({ enUS: '7D Yield', zhCN: '7天年化' })}
+          </span>
+          <span
+            className={styles['value']}
+            style={{
+              color:
+                Number(props.automatorDetail.yieldPercentage) >= 0
+                  ? 'var(--color-rise)'
+                  : 'var(--color-fall)',
+            }}
+          >
+            {displayPercentage(
+              Number(props.automatorDetail.yieldPercentage) / 100,
+            )}
+          </span>
+        </div>
+        <div className={styles['automator-size']}>
+          <div className={styles['pool-size']}>
+            <div className={styles['label']}>
+              {t({ enUS: 'Pool Size', zhCN: '规模' })}
+            </div>
+            <div className={styles['value']}>
+              <AmountDisplay
+                amount={
+                  +props.automatorDetail.aumBySharesToken ||
+                  +props.automatorDetail.aumByVaultDepositCcy /
+                    +props.automatorDetail.nav
+                }
+                ccy={props.automatorDetail.vaultInfo.depositCcy}
+              />
+            </div>
+          </div>
+
+          <div className={styles['optivisor-funds']}>
+            <div className={styles['label']}>
+              {t({ enUS: `Optivisor's Funds`, zhCN: '主理人份额' })}
+            </div>
+            <div className={styles['value']}>
+              <AmountDisplay
+                amount={
+                  props.automatorDetail.creatorAmountByClientDepositCcy || 0
+                }
+                ccy={props.automatorDetail.vaultInfo.depositCcy}
+              />
+              <span className={styles['unit']}>
+                {props.automatorDetail.vaultInfo.depositCcy}
+              </span>
+              <span className={styles['percent']}>
+                {displayPercentage(
+                  Number(
+                    props.automatorDetail?.creatorAmountByVaultDepositCcy,
+                  ) / Number(props.automatorDetail?.aumByVaultDepositCcy),
+                )}
+              </span>
+            </div>
+
+            <div className={styles['bar-bg']}>
+              <div
+                className={styles['bar']}
+                style={{
+                  width: `${
+                    props.automatorDetail?.creatorAmountByVaultDepositCcy ===
+                      undefined || !props.automatorDetail?.aumByVaultDepositCcy
+                      ? 0
+                      : (Number(
+                          props.automatorDetail?.creatorAmountByVaultDepositCcy,
+                        ) /
+                          Number(props.automatorDetail?.aumByVaultDepositCcy)) *
+                        100
+                  }%`,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className={styles['automator-follower']}>
+          <div className={styles['deposit-ccy']}>
+            <div className={styles['label']}>
+              {t({ enUS: 'Deposit', zhCN: '存入' })}
+            </div>
+            <div className={styles['value']}>
+              <img
+                className={styles['logo']}
+                src={
+                  CCYService.ccyConfigs[
+                    props.automatorDetail.vaultInfo.depositCcy
+                  ]?.icon
+                }
+                alt=""
+              />
+            </div>
+          </div>
+
+          <div className={styles['deposit-ccy']}>
+            <div className={styles['label']}>
+              {t({ enUS: 'Participating Investor', zhCN: '参与钱包数' })}
+            </div>
+            <div className={styles['value']}>
+              {props.automatorDetail.participantNum || '-'}
+            </div>
+          </div>
+
+          {data && (
+            <div className={styles['followers-pnl']}>
+              <div className={styles['label']}>
+                {t({ enUS: `Followers' PnL`, zhCN: '参与者 PnL' })}
+              </div>
+              <div className={styles['value']}>
+                {data.map((row) => (
+                  <div className={styles['follower']}>
+                    <span className={styles['wallet']}>
+                      {row.wallet.replace(/^(\w{8})\w+$/, (_, s) => `${s}...`)}
+                    </span>
+                    <span className={styles['day']}>{row.followDay}</span>
+                    <span className={styles['percentage']}>
+                      {displayPercentage(Number(row.pnlPercentage) / 100, 1)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Modal>
