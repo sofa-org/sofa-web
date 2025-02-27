@@ -8,9 +8,11 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 
 import { useAutomatorStore } from '../automator/store';
 
-export function useAutomatorMarketSelector() {
+export function useAutomatorMarketSelector(options?: { queryName?: string }) {
   const { chainId } = useWalletStore((state) => state);
-  const v = useQuery((p) => p['automator-vault'] as string);
+  const v = useQuery(
+    (p) => p[options?.queryName || 'automator-vault'] as string,
+  );
   useEffect(() => {
     return useAutomatorStore.subscribeVaults(chainId);
   }, [chainId]);
