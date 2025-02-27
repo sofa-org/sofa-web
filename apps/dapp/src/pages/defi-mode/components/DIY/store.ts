@@ -280,7 +280,7 @@ export const useDIYState = Object.assign(instant, {
             simplePlus(it.oddsInfo?.max, it.oddsInfo?.rch) || 0,
         });
       }
-      if (!formData.apyTarget)
+      if (formData.apyTarget === undefined)
         throw new Error(`Invalid apyTarget(${formData.apyTarget})`);
       return getNearestItemIndex(quotes, formData.apyTarget, {
         calcCompareNum: (it) =>
