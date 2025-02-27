@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useRef } from 'react';
 import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
@@ -26,6 +26,9 @@ import {
 import { AutomatorFollowers } from './components/Followers';
 import { AutomatorPerformance } from './components/Performance';
 import { AutomatorPositions } from './components/Positions';
+import AutomatorShareModal, {
+  AutomatorShareModalPropsRef,
+} from './components/ShareModal';
 import AutomatorTrade from './components/Trade';
 import { AutomatorTransactions } from './components/Transactions';
 import locale from './locale';
@@ -110,6 +113,8 @@ const Index = () => {
         }-${automator.vaultInfo.vault.toLowerCase()}-`
       ],
   );
+
+  const shareModalRef = useRef<AutomatorShareModalPropsRef>(null);
 
   return (
     <TopTabs
@@ -211,6 +216,15 @@ const Index = () => {
                 </MsgDisplay>
               </div>
             </div>
+            <div
+              className={styles['share-btn']}
+              onClick={() => shareModalRef.current?.show()}
+            >
+              {t({
+                enUS: 'Share',
+                zhCN: '分享',
+              })}
+            </div>
           </h1>
         </>
       }
@@ -220,6 +234,13 @@ const Index = () => {
       onChange={(v) => updateQuery({ 'automator-operate-tab': v })}
     >
       <div className={styles['container']}>{item.content()}</div>
+      {(automatorDetail && (
+        <AutomatorShareModal
+          automatorDetail={automatorDetail}
+          ref={shareModalRef}
+        />
+      )) ||
+        undefined}
     </TopTabs>
   );
 };

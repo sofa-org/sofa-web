@@ -67,7 +67,8 @@
     "swiper": "^11.0.7",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-svgr": "^4.1.0",
-    "zustand": "^4.4.6"
+    "zustand": "^4.4.6",
+    "html-to-image": "^1.11.11"
   },
   "devDependencies": {
     "@livelybone/promise-wait": "^1.2.0",
