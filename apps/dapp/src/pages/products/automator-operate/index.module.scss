@@ -101,6 +101,10 @@
   }
 }
 
+.share-btn {
+  @include pointer;
+}
+
 @mixin rewrite {
   .head-title.head-title {
     width: 100%;

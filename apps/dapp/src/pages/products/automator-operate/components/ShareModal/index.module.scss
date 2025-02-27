@@ -15,3 +15,22 @@
 .automator-share-modal {
   font-size: 12px;
 }
+.modal-title {
+  .status {
+    .amount {
+      @include bold;
+    }
+  }
+}
+.modal-footer {
+  .btn {
+    @include pointer;
+  }
+}
+
+.modal-capturing {
+  margin: 0 !important;
+  :global(.semi-modal-footer) {
+    display: none !important;
+  }
+}
