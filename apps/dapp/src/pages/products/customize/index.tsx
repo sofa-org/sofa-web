@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { DatePicker } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -37,6 +38,7 @@ import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { PayoffChart } from '@/components/Payoff';
+import { usePPSNow } from '@/components/PPS/hooks';
 import { PriceRangeInputEl } from '@/components/PriceRangeInput';
 import {
   ProductTypeSelector,
@@ -265,6 +267,8 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
       setBaseCcy(product.vault.depositBaseCcy);
     }
   }, [baseCcy, product, quoteInfo]);
+  const pps = usePPSNow(product?.vault);
+
   return (
     <div
       className={classNames(styles['customize'], {
@@ -417,6 +421,20 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                   }
                 />
               </div>
+              {(product?.vault.depositBaseCcy && pps != undefined && (
+                <div className={styles['amount-in-base-ccy']}>
+                  ≈{' '}
+                  {amountFormatter(
+                    isNullLike(product?.depositAmount)
+                      ? undefined
+                      : Number(product?.depositAmount) * pps,
+                    CCYService.ccyConfigs[product.vault.depositBaseCcy]
+                      ?.precision,
+                  )}{' '}
+                  {product?.vault.depositBaseCcy}
+                </div>
+              )) ||
+                undefined}
               <div className={styles['balance']}>
                 <span className={styles['label']}>{t('Wallet Balance')}</span>
                 <span className={styles['value']}>

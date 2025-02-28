@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Spin } from '@douyinfe/semi-ui';
+import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -32,6 +33,7 @@ import { stringify } from 'qs';
 import AmountInput from '@/components/AmountInput';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { PayoffChart } from '@/components/Payoff';
+import { usePPSNow } from '@/components/PPS/hooks';
 import {
   ProductTypeRefs,
   RiskTypeRefs,
@@ -166,6 +168,8 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
       setBaseCcy(data.vault.depositBaseCcy);
     }
   }, [baseCcy, data]);
+  const pps = usePPSNow(product?.vault);
+
   return (
     <>
       <div className={styles['form']}>
@@ -268,6 +272,19 @@ const El = (props: InvestModalProps & { setVisible: Dispatch<boolean> }) => {
             }}
             onBlur={() => product && useProductsState.quote(product)}
           />
+          {(product?.vault.depositBaseCcy && pps != undefined && (
+            <div className={styles['amount-in-base-ccy']}>
+              ≈{' '}
+              {amountFormatter(
+                isNullLike(product?.depositAmount)
+                  ? undefined
+                  : Number(product?.depositAmount) * pps,
+                CCYService.ccyConfigs[product.vault.depositBaseCcy]?.precision,
+              )}{' '}
+              {product?.vault.depositBaseCcy}
+            </div>
+          )) ||
+            undefined}
           <div className={styles['balance']}>
             <span className={styles['label']}>{t('wallet.balance')}</span>
             <span className={styles['value']}>
