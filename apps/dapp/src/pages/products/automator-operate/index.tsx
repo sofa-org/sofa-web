@@ -220,10 +220,12 @@ const Index = () => {
               className={styles['share-btn']}
               onClick={() => shareModalRef.current?.show()}
             >
-              {t({
-                enUS: 'Share',
-                zhCN: '分享',
-              })}
+              <span>
+                {t({
+                  enUS: 'Share',
+                  zhCN: '分享',
+                })}
+              </span>
             </div>
           </h1>
         </>

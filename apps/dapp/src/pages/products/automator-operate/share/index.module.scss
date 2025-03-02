@@ -1,1 +1,274 @@
-// TODO
+.automator-share-page {
+  color: #fff;
+
+  @include flex-center;
+
+  flex-direction: column;
+  width: 1000px;
+  margin: 0 auto;
+  padding-top: 40px;
+}
+
+.amount {
+  @include bold;
+
+  background: var(
+    linear-gradient(270deg, #d98a54 0%, #fffa00 0%, #ffa82e 100%)
+  );
+  background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.automator-name {
+  @include bold;
+
+  color: #fff;
+  font-size: 24px;
+}
+
+.automator-infos {
+  display: flex;
+  margin: 16px 0;
+  height: 20px;
+}
+
+.automator-address {
+  font-size: 16px;
+
+  &::before {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    content: "";
+    background: url("./assets/icon-user.svg") no-repeat center / 100%;
+    margin: -4px 6px 0 24px;
+    vertical-align: middle;
+  }
+
+  .logo {
+    margin: -4px 0 0 6px;
+    width: 19px;
+    height: 19px;
+    vertical-align: middle;
+  }
+}
+
+.automator-risk {
+  line-height: 20px;
+
+  .label {
+    width: 20px;
+  }
+
+  .risk-desc {
+    color: #fff;
+
+    &::before {
+      content: "|";
+      color: fff;
+      opacity: 0.3;
+      margin: 0 8px;
+    }
+  }
+}
+
+.display-flex {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.display-flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.automator-desc {
+  font-size: 14px;
+  color: #fff;
+  opacity: 0.65;
+  margin-bottom: 26px;
+}
+
+.automator-performance {
+  width: 333px;
+  height: 394px;
+  background: url("./assets/bg-treasure.png") no-repeat center / 100%;
+  text-align: center;
+  padding-top: 80px;
+
+  .label {
+    color: #fff;
+    font-size: 16px;
+    opacity: 0.65;
+    display: block;
+    margin-bottom: 24px;
+  }
+
+  .value {
+    @include bold;
+
+    font-size: 48px;
+  }
+}
+
+.modal-capturing {
+  margin: 0 !important;
+
+  :global(.semi-modal-footer) {
+    display: none !important;
+  }
+}
+
+.automator-size {
+  width: 651px;
+  height: 181px;
+  padding: 24px;
+  border-radius: 16px;
+  border: 0.871px solid #e0e0e0;
+  background: #fff;
+
+  .label {
+    color: #000;
+    font-size: 16px;
+    opacity: 0.45;
+    margin-bottom: 23px;
+  }
+
+  .value {
+    @include bold;
+
+    color: #000;
+    opacity: 0.85;
+    font-size: 24px;
+    display: inline;
+  }
+
+  .unit {
+    font-size: 16px;
+    margin-left: 8px;
+  }
+
+  .bar-bg {
+    position: relative;
+    width: 603px;
+    height: 20px;
+    margin-top: 32px;
+    border-radius: 100px;
+    background: linear-gradient(
+      270deg,
+      rgb(255 250 0 / 24%) -30.43%,
+      rgb(255 222 195 / 24%) -30.43%,
+      rgb(243 176 128 / 24%) 40.17%,
+      rgb(232 137 71 / 24%) 100%
+    );
+
+    > .bar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: 100px;
+      background: linear-gradient(
+        270deg,
+        #fffa00 -30.43%,
+        #ffdec3 -30.43%,
+        #e88947 100%
+      );
+    }
+  }
+}
+
+.optivisor-funds {
+  .label {
+    text-align: right;
+  }
+
+  .percent {
+    margin-right: 8px;
+    background: linear-gradient(
+      270deg,
+      #fffa00 -30.43%,
+      #ffdec3 -30.43%,
+      #e88947 100%
+    );
+    background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.automator-follower {
+  display: flex;
+  width: 651px;
+  height: 197px;
+  padding: 24px;
+  align-items: flex-start;
+  gap: 32px;
+  border-radius: 16px;
+  border: 0.871px solid #e0e0e0;
+  background: #fff;
+  margin-top: 16px;
+
+  .label {
+    color: #000;
+    font-size: 16px;
+    opacity: 0.45;
+    margin-bottom: 12px;
+  }
+
+  .line {
+    width: 1px;
+    height: 150px;
+    background: linear-gradient(
+      to bottom,
+      #d8d8d8,
+      #d8d8d8 2px,
+      transparent 2px,
+      transparent
+    );
+    background-size: 100% 4px;
+  }
+}
+
+.followers-pnl {
+  .value {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .follower {
+    @include bold;
+
+    color: #000;
+    font-size: 16px;
+    display: flex;
+    padding: 6px 12px;
+    align-items: flex-start;
+    gap: 12px;
+    border-radius: 4px;
+    background: rgb(80 209 19 / 12%);
+  }
+
+  .percentage {
+    @include bold;
+
+    color: #6ad837;
+  }
+}
+
+.deposit-ccy {
+  .logo {
+    width: 40px;
+  }
+
+  .value {
+    @include bold;
+
+    color: #000;
+    opacity: 0.85;
+    font-size: 36px;
+  }
+}
