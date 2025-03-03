@@ -54,6 +54,28 @@
   z-index: 10;
   height: 40px;
 }
+.base-ccy-est-toggle {
+  @include pointer;
+  font-weight: 300;
+  position: relative;
+  margin-left: 6px;
+  background: url("./assets/unselected.svg") no-repeat left center !important;
+  background-size: contain;
+  height: 20px;
+  padding-left: 22px;
+  display: inline-block;
+  &.selected {
+    background-image: url("./assets/selected.svg") !important;
+  }
+  .base-ccy {
+    font-weight: 500;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+    padding-left: 20px;
+    margin-left: 2px;
+  }
+}
 
 .btn-bottom {
   flex: 1;

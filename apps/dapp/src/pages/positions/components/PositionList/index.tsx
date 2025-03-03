@@ -18,8 +18,9 @@ import {
 import { PositionStatus } from '@sofa/services/the-graph';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
+import { formatHighlightedText } from '@sofa/utils/string';
 import { joinUrl } from '@sofa/utils/url';
-import { useInfiniteScroll } from 'ahooks';
+import { useInfiniteScroll, useLocalStorageState } from 'ahooks';
 import classNames from 'classnames';
 import { uniqBy } from 'lodash-es';
 
@@ -200,6 +201,12 @@ const List = (props: {
       ) || {},
     [data],
   );
+  const [positionListConfig, setPositionListConfig] = useLocalStorageState(
+    'position-list-1',
+    {
+      defaultValue: { showBaseCcyEst: true },
+    },
+  );
   return (
     <>
       <Spin
@@ -221,6 +228,37 @@ const List = (props: {
                 alt=""
               />
               <span>{CCYService.ccyConfigs[e[0]]?.name || e[0]}</span>
+              {(e[1]?.[0]?.vault?.depositBaseCcy && (
+                <span
+                  className={classNames(styles['base-ccy-est-toggle'], {
+                    [styles['selected']]: positionListConfig?.showBaseCcyEst,
+                  })}
+                  onClick={() => {
+                    setPositionListConfig({
+                      ...positionListConfig,
+                      showBaseCcyEst: !positionListConfig?.showBaseCcyEst,
+                    });
+                  }}
+                >
+                  {formatHighlightedText(
+                    t(
+                      {
+                        enUS: 'Show [[{{baseCcy}}]] Potential Profits',
+                      },
+                      {
+                        baseCcy: e[1][0].vault.depositBaseCcy,
+                      },
+                    ),
+                    {
+                      hightlightedClassName: styles['base-ccy'],
+                      hightlightedStyle: {
+                        backgroundImage: `url(${CCYService.ccyConfigs[e[1][0].vault.depositBaseCcy]?.icon || ''})`,
+                      },
+                    },
+                  )}
+                </span>
+              )) ||
+                undefined}
             </div>
             <div
               key={`${e[0]}-container`}
@@ -236,6 +274,7 @@ const List = (props: {
                     onClick={() => setSelectedPosition(it)}
                     isAutomator={!!props.automator}
                     key={`${it.id}-${ProductsService.productKey(it.product)}`}
+                    showBaseCcyEst={positionListConfig?.showBaseCcyEst || false}
                   />
                 ),
               )}

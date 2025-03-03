@@ -5,6 +5,7 @@ import IconRCH from './assets/icon-rch.png';
 import IconSTETH from './assets/icon-steth.svg?url';
 import IconsUSDa from './assets/icon-susda.png?url';
 import IconUSD from './assets/icon-usd.svg?url';
+import IconUSDa from './assets/icon-usda.png?url';
 import IconUSDC from './assets/icon-usdc.svg?url';
 import IconUSDT from './assets/icon-usdt.svg?url';
 
@@ -86,6 +87,12 @@ export class CCYService {
     sUSDa: {
       name: 'sUSDa',
       icon: IconsUSDa,
+      color: '#FFA800',
+      precision: 4,
+    },
+    USDa: {
+      name: 'USDa',
+      icon: IconUSDa,
       color: '#FFA800',
       precision: 4,
     },

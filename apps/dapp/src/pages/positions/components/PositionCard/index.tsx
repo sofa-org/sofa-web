@@ -42,6 +42,7 @@ export interface PositionCardProps {
   position: PositionInfo & { vault: VaultInfo };
   onStatusChange?(status: PositionStatus): void;
   onClick?(): void;
+  showBaseCcyEst: boolean;
 }
 
 export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 5;
@@ -102,7 +103,7 @@ const ProtectedAmounts = (
           {product.vault.depositCcy}
         </span>
       </div>
-      {(position.vault.depositBaseCcy && (
+      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
         <div className={styles['base-ccy-amount-own']}>
           ≈{' '}
           {amountFormatter(
@@ -120,7 +121,7 @@ const ProtectedAmounts = (
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
-      {(position.vault.depositBaseCcy && (
+      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
         <div className={styles['base-ccy-amount']}>
           ≈{' '}
           {amountFormatter(
@@ -139,7 +140,7 @@ const ProtectedAmounts = (
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
-      {(position.vault.depositBaseCcy && (
+      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
         <div className={styles['base-ccy-amount']}>
           ≈{' '}
           {amountFormatter(
@@ -155,7 +156,8 @@ const ProtectedAmounts = (
   ) : (
     <div
       className={classNames(styles['amounts'], {
-        [styles['has-deposit-base-ccy']]: !!position.vault.depositBaseCcy,
+        [styles['has-deposit-base-ccy']]:
+          !!position.vault.depositBaseCcy && props.showBaseCcyEst,
       })}
     >
       <div className={classNames(styles['amount'], styles['amount-for-claim'])}>
@@ -376,7 +378,8 @@ const PositionCard = (props: PositionCardProps) => {
       <div
         className={classNames(styles['card'], {
           [styles['has-rch-amount']]: !position.claimParams.maker,
-          [styles['has-deposit-base-ccy']]: !!product.vault.depositBaseCcy,
+          [styles['has-deposit-base-ccy']]:
+            !!product.vault.depositBaseCcy && props.showBaseCcyEst,
         })}
         onClick={() => props.onClick?.()}
       >
