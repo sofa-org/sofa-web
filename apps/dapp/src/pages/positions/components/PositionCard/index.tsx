@@ -7,7 +7,7 @@ import {
   PositionsService,
   TransactionProgress,
 } from '@sofa/services/positions';
-import { ProductType, RiskType } from '@sofa/services/products';
+import { ProductType, RiskType, VaultInfo } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
@@ -39,7 +39,7 @@ addI18nResources(locale, 'PositionCard');
 
 export interface PositionCardProps {
   isAutomator?: boolean;
-  position: PositionInfo;
+  position: PositionInfo & { vault: VaultInfo };
   onStatusChange?(status: PositionStatus): void;
   onClick?(): void;
 }
@@ -90,7 +90,7 @@ const ProtectedAmounts = (
   return !hasSettled ? (
     <div
       className={classNames(styles['amounts'], {
-        [styles['has-deposit-base-ccy']]: !!product.vault.depositBaseCcy,
+        [styles['has-deposit-base-ccy']]: !!position.vault.depositBaseCcy,
       })}
     >
       <div className={styles['amount']}>
@@ -102,14 +102,14 @@ const ProtectedAmounts = (
           {product.vault.depositCcy}
         </span>
       </div>
-      {(product.vault.depositBaseCcy && (
+      {(position.vault.depositBaseCcy && (
         <div className={styles['base-ccy-amount-own']}>
           ≈{' '}
           {amountFormatter(
             position.convertedCalculatedInfoByDepositBaseCcy?.amounts?.own,
-            CCYService.ccyConfigs[product.vault.depositBaseCcy]?.precision,
+            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
           )}{' '}
-          {product.vault.depositBaseCcy}
+          {position.vault.depositBaseCcy}
         </div>
       )) ||
         undefined}
@@ -120,15 +120,15 @@ const ProtectedAmounts = (
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
-      {(product.vault.depositBaseCcy && (
+      {(position.vault.depositBaseCcy && (
         <div className={styles['base-ccy-amount']}>
           ≈{' '}
           {amountFormatter(
             position.convertedCalculatedInfoByDepositBaseCcy?.amounts
               ?.minRedeemable,
-            CCYService.ccyConfigs[product.vault.depositBaseCcy]?.precision,
+            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
           )}{' '}
-          {product.vault.depositBaseCcy}
+          {position.vault.depositBaseCcy}
         </div>
       )) ||
         undefined}
@@ -139,15 +139,15 @@ const ProtectedAmounts = (
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
-      {(product.vault.depositBaseCcy && (
+      {(position.vault.depositBaseCcy && (
         <div className={styles['base-ccy-amount']}>
           ≈{' '}
           {amountFormatter(
             position.convertedCalculatedInfoByDepositBaseCcy?.amounts
               ?.maxRedeemable,
-            CCYService.ccyConfigs[product.vault.depositBaseCcy]?.precision,
+            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
           )}{' '}
-          {product.vault.depositBaseCcy}
+          {position.vault.depositBaseCcy}
         </div>
       )) ||
         undefined}
@@ -155,7 +155,7 @@ const ProtectedAmounts = (
   ) : (
     <div
       className={classNames(styles['amounts'], {
-        [styles['has-deposit-base-ccy']]: !!product.vault.depositBaseCcy,
+        [styles['has-deposit-base-ccy']]: !!position.vault.depositBaseCcy,
       })}
     >
       <div className={classNames(styles['amount'], styles['amount-for-claim'])}>

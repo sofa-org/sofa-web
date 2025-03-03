@@ -417,8 +417,8 @@ export class MarketService {
           ? MarketService.$getPPSHistory({
               fromCcy: params.fromCcy,
               toCcy: params.toCcy,
-              startDateTime: min(params.timeList)! / 1000,
-              endDateTime: max(params.timeList)! / 1000,
+              startDateTime: min(params.timeList)! / 1000 - 86400,
+              endDateTime: max(params.timeList)! / 1000 + 86400,
             }).then((res) => {
               if (!res.length) {
                 console.error(

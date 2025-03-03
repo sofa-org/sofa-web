@@ -338,18 +338,17 @@ const Right = (props: BaseProps & { data: Partial<PositionInfo> }) => {
   );
 };
 export const ProjectedReturns = (
-  props: BaseProps & { data: Partial<PositionInfo> },
+  props: BaseProps & { data: Partial<PositionInfo> & { vault: VaultInfo } },
 ) => {
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
   const product = position.product;
-
   const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
   useEffect(() => {
-    if (!basedCcy && product?.vault?.depositBaseCcy) {
-      setBasedCcy(product.vault.depositBaseCcy);
+    if (!basedCcy && position.vault.depositBaseCcy) {
+      setBasedCcy(position.vault.depositBaseCcy);
     }
-  }, [basedCcy, product]);
+  }, [basedCcy, position]);
   if (!position.amounts || !position.pricesForCalculation || !product)
     return <div className={styles['profit-scenarios']} />;
   const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
@@ -375,7 +374,16 @@ export const ProjectedReturns = (
       >
         {isTrend && (
           <div className={styles['out-left']}>
-            <TrendImg data={position} />
+            <TrendImg
+              data={
+                basedCcy == position.vault.depositBaseCcy
+                  ? {
+                      ...position,
+                      ...position.convertedCalculatedInfoByDepositBaseCcy,
+                    }
+                  : position
+              }
+            />
           </div>
         )}
         <div className={styles['out-right']}>
@@ -388,14 +396,14 @@ export const ProjectedReturns = (
                 className={styles['base-ccy-select']}
                 onChange={(v) => setBasedCcy(v.target.value)}
               >
-                <Radio value={product?.vault.depositBaseCcy}>
-                  {product?.vault.depositBaseCcy}
+                <Radio value={position.vault.depositBaseCcy}>
+                  {position?.vault.depositBaseCcy}
                 </Radio>
-                <Radio value={product.vault.depositCcy}>
-                  {product.vault.depositCcy}
+                <Radio value={position.vault.depositCcy}>
+                  {position.vault.depositCcy}
                 </Radio>
               </RadioGroup>
-              {basedCcy == product.vault?.depositBaseCcy ? (
+              {basedCcy == position.vault?.depositBaseCcy ? (
                 <Right
                   data={{
                     ...position,

@@ -94,7 +94,7 @@ const List = (props: {
         `${it.id}-${it.product.vault.vault.toLowerCase()}-${it.createdAt}`,
     );
     console.info('Positions', list);
-    return list as PositionInfo[];
+    return list as (PositionInfo & { vault: VaultInfo })[];
   }, [$data, wallet.chainId, address]);
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
@@ -161,7 +161,9 @@ const List = (props: {
     return PositionsService.claimBatch(cb, data);
   });
 
-  const [selectedPosition, setSelectedPosition] = useState<PositionInfo>();
+  const [selectedPosition, setSelectedPosition] = useState<
+    PositionInfo & { vault: VaultInfo }
+  >();
 
   const handleStatusChange = useLazyCallback(
     (status: PositionStatus, $position?: PositionInfo) => {
@@ -191,7 +193,10 @@ const List = (props: {
           prev[it.product.vault.depositCcy].push(it);
           return prev;
         },
-        {} as Record<VaultInfo['depositCcy'], PositionInfo[]>,
+        {} as Record<
+          VaultInfo['depositCcy'],
+          (PositionInfo & { vault: VaultInfo })[]
+        >,
       ) || {},
     [data],
   );
@@ -204,6 +209,7 @@ const List = (props: {
         {Object.entries(dataGroupByDepositCcy).map((e) => (
           <>
             <div
+              key={`${e[0]}-title`}
               className={classNames(
                 styles['deposit-ccy-section'],
                 e[0].toLowerCase(),
@@ -216,7 +222,10 @@ const List = (props: {
               />
               <span>{CCYService.ccyConfigs[e[0]]?.name || e[0]}</span>
             </div>
-            <div className={styles['deposit-ccy-group']}>
+            <div
+              key={`${e[0]}-container`}
+              className={styles['deposit-ccy-group']}
+            >
               {e[1]?.map((it) =>
                 it.claimed ? (
                   <Fragment key={it.id} />

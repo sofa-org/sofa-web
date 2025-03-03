@@ -213,15 +213,14 @@ export class PositionsService {
     );
     const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
       ? (() => {
-          if (!ppsMap?.[vault.depositCcy]) return undefined;
+          const key = genPPSKey(vault);
+          if (!ppsMap?.[key]) return undefined;
           const expiry = it.product.expiry * 1000;
           const hasExpired = Date.now() > expiry;
           const pps = {
-            atTrade: ppsMap[vault.depositCcy][it.createdAt * 1000],
+            atTrade: ppsMap[key][it.createdAt * 1000],
             afterExpire:
-              ppsMap[vault.depositCcy][
-                !it.claimed && hasExpired ? 'now' : expiry
-              ],
+              ppsMap[key][!it.claimed && hasExpired ? 'now' : expiry],
           };
           if (!pps.atTrade || !pps.afterExpire) return undefined;
           return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
