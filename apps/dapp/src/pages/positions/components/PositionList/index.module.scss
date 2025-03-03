@@ -15,6 +15,7 @@
       gap: min(13px, 2vw);
     }
   }
+
   .deposit-ccy-section {
     @include flex-center;
 
@@ -26,10 +27,12 @@
       width: 20px;
       height: 20px;
     }
+
     > span {
       line-height: 20px;
     }
   }
+
   .deposit-ccy-group {
     @include flex-center;
 
@@ -54,26 +57,32 @@
   z-index: 10;
   height: 40px;
 }
+
 .base-ccy-est-toggle {
   @include pointer;
+
   font-weight: 300;
   position: relative;
   margin-left: 6px;
-  background: url("./assets/unselected.svg") no-repeat left center !important;
+  background-repeat: no-repeat;
+  background-position: center;
   background-size: contain;
   height: 20px;
-  padding-left: 22px;
   display: inline-block;
-  &.selected {
-    background-image: url("./assets/selected.svg") !important;
+
+  svg {
+    height: 16px;
+    margin-right: 6px;
+    margin-top: -2px;
   }
+
   .base-ccy {
     font-weight: 500;
     background-repeat: no-repeat;
     background-position: left center;
     background-size: contain;
     padding-left: 20px;
-    margin-left: 2px;
+    margin-left: 0;
   }
 }
 

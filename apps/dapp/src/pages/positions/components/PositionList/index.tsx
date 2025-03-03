@@ -37,6 +37,8 @@ import {
 import PositionCard, { judgeSettled } from '../PositionCard';
 import PositionDetailsModal from '../PositionDetails';
 
+import { Comp as SelectedBg } from './assets/selected.svg';
+import { Comp as UnselectedBg } from './assets/unselected.svg';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -240,6 +242,11 @@ const List = (props: {
                     });
                   }}
                 >
+                  {positionListConfig?.showBaseCcyEst ? (
+                    <SelectedBg />
+                  ) : (
+                    <UnselectedBg />
+                  )}
                   {formatHighlightedText(
                     t(
                       {
