@@ -7,6 +7,32 @@
   width: 1000px;
   margin: 0 auto;
   padding-top: 40px;
+  position: relative;
+}
+.btn-deposit {
+  @include flex-center;
+  @include pointer;
+  @include bold;
+
+  color: #000;
+  font-size: 16px;
+  padding: 0 36px;
+  height: 40px;
+  gap: 4px;
+  border-radius: 100px;
+  background: $color-main-gradient;
+  border: 1px solid #000;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  &::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: url("./assets/icon-download.svg") no-repeat center / 100%;
+    vertical-align: middle;
+  }
 }
 
 .amount {

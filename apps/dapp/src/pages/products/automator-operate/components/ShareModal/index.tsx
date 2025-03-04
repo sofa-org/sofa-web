@@ -360,7 +360,9 @@ const AutomatorShareModal = forwardRef<
                               (_, s) => `${s}...`,
                             )}
                           </span>
-                          <span className={styles['day']}>{row.followDay}</span>
+                          <span className={styles['day']}>
+                            {row.followDay} {t({ enUS: `day` })}
+                          </span>
                           <span className={styles['percentage']}>
                             {displayPercentage(
                               Number(row.pnlPercentage) / 100,

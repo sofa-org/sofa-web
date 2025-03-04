@@ -130,7 +130,21 @@ const Index = () => {
                 zhCN: '我的 Automator',
               })}
             </h2>
-            <CreatorAutomatorSelector className={styles['selector']} />
+            <div>
+              <CreatorAutomatorSelector className={styles['selector']} />
+              <div
+                className={styles['share-btn']}
+                onClick={() => shareModalRef.current?.show()}
+              >
+                <span>
+                  {t({
+                    enUS: 'Share',
+                    zhCN: '分享',
+                  })}
+                </span>
+              </div>
+            </div>
+
             <div className={styles['infos']}>
               <Address
                 address={automator?.vaultInfo.vault.toLowerCase() || ''}
@@ -215,17 +229,6 @@ const Index = () => {
                     ))}
                 </MsgDisplay>
               </div>
-            </div>
-            <div
-              className={styles['share-btn']}
-              onClick={() => shareModalRef.current?.show()}
-            >
-              <span>
-                {t({
-                  enUS: 'Share',
-                  zhCN: '分享',
-                })}
-              </span>
             </div>
           </h1>
         </>

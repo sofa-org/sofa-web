@@ -33,9 +33,15 @@ const Share = () => {
         `${automator.chainId}-${automator.vault.toLowerCase()}-`
       ],
   );
-  // const { data } = useRequest(() =>
-  //   AutomatorService.topFollowers(automatorDetail?.vaultInfo),
-  // );
+  const { data } = useRequest(
+    () =>
+      automatorDetail
+        ? AutomatorService.topFollowers(automatorDetail?.vaultInfo)
+        : Promise.resolve(undefined),
+    {
+      refreshDeps: [automatorDetail],
+    },
+  );
   return (
     <div className={styles['automator-share-page']}>
       <AsyncButton
@@ -227,30 +233,38 @@ const Share = () => {
                     </div>
                   </div>
 
-                  {/* {data && (
-                <>
-                <div className={styles['line']} />
-                
-                <div className={styles['followers-pnl']}>
-                  <div className={styles['label']}>
-                    {t({ enUS: `Followers' PnL`, zhCN: '参与者 PnL' })}
-                  </div>
-                  <div className={styles['value']}>
-                    {data.map((row) => (
-                      <div className={styles['follower']}>
-                        <span className={styles['wallet']}>
-                          {row.wallet.replace(/^(\w{8})\w+$/, (_, s) => `${s}...`)}
-                        </span>
-                        <span className={styles['day']}>{row.followDay}</span>
-                        <span className={styles['percentage']}>
-                          {displayPercentage(Number(row.pnlPercentage) / 100, 1)}
-                        </span>
+                  {data && (
+                    <>
+                      <div className={styles['line']} />
+
+                      <div className={styles['followers-pnl']}>
+                        <div className={styles['label']}>
+                          {t({ enUS: `Followers' PnL`, zhCN: '参与者 PnL' })}
+                        </div>
+                        <div className={styles['value']}>
+                          {data.map((row) => (
+                            <div className={styles['follower']}>
+                              <span className={styles['wallet']}>
+                                {row.wallet.replace(
+                                  /^(\w{8})\w+$/,
+                                  (_, s) => `${s}...`,
+                                )}
+                              </span>
+                              <span className={styles['day']}>
+                                {row.followDay}
+                              </span>
+                              <span className={styles['percentage']}>
+                                {displayPercentage(
+                                  Number(row.pnlPercentage) / 100,
+                                  1,
+                                )}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                </>
-              )} */}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
