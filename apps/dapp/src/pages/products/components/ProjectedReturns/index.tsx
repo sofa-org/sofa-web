@@ -408,6 +408,13 @@ export const ProjectedReturns = (
                   data={{
                     ...position,
                     ...position.convertedCalculatedInfoByDepositBaseCcy,
+                    product: {
+                      ...position.product!,
+                      vault: {
+                        ...position.product!.vault,
+                        depositCcy: basedCcy,
+                      },
+                    },
                   }}
                 />
               ) : (
