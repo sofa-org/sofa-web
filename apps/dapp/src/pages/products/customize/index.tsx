@@ -468,15 +468,40 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                 <div className={styles['details']}>
                   <PayoffChart
                     className={styles['chart']}
-                    depositCcy={quoteInfo.vault.depositCcy}
+                    depositCcy={
+                      baseCcy && baseCcy == quoteInfo.vault.depositBaseCcy
+                        ? quoteInfo.vault.depositBaseCcy
+                        : quoteInfo.vault.depositCcy
+                    }
                     productType={quoteInfo.vault.productType}
                     anchorPrices={quoteInfo.anchorPrices}
-                    protectedYield={Number(quoteInfo.apyInfo?.min)}
-                    enhancedYield={simplePlus(
-                      quoteInfo.apyInfo?.max,
-                      -(quoteInfo.apyInfo?.min || 0),
+                    protectedYield={Number(
+                      baseCcy && baseCcy == quoteInfo.vault.depositBaseCcy
+                        ? quoteInfo.convertedCalculatedInfoByDepositBaseCcy
+                            ?.apyInfo?.min
+                        : quoteInfo.apyInfo?.min,
                     )}
-                    rchYield={Number(quoteInfo.apyInfo?.rch)}
+                    enhancedYield={
+                      baseCcy && baseCcy == quoteInfo.vault.depositBaseCcy
+                        ? simplePlus(
+                            quoteInfo.convertedCalculatedInfoByDepositBaseCcy
+                              ?.apyInfo?.max,
+                            -(
+                              quoteInfo.convertedCalculatedInfoByDepositBaseCcy
+                                ?.apyInfo?.min || 0
+                            ),
+                          )
+                        : simplePlus(
+                            quoteInfo.apyInfo?.max,
+                            -(quoteInfo.apyInfo?.min || 0),
+                          )
+                    }
+                    rchYield={Number(
+                      baseCcy && baseCcy == quoteInfo.vault.depositBaseCcy
+                        ? quoteInfo.convertedCalculatedInfoByDepositBaseCcy
+                            ?.apyInfo?.rch
+                        : quoteInfo.apyInfo?.rch,
+                    )}
                     showYAxis
                     displayRchYield
                     atm={prices?.[quoteInfo.vault.forCcy]}
