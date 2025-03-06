@@ -9,6 +9,7 @@
   padding-top: 40px;
   position: relative;
 }
+
 .btn-deposit {
   @include flex-center;
   @include pointer;
@@ -25,6 +26,7 @@
   position: absolute;
   top: 40px;
   right: 0;
+
   &::before {
     content: "";
     width: 20px;
@@ -41,7 +43,6 @@
   background: var(
     linear-gradient(270deg, #d98a54 0%, #fffa00 0%, #ffa82e 100%)
   );
-  background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -115,6 +116,7 @@
   color: #fff;
   opacity: 0.65;
   margin-bottom: 26px;
+  max-width: 1000px;
 }
 
 .automator-performance {
@@ -219,7 +221,6 @@
       #ffdec3 -30.43%,
       #e88947 100%
     );
-    background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }

@@ -1,13 +1,18 @@
+import { useEffect, useMemo } from 'react';
 import { AutomatorService } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
+import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import { useRequest } from 'ahooks';
+import { parse } from 'qs';
 
 import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
 import { MsgDisplay } from '@/components/MsgDisplay';
+import { useWalletStore } from '@/components/WalletConnector/store';
 import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
 
@@ -18,14 +23,38 @@ import { Comp as IconRisk } from '../../automator-mine/assets/icon-risk.svg';
 import locale from '../locale';
 
 import styles from './index.module.scss';
-
 addI18nResources(locale, 'AutomatorOperate');
 
 const Share = () => {
   const [t] = useTranslation('AutomatorOperate');
-  const { automator } = useAutomatorMarketSelector({
+  const automatorVault = useMemo(
+    () => String(parse(location.search, { ignoreQueryPrefix: true })['v']),
+    [],
+  );
+  useEffect(
+    useLazyCallback(() => {
+      if (automatorVault) {
+        const v = ContractsService.AutomatorVaults.find(
+          (r) => r.vault.toLowerCase() == automatorVault.toLowerCase(),
+        );
+        if (v && v.chainId != useWalletStore.getState().chainId) {
+          useWalletStore.setChain(v.chainId);
+        }
+      }
+    }),
+    [automatorVault],
+  );
+  const { automator: automatorCurrent } = useAutomatorMarketSelector({
     queryName: 'v',
   });
+  const automator = useMemo(
+    () =>
+      automatorCurrent &&
+      automatorCurrent.vault.toLowerCase() == automatorVault?.toLowerCase()
+        ? automatorCurrent
+        : undefined,
+    [automatorVault, automatorCurrent],
+  );
   const automatorDetail = useAutomatorStore(
     (state) =>
       automator &&
@@ -107,15 +136,13 @@ const Share = () => {
 
             <div className={styles['automator-desc']}>
               <MsgDisplay>
-                {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
-                {(automatorDetail.vaultInfo.desc || '...')
-                  .split('\n')
-                  .map((line, idx) => (
-                    <>
-                      {idx > 0 ? <br key={`lb-${idx}`} /> : undefined}
-                      {line}
-                    </>
-                  ))}
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      automatorDetail.vaultInfo.desc?.replace('\n', '<br />') ||
+                      '...',
+                  }}
+                />
               </MsgDisplay>
             </div>
 

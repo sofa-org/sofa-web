@@ -238,15 +238,15 @@ const AutomatorShareModal = forwardRef<
 
         <div className={styles['automator-desc']}>
           <MsgDisplay>
-            {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
-            {(props.automatorDetail.vaultInfo.desc || '...')
-              .split('\n')
-              .map((line, idx) => (
-                <>
-                  {idx > 0 ? <br key={`lb-${idx}`} /> : undefined}
-                  {line}
-                </>
-              ))}
+            <span
+              dangerouslySetInnerHTML={{
+                __html:
+                  props.automatorDetail.vaultInfo.desc?.replace(
+                    '\n',
+                    '<br />',
+                  ) || '...',
+              }}
+            />
           </MsgDisplay>
         </div>
 
