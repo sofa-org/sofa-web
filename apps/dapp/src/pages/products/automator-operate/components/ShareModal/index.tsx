@@ -18,6 +18,10 @@ import { Comp as Logo } from '@/assets/logo';
 import AmountDisplay from '@/components/AmountDisplay';
 import { MsgDisplay } from '@/components/MsgDisplay';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
+import {
+  captureAndCopyImage,
+  useAutomatorShareInfo,
+} from '@/components/Share/utils';
 import { addI18nResources } from '@/locales';
 import { AutomatorRiskExposureMap } from '@/pages/products/automator-create/util';
 
@@ -49,49 +53,14 @@ const AutomatorShareModal = forwardRef<
     show: () => setVisible(true),
   }));
 
-  const copyImage = useLazyCallback(async () => {
-    const element = document.querySelector<HTMLElement>('.semi-modal')!;
-    element.className = element.className + ' ' + styles['modal-capturing'];
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    // window.devicePixelRatio = 2;
-    const blob = await htmlToImage.toBlob(element, {
-      // pixelRatio: 2,
-      // skipAutoScale: true,
-      // filter: (e) =>
-      //   e.tagName == 'BUTTON' ||
-      //   e.tagName == 'A' ||
-      //   e.className?.includes(styles['btns'])
-      //     ? false
-      //     : true,
-    });
-    element.className = element.className.replace(
-      styles['modal-capturing'],
-      '',
-    );
-    const downloadLink = document.createElement('a');
-    downloadLink.setAttribute('download', 'ShareImage.png');
-    if (!blob) {
-      Toast.error('Save picture failed');
-      return;
-    }
-    try {
-      navigator.clipboard.write([
-        new ClipboardItem({
-          'image/png': blob,
-        }),
-      ]);
-    } catch (error) {
-      const url = URL.createObjectURL(blob);
-      downloadLink.setAttribute('href', url);
-      downloadLink.click();
-    }
-  });
-
   const { data } = useRequest(() =>
     AutomatorService.topFollowers(props.automatorDetail.vaultInfo),
   );
 
-  const shareLink = `${location.protocol}//${location.host}/a?v=${props.automatorDetail.vaultInfo.vault}`;
+  const { shareText, shareLink } = useAutomatorShareInfo({
+    t,
+    vault: props.automatorDetail.vaultInfo,
+  });
 
   return (
     <Modal
@@ -134,7 +103,14 @@ const AutomatorShareModal = forwardRef<
             <a
               className={classNames(styles['btn'], styles['copy-img'])}
               onClick={() =>
-                copyImage()
+                captureAndCopyImage({
+                  selector: '.semi-modal',
+                  capturingClassName: styles['modal-capturing'],
+                  maskElementClassName: styles['modal-capturing-mask'],
+                  filter: (e) => {
+                    return e.getAttribute?.('aria-label') != 'close';
+                  },
+                })
                   .then(() =>
                     Toast.success(
                       t({
@@ -157,16 +133,7 @@ const AutomatorShareModal = forwardRef<
               onClick={(e) => {
                 e.preventDefault();
                 Promise.resolve()
-                  .then(() =>
-                    copy(
-                      t(
-                        {
-                          enUS: `Create an Automator to become an investment leader / One-click follow investment to enjoy profit sharing:\n{{shareLink}}`,
-                        },
-                        { shareLink },
-                      ),
-                    ),
-                  )
+                  .then(() => copy(shareText))
                   .then(() =>
                     Toast.success(
                       t({

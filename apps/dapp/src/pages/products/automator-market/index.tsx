@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Spin } from '@douyinfe/semi-ui';
 import { AutomatorInfo } from '@sofa/services/automator';
@@ -22,6 +22,9 @@ import { useAutomatorModal } from '../automator/index-modal';
 import { useAutomatorStore } from '../automator/store';
 
 import { AutomatorCard } from './components/Card';
+import AutomatorUserShareModal, {
+  AutomatorUserShareModalPropsRef,
+} from './components/ShareModal';
 
 import styles from './index.module.scss';
 
@@ -189,7 +192,10 @@ const Index = () => {
     }),
     [data],
   );
-
+  const shareModalRef = useRef<AutomatorUserShareModalPropsRef>(null);
+  const [currentShareInfo, setCurrentShareInfo] = useState<
+    AutomatorInfo | undefined
+  >(undefined);
   return (
     <TopTabs
       type={'banner-expandable-tab'}
@@ -233,6 +239,13 @@ const Index = () => {
                   key={a.vaultInfo.vault.toLowerCase()}
                   info={a}
                   modalController={modalController}
+                  showShareBtn={tab === 'holding'}
+                  onShareClicked={(v) => {
+                    setCurrentShareInfo(v);
+                    setTimeout(() => {
+                      shareModalRef.current?.show();
+                    }, 0);
+                  }}
                 />
               ))}
             </div>
@@ -256,6 +269,14 @@ const Index = () => {
         )}
       </Spin>
       {modal}
+
+      {(currentShareInfo && (
+        <AutomatorUserShareModal
+          automatorInfo={currentShareInfo}
+          ref={shareModalRef}
+        />
+      )) ||
+        undefined}
     </TopTabs>
   );
 };

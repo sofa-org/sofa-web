@@ -210,6 +210,16 @@
   }
 }
 
+.modal-capturing-mask {
+  @include flex-center;
+
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: #fff;
+  transition: opacity 0.3s ease;
+}
+
 .automator-size {
   width: 651px;
   height: 181px;

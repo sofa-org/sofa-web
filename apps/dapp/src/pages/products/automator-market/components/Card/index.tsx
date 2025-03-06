@@ -25,6 +25,8 @@ import styles from './index.module.scss';
 export interface AutomatorCardProps {
   info: AutomatorInfo;
   modalController: ReturnType<typeof useAutomatorModal>[1];
+  showShareBtn?: boolean;
+  onShareClicked: (v: AutomatorInfo) => void;
 }
 
 export const AutomatorCard = (props: AutomatorCardProps) => {
@@ -57,6 +59,22 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
           simple
           linkBtn
         />
+        {props.showShareBtn ? (
+          <div
+            className={styles['share-btn']}
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onShareClicked(props.info);
+            }}
+          >
+            <span>
+              {t({
+                enUS: 'Share',
+                zhCN: '分享',
+              })}
+            </span>
+          </div>
+        ) : undefined}
       </div>
       <div className={styles['yield']}>
         <div className={styles['label']}>

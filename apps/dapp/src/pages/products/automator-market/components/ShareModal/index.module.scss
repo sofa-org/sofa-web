@@ -1,0 +1,20 @@
+.modal-capturing {
+  margin: 0 !important;
+
+  :global(.semi-modal-footer) {
+    display: none !important;
+  }
+}
+
+.modal-capturing-mask {
+  @include flex-center;
+
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 99999;
+  background-color: #fff;
+  transition: opacity 0.3s ease;
+}
