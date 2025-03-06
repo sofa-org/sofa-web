@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Spin } from '@douyinfe/semi-ui';
 import { AutomatorInfo } from '@sofa/services/automator';
@@ -9,7 +9,7 @@ import { ChainMap } from '@sofa/services/chains';
 import { t, TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
-import { useQuery } from '@sofa/utils/hooks';
+import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import { arrToDict, objectValCvt } from '@sofa/utils/object';
 import classNames from 'classnames';
 
@@ -169,6 +169,25 @@ const Index = () => {
         .filter(Boolean)
         .join(', '),
     [],
+  );
+  // 自动打开url里的automator
+  const vaultAddress = useQuery(
+    (q) => q['automator-vault'] as string | undefined,
+  );
+  const [lastOpenVault, setLastOpenVault] = useState('');
+  useEffect(
+    useLazyCallback(() => {
+      if (vaultAddress) {
+        const v = data?.find(
+          (v) => v.vaultInfo.vault.toLowerCase() == vaultAddress.toLowerCase(),
+        );
+        if (v && v.vaultInfo.vault.toLowerCase() != lastOpenVault) {
+          setLastOpenVault(v.vaultInfo.vault.toLowerCase());
+          modalController.open(v.vaultInfo, undefined);
+        }
+      }
+    }),
+    [data],
   );
 
   return (
