@@ -578,7 +578,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             <span className={styles['desc']}>
                               {t({
                                 enUS: 'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)',
-                                zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve年化)。 （Aave/Lido/Sofa/Curve年化）',
+                                zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve/Avalon年化)。 （Aave/Lido/Sofa/Curve/Avalon年化）',
                               })}
                             </span>
                             <span className={styles['value']}>
@@ -595,7 +595,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             <span className={styles['desc']}>
                               {t({
                                 enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Pool Size)',
-                                zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve年化预估) ^ (期限 / 365) - 池子大小）',
+                                zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve/Avalon年化预估) ^ (期限 / 365) - 池子大小）',
                               })}
                             </span>
                             <span className={styles['value']}>
