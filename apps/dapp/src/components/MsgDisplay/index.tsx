@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import styles from './index.module.scss';
 
-export const MsgDisplay = (props: BaseProps) => {
+export const MsgDisplay = (props: BaseProps & { expandDisabled?: boolean }) => {
   const [more, setMore] = useState(false);
 
   return (
@@ -14,7 +14,7 @@ export const MsgDisplay = (props: BaseProps) => {
         props.className,
       )}
       style={props.style}
-      onClick={() => setMore((pre) => !pre)}
+      onClick={() => !props.expandDisabled && setMore((pre) => !pre)}
     >
       {props.children}
       {/* <span className={styles['more']} onClick={() => setMore((pre) => !pre)}>

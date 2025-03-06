@@ -76,18 +76,21 @@ export const useAutomatorStore = Object.assign(
         }));
       });
     },
-    _subscribeVaultsTimer: null as ReturnType<typeof setInterval> | null,
+    _subscribeVaultsTimer: {} as Record<
+      number /* chainId */,
+      ReturnType<typeof setInterval> | null
+    >,
     subscribeVaults: (chainId: number) => {
-      if (!useAutomatorStore._subscribeVaultsTimer) {
+      if (!useAutomatorStore._subscribeVaultsTimer[chainId]) {
         useAutomatorStore.getAutomatorVaults(chainId);
-        useAutomatorStore._subscribeVaultsTimer = setInterval(
+        useAutomatorStore._subscribeVaultsTimer[chainId] = setInterval(
           () => useAutomatorStore.getAutomatorVaults(chainId),
           MsIntervals.min,
         );
       }
       return () => {
-        clearInterval(useAutomatorStore._subscribeVaultsTimer!);
-        useAutomatorStore._subscribeVaultsTimer = null;
+        clearInterval(useAutomatorStore._subscribeVaultsTimer[chainId]!);
+        useAutomatorStore._subscribeVaultsTimer[chainId] = null;
       };
     },
     _subscribeOverviewTimer: null as ReturnType<typeof setInterval> | null,
@@ -160,15 +163,15 @@ export const useAutomatorStore = Object.assign(
     subscribePerformances: (vault: AutomatorVaultInfo) => {
       const sync = () =>
         AutomatorService.performance(vault)
-          .then((weeklyPnlList) =>
+          .then((weeklyPnlList) => {
             useAutomatorStore.setState((pre) => ({
               performances: {
                 ...pre.performances,
                 [`${vault.chainId}-${vault.vault.toLowerCase()}-`]:
                   weeklyPnlList.value,
               },
-            })),
-          )
+            }));
+          })
           .catch((err) =>
             Toast.error(`Failed to fetch weekly pnl list: ${getErrorMsg(err)}`),
           );

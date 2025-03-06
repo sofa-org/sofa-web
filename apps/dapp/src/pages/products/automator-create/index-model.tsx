@@ -20,6 +20,7 @@ import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import { isMockEnabled } from '@sofa/services/mock';
+import { displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
@@ -41,6 +42,7 @@ import {
   getNameForChain,
   useAutomatorCreateStore,
 } from './store';
+import { AutomatorRiskExposures } from './util';
 
 import styles from './index-model.module.scss';
 
@@ -319,8 +321,8 @@ const StepForm = () => {
                   </Tooltip>
                   <div className={styles['field-desc']}>
                     {t({
-                      enUS: 'You can only trade products with expiration dates within the selected waiting period.',
-                      zhCN: '您只能交易到期日期在选择的等待期内的产品。',
+                      enUS: 'Note: You can only execute underlying products with expiry dates shorter or equal to the redemption period.',
+                      zhCN: '注意：您只能交易到期日期在选择的等待期内的产品。',
                     })}
                   </div>
                 </>
@@ -348,7 +350,7 @@ const StepForm = () => {
               field="feeRate"
               label={
                 <>
-                  {t({ enUS: 'Profits Share Ratio', zhCN: '利润分成比例' })}
+                  {t({ enUS: 'Profit Share %', zhCN: '利润分成百分比' })}
                   <Tooltip
                     style={{
                       maxWidth: isMobileUI ? '80vw' : '500px',
@@ -416,24 +418,13 @@ const StepForm = () => {
                 },
               ]}
             >
-              <Form.Select.Option value={'R0'}>
-                【R0 - Ultra-Safe】Max Risk Exposure: 0.1%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R1'}>
-                【R1 - Minimal Risk】Max Risk Exposure: 5%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R2'}>
-                【R2 - Low Risk】Max Risk Exposure: 10%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R3'}>
-                【R3 - Moderate Risk】Max Risk Exposure: 20%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R4'}>
-                【R4 - High Risk】Max Risk Exposure: 35%
-              </Form.Select.Option>
-              <Form.Select.Option value={'R5'}>
-                【R5 - Very High Risk】Max Risk Exposure: 50%
-              </Form.Select.Option>
+              {AutomatorRiskExposures.map((it) => (
+                <Form.Select.Option value={it.label} key={it.value}>
+                  【{it.label} - {it.desc(t)}】
+                  {t({ enUS: 'Max Risk Exposure', zhCN: '最大风险敞口' })}:{' '}
+                  {displayPercentage(it.value)}
+                </Form.Select.Option>
+              ))}
             </Form.Select>
           </Col>
         </Row>
@@ -441,7 +432,10 @@ const StepForm = () => {
           <Col span={24}>
             <Form.TextArea
               field="description"
-              label={t({ enUS: 'Strategy Description', zhCN: '策略描述' })}
+              label={t({
+                enUS: 'Strategy Description (Optional)',
+                zhCN: '策略描述 (可选)',
+              })}
               trigger="blur"
               rules={[]}
             />
@@ -471,7 +465,7 @@ const StepForm = () => {
       <div className={styles['tips']}>
         <p className={styles['tip']}>
           {t({
-            enUS: 'Note: Automator information cannot be edited after vault created.',
+            enUS: 'Note: Automator vault information cannot be modified after creation.',
             zhCN: '注意：创建金库后，Automator信息不可编辑。',
           })}
         </p>
@@ -490,7 +484,7 @@ const StepCreating = () => {
           t(
             {
               enUS: 'Automator [[{{name}}]] is Creating',
-              zhCN: '自动化器[[{{name}}]]正在创建',
+              zhCN: 'Automator [[{{name}}]]正在创建',
             },
             {
               name: payload.automatorName,
@@ -534,7 +528,7 @@ const StepFinished = () => {
           t(
             {
               enUS: 'Automator [[{{name}}]] is created!',
-              zhCN: '自动化器[[{{name}}]]已创建！',
+              zhCN: 'Automator [[{{name}}]]已创建！',
             },
             {
               name: payload.automatorName,
@@ -563,7 +557,7 @@ const StepFinished = () => {
           styles['btn-finish'],
         )}
       >
-        {t({ enUS: 'Go to Automator Management', zhCN: '前往自动化器管理' })}
+        {t({ enUS: 'Go to Automator Management', zhCN: '前往 Automator 管理' })}
       </Button>
     </div>
   );

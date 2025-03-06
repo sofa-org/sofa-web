@@ -210,8 +210,17 @@
 
     :global {
       .apy-desc {
+        @include pointer;
+
+        color: rgba(#000, 0.85);
         text-decoration: underline dashed rgba(#000, 0.12);
       }
+    }
+
+    .base-ccy {
+      @include bold;
+
+      color: #000;
     }
   }
 

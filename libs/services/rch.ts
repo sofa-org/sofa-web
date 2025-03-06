@@ -80,7 +80,6 @@ export class RCHService {
     airdropStartAt: next8h(+dayjs('2024-06-08').valueOf()),
     airdropSchedule: [
       { startDay: 0, endDay: 180, airdropEveryDay: 12500 },
-      // TODO
       { startDay: 180, endDay: 180 * 2, airdropEveryDay: 12500 * 0.8 },
       {
         startDay: 180 * 2,

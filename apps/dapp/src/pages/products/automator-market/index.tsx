@@ -1,16 +1,17 @@
 import { useEffect, useMemo } from 'react';
-import { Spin } from '@douyinfe/semi-ui';
+import { useNavigate } from 'react-router-dom';
+import { Button, Spin } from '@douyinfe/semi-ui';
 import { AutomatorInfo } from '@sofa/services/automator';
 import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
-import { ContractsService } from '@sofa/services/contracts';
-import { TFunction, useTranslation } from '@sofa/services/i18n';
+import { t, TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
 import { useQuery } from '@sofa/utils/hooks';
-import { arrToDict } from '@sofa/utils/object';
+import { arrToDict, objectValCvt } from '@sofa/utils/object';
+import classNames from 'classnames';
 
 import CEmpty from '@/components/Empty';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
@@ -30,10 +31,72 @@ const tabOptions = [
     value: 'all',
   },
   {
-    label: (t: TFunction) => t({ enUS: 'Holding', zhCN: '我参与的' }),
+    label: (t: TFunction) => t({ enUS: 'Portfolio', zhCN: '我参与的' }),
     value: 'holding',
   },
 ];
+
+const ChainList = () => {
+  useEffect(() => {
+    const unsubscribes = Object.values(ChainMap).map((it) =>
+      useAutomatorStore.subscribeVaults(it.chainId),
+    );
+    return () => unsubscribes.forEach((cb) => cb());
+  }, []);
+
+  const vaultsCount = useAutomatorStore((s) =>
+    objectValCvt(s.vaults, (v) =>
+      !v ? 0 : Object.entries(v).filter((it) => !!it[0]).length,
+    ),
+  );
+
+  const chainId = useWalletStore((s) => s.chainId);
+
+  const options = useMemo(
+    () =>
+      Object.values(ChainMap)
+        .filter((it) => vaultsCount[it.chainId])
+        .map((it) => ({
+          label: (
+            <>
+              <img src={it.icon} alt="" />
+              {it.name}
+              <span className={styles['count']}>{vaultsCount[it.chainId]}</span>
+            </>
+          ),
+          value: it.chainId,
+        })),
+    [vaultsCount],
+  );
+
+  return (
+    <div className={styles['chain-select']}>
+      {options.map((it) => (
+        <div
+          className={classNames(styles['chain'], {
+            [styles['active']]: it.value === chainId,
+          })}
+          key={it.value}
+          onClick={() => useWalletStore.setChain(it.value)}
+        >
+          {it.label}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const CreateBtn = () => {
+  const navigate = useNavigate();
+  return (
+    <Button
+      className={styles['btn-create']}
+      onClick={() => navigate('/products/automator/create')}
+    >
+      {t({ enUS: 'Create Automator', zhCN: '创建 Automator' })}
+    </Button>
+  );
+};
 
 const Index = () => {
   const [t] = useTranslation('AutomatorMarket');
@@ -134,6 +197,8 @@ const Index = () => {
       value={tab}
       onChange={(v) => updateQuery({ 'automator-market-tab': v })}
     >
+      <ChainList />
+      <CreateBtn />
       <Spin wrapperClassName={styles['cards-wrapper']} spinning={loading}>
         {lists?.map((it) => {
           return (

@@ -2,7 +2,8 @@ import { Fragment, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Modal, Spin, Toast } from '@douyinfe/semi-ui';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
-import { AutomatorVaultInfo } from '@sofa/services/base-type';
+import { AutomatorVaultInfo, VaultInfo } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionInfo,
@@ -17,8 +18,9 @@ import {
 import { PositionStatus } from '@sofa/services/the-graph';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback } from '@sofa/utils/hooks';
+import { formatHighlightedText } from '@sofa/utils/string';
 import { joinUrl } from '@sofa/utils/url';
-import { useInfiniteScroll } from 'ahooks';
+import { useInfiniteScroll, useLocalStorageState } from 'ahooks';
 import classNames from 'classnames';
 import { uniqBy } from 'lodash-es';
 
@@ -35,6 +37,8 @@ import {
 import PositionCard, { judgeSettled } from '../PositionCard';
 import PositionDetailsModal from '../PositionDetails';
 
+import { Comp as SelectedBg } from './assets/selected.svg';
+import { Comp as UnselectedBg } from './assets/unselected.svg';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -64,7 +68,7 @@ const List = (props: {
           chainId: wallet.chainId,
           owner: address,
           claimed: false,
-          concealed: false,
+          concealed: props.automator ? undefined : false,
           riskType: props.automator ? undefined : props.riskType,
           productType: props.automator ? undefined : props.productType,
         },
@@ -93,7 +97,7 @@ const List = (props: {
         `${it.id}-${it.product.vault.vault.toLowerCase()}-${it.createdAt}`,
     );
     console.info('Positions', list);
-    return list as PositionInfo[];
+    return list as (PositionInfo & { vault: VaultInfo })[];
   }, [$data, wallet.chainId, address]);
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
@@ -101,12 +105,13 @@ const List = (props: {
   const unClaimedList = useMemo(
     () =>
       data?.filter((it) => {
-        if (!Number(it.amounts.redeemable) || it.claimed) return false;
+        if ((!props.automator && !Number(it.amounts.redeemable)) || it.claimed)
+          return false;
         if (judgeSettled(it)) return true;
         if (it.claimParams.maker && it.triggerPrice) return true;
         return false;
       }) || [],
-    [data],
+    [data, props.automator],
   );
 
   const loseList = useMemo(
@@ -159,7 +164,9 @@ const List = (props: {
     return PositionsService.claimBatch(cb, data);
   });
 
-  const [selectedPosition, setSelectedPosition] = useState<PositionInfo>();
+  const [selectedPosition, setSelectedPosition] = useState<
+    PositionInfo & { vault: VaultInfo }
+  >();
 
   const handleStatusChange = useLazyCallback(
     (status: PositionStatus, $position?: PositionInfo) => {
@@ -179,26 +186,109 @@ const List = (props: {
       );
     },
   );
-
+  const dataGroupByDepositCcy = useMemo(
+    () =>
+      data?.reduce(
+        (prev, it) => {
+          if (!prev[it.product.vault.depositCcy]) {
+            prev[it.product.vault.depositCcy] = [];
+          }
+          prev[it.product.vault.depositCcy].push(it);
+          return prev;
+        },
+        {} as Record<
+          VaultInfo['depositCcy'],
+          (PositionInfo & { vault: VaultInfo })[]
+        >,
+      ) || {},
+    [data],
+  );
+  const [positionListConfig, setPositionListConfig] = useLocalStorageState(
+    'position-list-1',
+    {
+      defaultValue: { showBaseCcyEst: true },
+    },
+  );
   return (
     <>
       <Spin
         wrapperClassName={styles['list']}
         spinning={loading || (!data && !!address)}
       >
-        {data?.map((it) =>
-          it.claimed ? (
-            <Fragment key={it.id} />
-          ) : (
-            <PositionCard
-              position={it}
-              onStatusChange={(status) => handleStatusChange(status, it)}
-              onClick={() => setSelectedPosition(it)}
-              isAutomator={!!props.automator}
-              key={`${it.id}-${ProductsService.productKey(it.product)}`}
-            />
-          ),
-        )}
+        {Object.entries(dataGroupByDepositCcy).map((e) => (
+          <>
+            <div
+              key={`${e[0]}-title`}
+              className={classNames(
+                styles['deposit-ccy-section'],
+                e[0].toLowerCase(),
+              )}
+            >
+              <img
+                className={styles['logo']}
+                src={CCYService.ccyConfigs[e[0]]?.icon}
+                alt=""
+              />
+              <span>{CCYService.ccyConfigs[e[0]]?.name || e[0]}</span>
+              {(e[1]?.[0]?.vault?.depositBaseCcy && (
+                <span
+                  className={classNames(styles['base-ccy-est-toggle'], {
+                    [styles['selected']]: positionListConfig?.showBaseCcyEst,
+                  })}
+                  onClick={() => {
+                    setPositionListConfig({
+                      ...positionListConfig,
+                      showBaseCcyEst: !positionListConfig?.showBaseCcyEst,
+                    });
+                  }}
+                >
+                  {positionListConfig?.showBaseCcyEst ? (
+                    <SelectedBg />
+                  ) : (
+                    <UnselectedBg />
+                  )}
+                  {formatHighlightedText(
+                    t(
+                      {
+                        enUS: 'Show [[{{baseCcy}}]] Potential Profits',
+                      },
+                      {
+                        baseCcy: e[1][0].vault.depositBaseCcy,
+                      },
+                    ),
+                    {
+                      hightlightedClassName: styles['base-ccy'],
+                      hightlightedStyle: {
+                        backgroundImage: `url(${CCYService.ccyConfigs[e[1][0].vault.depositBaseCcy]?.icon || ''})`,
+                      },
+                    },
+                  )}
+                </span>
+              )) ||
+                undefined}
+            </div>
+            <div
+              key={`${e[0]}-container`}
+              className={styles['deposit-ccy-group']}
+            >
+              {e[1]?.map((it) =>
+                it.claimed ? (
+                  <Fragment key={it.id} />
+                ) : (
+                  <PositionCard
+                    position={it}
+                    onStatusChange={(status) => handleStatusChange(status, it)}
+                    onClick={() => setSelectedPosition(it)}
+                    isAutomator={!!props.automator}
+                    key={`${it.id}-${ProductsService.productKey(it.product)}`}
+                    showBaseCcyEst={positionListConfig?.showBaseCcyEst || false}
+                  />
+                ),
+              )}
+            </div>
+          </>
+        ))}
+
         {!data?.length && !loading && (
           <CEmpty
             className={styles['empty']}
@@ -213,7 +303,7 @@ const List = (props: {
         />
       </Spin>
       <div className={styles['btn-bottom-wrapper']}>
-        {!!loseList.length && (
+        {!!loseList.length && !props.automator && (
           <AsyncButton
             size="large"
             theme="solid"
@@ -270,17 +360,17 @@ const List = (props: {
             navigate(link);
           }}
         >
-          {t({ enUS: 'ALL HISTORY', zhCN: '全部历史' })}
+          {t({ enUS: 'All History', zhCN: '全部历史' })}
         </Button>
         {!!unClaimedList.length && (
           <Button
             size="large"
             theme="solid"
             type="primary"
-            className={styles['btn-bottom']}
+            className={classNames(styles['btn-bottom'], styles['btn-claim'])}
             onClick={claimAll}
           >
-            {t('CLAIM ALL')} ({unClaimedList.length})
+            {t('Claim All')} ({unClaimedList.length})
           </Button>
         )}
       </div>

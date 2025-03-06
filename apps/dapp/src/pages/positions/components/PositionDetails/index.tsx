@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { Modal, Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
-import { ProductType, RiskType } from '@sofa/services/contracts';
+import { ProductType, RiskType, VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionInfo,
@@ -44,7 +44,7 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'PositionDetails');
 
 export interface PositionDetailsProps {
-  position: PositionInfo;
+  position: PositionInfo & { vault: VaultInfo };
   onStatusChange?(status: PositionStatus): void;
 }
 

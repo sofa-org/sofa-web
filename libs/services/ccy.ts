@@ -3,7 +3,9 @@ import IconCrvUSD from './assets/icon-crvusd.png';
 import IconETH from './assets/icon-eth.svg?url';
 import IconRCH from './assets/icon-rch.png';
 import IconSTETH from './assets/icon-steth.svg?url';
+import IconsUSDa from './assets/icon-susda.png?url';
 import IconUSD from './assets/icon-usd.svg?url';
+import IconUSDa from './assets/icon-usda.avif?url';
 import IconUSDC from './assets/icon-usdc.svg?url';
 import IconUSDT from './assets/icon-usdt.svg?url';
 
@@ -32,37 +34,37 @@ export class CCYService {
       name: 'USD',
       icon: IconUSD,
       color: '#FFD639',
-      precision: 2,
+      precision: 4,
     },
     crvUSD: {
       name: 'crvUSD',
       icon: IconCrvUSD,
       color: '#366f49',
-      precision: 2,
+      precision: 4,
     },
     scrvUSD: {
       name: 'scrvUSD',
       icon: IconCrvUSD,
       color: '#366f49',
-      precision: 2,
+      precision: 4,
     },
     USDC: {
       name: 'USDC',
       icon: IconUSDC,
       color: '#2675CA',
-      precision: 2,
+      precision: 4,
     },
     USDT: {
       name: 'USDT',
       icon: IconUSDT,
       color: '#1BA27A',
-      precision: 2,
+      precision: 4,
     },
     RCH: {
       name: 'RCH',
       icon: IconRCH,
       color: '#FFD639',
-      precision: 2,
+      precision: 4,
     },
     stETH: {
       name: 'ETH',
@@ -81,6 +83,18 @@ export class CCYService {
       icon: IconBTC,
       color: '#FFA800',
       precision: 5,
+    },
+    sUSDa: {
+      name: 'sUSDa',
+      icon: IconsUSDa,
+      color: '#FFA800',
+      precision: 4,
+    },
+    USDa: {
+      name: 'USDa',
+      icon: IconUSDa,
+      color: '#FFA800',
+      precision: 4,
     },
   };
 }

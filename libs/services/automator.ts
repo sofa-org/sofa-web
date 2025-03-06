@@ -1,8 +1,8 @@
-import { applyMock, asyncCache } from '@sofa/utils/decorators';
+import { applyMock, asyncCache, asyncShare } from '@sofa/utils/decorators';
 import { MsIntervals } from '@sofa/utils/expiry';
-import { isLegalNum, isNullLike } from '@sofa/utils/fns';
+import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
-import { get, omitBy, pick } from 'lodash-es';
+import { get, omitBy } from 'lodash-es';
 
 import AutomatorAbis from './abis/AAVEAutomatorBase.json';
 import {
@@ -27,17 +27,19 @@ export interface OriginAutomatorInfo {
   participantNum: number; // 参与者数量
   aumByVaultDepositCcy: number | string; // aum
   aumByClientDepositCcy: number | string; // aum
+  aumBySharesToken: number | string; // aum
   creatorAmountByVaultDepositCcy: number | string; // creator 份额
   creatorAmountByClientDepositCcy: number | string; // aum
   nav: number | string; // 净值 (vaultDepositCcy/sharesToken)
   dateTime: number; // 净值产生的时间 (秒级时间戳)
   yieldPercentage: number | string; // 7D Yield(百分比)
-  creator: string; // 创建者
+  creator: string; // 主理人
   createTime: number; // automator创建时间, s
   vaultDepositCcy: string; // Automator 拿到客户的钱之后 用来申购 vault 的币种
   clientDepositCcy: string; // 用户存入的标的物
   sharesToken: string; // Automator 的份额代币
   redemptionPeriodDay: number | string; // 赎回观察时间
+  riskExposure: number | string; // 最多能亏损多少比例的本金
 }
 
 // server 返回的结构
@@ -51,7 +53,7 @@ export interface OriginAutomatorDetail extends OriginAutomatorInfo {
   totalPnlWithRchByClientDepositCcy: number | string; // 总PNL(标的币种的总PNL + rch转换成clientDepositCcy的pnl)
   pnlPercentage: number | string; // Yield (百分比) (基于clientDepositCcy)
   sharesToken: string; // 净值单位 (sharesToken)
-  profits: number | string; // totalTradingPnlByVaultDepositCcy * feeRate (vaultDepositCcy)
+  totalOptivisorProfitByVaultDepositCcy: number | string; // 基金管理者累计获取的利润
   unExpiredAmountByVaultDepositCcy: number | string; // Active Position Locked (vaultDepositCcy)
   unclaimedAmountByVaultDepositCcy: number | string; // Position unclaimed (vaultDepositCcy)
   redeemedAmountByVaultDepositCcy: number | string; // To Be Redeemed (vaultDepositCcy)
@@ -59,12 +61,12 @@ export interface OriginAutomatorDetail extends OriginAutomatorInfo {
   redemptionPeriodDay: number; // 赎回观察时间 (单位：天)
   positionSize?: number | string; // 当前未到期的头寸数量
   pastAvailableBalanceExcludingPrincipal: number | string; // Available Balance Excluding Principal-vaultDepositCcy
-  historicalInterestPlusNetPnL: number | string; // Historical Interest Earned(The cumulative interest earned through Aave/Lido/Sofa/Curve)-vaultDepositCcy
+  historicalInterestPlusNetPnL: number | string; // Historical Interest Earned(The cumulative interest earned through Aave/Lido/Sofa/Curve/Avalon)-vaultDepositCcy
   lockedByUnclaimedPosition: number | string; // Current Position(Value of open & Unclaimed positions.)-vaultDepositCcy
   estimatedFutureInterestByVaultCcy: number | string; // Estimated (estimatedTenorInDays)-Day Interest-vaultDepositCcy
   estimatedTenorInDays: number | string; // estimated Tenor In Days-vaultDepositCcy
   poolSizeForFutureInterestByVaultCcy: number | string; // Net PnL (RCH not included)-vaultDepositCcy
-  estimatedFundingApyPercentage: number | string; // Estimated Aave/Lido/Sofa/Curve Yield(百分比)
+  estimatedFundingApyPercentage: number | string; // Estimated Aave/Lido/Sofa/Curve/Avalon Yield(百分比)
 }
 
 export interface AutomatorInfo
@@ -227,11 +229,13 @@ export class AutomatorService {
             (() => {
               if (it.vaultDepositCcy === 'scrvUSD') return InterestType.CURVE;
               if (it.vaultDepositCcy === 'stRCH') return InterestType.SOFA;
+              if (it.vaultDepositCcy === 'zRCH') return InterestType.SOFA;
               if (it.vaultDepositCcy.startsWith('st')) return InterestType.LIDO;
               if (it.vaultDepositCcy.startsWith('a')) return InterestType.AAVE;
               return undefined;
             })(),
           createTime: it.createTime * 1000 || vault?.createTime,
+          riskExposure: it.riskExposure || 0,
         },
         (it) => isNullLike(it),
       ),
@@ -251,6 +255,13 @@ export class AutomatorService {
       .then((res) => res.value.map(AutomatorService.cvtAutomatorInfo));
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   static async info({ chainId, vault }: AutomatorVaultInfo) {
     return http
       .get<unknown, HttpResponse<OriginAutomatorDetail>>(`/automator/info`, {
@@ -268,6 +279,13 @@ export class AutomatorService {
     );
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   static async performance({ chainId, vault }: AutomatorVaultInfo) {
     return http.get<unknown, HttpResponse<AutomatorPerformance[]>>(
       `/automator/performance`,
@@ -277,6 +295,13 @@ export class AutomatorService {
     );
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   static async transactions(
     { chainId, vault }: AutomatorVaultInfo,
     params: Omit<AutomatorTransactionsParams, 'wallet'>,
@@ -303,6 +328,13 @@ export class AutomatorService {
     };
   }
 
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
   @applyMock('automatorFollowers')
   static async followers(vault: AutomatorVaultInfo, params: PageParams) {
     const pageSize = params.limit || 40;

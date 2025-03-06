@@ -62,6 +62,7 @@ const AutomatorModal = (props: BaseInputProps<boolean>) => {
       visible={props.value}
       onCancel={() => props.onChange?.(false)}
       className={styles['automator-modal']}
+      keepDOM={false}
     >
       <AutomatorModalEl />
     </Modal>

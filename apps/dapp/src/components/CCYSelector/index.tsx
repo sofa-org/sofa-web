@@ -33,8 +33,8 @@ export interface DepositCCYSelectorProps
 
 export function useForCcySelect() {
   const query = useQuery();
-  const setForCcy = useLazyCallback((v: VaultInfo['forCcy']) =>
-    updateQuery?.({ 'for-ccy': v }),
+  const setForCcy = useLazyCallback(
+    (v: VaultInfo['forCcy']) => updateQuery?.({ 'for-ccy': v }),
   );
   return [
     (query['for-ccy'] as VaultInfo['forCcy']) || 'WETH',
@@ -48,13 +48,13 @@ export function useDepositCcySelect() {
   const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const chainId = useWalletStore((state) => state.chainId);
-  const setDepositCcy = useLazyCallback((v: VaultInfo['depositCcy']) =>
-    updateQuery?.({ 'deposit-ccy': v }),
+  const setDepositCcy = useLazyCallback(
+    (v: VaultInfo['depositCcy']) => updateQuery?.({ 'deposit-ccy': v }),
   );
   const $ccy = (query['deposit-ccy'] as VaultInfo['depositCcy']) || 'USDT';
   const ccy = useMemo(
     () =>
-      ContractsService.vaults.find(
+      ContractsService.vaults.some(
         (it) =>
           !it.tradeDisable &&
           it.chainId === chainId &&
@@ -63,7 +63,13 @@ export function useDepositCcySelect() {
           it.depositCcy === $ccy,
       )
         ? $ccy
-        : 'USDT',
+        : ContractsService.vaults.find(
+            (it) =>
+              !it.tradeDisable &&
+              it.chainId === chainId &&
+              it.riskType === riskType &&
+              it.productType === productType,
+          )?.depositCcy || 'USDT',
     [$ccy, chainId, productType, riskType],
   );
   return [ccy, setDepositCcy] as const;
@@ -117,7 +123,9 @@ export const CCYSelector = (
 };
 
 export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
+  const [project] = useProjectChange();
   const [productType] = useProductSelect();
+  const [riskType] = useRiskSelect(project);
   const chainId = useWalletStore((state) => state.chainId);
   const [ccy, setCcy] = useDepositCcySelect();
   const [t] = useTranslation();
@@ -128,6 +136,7 @@ export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
           (it) =>
             it.chainId === chainId &&
             it.productType === productType &&
+            it.riskType === riskType &&
             !it.tradeDisable,
         ),
         (it) => it.depositCcy,

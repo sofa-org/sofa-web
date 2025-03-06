@@ -1,3 +1,27 @@
+.btn-deposit-1.btn-deposit-1 {
+  min-width: 96px;
+  padding: 0 min(24px, 3.2vw);
+  height: 32px;
+  opacity: 0.8;
+  background: #000;
+  border-radius: 20px;
+
+  &:hover {
+    opacity: 1;
+    background: #000;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+
+  :global {
+    .semi-button-content {
+      color: #fff;
+    }
+  }
+}
+
 .form {
   width: $width-content;
   margin: 12px auto 18px;
@@ -8,8 +32,7 @@
 
 .content {
   @include flex-center;
-
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   position: relative;
@@ -17,7 +40,11 @@
   margin: min(20px, 2vw);
 
   > div:first-child {
-    flex: 3;
+    @include flex-center;
+    // flex: 3;
+    // max-width: 340px;
+    padding-right: 12px;
+    border-right: 0.5px solid rgba($color: #000, $alpha: 10%);
   }
 
   .kline {
@@ -31,6 +58,15 @@
   :global(#kline-2) {
     width: 100%;
     max-height: calc(100vh - 48px - 80px - 40px);
+  }
+
+  .right {
+    @include flex-center;
+
+    flex-wrap: wrap;
+    gap: 0 6px;
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 }
 
@@ -64,7 +100,7 @@
 }
 
 .amount {
-  flex: 1;
+  // flex: 1;
   padding: 12px;
   line-height: 14px;
   color: rgba(#000, 0.65);
@@ -104,10 +140,20 @@
 
 .automator-number-tooltip {
   max-width: min(560px, 80vw);
+
+  :global(.semi-tooltip-content) {
+    min-width: min(300px, 50vw);
+  }
+
   background: #fff;
 
   > svg {
     color: #fff !important;
+  }
+
+  .automator-details > .desc {
+    padding: 10px;
+    color: #000;
   }
 
   .amount {
@@ -150,14 +196,10 @@
     margin-top: 0;
 
     .amount {
+      position: relative;
       padding-bottom: 0;
       padding-top: 0;
       position: relative;
-
-      &:first-child {
-        max-width: 270px;
-        border-right: 0.5px solid rgba($color: #000, $alpha: 10%);
-      }
 
       .unit {
         font-size: 12px;
@@ -167,10 +209,10 @@
   }
 
   .icon-detail {
-    // display: none;
-    width: 16px;
-    height: 16px;
-    margin: -4px 0 0 2px;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin: -4px 0 0 6px;
   }
 }
 

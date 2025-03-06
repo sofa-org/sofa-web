@@ -15,6 +15,33 @@
       gap: min(13px, 2vw);
     }
   }
+
+  .deposit-ccy-section {
+    @include flex-center;
+
+    justify-content: flex-start;
+    width: 100%;
+    color: #fff;
+
+    > img {
+      width: 20px;
+      height: 20px;
+    }
+
+    > span {
+      line-height: 20px;
+    }
+  }
+
+  .deposit-ccy-group {
+    @include flex-center;
+
+    width: 100%;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: min(13px, 2vw);
+  }
 }
 
 .list-wrapper {
@@ -31,18 +58,43 @@
   height: 40px;
 }
 
+.base-ccy-est-toggle {
+  @include pointer;
+
+  font-weight: 300;
+  font-size: 13px;
+  position: relative;
+  margin-left: 6px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  height: 20px;
+  display: inline-block;
+  color: rgba(#fff, 0.85);
+
+  svg {
+    height: 16px;
+    margin-right: 5px;
+    margin-top: -3px;
+  }
+
+  .base-ccy {
+    font-weight: 500;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+    padding-left: 20px;
+    margin-left: 0;
+  }
+}
+
 .btn-bottom {
   flex: 1;
   height: 34px;
   padding: 0 12px;
   font-size: 12px;
-  color: rgba(#fff, 0.65);
-  border-radius: 8px;
   transition: all 0.3s ease;
-  background: transparent !important;
-  border: 1px solid rgba(#fff, 0.24) !important;
   border-radius: 17px;
-  opacity: 0.8;
 
   &:active,
   &:hover {
@@ -50,7 +102,18 @@
   }
 
   &.btn-txt {
+    color: rgba(#fff, 0.65);
+    background: transparent !important;
     border: none !important;
+  }
+
+  &.btn-claim {
+    @include bold;
+
+    padding: 0 20px;
+    color: rgba(#000, 0.85);
+    background: #fff !important;
+    border: 1px solid #fff !important;
   }
 }
 
@@ -79,6 +142,15 @@
       &:hover {
         background: rgba(#555, 1) !important;
         box-shadow: 0 5px 10px 0 rgba(#000, 0.5);
+      }
+
+      &.btn-claim {
+        @include bold;
+
+        padding: 0 16px;
+        color: rgba(#000, 0.75);
+        background: #fff !important;
+        border: 1px solid rgba(#fff, 0.24) !important;
       }
     }
   }

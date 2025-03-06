@@ -47,7 +47,8 @@
 }
 
 .btn-add-container {
-  padding: min(20px, 2vw) min(20px + 12px, 2vw + 12px);
+  width: 100%;
+  padding: 0 min(20px + 12px, 2vw + 12px) min(20px, 2vw);
 
   .btn-add {
     height: min(40px, 8vw);
@@ -60,7 +61,8 @@
   }
 }
 
-.custom-tickets {
+.custom-tickets.custom-tickets {
+  flex-wrap: wrap;
   flex: 1;
   margin: 0;
 
@@ -172,9 +174,10 @@
       .digi {
         margin-top: 30px;
         position: relative;
+
         &::before {
           content: "";
-          background: url(./assets/icon-airdrop.svg) no-repeat center;
+          background: url("./assets/icon-airdrop.svg") no-repeat center;
           width: 20px;
           height: 20px;
           position: absolute;

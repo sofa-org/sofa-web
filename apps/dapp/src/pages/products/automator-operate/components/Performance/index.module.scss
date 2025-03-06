@@ -12,6 +12,7 @@
 .title {
   @include flex-center;
   @include bold;
+
   position: absolute;
   left: 0;
   top: 28px;
@@ -24,11 +25,13 @@
 
 .label-1 {
   @include gradient-txt(linear-gradient(to right, #e88947, #ffdec3));
+
   margin: 0;
 }
 
 .item-1 {
   @include flex-center;
+
   margin: 0;
 }
 
@@ -36,10 +39,17 @@
   margin: 0;
   font-size: 14px;
   opacity: 0.5;
+
+  &.underline {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: #aaa;
+  }
 }
 
 .value {
   @include bold;
+
   margin: 0;
 
   .cvt {
@@ -48,6 +58,7 @@
 
   .weaken {
     @include regular;
+
     font-size: 0.9em;
     opacity: 0.45;
   }
@@ -55,6 +66,7 @@
 
 .unit {
   @include regular;
+
   margin: 0;
   padding: 0 0 0 3px;
   font-size: min(0.8em, 12px);
@@ -62,7 +74,7 @@
 
   &.icon-airdrop {
     padding-right: 1em;
-    background: url(../../../../positions/automator/assets/icon-airdrop.svg)
+    background: url("../../../../positions/automator/assets/icon-airdrop.svg")
       no-repeat;
     background-position: 100% 34%;
     background-size: 0.9em 0.9em;
@@ -70,8 +82,22 @@
   }
 }
 
+.percent {
+  @include bold;
+  @include gradient-txt(linear-gradient(to right, #e88947, #ffdec3));
+
+  display: inline-block;
+  padding: 0 0 0 6px;
+  margin: 0 0 0 6px;
+  font-size: min(0.8em, 12px);
+  line-height: 0.8em;
+  border-left: 1px dashed rgba(#000, 0.2);
+  opacity: 0.8;
+}
+
 .separator {
   @include regular;
+
   display: inline-block;
   padding: 0 6px;
   font-size: 0.8em;
@@ -84,6 +110,7 @@
 
 .item {
   @include flex-center;
+
   font-size: 18px;
   justify-content: flex-start;
   flex: 1;
@@ -110,6 +137,7 @@
     linear-gradient(to right, #e88947, #ffdec3)
   );
   @include flex-center;
+
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: 4px 24px;
@@ -138,18 +166,42 @@
 
 .pool-size-infos {
   @include flex-center;
+
   justify-content: space-between;
   flex-wrap: wrap;
   margin: 0;
+  padding-right: 50%;
 
   .item {
     @include flex-center;
-    justify-content: flex-start;
-    flex: 1;
-    min-width: 45%;
+
+    justify-content: space-between;
+    flex: none;
+    position: relative;
+    width: 100%;
+    padding: 0 0 0 16px;
 
     .label {
       width: 160px;
+    }
+  }
+}
+
+.creator-amount {
+  @include flex-center;
+
+  justify-content: space-between;
+  margin: min(24px, 3.2vw) 0 0;
+  padding: min(24px, 3.2vw) 0 0;
+  border-top: 1px dashed rgba(#000, 0.2);
+
+  .item {
+    @include flex-center;
+
+    justify-content: flex-start;
+
+    .label {
+      width: 200px;
     }
   }
 }
@@ -167,23 +219,15 @@
 }
 
 .dot {
+  position: absolute;
+  left: 0;
+  top: 8px;
   display: block;
   width: 8px;
   height: 8px;
   margin: 0;
   border-radius: 50%;
-  background: currentColor;
-}
-
-.percent {
-  display: inline-block;
-  margin: 0;
-  padding: 0 0 0 6px;
-  margin: 0 0 0 6px;
-  font-size: min(0.8em, 12px);
-  line-height: 0.8em;
-  border-left: 1px dashed rgba(#000, 0.2);
-  opacity: 0.8;
+  background: currentcolor;
 }
 
 .footer {
@@ -197,6 +241,10 @@
   position: absolute;
   top: 16px;
   right: 0;
+}
+
+.btn-deposit.btn-deposit,
+.btn-claim.btn-claim {
   min-width: 120px;
   padding: 0 min(24px, 3.2vw);
   height: 40px;
@@ -237,7 +285,7 @@
 @mixin rewrite {
   .title {
     top: 0;
-    border-radius: 0 0 4px 0;
+    border-radius: 0 0 4px;
   }
 
   .value {
@@ -246,6 +294,23 @@
     .cvt {
       display: block;
       padding: 0;
+    }
+  }
+
+  .dot {
+    top: 4px;
+  }
+
+  .creator-amount {
+    .item {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .label {
+        width: auto;
+        font-size: 12px;
+        white-space: nowrap;
+      }
     }
   }
 
@@ -270,6 +335,10 @@
         font-size: 10px;
       }
     }
+  }
+
+  .pool-size-infos {
+    padding-right: 0;
   }
 
   .pool-size-infos,

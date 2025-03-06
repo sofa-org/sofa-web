@@ -102,7 +102,7 @@ const contents = (t: TFunction) => [
         `RCH can only be earned by protocol usage or ecosystem building rewards.  'Trade to Earn'.`,
       ),
       t(
-        `ALL protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.`,
+        `All protocol earnings will be recycled to burn RCH tokens daily, ensuring a net deflationary float over time.`,
       ),
       t(
         `Model design ensures that 100% of the value accretion will be allocated to our core users and long term hodlers.  Building it for the community.`,

@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import { ContractsService, RiskType, VaultInfo } from '../contracts';
 import {
   ApyDefinition,
+  OriginProductQuoteResult,
   ProductQuoteResult,
   ProductsService,
 } from '../products';
@@ -27,8 +28,8 @@ function mockDIYConfig(params: ProductsDIYConfigRequest) {
   }));
 }
 
-function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
-  return params.vaults
+async function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
+  const origin = params.vaults
     .split(',')
     .map((it) => it.trim())
     .flatMap((vault) => {
@@ -37,19 +38,77 @@ function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
         chainId: params.chainId,
       });
       if (!vaultInfo) return undefined;
-      return [...Array(2)].map(() => mockProductQuote(vaultInfo));
+      if (params.expiryDateTime) {
+        return [...Array(2)].map(() => mockProductQuote(vaultInfo, params));
+      } else {
+        const result: OriginProductQuoteResult[] = [];
+        for (const expiryDateTime of [
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 7) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+          next8h(undefined, 18) / 1000,
+        ]) {
+          result.push(
+            mockProductQuote(vaultInfo, {
+              ...params,
+              expiryDateTime,
+            }),
+          );
+        }
+        return result;
+      }
     })
     .filter(Boolean);
+  if (!origin.length) {
+    return [];
+  }
+  return ProductsService.dealOriginQuotes(origin as OriginProductQuoteResult[]);
 }
 
 function mockProductQuote(
-  params: PartialRequired<VaultInfo, 'forCcy' | 'riskType'>,
-): ProductQuoteResult {
-  return {
+  vaultInfo: PartialRequired<VaultInfo, 'forCcy' | 'riskType'>,
+  params: ProductsDIYRecommendRequest,
+): OriginProductQuoteResult {
+  const prices: PartialRecord<CCY, number> = {
+    RCH: 0.3,
+    WBTC: 95000,
+  };
+  const vault = ProductsService.findVault(ContractsService.vaults, vaultInfo)!;
+  const origin: OriginProductQuoteResult = {
+    chainId: vault.chainId,
+    depositAmount: 100,
     rfqId: '',
-    anchorPrices: [2000, 3000],
-    vault: ProductsService.findVault(ContractsService.vaults, params)!, // 合约地址
-    expiry: next8h(undefined, 18) / 1000, // 到期日对应的秒级时间戳，例如 1672387200
+    vault: vault.vault, // 合约地址
+    expiry: params.expiryDateTime || next8h(undefined, 18) / 1000, // 到期日对应的秒级时间戳，例如 1672387200
     timestamp: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前定价对应的触发时间；下一个观察开始时间基于此逻辑计算
     observationStart: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前产品根据timestamp预估的开始观察敲入敲出时间
     quote: {
@@ -99,9 +158,12 @@ function mockProductQuote(
       min: 0, // 对赌输了的情况对应的赔率
       max: Math.random() * 10, // 对赌全赢的情况对应的赔率
     },
-    relevantDollarPrices: [{ ccy: 'RCH', price: Math.random() * 10 }], // 计算 RCH 年化时的币种价格
-    pricesForCalculation: { RCH: Math.random() * 10 },
+    relevantDollarPrices: Object.entries(prices).map((e) => ({
+      ccy: e[0],
+      price: e[1],
+    })), // 计算 RCH 年化时的币种价格
   };
+  return origin;
 }
 
 if (!window.mockData) window.mockData = {};

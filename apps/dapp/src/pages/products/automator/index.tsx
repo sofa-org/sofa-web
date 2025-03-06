@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Tabs } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
-import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
 import { updateQuery } from '@sofa/utils/history';
@@ -35,7 +34,7 @@ export const AutomatorEl = (props: BaseProps) => {
   }));
   const { address } = useWalletStore((state) => state);
   const isMobileUI = useIsMobileUI();
-  const { automator: vault } = useAutomatorMarketSelector();
+  const { automator: vault, automators } = useAutomatorMarketSelector();
 
   const handleSuccess = useLazyCallback(() => {
     if (vault && address) {
@@ -57,6 +56,14 @@ export const AutomatorEl = (props: BaseProps) => {
     }
   });
 
+  const chainsHasAutomator = useMemo(
+    () =>
+      (Env.isDaily ? [421614] : [1, 42161])
+        .map((it) => ChainMap[it]?.name)
+        .filter(Boolean)
+        .join(', '),
+    [],
+  );
   return (
     <>
       <div
@@ -66,53 +73,79 @@ export const AutomatorEl = (props: BaseProps) => {
           props.className,
         )}
       >
-        <AutomatorUserInfo vault={vault} />
-        <div className={styles['left']}>
-          <AutomatorOverview vault={vault} />
-        </div>
-        <div
-          className={classNames(
-            styles['right'],
-            styles[`mobile-tab-${mobileUITab || 'none'}`],
-          )}
-        >
-          <div
-            className={styles['mobile-tab-bg']}
-            onClick={() => onTabClick('')}
-          />
-          <Tabs
-            type="card"
-            size="small"
-            className={styles['tabs']}
-            activeKey={tab === 'redeem' ? 'redeem' : 'deposit'}
-            onTabClick={onTabClick}
-          >
-            <Tabs.TabPane
-              itemKey="deposit"
-              tab={
-                <span
-                  className={classNames(styles['tab-title'], styles['deposit'])}
-                >
-                  {t({ enUS: 'Mint', zhCN: '铸造' })}
-                </span>
+        {!vault && !automators.length ? (
+          <div className={styles['switch-chain-alert']}>
+            <CEmpty
+              description={
+                tab === 'holding'
+                  ? undefined
+                  : t(
+                      {
+                        enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
+                        zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
+                      },
+                      { chains: chainsHasAutomator },
+                    )
               }
+            />
+          </div>
+        ) : (
+          <>
+            <AutomatorUserInfo vault={vault} />
+            <div className={styles['left']}>
+              <AutomatorOverview vault={vault} />
+            </div>
+            <div
+              className={classNames(
+                styles['right'],
+                styles[`mobile-tab-${mobileUITab || 'none'}`],
+              )}
             >
-              <AutomatorDeposit vault={vault} onSuccess={handleSuccess} />
-            </Tabs.TabPane>
-            <Tabs.TabPane
-              itemKey="redeem"
-              tab={
-                <span
-                  className={classNames(styles['tab-title'], styles['redeem'])}
+              <div
+                className={styles['mobile-tab-bg']}
+                onClick={() => onTabClick('')}
+              />
+              <Tabs
+                type="card"
+                size="small"
+                className={styles['tabs']}
+                activeKey={tab === 'redeem' ? 'redeem' : 'deposit'}
+                onTabClick={onTabClick}
+              >
+                <Tabs.TabPane
+                  itemKey="deposit"
+                  tab={
+                    <span
+                      className={classNames(
+                        styles['tab-title'],
+                        styles['deposit'],
+                      )}
+                    >
+                      {t({ enUS: 'Mint', zhCN: '铸造' })}
+                    </span>
+                  }
                 >
-                  {t({ enUS: 'Redeem', zhCN: '赎回' })}
-                </span>
-              }
-            >
-              <AutomatorWithdraw vault={vault} onSuccess={handleSuccess} />
-            </Tabs.TabPane>
-          </Tabs>
-        </div>
+                  <AutomatorDeposit vault={vault} onSuccess={handleSuccess} />
+                </Tabs.TabPane>
+                <Tabs.TabPane
+                  itemKey="redeem"
+                  tab={
+                    <span
+                      className={classNames(
+                        styles['tab-title'],
+                        styles['redeem'],
+                      )}
+                    >
+                      {t({ enUS: 'Redeem', zhCN: '赎回' })}
+                    </span>
+                  }
+                >
+                  <AutomatorWithdraw vault={vault} onSuccess={handleSuccess} />
+                </Tabs.TabPane>
+              </Tabs>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

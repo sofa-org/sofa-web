@@ -15,7 +15,7 @@ import {
 } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { MsIntervals } from '@sofa/utils/expiry';
-import { getErrorMsg, isNullLike } from '@sofa/utils/fns';
+import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback, useTime } from '@sofa/utils/hooks';
 import { arrToDict, simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
@@ -99,7 +99,10 @@ export interface ProductInvestButtonProps extends BaseProps {
   chainId: number;
   autoQuote?: boolean;
   afterInvest?(): void;
-  vaultInfo?: Pick<VaultInfo, 'depositCcy' | 'riskType' | 'productType'>;
+  vaultInfo?: Pick<
+    VaultInfo,
+    'depositCcy' | 'riskType' | 'productType' | 'onlyForAutomator'
+  >;
   useProductsState: ProductsStateType;
   products: PartialRequired<ProductQuoteParams, 'id' | 'vault'>[];
   quoteInfos: (ProductQuoteResult | undefined)[];
@@ -107,8 +110,7 @@ export interface ProductInvestButtonProps extends BaseProps {
     cb: (progress: TransactionProgress) => void,
     data: ProductQuoteResult[],
   ) => Promise<void>;
-  insufficientGetBalance: (depositCcy: string) => number | undefined;
-  insufficientDeps: unknown[];
+  isInsufficientBalance: (amount: string | number) => boolean;
 }
 
 function useShouldQuote(
@@ -129,13 +131,13 @@ function useShouldQuote(
       const shouldQuote =
         !quoteInfo ||
         (wallet.address && !quoteInfo.quote.signature) ||
-        quoteInfo.quote.deadline * 1000 - 0.5 * MsIntervals.min <= time || // 提前
+        quoteInfo.quote.deadline * 1000 - 0.3 * MsIntervals.min <= time || // 提前
         (it && quoteInfo.amounts.own != it.depositAmount);
       if (shouldQuote && quoteInfo) _useProductsState.delQuote(quoteInfo);
       return shouldQuote;
     });
     return !!shouldQuoteList.length;
-  }, [products, quoteInfos, time, wallet.address]);
+  }, [_useProductsState, products, quoteInfos, time, wallet.address]);
 }
 
 export const ProductInvestButton = (props: ProductInvestButtonProps) => {
@@ -154,7 +156,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
         chainId: props.chainId,
         ...vaultInfo,
       },
-    [vaultInfo],
+    [props.chainId, props.vault, vaultInfo],
   );
   const shouldQuote = useShouldQuote(
     wallet,
@@ -164,11 +166,10 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   );
   const insufficient = useMemo(() => {
     if (!vault?.depositCcy) return false;
-    const balance = props.insufficientGetBalance(vault.depositCcy);
-    if (shouldQuote || isNullLike(balance)) return false;
+    if (shouldQuote) return false;
     const amount = simplePlus(...products.map((it) => it.depositAmount))!;
-    return amount > balance;
-  }, [products, shouldQuote, vault?.depositCcy, ...props.insufficientDeps]);
+    return props.isInsufficientBalance(amount);
+  }, [products, shouldQuote, vault?.depositCcy]);
 
   const showQuote = shouldQuote || !quoteInfos.length;
   const quote = useLazyCallback(async (noToast?: boolean) => {
@@ -225,10 +226,8 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   const handleSubmit = useLazyCallback(async () => {
     if (!vault) return;
     const amount = simplePlus(...quoteInfos.map((it) => it?.amounts.own)) || 0;
-    if (
-      wallet.balance?.[vault.depositCcy] &&
-      wallet.balance[vault.depositCcy]! < amount
-    ) {
+    const insufficient = props.isInsufficientBalance(amount);
+    if (insufficient) {
       return Toast.warning(t('Balance is no enough!'));
     }
     const delRfq = (key: NonNullable<TransactionProgress['details']>[0][0]) => {
@@ -259,7 +258,8 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
             delRfq(it[0]);
           }
         });
-        if (vault.riskType === RiskType.RISKY) pokerRightsReminder();
+        if (vault.riskType === RiskType.RISKY && !vault.onlyForAutomator)
+          pokerRightsReminder();
         useWalletStore.updateBalanceByVault(props.vault);
       }
       if (/Success/i.test(progress.status)) {
@@ -285,11 +285,13 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       <BaseInvestButton
         shouldPrepare={shouldQuote || !products.length}
         preparing={
-          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+          vault.riskType === RiskType.PROTECTED &&
+          interestRate?.apyUsed === undefined
         }
         prepare={quote}
         prepareText={
-          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+          vault.riskType === RiskType.PROTECTED &&
+          interestRate?.apyUsed === undefined
             ? t('In Preparation...')
             : t('Request For Quote')
         }
@@ -311,7 +313,7 @@ const InvestButton = (
     | 'products'
     | 'quoteInfos'
     | 'mint'
-    | 'insufficientGetBalance'
+    | 'isInsufficientBalance'
     | 'insufficientDeps'
   >,
 ) => {
@@ -348,8 +350,11 @@ const InvestButton = (
         }
         return PositionsService.batchDeposit(cb, data as ProductQuoteResult[]);
       }}
-      insufficientGetBalance={(depositCcy) => wallet.balance?.[depositCcy]}
-      insufficientDeps={[wallet.balance]}
+      isInsufficientBalance={(amount) =>
+        !vault ||
+        !wallet.balance ||
+        Number(wallet.balance[vault.depositCcy]) < +amount
+      }
       {...props}
     />
   );

@@ -249,7 +249,10 @@ export const AutomatorProgress = forwardRef<ProgressRef, ProgressProps>(
             className={styles['deposit-progress-title']}
             dangerouslySetInnerHTML={{
               __html: t(
-                'Deposit successful. <a href="{{url}}">Go to transaction page</a> to see your successful records',
+                {
+                  enUS: 'Successful. <a href="{{url}}">Go to transaction page</a> to see your successful records',
+                  zhCN: '操作成功。<a href="{{url}}">前往</a>查看您的成功记录。',
+                },
                 {
                   url: `/transactions?${stringify({
                     ...parse(window.location.search),

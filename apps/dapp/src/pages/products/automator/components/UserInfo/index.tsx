@@ -32,15 +32,16 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
         ]
       : undefined,
   );
-  const desc = useAutomatorStore(
-    (state) =>
+  const desc = useAutomatorStore((state) => {
+    const str =
       (props.vault &&
         address &&
         state.vaultOverviews[
           `${props.vault.chainId}-${props.vault.vault.toLowerCase()}-`
         ]?.vaultInfo.desc) ||
-      props.vault?.desc,
-  );
+      props.vault?.desc;
+    return str?.replace(/\n|\r/g, '<br/>');
+  });
   useEffect(() => {
     if (props.vault && address)
       return useAutomatorStore.subscribeUserInfo(props.vault, address);
@@ -149,7 +150,7 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
             </span>
             <span className={styles['separator']}>+</span>
             <span className={classNames(styles['amount'], styles['rch'])}>
-              <AmountDisplay amount={data?.server?.rchTotalPnl} />{' '}
+              <AmountDisplay amount={data?.server?.totalRchAmount} />{' '}
               <span className={styles['unit']}>RCH</span>
             </span>
           </div>

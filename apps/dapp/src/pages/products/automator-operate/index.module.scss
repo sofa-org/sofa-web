@@ -6,6 +6,17 @@
   border-left: 1px dashed rgba(#fff, 0.2);
 }
 
+.risk-desc {
+  @include regular;
+
+  margin: 0 0 0 4px;
+  padding: 0 0 0 8px;
+  line-height: 0.8em;
+  font-size: 0.8em;
+  opacity: 0.5;
+  border-left: 1px dashed rgba(#fff, 0.5);
+}
+
 .head-title {
   width: $width-content;
   margin: 0 auto;
@@ -40,6 +51,8 @@
       opacity: 0.5;
     }
 
+    .item > img,
+    .item > svg,
     img.label,
     svg.label {
       flex: none;

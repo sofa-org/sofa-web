@@ -1,6 +1,11 @@
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { useTranslation } from '@sofa/services/i18n';
-import { ProductType, RiskType, VaultInfo } from '@sofa/services/products';
+import {
+  CalculatedInfo,
+  ProductType,
+  RiskType,
+  VaultInfo,
+} from '@sofa/services/products';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { simplePlus } from '@sofa/utils/object';
 import { useSize } from 'ahooks';
@@ -40,6 +45,12 @@ export interface PayoffProps extends PayoffChartProps {
   positionAmount: number; // 对赌头寸，单位 {depositCcy}
   refMs: number; // 开始投资时间
   expMs: number; // 到期时间
+
+  depositBaseCcyConfig?: {
+    depositCcy: CCY | USDS;
+    depositBaseCcy: CCY | USDS;
+    maxApy: number;
+  };
 }
 
 export const PayoffChart = (props: PayoffChartProps) => {
@@ -391,7 +402,33 @@ const Payoff = (props: PayoffProps) => {
             <span className={styles['badge-leverage']}>Lev.</span>
           )}
         </span>
-        <ApyDesc>{t('type')}</ApyDesc>
+        <ApyDesc>
+          {props.depositBaseCcyConfig ? (
+            <>
+              <span className={styles['base-ccy']}>
+                {props.depositBaseCcyConfig.depositBaseCcy}
+              </span>{' '}
+            </>
+          ) : undefined}
+          {t('type')}
+
+          {props.depositBaseCcyConfig ? (
+            <>
+              <div className={styles['origin-ccy']}>
+                {t(
+                  {
+                    enUS: '({{depositCcy}} Potential Yield: {{apy}} APY)',
+                    zhCN: '({{depositCcy}} 潜在年化收益: {{apy}})',
+                  },
+                  {
+                    apy: displayPercentage(props.depositBaseCcyConfig.maxApy),
+                    depositCcy: props.depositBaseCcyConfig.depositCcy,
+                  },
+                )}
+              </div>
+            </>
+          ) : undefined}
+        </ApyDesc>
       </div>
       <PayoffChart atm={atm} {...props} affectByOther />
     </div>

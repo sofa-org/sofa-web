@@ -5,6 +5,7 @@ import { AutomatorFollower, AutomatorService } from '@sofa/services/automator';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { getErrorMsg } from '@sofa/utils/fns';
+import { simplePlus } from '@sofa/utils/object';
 import { useInfiniteScroll } from 'ahooks';
 import classNames from 'classnames';
 
@@ -99,7 +100,10 @@ export const AutomatorFollowers = () => {
               <div className={styles['cvt']}>
                 <span className={styles['separator']}>≈</span>
                 <AmountDisplay
-                  amount={record.amountByClientDepositCcy}
+                  amount={simplePlus(
+                    record.totalPnlByClientDepositCcy,
+                    record.totalRchPnlByClientDepositCcy,
+                  )}
                   ccy={vault?.depositCcy}
                 />
                 <span className={styles['unit']}>{vault?.depositCcy}</span>
@@ -119,7 +123,7 @@ export const AutomatorFollowers = () => {
                     : 'var(--color-fall)',
               }}
             >
-              {displayPercentage(record.pnlPercentage)}
+              {displayPercentage(+record.pnlPercentage / 100)}
             </span>
           ),
         },
@@ -132,7 +136,7 @@ export const AutomatorFollowers = () => {
       className={styles['table']}
       columns={columns}
       dataSource={data?.list}
-      loading={loading || !data}
+      loading={loading && !data}
       pagination={false}
       rowKey={(record) => String(record?.wallet)}
       empty={<CEmpty />}

@@ -2,7 +2,7 @@
   @include pointer;
 
   flex: 1;
-  margin: 0;
+  margin: 0 0 16px;
   padding: 16px;
   border-radius: 16px;
   background: #fff;
@@ -20,6 +20,12 @@
   margin: 0;
   font-size: 14px;
   opacity: 0.45;
+
+  &.underline {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: #aaa;
+  }
 }
 
 .value {
@@ -40,6 +46,7 @@
 
   .weaken {
     @include regular;
+
     opacity: 0.45;
     font-size: 0.9em;
   }
@@ -55,7 +62,7 @@
 
   &.icon-airdrop {
     padding-right: 1em;
-    background: url(../../../../positions/automator/assets/icon-airdrop.svg)
+    background: url("../../../../positions/automator/assets/icon-airdrop.svg")
       no-repeat;
     background-position: 100% 34%;
     background-size: 0.9em 0.9em;
@@ -232,6 +239,7 @@
 @mixin rewrite {
   .item {
     @include flex-column-center;
+
     align-items: flex-start;
     justify-content: flex-start;
     gap: 6px;
@@ -278,6 +286,7 @@
 
       .item {
         @include flex-center;
+
         justify-content: space-between;
         width: 100%;
         margin: 0;
@@ -298,13 +307,9 @@
 }
 
 @media (orientation: portrait) {
-  :global(.is-mobile) {
-    @include rewrite;
-  }
+  @include rewrite;
 }
 
 @media (width <=720px) {
-  :global(.is-pc) {
-    @include rewrite;
-  }
+  @include rewrite;
 }

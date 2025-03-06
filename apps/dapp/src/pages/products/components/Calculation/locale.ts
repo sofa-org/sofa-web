@@ -12,17 +12,17 @@ export default {
     Days: 'Days',
     'Expiry Time - Execution Time (in EpochSeconds)':
       'Expiry Time - Execution Time (in EpochSeconds)',
-    'Estimated Aave/Lido/Sofa/Curve Yield':
-      'Estimated Aave/Lido/Sofa/Curve Yield',
-    'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)':
-      'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
-    'Estimated Aave/Lido/Sofa/Curve Return':
-      'Estimated Aave/Lido/Sofa/Curve Return',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Yield':
+      'Estimated Aave/Lido/Sofa/Curve/Avalon Yield',
+    'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)':
+      'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Return':
+      'Estimated Aave/Lido/Sofa/Curve/Avalon Return',
     '(Deposit*(1+Base APY Estimate)^(Tenor/365)-Deposit)':
       '(Deposit*(1+Base APY Estimate)^(Tenor/365)-Deposit)',
     'Earn | Base Yield(APY)': 'Earn | Base Yield(APY)',
-    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate":
-      "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate",
+    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate":
+      "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate",
     'Earn | Base Return': 'Earn | Base Return',
     '(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)':
       '(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)',
@@ -35,8 +35,8 @@ export default {
     'Calculate Premium to ensure the Base Yield even after fee deduction.':
       'Calculate Premium to ensure the Base Yield even after fee deduction.',
     Premium: 'Premium',
-    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))':
-      'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))',
+    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))':
+      'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))',
     'Enhanced Amount': 'Enhanced Amount',
     'Upside Settlement Fee': 'Upside Settlement Fee',
     'Protocol Upside Fee (Winning Only)': 'Protocol Upside Fee (Winning Only)',
@@ -93,13 +93,13 @@ export default {
       'Estimated Base with RCH APY Return(after Fee)',
     'Estimated Upside APY Return(after Fee)':
       'Estimated Upside APY Return(after Fee)',
-    '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)':
-      '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)',
-    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
-      '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price',
+    '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)':
+      '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)',
+    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
+      '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price',
     'Estimated Trading Fee': 'Estimated Trading Fee',
-    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)':
-      'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)',
+    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)':
+      'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)',
     'Settlement Fee': 'Settlement Fee',
     'Estimated Settlement Fee': 'Estimated Settlement Fee',
     'Protocol Settlement Fee': 'Protocol Settlement Fee',
@@ -120,7 +120,7 @@ export default {
     'Expiry Time - Execution Time (in EpochSeconds)':
       '有効期限 - 実行時間（エポック秒で）',
     Premium: 'プレミアム',
-    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))':
+    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))':
       '手数料控除後も基本利回りを保証するオプション購入のためのプレミアム額。<br/>((見積もりのAave/Lido/Sofa/Curveリターン - Earn|Baseリターン) / (預入金額 + 見積もりのAave/Lido/Sofa/Curveリターン) * 預入金額 / (1 + 取引手数料率))',
     'MM Collateral': 'MM担保',
     'From Market Maker Price': 'マーケットメーカー価格から',
@@ -179,19 +179,21 @@ export default {
       '推定アップサイドAPYリターン（手数料後）',
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
       '((預金+基本リターン+RCHリターン+増強額-アップサイド決済手数料)/預金)^(365/期間)-1',
-    'Estimated Aave/Lido/Sofa/Curve Yield': '推定Aave/Lido/Sofa/Curve収益',
-    'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)':
-      'Min(1ヶ月Aave/Lido/Sofa/Curve平均, 現在のAave/Lido/Sofa/Curve APY) (Aave/Lido/Sofa/Curve APY)',
-    'Estimated Aave/Lido/Sofa/Curve Return': '推定Aave/Lido/Sofa/Curveリターン',
-    '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)':
-      '(預金 * (1 + Aave/Lido/Sofa/Curve APY推定) ^ (期間 / 365) - 預金)',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Yield':
+      '推定Aave/Lido/Sofa/Curve収益',
+    'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)':
+      'Min(1ヶ月Aave/Lido/Sofa/Curve平均, 現在のAave/Lido/Sofa/Curve APY) (Aave/Lido/Sofa/Curve/Avalon APY)',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Return':
+      '推定Aave/Lido/Sofa/Curveリターン',
+    '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)':
+      '(預金 * (1 + Aave/Lido/Sofa/Curve/Avalon APY推定) ^ (期間 / 365) - 預金)',
     'Earn | Base Yield(APY)': 'Earn | 基本収益(APY)',
-    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate":
+    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate":
       'ユーザーの選択。実際のAave/Lido/Sofa/Curveリターンが現在の推定値と同等ならば、基本収益を達成できます',
     'Earn | Base Return': 'Earn | 基本リターン',
     '(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)':
       '(預金*(1+基本APY推定)^(期間/365)-預金)',
-    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
+    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
       '(MM担保 + プレミアム) * ((1 + Aave/Lido/Sofa/Curve利率) ^ (期間 / 365) - 1) 市場メーカーの価格から',
     'Calculate Premium Considering Fee Cost':
       '手数料のコストを考慮してプレミアムを計算',
@@ -199,7 +201,7 @@ export default {
     'Calculate Premium to ensure the Base Yield even after fee deduction.':
       '手数料控除後も基本収益を保証するためのプレミアムを計算します。',
     'Estimated Trading Fee': '推定取引手数料',
-    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)':
+    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)':
       'プレミアム*取引手数料率*((1+ Aave/Lido/Sofa/Curve利率)^(期間/365)-1)',
     'Estimated Settlement Fee': '推定決済手数料',
     'Estimated Base APY Return': '推定基本APYリターン',
@@ -223,8 +225,8 @@ export default {
     'Expiry Time - Execution Time (in EpochSeconds)':
       'Время окончания - Время исполнения (в EpochSeconds)',
     Premium: 'Премия',
-    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))':
-      'Сумма премии для покупки опционов, обеспечивающих базовую доходность даже после вычета комиссии. <br/>((Ожидаемая доходность Aave/Lido/Sofa/Curve - Earn|Основная доходность) / (Сумма депозита + Ожидаемая доходность Aave/Lido/Sofa/Curve) * Сумма депозита / (1 + Ставка торговой комиссии))',
+    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))':
+      'Сумма премии для покупки опционов, обеспечивающих базовую доходность даже после вычета комиссии. <br/>((Ожидаемая доходность Aave/Lido/Sofa/Curve/Avalon - Earn|Основная доходность) / (Сумма депозита + Ожидаемая доходность Aave/Lido/Sofa/Curve/Avalon) * Сумма депозита / (1 + Ставка торговой комиссии))',
     'MM Collateral': 'Залог MM',
     'From Market Maker Price': 'Цена от маркет-мейкера',
     'Enhanced Amount': 'Увеличенная сумма',
@@ -285,30 +287,30 @@ export default {
       'Ожидаемый увеличенный доход APY (после вычета комиссий)',
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
       '((Депозит+Базовая прибыль + Доход RCH + Увеличенная сумма - Комиссия за досрочное закрытие)/Депозит)^(365/Срок)-1',
-    'Estimated Aave/Lido/Sofa/Curve Yield':
-      'Оценка доходности Aave/Lido/Sofa/Curve',
-    'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)':
-      'Min(Среднее значение Aave/Lido/Sofa/Curve за 1 месяц, текущий Aave/Lido/Sofa/Curve APY). (Aave/Lido/Sofa/Curve APY)',
-    'Estimated Aave/Lido/Sofa/Curve Return':
-      'Оценка дохода Aave/Lido/Sofa/Curve',
-    '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)':
-      '(Депозит * (1 + Предполагаемый APY Aave/Lido/Sofa/Curve) ^ (Срок / 365) - Депозит)',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Yield':
+      'Оценка доходности Aave/Lido/Sofa/Curve/Avalon',
+    'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)':
+      'Min(Среднее значение Aave/Lido/Sofa/Curve/Avalon за 1 месяц, текущий Aave/Lido/Sofa/Curve/Avalon APY). (Aave/Lido/Sofa/Curve/Avalon APY)',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Return':
+      'Оценка дохода Aave/Lido/Sofa/Curve/Avalon',
+    '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)':
+      '(Депозит * (1 + Предполагаемый APY Aave/Lido/Sofa/Curve/Avalon) ^ (Срок / 365) - Депозит)',
     'Earn | Base Yield(APY)': 'Earn | Базовая доходность (APY)',
-    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate":
-      'Выбор пользователя. Базовый доход достижим, если фактическая доходность Aave/Lido/Sofa/Curve равна текущей оценке',
+    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate":
+      'Выбор пользователя. Базовый доход достижим, если фактическая доходность Aave/Lido/Sofa/Curve/Avalon равна текущей оценке',
     'Earn | Base Return': 'Earn | Базовый возврат',
     '(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)':
       '(Депозит*(1+Оценка базового APY)^(Срок/365)-Депозит)',
-    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
-      '(Коллатерал MM + Премия) * ((1 + Процентная ставка Aave/Lido/Sofa/Curve) ^ (Срок / 365) - 1). По цене маркет мейкера',
+    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
+      '(Коллатерал MM + Премия) * ((1 + Процентная ставка Aave/Lido/Sofa/Curve/Avalon) ^ (Срок / 365) - 1). По цене маркет мейкера',
     'Calculate Premium Considering Fee Cost':
       'Рассчитать премию с учетом стоимости комиссий',
     True: 'Истинно',
     'Calculate Premium to ensure the Base Yield even after fee deduction.':
       'Рассчитать премию, чтобы обеспечить базовую доходность даже после вычета комиссии.',
     'Estimated Trading Fee': 'Оценочная торговая комиссия',
-    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)':
-      'Премия * Ставка торговой комиссии * ((1 + Процентная ставка Aave/Lido/Sofa/Curve) ^ (Срок / 365) - 1)',
+    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)':
+      'Премия * Ставка торговой комиссии * ((1 + Процентная ставка Aave/Lido/Sofa/Curve/Avalon) ^ (Срок / 365) - 1)',
     'Estimated Settlement Fee': 'Оценочная комиссия за расчет',
     'Estimated Base APY Return': 'Оценочный базовый годовой доход',
     'Estimated Base with RCH APY Return':
@@ -377,26 +379,26 @@ export default {
     'Estimated Upside APY Return(after Fee)':
       '预估增强型年化收益（扣除费用后）',
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
-      '((存款+基础回报+RCH回报+增强额-提前解除费)/存款)^(365/期限)-1',
+      '((存款+基础回报+RCH回报+增强额-结算手续费)/存款)^(365/期限)-1',
     'Deposit Notional': '存入本金',
-    'Estimated Aave/Lido/Sofa/Curve Yield':
-      '预计 Aave/Lido/Sofa/Curve 年化收益率',
-    'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)':
-      'Min(1个月 Aave/Lido/Sofa/Curve 收益率平均值, 当前 Aave/Lido/Sofa/Curve 收益率)。（Aave/Lido/Sofa/Curve 年化利率规范）',
-    'Estimated Aave/Lido/Sofa/Curve Return':
-      '预计 Aave/Lido/Sofa/Curve 收益回报',
-    '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)':
-      '(存款*(1+ Aave/Lido/Sofa/Curve 年化预估)^(期限/365)-存款)',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Yield':
+      '预计 Aave/Lido/Sofa/Curve/Avalon 年化收益率',
+    'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)':
+      'Min(1个月 Aave/Lido/Sofa/Curve/Avalon 收益率平均值, 当前 Aave/Lido/Sofa/Curve/Avalon 收益率)。（Aave/Lido/Sofa/Curve/Avalon 年化利率规范）',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Return':
+      '预计 Aave/Lido/Sofa/Curve/Avalon 收益回报',
+    '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)':
+      '(存款*(1+ Aave/Lido/Sofa/Curve/Avalon 年化预估)^(期限/365)-存款)',
     'Earn | Base Yield(APY)': 'Earn | 基础收益',
-    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate":
-      '用户选择。如果实际 Aave/Lido/Sofa/Curve 回报等于当前预估，则可以实现基础收益',
+    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate":
+      '用户选择。如果实际 Aave/Lido/Sofa/Curve/Avalon 回报等于当前预估，则可以实现基础收益',
     'Earn | Base Return': 'Earn | 基础回报',
     '(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)':
       '(存款*(1+基础年化预估)^(期限/365)-存款)',
-    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))':
-      '用于购买期权的权利金，确保扣除费用后仍可获得基础收益。<br/>((预计 Aave/Lido/Sofa/Curve 回报 - Earn|基础回报) / (存入金额 + 预计 Aave/Lido/Sofa/Curve 回报) * 存入金额 / (1 + 交易费率))',
-    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
-      '(做市商抵押金+权利金)*((1+ Aave/Lido/Sofa/Curve 利率)^(期限/365)-1)。来自做市商价格',
+    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))':
+      '用于购买期权的权利金，确保扣除费用后仍可获得基础收益。<br/>((预计 Aave/Lido/Sofa/Curve/Avalon 回报 - Earn|基础回报) / (存入金额 + 预计 Aave/Lido/Sofa/Curve/Avalon 回报) * 存入金额 / (1 + 交易费率))',
+    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
+      '(做市商抵押金+权利金)*((1+ Aave/Lido/Sofa/Curve/Avalon 利率)^(期限/365)-1)。来自做市商价格',
     'Settlement Fee Rate': '结算费率',
     'Specified in Smart Contract': '在智能合约中指定',
     'Trading Fee Rate': '交易费率',
@@ -405,8 +407,8 @@ export default {
     'Calculate Premium to ensure the Base Yield even after fee deduction.':
       '计算权利金以确保扣除费用后的基础收益。',
     'Estimated Trading Fee': '预估交易费',
-    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)':
-      '权利金*交易费率*((1+ Aave/Lido/Sofa/Curve 利率)^(期限/365)-1)',
+    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)':
+      '权利金*交易费率*((1+ Aave/Lido/Sofa/Curve/Avalon 利率)^(期限/365)-1)',
     'Protocol Upside Fee (Winning Only)': '协议增强收益费（仅赢取时收取）',
     'Estimated Base APY Return': '预计基础年化收益',
     'Estimated Base with RCH APY Return': '预计RCH基础年化收益',
@@ -435,8 +437,8 @@ export default {
     'Expiry Time - Execution Time (in EpochSeconds)':
       '到期時間 - 執行時間（以Epoch秒計）',
     Premium: '權利金',
-    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))':
-      '用於購買期權的權利金，確保扣除費用後仍可獲得基礎收益。<br/>((預計 Aave/Lido/Sofa/Curve 回報 - Earn|基礎回報) / (存入金額 + 預計 Aave/Lido/Sofa/Curve 回報) * 存入金額 / (1 + 交易費率))',
+    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))':
+      '用於購買期權的權利金，確保扣除費用後仍可獲得基礎收益。<br/>((預計 Aave/Lido/Sofa/Curve/Avalon 回報 - Earn|基礎回報) / (存入金額 + 預計 Aave/Lido/Sofa/Curve/Avalon 回報) * 存入金額 / (1 + 交易費率))',
     'MM Collateral': '市場做市商抵押',
     'From Market Maker Price': '來自做市商的價格',
     'Enhanced Amount': '增值金額',
@@ -490,29 +492,30 @@ export default {
       '((存款+基礎回報+RCH回報)/存款)^(365/期限)-1',
     'Estimated Upside APY Return(after Fee)': '預估增強型年化收益(扣除費用後)',
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
-      '((存款+基礎回報+RCH回報+增強額-提前解除費)/存款)^(365/期限)-1',
-    'Estimated Aave/Lido/Sofa/Curve Yield':
+      '((存款+基礎回報+RCH回報+增強額-結算手續費)/存款)^(365/期限)-1',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Yield':
       '預計Aave/Lido/Sofa/Curve年化收益率',
-    'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)':
+    'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)':
       '最小值(1個月Aave/Lido/Sofa/Curve平均收益,當前Aave/Lido/Sofa/Curve年化).^（Aave/Lido/Sofa/Curve年化利率）',
-    'Estimated Aave/Lido/Sofa/Curve Return': '預計Aave/Lido/Sofa/Curve收益回報',
-    '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)':
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Return':
+      '預計Aave/Lido/Sofa/Curve收益回報',
+    '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)':
       '(存款*(1+Aave/Lido/Sofa/Curve年化預估)^(期限/365)-存款)',
     'Earn | Base Yield(APY)': 'Earn | 基礎收益',
-    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate":
+    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate":
       '用戶選擇。如果實際Aave/Lido/Sofa/Curve收益等於當前預估，則可實現基礎收益',
     'Earn | Base Return': 'Earn | 基礎回報',
     '(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)':
       '(存款*(1+基礎年化預估)^(期限/365)-存款)',
-    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
+    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
       '(市場製造商抵押物+權利金)*((1+Aave/Lido/Sofa/Curve利率)^(期限/365)-1)。來自市場製造商價格',
     'Calculate Premium Considering Fee Cost': '考慮費用成本計算權利金',
     True: '真',
     'Calculate Premium to ensure the Base Yield even after fee deduction.':
       '計算保費以確保在扣除費用後的基礎收益。',
     'Estimated Trading Fee': '預估交易費',
-    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)':
-      '保費*交易費率*((1+ Aave/Lido/Sofa/Curve 利率)^(期限/365)-1)',
+    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)':
+      '保費*交易費率*((1+ Aave/Lido/Sofa/Curve/Avalon 利率)^(期限/365)-1)',
     'Estimated Settlement Fee': '預估結算費',
     'Estimated Base APY Return': '預計基礎年化收益',
     'Estimated Base with RCH APY Return': '預計RCH基礎年化收益',
@@ -535,8 +538,8 @@ export default {
     'Expiry Time - Execution Time (in EpochSeconds)':
       '到期時間 - 執行時間（以Epoch秒計）',
     Premium: '權利金',
-    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))':
-      '用於購買期權的權利金，確保扣除費用後仍可獲得基礎收益。<br/>((預計 Aave/Lido/Sofa/Curve 回報 - Earn|基礎回報) / (存入金額 + 預計 Aave/Lido/Sofa/Curve 回報) * 存入金額 / (1 + 交易費率))',
+    'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))':
+      '用於購買期權的權利金，確保扣除費用後仍可獲得基礎收益。<br/>((預計 Aave/Lido/Sofa/Curve/Avalon 回報 - Earn|基礎回報) / (存入金額 + 預計 Aave/Lido/Sofa/Curve/Avalon 回報) * 存入金額 / (1 + 交易費率))',
     'MM Collateral': '市場做市商抵押物',
     'From Market Maker Price': '來自做市商的價格',
     'Enhanced Amount': '增值金額',
@@ -591,27 +594,29 @@ export default {
     'Estimated Upside APY Return(after Fee)': '預估增益APY收益（扣除費用後）',
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
       '((存款+基本回報+RCH回報+增強金額-提前結算費用)/存款)^(365/期限)-1',
-    'Estimated Aave/Lido/Sofa/Curve Yield': '預估Aave/Lido/Sofa/Curve收益',
-    'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)':
-      '最低值(1個月Aave/Lido/Sofa/Curve平均值, 當前Aave/Lido/Sofa/Curve APY)。（Aave/Lido/Sofa/Curve APY）',
-    'Estimated Aave/Lido/Sofa/Curve Return': '預估Aave/Lido/Sofa/Curve回報',
-    '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)':
-      '(存款 * (1 + Aave/Lido/Sofa/Curve APY估計) ^ (期限 / 365) - 存款)',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Yield':
+      '預估Aave/Lido/Sofa/Curve收益',
+    'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)':
+      '最低值(1個月Aave/Lido/Sofa/Curve平均值, 當前Aave/Lido/Sofa/Curve APY)。（Aave/Lido/Sofa/Curve/Avalon APY）',
+    'Estimated Aave/Lido/Sofa/Curve/Avalon Return':
+      '預估Aave/Lido/Sofa/Curve回報',
+    '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)':
+      '(存款 * (1 + Aave/Lido/Sofa/Curve/Avalon APY估計) ^ (期限 / 365) - 存款)',
     'Earn | Base Yield(APY)': 'Earn | 基本利率(APY)',
-    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate":
+    "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate":
       '用戶選擇。如果實際Aave/Lido/Sofa/Curve回報等於當前估算，則可以實現基本收益',
     'Earn | Base Return': 'Earn | 基本回報',
     '(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)':
       '(存款*(1+基本APY估計)^(期限/365)-存款)',
-    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
+    '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price':
       '(市場製造商抵押品 + 保費) * ((1 + Aave/Lido/Sofa/Curve利率) ^ (期限 / 365) - 1)。來自市場製造商價格',
     'Calculate Premium Considering Fee Cost': '考慮費用成本計算保費',
     True: '真實',
     'Calculate Premium to ensure the Base Yield even after fee deduction.':
       '計算權利金以確保扣除費用後的基礎收益。',
     'Estimated Trading Fee': '預估交易費',
-    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)':
-      '權利金*交易費率*((1+ Aave/Lido/Sofa/Curve 利率)^(期限/365)-1)',
+    'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)':
+      '權利金*交易費率*((1+ Aave/Lido/Sofa/Curve/Avalon 利率)^(期限/365)-1)',
     'Estimated Settlement Fee': '預估結算費',
     'Estimated Base APY Return': '預估基礎年化收益',
     'Estimated Base with RCH APY Return': '預估RCH基礎年化收益',

@@ -3,6 +3,7 @@
 
   flex: 1;
   max-width: 258px;
+  min-width: max(calc(100% / 4 - 16px * 3), 200px);
   margin: 0;
   padding: 16px;
   border-radius: 16px;
@@ -47,6 +48,26 @@
 .value {
   margin: 0;
 
+  .warning {
+    position: relative;
+    padding: 2px 0;
+    margin-left: 4px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      bottom: 0;
+      border-bottom: 1px dashed rgba(#000, 0.3);
+    }
+  }
+
+  svg {
+    width: 0.9em;
+    height: 0.9em;
+  }
+
   &.apy {
     @include bold;
 
@@ -75,10 +96,11 @@
 .yield,
 .size,
 .creator {
-  @include flex-center;
+  @include flex-column-center;
 
-  justify-content: space-between;
-  margin: 0 0 6px;
+  align-items: flex-start;
+  gap: 0;
+  margin: 0 0 12px;
   line-height: 25px;
 }
 
@@ -94,6 +116,7 @@
   gap: 28px;
 }
 
+.risk,
 .runtime,
 .people {
   @include flex-center;
@@ -101,7 +124,7 @@
   position: relative;
   margin: 0;
 
-  svg {
+  > svg {
     width: 1.2em;
     height: 1.2em;
   }
@@ -126,4 +149,23 @@
   &.card {
     max-width: unset;
   }
+}
+
+@mixin rewrite {
+  .yield,
+  .size,
+  .creator {
+    @include flex-center;
+
+    justify-content: space-between;
+    gap: 0;
+  }
+}
+
+@media (orientation: portrait) {
+  @include rewrite;
+}
+
+@media (width <=720px) {
+  @include rewrite;
 }

@@ -1,15 +1,21 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorDetail } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
-import { formatDuration } from '@sofa/utils/time';
+import {
+  amountFormatter,
+  cvtAmountsInCcy,
+  displayPercentage,
+} from '@sofa/utils/amount';
+import { formatDurationToDay } from '@sofa/utils/time';
 import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
+import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { formatTime } from '@/components/TimezoneSelector/store';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
@@ -27,6 +33,7 @@ export interface AutomatorCreatorCardProps {
 export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
   const [t] = useTranslation('AutomatorCreatorCard');
   const navigate = useNavigate();
+  const prices = useIndexPrices((s) => s.prices);
   const isMobileUI = useIsMobileUI();
   const depositCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.info.vaultInfo.depositCcy],
@@ -64,10 +71,8 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
               <div className={styles['runtime']}>
                 <IconCalendar />
                 {props.info.vaultInfo.createTime
-                  ? formatDuration(
+                  ? formatDurationToDay(
                       Date.now() - +props.info.vaultInfo.createTime,
-                      1,
-                      true,
                     )
                   : '-'}
               </div>
@@ -112,7 +117,10 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
         </div>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={+props.info.aumByVaultDepositCcy / +props.info.nav}
+            amount={
+              +props.info.aumBySharesToken ||
+              +props.info.aumByVaultDepositCcy / +props.info.nav
+            }
             ccy={props.info.vaultInfo.depositCcy}
           />
           <span className={styles['unit']}>
@@ -153,8 +161,15 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
         </div>
       </div>
       <div className={styles['item']}>
-        <div className={styles['label']}>
-          {t({ enUS: 'Historical Cumulative PnL', zhCN: '历史累计损益' })}
+        <div className={classNames(styles['label'], styles['underline'])}>
+          <Tooltip
+            content={t({
+              enUS: 'Means the total profit and loss (PnL) accumulated by the Automator, after deducting platform fees and the profit share for the Optivisor, reflecting the actual realized returns for investors and creators.',
+              zhCN: '指 Automator 累积的总利润和亏损（PnL），扣除平台费用和 Optivisor 的利润分成后，反映投资者和主理人的实际实现收益。',
+            })}
+          >
+            {t({ enUS: 'Historical Cumulative PnL', zhCN: '历史累计损益' })}
+          </Tooltip>
         </div>
         <div className={styles['value']}>
           <span
@@ -195,8 +210,15 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
         </div>
       </div>
       <div className={styles['item']}>
-        <div className={styles['label']}>
-          {t({ enUS: 'Historical Cumulative PnL%', zhCN: '历史累计损益%' })}
+        <div className={classNames(styles['label'], styles['underline'])}>
+          <Tooltip
+            content={t({
+              enUS: `Represents the percentage return on investment (ROI) accumulated by the Automator, after deducting platform fees and the profit share for the Optivisor. It reflects the overall performance as a percentage of the initial funds invested.`,
+              zhCN: '表示 Automator 在扣除平台费用和 Optivisor 的利润分成后累积的投资回报率（ROI）。该指标以初始投资资金的百分比形式反映整体表现。',
+            })}
+          >
+            {t({ enUS: 'Historical Cumulative PnL%', zhCN: '历史累计损益%' })}
+          </Tooltip>
         </div>
         <div
           className={styles['value']}
@@ -207,23 +229,42 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
                 : 'var(--color-fall)',
           }}
         >
-          {displayPercentage(props.info.pnlPercentage, 2, true)}
+          {displayPercentage(+props.info.pnlPercentage / 100, 2, true)}
         </div>
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
           {t(
-            { enUS: 'Total Share Profits', zhCN: '总分润' },
+            { enUS: 'Cumulative Profit Share', zhCN: '累计分润' },
             { time: formatTime(props.info.dateTime, 'MMM.DD') },
           )}
         </div>
         <div className={styles['value']}>
           <AmountDisplay
-            amount={props.info.profits}
+            amount={props.info.totalOptivisorProfitByVaultDepositCcy}
             ccy={props.info.vaultInfo.vaultDepositCcy}
           />
           <span className={styles['unit']}>
             {props.info.vaultInfo.vaultDepositCcy}
+          </span>
+          <span className={styles['cvt']}>
+            <span className={styles['separator']}>≈</span>
+            <AmountDisplay
+              amount={cvtAmountsInCcy(
+                [
+                  [
+                    props.info.vaultInfo.vaultDepositCcy,
+                    props.info.totalOptivisorProfitByVaultDepositCcy,
+                  ],
+                ],
+                prices,
+                props.info.vaultInfo.depositCcy,
+              )}
+              ccy={props.info.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {props.info.vaultInfo.depositCcy}
+            </span>
           </span>
         </div>
       </div>

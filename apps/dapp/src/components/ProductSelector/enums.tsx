@@ -36,7 +36,7 @@ export const ProjectTypeRefs = {
     label: (t: TFunction) => t('Earn'),
     desc: (t: TFunction) =>
       t(
-        'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
+        'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve/Avalon, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.',
       ),
     desc1: (t: TFunction) =>
       t({
@@ -115,6 +115,14 @@ export const ProductTypeRefs = {
     label: (t: TFunction) => t('Bull Trend'),
     label1: (t: TFunction) => t({ enUS: 'Go up', zhCN: '上涨' }),
     label2: (t: TFunction) => t({ enUS: 'Buy', zhCN: '买涨' }),
+    label3: (t: TFunction) => (
+      <>
+        <span style={{ color: 'var(--color-rise)' }}>
+          {t({ enUS: 'Buy', zhCN: '买' })}
+        </span>
+        {t({ enUS: 'Smart Trend', zhCN: 'Smart Trend' })}
+      </>
+    ),
     desc: (t: TFunction) =>
       t('Earn Extra Yield on directional market movements'),
     suitableDesc: (t: TFunction) =>
@@ -222,6 +230,14 @@ export const ProductTypeRefs = {
     label: (t: TFunction) => t('Rangebound'),
     label1: (t: TFunction) => t({ enUS: 'Flat', zhCN: '震荡' }),
     label2: (t: TFunction) => t({ enUS: 'Flat', zhCN: '震荡' }),
+    label3: (t: TFunction) => (
+      <>
+        <span style={{ color: 'var(--color-rise)' }}>
+          {t({ enUS: 'Buy', zhCN: '买' })}
+        </span>
+        {t({ enUS: 'Rangebound', zhCN: 'Rangebound' })}
+      </>
+    ),
     desc: (t: TFunction) => t('Win if price always in Range before expiry.'),
     suitableDesc: (t: TFunction) =>
       t(
@@ -318,6 +334,14 @@ export const ProductTypeRefs = {
     label: (t: TFunction) => t('Bear Trend'),
     label1: (t: TFunction) => t({ enUS: 'Go down', zhCN: '下跌' }),
     label2: (t: TFunction) => t({ enUS: 'Sell', zhCN: '买跌' }),
+    label3: (t: TFunction) => (
+      <>
+        <span style={{ color: 'var(--color-)' }}>
+          {t({ enUS: 'Sell', zhCN: '卖' })}
+        </span>
+        {t({ enUS: 'Smart Trend', zhCN: 'Smart Trend' })}
+      </>
+    ),
     desc: (t: TFunction) =>
       t('Earn Extra Yield on directional market movements'),
     suitableDesc: (t: TFunction) =>

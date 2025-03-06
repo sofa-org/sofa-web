@@ -5,7 +5,7 @@ import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
 import { useIsPortrait, useQuery } from '@sofa/utils/hooks';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 
 import Address from '@/components/Address';
 import { MsgDisplay } from '@/components/MsgDisplay';
@@ -14,8 +14,10 @@ import TopTabs from '@/components/TopTabs';
 import { addI18nResources } from '@/locales';
 
 import { useAutomatorStore } from '../automator/store';
+import { AutomatorRiskExposureMap } from '../automator-create/util';
 import { Comp as IconCalendar } from '../automator-mine/assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../automator-mine/assets/icon-people.svg';
+import { Comp as IconRisk } from '../automator-mine/assets/icon-risk.svg';
 
 import {
   CreatorAutomatorSelector,
@@ -36,7 +38,7 @@ const PositionTab = () => {
   const { automator } = useCreatorAutomatorSelector();
   return (
     <span>
-      {t({ enUS: 'Positions', zhCN: '头寸' })}
+      {t({ enUS: 'Positions', zhCN: '头寸&交易历史' })}
       {!!automator?.positionSize && (
         <span className={styles['position-size']}>
           {automator?.positionSize || '1'}
@@ -74,7 +76,7 @@ const $options: {
     content: () => <AutomatorFollowers />,
   },
   {
-    label: (t) => t({ enUS: 'Subscription History', zhCN: '交易记录' }),
+    label: (t) => t({ enUS: 'Subscription History', zhCN: '铸造赎回记录' }),
     value: 'transactions',
     content: () => <AutomatorTransactions />,
   },
@@ -103,9 +105,12 @@ const Index = () => {
     (state) =>
       automator &&
       state.vaultDetails[
-        `${automator.vaultInfo.chainId}-${automator.vaultInfo.vault.toLowerCase()}-`
+        `${
+          automator.vaultInfo.chainId
+        }-${automator.vaultInfo.vault.toLowerCase()}-`
       ],
   );
+
   return (
     <TopTabs
       type="banner-expandable-tab"
@@ -153,16 +158,44 @@ const Index = () => {
               <div className={styles['item']}>
                 <IconCalendar className={styles['label']} />
                 {automator?.vaultInfo.createTime
-                  ? formatDuration(
+                  ? formatDurationToDay(
                       Date.now() - +automator?.vaultInfo.createTime,
-                      1,
-                      true,
                     )
                   : '-'}
               </div>
               <div className={styles['item']}>
                 <IconPeople className={styles['label']} />
                 {automator?.participantNum || '-'}
+              </div>
+              <div className={styles['item']}>
+                <IconRisk className={styles['label']} />
+                {automator &&
+                  (() => {
+                    const ref =
+                      AutomatorRiskExposureMap[
+                        automator.vaultInfo.riskExposure!
+                      ];
+                    return ref ? (
+                      <>
+                        <span
+                          style={{
+                            color: ref?.color || 'inherit',
+                          }}
+                        >
+                          {ref.label} - {ref.desc(t)}
+                        </span>
+                        <span className={styles['risk-desc']}>
+                          {t({
+                            enUS: 'Max Risk Exposure',
+                            zhCN: '最大风险敞口',
+                          })}
+                          : {displayPercentage(ref.value)}
+                        </span>
+                      </>
+                    ) : (
+                      'R-'
+                    );
+                  })()}
               </div>
               <div className={styles['desc']}>
                 <MsgDisplay>

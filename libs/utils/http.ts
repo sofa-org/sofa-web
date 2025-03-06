@@ -17,7 +17,7 @@ export const AuthToken = new UserStorage<string>(
   () =>
     jsonSafeParse(localStorage.getItem('wallet-info'), {
       state: { address: '' },
-    }).state.address,
+    })?.state?.address || '',
 );
 
 // const codeMessage = {

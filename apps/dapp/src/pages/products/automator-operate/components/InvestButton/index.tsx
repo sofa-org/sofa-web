@@ -4,7 +4,7 @@ import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { ProductType, RiskType } from '@sofa/services/contracts';
 import { ProductsService } from '@sofa/services/products';
 
-import { useWalletStore } from '@/components/WalletConnector/store';
+import { calcAvailableBalance } from '@/pages/products/automator-create/util';
 import { useProductsState } from '@/pages/products/automator-store';
 import {
   ProductInvestButton,
@@ -23,8 +23,7 @@ const InvestButton = (
     | 'products'
     | 'quoteInfos'
     | 'mint'
-    | 'insufficientGetBalance'
-    | 'insufficientDeps'
+    | 'isInsufficientBalance'
   > & {
     depositCcy: string;
   },
@@ -42,6 +41,11 @@ const InvestButton = (
     products.map((it) => state.quoteInfos[ProductsService.productKey(it)]),
   );
 
+  const availableBalance = useMemo(
+    () => calcAvailableBalance(automator),
+    [automator],
+  );
+
   return (
     <ProductInvestButton
       products={products}
@@ -52,26 +56,8 @@ const InvestButton = (
         riskType: RiskType.RISKY,
         // for automator, there is no recommended list, so the value of productType doesn't matter
         productType: ProductType.BearSpread,
+        onlyForAutomator: true,
       }}
-      insufficientGetBalance={(depositCcy) => {
-        if (
-          !automator?.vaultInfo?.vaultDepositCcy ||
-          !automator.availableAmountByVaultDepositCcy
-        ) {
-          return 0;
-        }
-        if (
-          automator.vaultInfo.vaultDepositCcy == depositCcy ||
-          `a${depositCcy}` == automator.vaultInfo.vaultDepositCcy
-        ) {
-          return Number(automator.availableAmountByVaultDepositCcy);
-        }
-        return 0;
-      }}
-      insufficientDeps={[
-        automator?.availableAmountByVaultDepositCcy,
-        automator?.vaultInfo.vaultDepositCcy,
-      ]}
       mint={async (cb, data) => {
         const a = getCurrentCreatorAutomator();
         if (!a.automator) {
@@ -84,6 +70,7 @@ const InvestButton = (
           data,
         );
       }}
+      isInsufficientBalance={(amount) => availableBalance < +amount}
       {...props}
     />
   );

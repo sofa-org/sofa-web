@@ -4,7 +4,7 @@ import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
-import { formatDuration } from '@sofa/utils/time';
+import { formatDurationToDay } from '@sofa/utils/time';
 import { useCountDown } from 'ahooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -23,7 +23,7 @@ const useAutomatorRedeemAwaitEl = (props: {
   vault?: AutomatorVaultInfo;
   redemptionInfo:
     | {
-        pendingSharesWithDecimals: number;
+        pendingSharesWithDecimals: string | number;
         createTime: number;
       }
     | undefined;
@@ -109,7 +109,7 @@ const useAutomatorRedeemAwaitEl = (props: {
             {t({ enUS: 'Available For Claim', zhCN: '可领取时间' })}
             {/* {vault?.claimPeriod && (
               <span className={styles['badge']}>
-                {formatDuration(vault.claimPeriod, 1, true)}
+                {formatDurationToDay(vault.claimPeriod)}
               </span>
             )} */}
           </div>
@@ -174,8 +174,7 @@ export const AutomatorRedeemAwait = (props: {
         zhCN: '一旦可赎回，您将有 <span class="highlight">{{duration}}</span> 时间赎回。如未及时赎回，您将需要重新申请赎回。',
       },
       {
-        duration:
-          vault?.claimPeriod && formatDuration(vault?.claimPeriod, 1, true),
+        duration: vault?.claimPeriod && formatDurationToDay(vault?.claimPeriod),
       },
     ),
   });
@@ -209,7 +208,7 @@ export const AutomatorRedeemAwait = (props: {
           //               zhCN: '一旦取消赎回，您将需要 <span class="highlight">等待 {{duration}}</span> 才能发起新的赎回。您确认取消赎回吗？',
           //             },
           //             {
-          //               duration: formatDuration(vault.redeemWaitPeriod, 1, true),
+          //               duration: formatDurationToDay(vault.redeemWaitPeriod),
           //             },
           //           ),
           //         }}
@@ -236,7 +235,7 @@ export const AutomatorRedeemAwait = (props: {
         {t({ enUS: 'Awaiting Claim', zhCN: '等待赎回' })}
         <>
           <span className={classNames('txt-gradient', styles['duration'])}>
-            {formatDuration(time)}
+            {formatDurationToDay(time)}
           </span>
           <Popover
             content={

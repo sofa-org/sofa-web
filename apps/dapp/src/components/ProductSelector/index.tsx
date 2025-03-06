@@ -88,7 +88,10 @@ export function useProductSelect() {
 
 export function useRiskSelect(project: ProjectType) {
   const defaultVal = useMemo(
-    () => (project === ProjectType.Surge ? RiskType.RISKY : RiskType.PROTECTED),
+    () =>
+      [ProjectType.Surge, ProjectType.Automator].includes(project)
+        ? RiskType.RISKY
+        : RiskType.PROTECTED,
     [project],
   );
   const val = useQuery()['risk-type'];

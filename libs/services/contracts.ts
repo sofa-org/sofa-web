@@ -35,8 +35,20 @@ import { WalletConnect } from './wallet-connect';
 export { ProductType, RiskType, TransactionStatus };
 export type { VaultInfo };
 
+export class InvalidVaultError extends Error {
+  constructor() {
+    super('InvalidVaultError');
+  }
+}
+
 export class ContractsService {
-  static vaults = [...earnVaults, ...surgeVaults];
+  static vaults = [...earnVaults, ...surgeVaults].map((it) => ({
+    ...it,
+    tradeDisable: it.tradeDisable || undefined,
+    onlyForAutomator: it.onlyForAutomator || undefined,
+    interestType: it.interestType || undefined,
+    earlyClaimable: it.earlyClaimable || undefined,
+  }));
   static AutomatorVaults = AutomatorVaults;
 
   static rchAddress() {
@@ -66,7 +78,7 @@ export class ContractsService {
         it.vault.toLowerCase() === vault.toLowerCase() &&
         it.chainId === chainId,
     );
-    if (!vaultInfo) throw new Error('Invalid vault');
+    if (!vaultInfo) throw new InvalidVaultError();
     return vaultInfo;
   }
 

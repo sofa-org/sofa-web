@@ -11,6 +11,7 @@ import { pick } from 'lodash-es';
 
 import { CommonAbis } from './abis/common-abis';
 import type { AutomatorVaultInfo } from './base-type';
+import { ChainMap } from './chains';
 import { ContractsService, RiskType, TransactionStatus } from './contracts';
 import { ProductQuoteResult, ProductType } from './products';
 import { PositionInfoInGraph } from './the-graph';
@@ -115,7 +116,8 @@ export class WalletService {
       [CommonAbis.symbol],
       provider,
     );
-    const symbol = await collateralContract.symbol();
+    const $symbol = await collateralContract.symbol();
+    const symbol = $symbol === 'USD₮0' ? 'USDT' : $symbol;
     return { symbol, address };
   }
 
@@ -680,13 +682,16 @@ export class WalletService {
       await tokenContract.balanceOf(address),
       decimal,
     );
-    return { [symbol]: Number(balance) };
+    return { [symbol === 'USD₮0' ? 'USDT' : symbol]: Number(balance) };
   }
 
   private static web3NameInstance: ReturnType<typeof createWeb3Name>;
   static async web3name(address: string) {
     WalletService.web3NameInstance =
       WalletService.web3NameInstance || createWeb3Name();
-    return WalletService.web3NameInstance.getDomainName({ address });
+    return WalletService.web3NameInstance.getDomainName({
+      address,
+      queryChainIdList: Object.keys(ChainMap).map(Number),
+    });
   }
 }

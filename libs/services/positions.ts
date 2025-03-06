@@ -1,10 +1,26 @@
-import { safeRun } from '@sofa/utils/fns';
+import { calc_yield } from '@sofa/alg';
+import { isNullLike, safeRun } from '@sofa/utils/fns';
 import { http, pollingUntil } from '@sofa/utils/http';
+import { simplePlus } from '@sofa/utils/object';
 import { UserStorage } from '@sofa/utils/storage';
 
-import { ContractsService, ProductType, TransactionStatus } from './contracts';
+import {
+  ContractsService,
+  ProductType,
+  TransactionStatus,
+  VaultInfo,
+} from './contracts';
 import { TFunction } from './i18n';
-import { CalculatedInfo, ProductInfo, ProductsService } from './products';
+import { MarketService } from './market';
+import {
+  CalculatedInfo,
+  extractFromPPSKey,
+  genPPSKey,
+  PPSKey,
+  PPSValue as PPSValue,
+  ProductInfo,
+  ProductsService,
+} from './products';
 import { RiskType } from './products';
 import { BindTradeInfo, ReferralService } from './referral';
 import {
@@ -71,6 +87,9 @@ export interface OriginPositionInfo extends CalculatedInfo, SettlementInfo {
 
 export interface PositionInfo extends OriginPositionInfo {
   pricesForCalculation: Record<string, number | undefined>;
+
+  // 对于存入之后没有利息的 earn 的 vault（比如 sUSDa 的几个 Earn 合约）来讲，需要计算以底层价值币种来转换数据
+  convertedCalculatedInfoByDepositBaseCcy?: CalculatedInfo;
 }
 
 export interface OriginTransactionInfo
@@ -178,6 +197,52 @@ export class PositionsService {
       );
   }
 
+  static cvtPosition<
+    T extends CalculatedInfo &
+      Pick<OriginPositionInfo, 'product' | 'createdAt'> & { claimed?: boolean },
+  >(
+    it: T,
+    ppsMap?: Record<
+      VaultInfo['depositCcy'],
+      Record<number /* timestamp */ | 'now', number>
+    >,
+  ) {
+    const vault = ContractsService.getVaultInfo(
+      it.product.vault.vault,
+      it.product.vault.chainId,
+    );
+    const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
+      ? (() => {
+          const key = genPPSKey(vault);
+          if (!ppsMap?.[key]) return undefined;
+          const expiry = it.product.expiry * 1000;
+          const hasExpired = Date.now() > expiry;
+          const pps = {
+            atTrade: ppsMap[key][it.createdAt * 1000],
+            afterExpire:
+              ppsMap[key][!it.claimed && hasExpired ? 'now' : expiry],
+          };
+          if (!pps.atTrade || !pps.afterExpire) return undefined;
+          return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
+            vault,
+            it,
+            it.createdAt * 1000,
+            !it.claimed && hasExpired ? Date.now() : expiry,
+            pps,
+          );
+        })()
+      : undefined;
+    return {
+      ...it,
+      vault,
+      pricesForCalculation: it.relevantDollarPrices.reduce(
+        (pre, it) => ({ ...pre, [it.ccy]: it.price }),
+        {},
+      ),
+      convertedCalculatedInfoByDepositBaseCcy,
+    };
+  }
+
   static async history(
     params: {
       chainId: number;
@@ -190,6 +255,7 @@ export class PositionsService {
       concealed?: boolean;
       positiveReturn?: boolean;
       positiveProfit?: boolean;
+      onlyForAutomator?: boolean;
     },
     extra?: PageParams<'cursor', 'createdAt' | 'return'>,
   ): Promise<PageResult<PositionInfo, { hasMore: boolean }, 'cursor'>> {
@@ -217,23 +283,66 @@ export class PositionsService {
       } as PositionParams,
     );
 
+    const list = res.value.map((it) => ({
+      position: it,
+      vault: ContractsService.getVaultInfo(
+        it.product.vault.vault,
+        it.product.vault.chainId,
+      ),
+    }));
+    const timeList = list.reduce(
+      (pre, it) => {
+        const vault = it.vault;
+        // 没有 depositBaseCcy 表示不需要转换，也就不需要历史的 pps
+        if (!vault.depositBaseCcy) return pre;
+        const key = genPPSKey(vault);
+        if (!pre[key]) pre[key] = [];
+        if (!pre[key].includes(it.position.createdAt * 1000))
+          pre[key].push(it.position.createdAt * 1000);
+        return pre;
+      },
+      {} as Record<PPSKey, number /* ms */[]>,
+    );
+
+    const [pps, apyMap] = await Promise.all([
+      Promise.all(
+        Object.entries(timeList).map(async ([k, list]) => [
+          k,
+          await MarketService.getPPS({
+            fromCcy: extractFromPPSKey(k as PPSKey).depositCcy,
+            toCcy: extractFromPPSKey(k as PPSKey).depositBaseCcy,
+            includeNow: true,
+            timeList: list,
+          }),
+        ]),
+      ).then((res) => Object.fromEntries(res) as Record<PPSKey, PPSValue>),
+      MarketService.interestRate(params.chainId),
+    ]);
+
+    const ppsMap = list.reduce((pre, { position, vault }) => {
+      const expiry = position.product.expiry * 1000;
+      const hasExpired = Date.now() > expiry;
+      if (!vault.depositBaseCcy || hasExpired) return pre;
+      const apy = apyMap[vault.depositBaseCcy];
+      if (isNullLike(apy))
+        throw new Error(`Can not find apy of ${vault.depositBaseCcy}`);
+      const key = genPPSKey(vault);
+      if (!pre[key][expiry]) {
+        pre[key][expiry] = simplePlus(
+          pre[key]['now'],
+          calc_yield(apy.apyUsed, pre[key]['now'], Date.now(), expiry),
+        )!;
+      }
+      return pre;
+    }, pps);
+
     return {
       cursor:
         extra?.orderBy === 'return'
           ? undefined
           : res.value[res.value.length - 1]?.createdAt,
       limit,
-      list: res.value.map((it) => ({
-        ...it,
-        vault: ContractsService.getVaultInfo(
-          it.product.vault.vault,
-          it.product.vault.chainId,
-        ),
-        pricesForCalculation: it.relevantDollarPrices.reduce(
-          (pre, it) => ({ ...pre, [it.ccy]: it.price }),
-          {},
-        ),
-      })),
+      list: res.value.map((it) => PositionsService.cvtPosition(it, ppsMap)),
       hasMore: res.value.length >= limit,
     };
   }
@@ -282,17 +391,7 @@ export class PositionsService {
     return {
       cursor: res.value[res.value.length - 1]?.createdAt,
       limit,
-      list: res.value.map((it) => ({
-        ...it,
-        vault: ContractsService.getVaultInfo(
-          it.product.vault.vault,
-          it.product.vault.chainId,
-        ),
-        pricesForCalculation: it.relevantDollarPrices.reduce(
-          (pre, it) => ({ ...pre, [it.ccy]: it.price }),
-          {},
-        ),
-      })),
+      list: res.value.map((it) => PositionsService.cvtPosition(it)),
     };
   }
 
@@ -606,6 +705,7 @@ export class PositionsService {
         riskType: RiskType.RISKY,
         chainId: params.chainId,
         productType: params.productType,
+        onlyForAutomator: false,
       },
       { ...pageParams },
     ).then((res) => res.list.filter((it) => !it.claimParams.maker));
@@ -622,6 +722,7 @@ export class PositionsService {
         riskType: RiskType.RISKY,
         chainId: params.chainId,
         positiveReturn: true,
+        onlyForAutomator: false,
       },
       { ...pageParams, orderBy: 'return' },
     ).then((res) => res.list.filter((it) => !it.claimParams.maker));

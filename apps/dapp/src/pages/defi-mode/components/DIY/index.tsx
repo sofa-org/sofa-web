@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ProductType, RiskType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
+import { ProductsDIYService } from '@sofa/services/products-diy';
 import { displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
@@ -79,24 +80,29 @@ const MarketView = () => {
   const formData = useDIYState((state) => state.formData[chainId]);
   const options = useMemo(() => {
     const options = useDIYState.getVaultOptions({ chainId }, ['productType']);
-    return [
-      ProductType.BullSpread,
-      ProductType.BearSpread,
-      ProductType.DNT,
-    ].map((productType) => ({
-      label: (
-        <>
-          {ProductTypeRefs[productType].icon1}
-          {ProductTypeRefs[productType].label1(t)}
-        </>
-      ),
-      value: productType,
-      disabled: options.every(
-        (it) => it.data.productType !== productType || it.disabled,
-      ),
-      data: { productType },
-    }));
-  }, [chainId, t]);
+    return [ProductType.BullSpread, ProductType.BearSpread, ProductType.DNT]
+      .filter(
+        (productType) =>
+          !ProductsDIYService.getSupportMatrix({
+            ...formData,
+            chainId,
+            productType,
+          }).skipCurrentOptionValue,
+      )
+      .map((productType) => ({
+        label: (
+          <>
+            {ProductTypeRefs[productType].icon1}
+            {ProductTypeRefs[productType].label1(t)}
+          </>
+        ),
+        value: productType,
+        disabled: options.every(
+          (it) => it.data.productType !== productType || it.disabled,
+        ),
+        data: { productType },
+      }));
+  }, [chainId, t, formData?.forCcy]);
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
@@ -252,8 +258,11 @@ const ApyTarget = () => {
     return (log - logMin) / (logMax - logMin);
   }, [formData?.apyTarget, logMax, logMin]);
 
-  const rchApy = useDIYState((state) => state.selectedQuote[0]?.apyInfo?.rch);
+  const selectedQuote = useDIYState((state) => state.selectedQuote[0]);
   const probabilityDesc = useMemo(() => {
+    const rchApy = selectedQuote?.convertedCalculatedInfoByDepositBaseCcy
+      ? selectedQuote.convertedCalculatedInfoByDepositBaseCcy.apyInfo?.rch
+      : selectedQuote?.apyInfo?.rch;
     if (!formData?.apyTarget || !rchApy) return undefined;
     const low = Math.min(min + (max - min) * 0.2, 0.5 + +rchApy);
     const high = Math.min(min + (max - min) * 0.8, 2 + +rchApy);
@@ -271,11 +280,21 @@ const ApyTarget = () => {
       txt: t({ enUS: 'Low likelihood', zhCN: '小概率' }),
       color: '#CD8E8E',
     };
-  }, [formData?.apyTarget, max, min, t, rchApy]);
+  }, [formData?.apyTarget, max, min, t, selectedQuote]);
+
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>
         {t({ enUS: 'APY target', zhCN: '目标年化收益' })}
+        {(selectedQuote?.convertedCalculatedInfoByDepositBaseCcy && (
+          <>
+            {' '}
+            <span className={styles['apy-base-ccy']}>
+              ({selectedQuote.vault.depositBaseCcy})
+            </span>
+          </>
+        )) ||
+          undefined}
       </div>
       <div className={styles['input-wrapper']}>
         <ProgressBar
@@ -415,7 +434,14 @@ export const DIY = () => {
         <MarketView />
         <HowLong />
         <DepositToken />
-        <RiskTolerance />
+        {ProductsDIYService.getSupportMatrix({
+          ...formData,
+          chainId,
+        }).skipOption?.includes('riskType') ? (
+          <></>
+        ) : (
+          <RiskTolerance />
+        )}
         {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>
       <MobileOnly display="block">

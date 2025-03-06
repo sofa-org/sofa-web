@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { DatePicker } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -16,7 +17,7 @@ import {
 } from '@sofa/services/products';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { day8h, displayExpiry, next8h, pre8h } from '@sofa/utils/expiry';
-import { calcVal } from '@sofa/utils/fns';
+import { calcVal, isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
@@ -37,6 +38,7 @@ import CEmpty from '@/components/Empty';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { PayoffChart } from '@/components/Payoff';
+import { usePPSNow } from '@/components/PPS/hooks';
 import { PriceRangeInputEl } from '@/components/PriceRangeInput';
 import {
   ProductTypeSelector,
@@ -169,20 +171,20 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
     (state) => state.interestRate[wallet.chainId]?.[depositCcy],
   );
   useEffect(() => {
-    if (interestRate?.apyUsed)
+    if (!isNullLike(interestRate?.apyUsed))
       updateProduct({ fundingApy: interestRate.apyUsed });
   }, [vault, interestRate?.apyUsed, updateProduct]);
 
-  const protectedApyOptions = useMemo(
-    () =>
-      ProductsService.genProtectedApyList(interestRate?.apyUsed, customDev).map(
-        (value) => ({
-          label: `${displayPercentage(value)} Yield`,
-          value,
-        }),
-      ),
-    [customDev, interestRate?.apyUsed],
-  );
+  const protectedApyOptions = useMemo(() => {
+    const apyList = ProductsService.genProtectedApyList(
+      interestRate?.apyUsed,
+      customDev,
+    );
+    return apyList.map((value) => ({
+      label: `${displayPercentage(value)} Yield`,
+      value,
+    }));
+  }, [customDev, interestRate?.apyUsed]);
   useEffect(() => {
     if (
       protectedApyOptions.length &&
@@ -251,6 +253,17 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
       anchorPrices: product.anchorPrices,
     });
   }, [product]);
+  const [baseCcy, setBaseCcy] = useState<CCY | USDS | undefined>(undefined);
+  useEffect(() => {
+    if (
+      !baseCcy &&
+      product?.vault.depositBaseCcy &&
+      quoteInfo?.convertedCalculatedInfoByDepositBaseCcy
+    ) {
+      setBaseCcy(product.vault.depositBaseCcy);
+    }
+  }, [baseCcy, product, quoteInfo]);
+  const pps = usePPSNow(product?.vault);
 
   return (
     <div
@@ -404,6 +417,20 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                   }
                 />
               </div>
+              {(product?.vault.depositBaseCcy && pps != undefined && (
+                <div className={styles['amount-in-base-ccy']}>
+                  ≈{' '}
+                  {amountFormatter(
+                    isNullLike(product?.depositAmount)
+                      ? undefined
+                      : Number(product?.depositAmount) * pps,
+                    CCYService.ccyConfigs[product.vault.depositBaseCcy]
+                      ?.precision,
+                  )}{' '}
+                  {product?.vault.depositBaseCcy}
+                </div>
+              )) ||
+                undefined}
               <div className={styles['balance']}>
                 <span className={styles['label']}>{t('Wallet Balance')}</span>
                 <span className={styles['value']}>
@@ -455,8 +482,10 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                     atm={prices?.[quoteInfo.vault.forCcy]}
                   />
                   <ProfitsRender
-                    data={{ ...quoteInfo, product: quoteInfo } as never}
+                    data={quoteInfo}
                     style={{ marginBottom: 40 }}
+                    baseCcy={baseCcy}
+                    setBaseCcy={setBaseCcy}
                   />
                   <QuoteExplain
                     riskType={quoteInfo.vault.riskType}
@@ -465,6 +494,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                   <Calculation
                     quote={quoteInfo}
                     className={styles['calculation']}
+                    baseCcy={baseCcy}
                   />
                 </div>
                 <div className={styles['brief']}>

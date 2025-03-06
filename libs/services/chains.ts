@@ -5,6 +5,7 @@ import IconArb from './assets/icon-arb.svg?url';
 import IconBNB from './assets/icon-bnb.webp';
 import IconETH from './assets/icon-eth.svg?url';
 import IconPol from './assets/icon-pol.webp';
+import IconSei from './assets/icon-sei.png';
 import IconSepolia from './assets/icon-sepolia.svg?url';
 import IconSepoliaArb from './assets/icon-sepolia-arb.svg?url';
 
@@ -53,6 +54,7 @@ export const ChainMap: Record<
     hlPriceOracle: Record<'BTC' | 'ETH', string>;
     spotPriceOracle: Record<'BTC' | 'ETH', string>;
     stRCHAddress: string;
+    zRCHAddress: string;
   }
 > = omitBy(
   {
@@ -88,7 +90,8 @@ export const ChainMap: Record<
       bonusAirdropAddress: '0x1e833096089Df3F8E8BF15839683c17Ad7694888',
       feeContractAddress: '0x4140AB4AFc36B93270a9659BD8387660cC6509b5',
       automatorFeeContractAddress: '0x322665298cFa800518D4Ef7919893b59514BA9D1',
-      rchBurnForAutomatorGraphUrl: '', // TODO
+      rchBurnForAutomatorGraphUrl:
+        'https://api.studio.thegraph.com/query/77961/sofa-automator-burner/version/latest',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/ethereum/{address}',
       hlPriceOracle: {
         BTC: '0x088dBBeEC1489c557f8D4fD6146E0590E303d7d9',
@@ -99,6 +102,7 @@ export const ChainMap: Record<
         ETH: '0x6417084B8Df644e1d7E32BE39B54F3a5BbEA645B',
       },
       stRCHAddress: '0x2B9aeA129B85F51A468274e7271434A83c3BB6b4',
+      zRCHAddress: '0x893B33977395642039de1b04A0cC788b4AF0bA08',
     },
     42161: {
       chainId: 42161,
@@ -141,6 +145,7 @@ export const ChainMap: Record<
         ETH: '0xab08fF5dd91636fE556f692825Cadd7bA04A4c97',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     56: {
       chainId: 56,
@@ -184,6 +189,7 @@ export const ChainMap: Record<
         ETH: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     137: {
       chainId: 137,
@@ -228,6 +234,51 @@ export const ChainMap: Record<
         ETH: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
       },
       stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
+    },
+    1329: {
+      chainId: 1329,
+      isTest: false,
+      name: 'Sei',
+      currency: 'SEI',
+      icon: IconSei,
+      explorerUrl: 'https://www.seiscan.app',
+      rpcUrl: 'https://sei.drpc.org',
+      rpcUrlsForAddNetwork: [
+        'https://sei.drpc.org',
+        'wss://evm-ws.sei-apis.com',
+        'wss://sei.drpc.org',
+        'https://evm-rpc.sei-apis.com',
+        'https://node.histori.xyz/sei-mainnet/8ry9f6t9dct1se2hlagxnd9n2a',
+      ],
+      nativeCurrency: {
+        name: 'SEI',
+        symbol: 'SEI', // 2-6 characters long
+        decimals: 18,
+      },
+      vaultGraphUrl: '', // TODO
+      automatorTheGraphUrl: '', // TODO
+      usdtAddress: '', // 只有 defaultChain 有
+      rchAddress: '', // 只有 defaultChain 有
+      rchAirdropAddress: '', // 只有 defaultChain 有
+      rchUniswapAddress: '', // 只有 defaultChain 有
+      rchUniswapVersion: 'v3',
+      bonusAirdropAddress: '', // 只有 defaultChain 有
+      feeContractAddress: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
+      automatorFeeContractAddress: '', // TODO
+      rchBurnForAutomatorGraphUrl: '',
+      uniswapUrl: 'https://app.uniswap.org/explore/tokens/sei/{address}',
+      // TODO
+      hlPriceOracle: {
+        BTC: '',
+        ETH: '',
+      },
+      spotPriceOracle: {
+        BTC: '0x05A60aE5705411EF03f162FeAb8fAbde77fb4597',
+        ETH: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
+      },
+      stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     11155111: {
       chainId: 11155111,
@@ -273,6 +324,7 @@ export const ChainMap: Record<
         ETH: '0x8Daeb7DcB6a1103b7a601017a479B0e5D10402af',
       },
       stRCHAddress: '0x2845aD1636F2273687850108581E8Cf321AAbD6d',
+      zRCHAddress: '', // 只有 defaultChain 有
     },
     421614: {
       chainId: 421614,
@@ -316,6 +368,7 @@ export const ChainMap: Record<
         ETH: '0x097CF0BaC8EeB369e2dbCcf72bCb9e54bC7F5f09',
       },
       stRCHAddress: '',
+      zRCHAddress: '', // 只有 defaultChain 有
     },
   },
   (val) => (Env.isDaily ? !val.isTest : val.isTest),

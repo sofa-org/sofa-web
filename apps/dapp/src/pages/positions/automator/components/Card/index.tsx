@@ -37,7 +37,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
             props.info.vaultInfo.depositCcy,
             props.info.totalPnlByClientDepositCcy,
           ],
-          ['RCH', props.info.rchTotalPnl],
+          ['RCH', props.info.totalRchAmount],
         ],
         prices,
         props.info.vaultInfo.depositCcy,
@@ -45,7 +45,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
     [
       prices,
       props.info.totalPnlByClientDepositCcy,
-      props.info.rchTotalPnl,
+      props.info.totalRchAmount,
       props.info.vaultInfo.depositCcy,
     ],
   );
@@ -73,7 +73,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
       </div>
       <div className={styles['item']}>
         <div className={styles['label']}>
-          {t({ enUS: 'Holding', zhCN: '持仓' })}
+          {t({ enUS: 'Assets', zhCN: '持仓' })}
         </div>
         <div className={styles['value']}>
           <AmountDisplay amount={props.info?.share} />
@@ -111,7 +111,7 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
           </span>
           <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
-            <AmountDisplay amount={props.info.rchTotalPnl} />
+            <AmountDisplay amount={props.info.totalRchAmount} />
             <span
               className={classNames(styles['unit'], styles['icon-airdrop'])}
             >
@@ -140,8 +140,11 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
                   : 'var(--color-fall)',
             }}
           >
-            {Number(props.info.pnlPercentage) >= 0 && '+'}
-            {displayPercentage(Number(props.info.pnlPercentage) / 100)}
+            {displayPercentage(
+              Number(props.info.pnlPercentage) / 100,
+              undefined,
+              true,
+            )}
           </span>
           {/* <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>

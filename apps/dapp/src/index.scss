@@ -10,6 +10,7 @@
 @import "@/styles/rewrite/input";
 @import "@/styles/rewrite/dropdown";
 @import "@/styles/rewrite/spin";
+@import "@/styles/rewrite/tooltip";
 @import "locomotive-scroll/dist/locomotive-scroll.css";
 
 :root {
@@ -37,6 +38,10 @@
     width 0.1s ease,
     height 0.1s ease;
   line-height: calc(1em + 6px);
+}
+
+*:focus-visible {
+  outline: none;
 }
 
 html {
