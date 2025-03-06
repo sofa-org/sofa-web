@@ -51,7 +51,6 @@
 
   background: linear-gradient(270deg, #d98a54 0%, #fffa00 0%, #ffa82e 100%);
   background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -82,6 +81,10 @@
     border-radius: 100px;
     background: linear-gradient(96deg, #50d113 0.36%, #ffe500 100%);
     box-shadow: 0 4px 4px 0 rgb(0 0 0 / 12%);
+
+    &:hover {
+      opacity: 0.65;
+    }
   }
 
   .icon {
@@ -277,7 +280,6 @@
       #ffdec3 -30.43%,
       #e88947 100%
     );
-    background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }

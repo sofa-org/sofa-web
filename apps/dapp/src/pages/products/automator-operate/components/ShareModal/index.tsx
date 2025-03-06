@@ -74,9 +74,17 @@ const AutomatorShareModal = forwardRef<
       Toast.error('Save picture failed');
       return;
     }
-    const url = URL.createObjectURL(blob);
-    downloadLink.setAttribute('href', url);
-    downloadLink.click();
+    try {
+      navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': blob,
+        }),
+      ]);
+    } catch (error) {
+      const url = URL.createObjectURL(blob);
+      downloadLink.setAttribute('href', url);
+      downloadLink.click();
+    }
   });
 
   const { data } = useRequest(() =>
@@ -126,7 +134,16 @@ const AutomatorShareModal = forwardRef<
             <a
               className={classNames(styles['btn'], styles['copy-img'])}
               onClick={() =>
-                copyImage().catch((e) => Toast.error(getErrorMsg(e)))
+                copyImage()
+                  .then(() =>
+                    Toast.success(
+                      t({
+                        enUS: 'Copy successful',
+                        zhCN: '复制成功',
+                      }),
+                    ),
+                  )
+                  .catch((e) => Toast.error(getErrorMsg(e)))
               }
             >
               <span className={styles['icon']} />
@@ -140,7 +157,16 @@ const AutomatorShareModal = forwardRef<
               onClick={(e) => {
                 e.preventDefault();
                 Promise.resolve()
-                  .then(() => copy(shareLink))
+                  .then(() =>
+                    copy(
+                      t(
+                        {
+                          enUS: `Create an Automator to become an investment leader / One-click follow investment to enjoy profit sharing:\n{{shareLink}}`,
+                        },
+                        { shareLink },
+                      ),
+                    ),
+                  )
                   .then(() =>
                     Toast.success(
                       t({
