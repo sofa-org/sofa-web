@@ -251,6 +251,7 @@ const List = (props: {
                     t(
                       {
                         enUS: 'Show [[{{baseCcy}}]] Potential Profits',
+                        zhCN: '显示 [[{{baseCcy}}]] 预计收益',
                       },
                       {
                         baseCcy: e[1][0].vault.depositBaseCcy,
