@@ -29,7 +29,7 @@ export default {
   Earn: 'Earn',
   'Capital Secured Earnings': '安全保障された収益',
   Secured: '安全な',
-  'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.':
+  'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve/Avalon, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.':
     '賢く貯蓄収入の安全性と組み込まれたオプションを組み合わせることで、あなたの元本はAave/Lido/Sofa/Curveなどの信頼できるDeFiプロトコルで安全に収益を生み出し、その収入の一部は上昇オプション構造の資金提供に使用され、追加の利益獲得の機会を提供します。リスクを意識したユーザーに最適です。',
   Leverage: 'レバレッジ',
   Surge: 'Surge',

@@ -27,8 +27,8 @@ export default {
   Earn: 'Earn',
   'Capital Secured Earnings': '安全收益',
   Secured: '安全的',
-  'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.':
-    '透過巧妙結合穩健的儲蓄收入與嵌入式選項，您的本金將在 Aave/Lido/Sofa/Curve 等值得信賴的 DeFi 協議中安全產生收益，同時部分收入將資助向上選項結構，以爭取額外收益。非常適合有風險意識的用戶，想要在最小化下行風險的同時獲得向上收益。',
+  'By smartly combining the safety of savings income with a sprinkle of embedded options, your principal is securely generating yield in trusted DeFi protocols such as Aave/Lido/Sofa/Curve/Avalon, while a portion of that income will be funding upside option structures for a chance at extra gains.  Perfect for the risk conscious user who wants to benefit from upside gains with minimal downside.':
+    '透過巧妙結合穩健的儲蓄收入與嵌入式選項，您的本金將在 Aave/Lido/Sofa/Curve/Avalon 等值得信賴的 DeFi 協議中安全產生收益，同時部分收入將資助向上選項結構，以爭取額外收益。非常適合有風險意識的用戶，想要在最小化下行風險的同時獲得向上收益。',
   Leverage: '槓桿',
   Surge: 'Surge',
   'ApxWinnings Tickets': '近似中獎券',

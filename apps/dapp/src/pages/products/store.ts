@@ -116,7 +116,7 @@ export const useProductsState = Object.assign(
         params.fundingApy === undefined
       )
         return new Error(
-          'Please wait for the yield from Aave/Lido/Sofa/Curve to be successfully retrieved',
+          'Please wait for the yield from Aave/Lido/Sofa/Curve/Avalon to be successfully retrieved',
         );
       return null;
     },

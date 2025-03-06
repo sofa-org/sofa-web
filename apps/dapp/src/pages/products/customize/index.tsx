@@ -180,10 +180,6 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
       interestRate?.apyUsed,
       customDev,
     );
-    if (apyList.length === 1 && apyList[0] === -0.01) {
-      // sUSDa 这类产品的特殊逻辑
-      return [{ label: '1% yield', value: -0.01 }];
-    }
     return apyList.map((value) => ({
       label: `${displayPercentage(value)} Yield`,
       value,
@@ -498,6 +494,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                   <Calculation
                     quote={quoteInfo}
                     className={styles['calculation']}
+                    baseCcy={baseCcy}
                   />
                 </div>
                 <div className={styles['brief']}>

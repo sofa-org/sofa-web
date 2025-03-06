@@ -563,13 +563,16 @@ export class ProductsService {
     expiredAt: number, // ms
     pps: { atTrade: number; afterExpire: number }, // depositCcy 与 depositBaseCcy 的汇率
   ): CalculatedInfo {
+    const total = +data.amounts.counterparty + +data.amounts.own;
     const amounts = {
       counterparty: +data.amounts.counterparty * pps.atTrade,
       own: +data.amounts.own * pps.atTrade,
       premium: +data.amounts.premium * pps.atTrade,
       forRchAirdrop: +data.amounts.forRchAirdrop * pps.atTrade,
       rchAirdrop: data.amounts.rchAirdrop,
-      totalInterest: +data.amounts.totalInterest * pps.afterExpire,
+      totalInterest:
+        (total + +data.amounts.totalInterest) * pps.afterExpire -
+        total * pps.atTrade,
       minRedeemable: +data.amounts.minRedeemable * pps.afterExpire,
       maxRedeemable: +data.amounts.maxRedeemable * pps.afterExpire,
       redeemable: Number(data.amounts.redeemable) * pps.afterExpire,

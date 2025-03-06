@@ -55,8 +55,8 @@ export const RiskDisclosures = () => {
             </p>
             <p className={styles['p']}>
               {t({
-                enUS: `· Earn-based products could see fluctuations in realized yields from external factors, such as changes in Aave/Lido/Sofa/Curve's prevailing interest rates.`,
-                zhCN: '· 基于收益的产品可能因外部因素（如 Aave/Lido/Sofa/Curve 的当前利率变化）导致实际收益波动。',
+                enUS: `· Earn-based products could see fluctuations in realized yields from external factors, such as changes in Aave/Lido/Sofa/Curve/Avalon's prevailing interest rates.`,
+                zhCN: '· 基于收益的产品可能因外部因素（如 Aave/Lido/Sofa/Curve/Avalon 的当前利率变化）导致实际收益波动。',
               })}
             </p>
           </>
@@ -83,8 +83,8 @@ export const RiskDisclosures = () => {
         </p>
         <p className={styles['p']}>
           {t({
-            enUS: '· A short-fall in staking income from Aave/Lido/Sofa/Curve (extreme case = 0%) could cause Earn-based products to return a total payout that is slightly less than the original deposit.',
-            zhCN: '· Aave/Lido/Sofa/Curve 的质押收入不足（极端情况下为 0%）可能导致基于收益的产品的总回报略低于原始存款。',
+            enUS: '· A short-fall in staking income from Aave/Lido/Sofa/Curve/Avalon (extreme case = 0%) could cause Earn-based products to return a total payout that is slightly less than the original deposit.',
+            zhCN: '· Aave/Lido/Sofa/Curve/Avalon 的质押收入不足（极端情况下为 0%）可能导致基于收益的产品的总回报略低于原始存款。',
           })}
         </p>
         <p className={styles['p']} />

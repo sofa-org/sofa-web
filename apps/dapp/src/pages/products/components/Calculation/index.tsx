@@ -45,30 +45,37 @@ export interface CalculationProps extends BaseProps {
     | 'apyInfo'
     | 'oddsInfo'
     | 'feeRate'
+    | 'convertedCalculatedInfoByDepositBaseCcy'
   >;
+  baseCcy?: string;
 }
 
 export const Calculation = (props: CalculationProps) => {
   const [t] = useTranslation('Calculation');
   const { timezone } = useTimezone();
   const z = displayWithFlag(timezone);
-  const { quote } = props;
-  const productRef = ProductTypeRefs[quote.vault.productType];
-  const riskTypeRef = RiskTypeRefs[quote.vault.riskType];
+  const vault = props.quote.vault;
+  const quote =
+    props.baseCcy === vault.depositBaseCcy
+      ? props.quote.convertedCalculatedInfoByDepositBaseCcy!
+      : props.quote;
+  const productRef = ProductTypeRefs[vault.productType];
+  const riskTypeRef = RiskTypeRefs[vault.riskType];
   const leverageInfo = useAsyncMemo(
     () =>
-      ProductsService.vaultLeverageInfo(quote.vault, quote.timestamp * 1000),
-    [quote.vault, quote.timestamp],
+      ProductsService.vaultLeverageInfo(vault, props.quote.timestamp * 1000),
+    [vault, props.quote.timestamp],
   );
+  console.log(1111, quote, props.quote);
   const data = useMemo(
     () =>
-      quote.vault.riskType === RiskType.RISKY
+      vault.riskType === RiskType.RISKY
         ? [
             {
               name: t('Deposit Notional'),
               value: (
                 <>
-                  {+quote.amounts.own} {quote.vault.depositCcy}
+                  {+quote.amounts.own} {props.baseCcy || vault.depositCcy}
                 </>
               ),
               desc: t("User's Deposit Amount"),
@@ -87,17 +94,17 @@ export const Calculation = (props: CalculationProps) => {
               name: t('Execution Time (UTC{{z}})', { z }),
               value: (
                 <>
-                  <Time time={quote.timestamp * 1000} />
+                  <Time time={props.quote.timestamp * 1000} />
                 </>
               ),
               desc: t('Recorded in EpochSeconds'),
             },
-            quote.vault.productType === ProductType.DNT
+            vault.productType === ProductType.DNT
               ? {
                   name: t('Observation Start (UTC{{z}})', { z }),
                   value: (
                     <>
-                      <Time time={next8h(quote.timestamp * 1000)} />
+                      <Time time={next8h(props.quote.timestamp * 1000)} />
                     </>
                   ),
                   desc: t('Recorded in EpochSeconds'),
@@ -107,7 +114,7 @@ export const Calculation = (props: CalculationProps) => {
               name: t('Expiry Time (UTC{{z}})', { z }),
               value: (
                 <>
-                  <Time time={next8h(quote.expiry * 1000)} />
+                  <Time time={next8h(props.quote.expiry * 1000)} />
                 </>
               ),
               desc: t('Recorded in EpochSeconds'),
@@ -118,7 +125,7 @@ export const Calculation = (props: CalculationProps) => {
                 <>
                   {displayTenor(
                     (
-                      ((quote.expiry - quote.timestamp) * 1000) /
+                      ((props.quote.expiry - props.quote.timestamp) * 1000) /
                       MsIntervals.day
                     ).toFixed(2),
                     t,
@@ -133,12 +140,12 @@ export const Calculation = (props: CalculationProps) => {
               value: (
                 <>
                   {amountFormatter(+quote.amounts.premium)}{' '}
-                  {quote.vault.depositCcy}
+                  {props.baseCcy || vault.depositCcy}
                 </>
               ),
               // Premium Amount used for the following calculation.
               desc: t(
-                'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))',
+                'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))',
               ),
               className: styles['gray'],
             },
@@ -147,7 +154,7 @@ export const Calculation = (props: CalculationProps) => {
               value: (
                 <>
                   {amountFormatter(quote.amounts.counterparty)}{' '}
-                  {quote.vault.depositCcy}
+                  {props.baseCcy || vault.depositCcy}
                 </>
               ),
               desc: t('From Market Maker Price'),
@@ -163,7 +170,7 @@ export const Calculation = (props: CalculationProps) => {
                       +quote.amounts.minRedeemable +
                       +quote.amounts.maxSettlementFee,
                   )}{' '}
-                  {quote.vault.depositCcy}
+                  {props.baseCcy || vault.depositCcy}
                 </>
               ),
               desc: t('(MM Collateral + Premium). From Market Maker Price'),
@@ -204,20 +211,20 @@ export const Calculation = (props: CalculationProps) => {
               value: (
                 <>
                   {amountFormatter(+quote.amounts.tradingFee)}{' '}
-                  {quote.vault.depositCcy}
+                  {props.baseCcy || vault.depositCcy}
                 </>
               ),
               desc: t('DepositAmount * Trading Fee Rate'),
               className: styles['gray'],
             },
-            ...(Date.now() > quote.expiry * 1000
+            ...(Date.now() > props.quote.expiry * 1000
               ? [
                   {
                     name: t('Settlement Fee'),
                     value: (
                       <>
                         {amountFormatter(quote.amounts.settlementFee)}{' '}
-                        {quote.vault.depositCcy}
+                        {props.baseCcy || vault.depositCcy}
                       </>
                     ),
                     desc: t('Protocol Settlement Fee'),
@@ -230,7 +237,7 @@ export const Calculation = (props: CalculationProps) => {
                     value: (
                       <>
                         {amountFormatter(+quote.amounts.maxSettlementFee)}{' '}
-                        {quote.vault.depositCcy}
+                        {props.baseCcy || vault.depositCcy}
                       </>
                     ),
                     desc: t('Protocol Upside Fee (Winning Only)'),
@@ -246,7 +253,10 @@ export const Calculation = (props: CalculationProps) => {
             {
               name: t('Estimated RCH Price'),
               value: (
-                <>{amountFormatter(quote.pricesForCalculation['RCH'])} USDT</>
+                <>
+                  {amountFormatter(props.quote.pricesForCalculation['RCH'])}{' '}
+                  USDT
+                </>
               ),
               desc: t('Implied live RCH USDT price'),
               className: styles['highlight'],
@@ -257,7 +267,7 @@ export const Calculation = (props: CalculationProps) => {
                 <>
                   {amountFormatter(
                     +quote.amounts.rchAirdrop *
-                      quote.pricesForCalculation['RCH']!,
+                      props.quote.pricesForCalculation['RCH']!,
                   )}{' '}
                   USDT
                 </>
@@ -266,13 +276,13 @@ export const Calculation = (props: CalculationProps) => {
               className: styles['highlight'],
             },
           ]
-        : quote.vault.riskType === RiskType.LEVERAGE
+        : vault.riskType === RiskType.LEVERAGE
           ? [
               {
                 name: t('User Actual Deposit'),
                 value: (
                   <>
-                    {+quote.amounts.own} {quote.vault.depositCcy}
+                    {+quote.amounts.own} {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t("User's Deposit Amount"),
@@ -291,17 +301,17 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Execution Time (UTC{{z}})', { z }),
                 value: (
                   <>
-                    <Time time={quote.timestamp * 1000} />
+                    <Time time={props.quote.timestamp * 1000} />
                   </>
                 ),
                 desc: t('Recorded in EpochSeconds'),
               },
-              quote.vault.productType === ProductType.DNT
+              vault.productType === ProductType.DNT
                 ? {
                     name: t('Observation Start (UTC{{z}})', { z }),
                     value: (
                       <>
-                        <Time time={next8h(quote.timestamp * 1000)} />
+                        <Time time={next8h(props.quote.timestamp * 1000)} />
                       </>
                     ),
                     desc: t('Recorded in EpochSeconds'),
@@ -311,7 +321,7 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Expiry Time (UTC{{z}})', { z }),
                 value: (
                   <>
-                    <Time time={next8h(quote.expiry * 1000)} />
+                    <Time time={next8h(props.quote.expiry * 1000)} />
                   </>
                 ),
                 desc: t('Recorded in EpochSeconds'),
@@ -322,7 +332,7 @@ export const Calculation = (props: CalculationProps) => {
                   <>
                     {displayTenor(
                       (
-                        ((quote.expiry - quote.timestamp) * 1000) /
+                        ((props.quote.expiry - props.quote.timestamp) * 1000) /
                         MsIntervals.day
                       ).toFixed(2),
                       t,
@@ -370,7 +380,7 @@ export const Calculation = (props: CalculationProps) => {
                     {amountFormatter(
                       +quote.amounts.own - +quote.amounts.borrowCost,
                     )}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: '',
@@ -381,7 +391,7 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.borrow)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: '',
@@ -398,7 +408,7 @@ export const Calculation = (props: CalculationProps) => {
                         (+quote.amounts.borrow * leverageInfo.leverage) /
                           (leverageInfo.leverage - 1),
                       )}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: '',
@@ -409,7 +419,7 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.borrowCost)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: '',
@@ -420,7 +430,7 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(quote.amounts.spreadCost)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t('Fee on Borrowing Cost'),
@@ -432,7 +442,7 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.borrowCost)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t(
@@ -442,7 +452,7 @@ export const Calculation = (props: CalculationProps) => {
               },
               {
                 name: t('Base Yield Amount'),
-                value: <>0 {quote.vault.depositCcy}</>,
+                value: <>0 {props.baseCcy || vault.depositCcy}</>,
                 desc: '',
                 className: styles['gray'],
               },
@@ -452,7 +462,7 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.premium)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t('Premium Amount used for the following calculation.'),
@@ -463,7 +473,7 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(quote.amounts.counterparty)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t('From Market Maker Price'),
@@ -478,7 +488,7 @@ export const Calculation = (props: CalculationProps) => {
                         +quote.amounts.minRedeemable +
                         +quote.amounts.maxSettlementFee,
                     )}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t('(MM Collateral+Premium). From Market Maker Price'),
@@ -486,13 +496,13 @@ export const Calculation = (props: CalculationProps) => {
               },
               {
                 name: t('Trading Fee'),
-                value: <>0 {quote.vault.depositCcy}</>,
+                value: <>0 {props.baseCcy || vault.depositCcy}</>,
                 desc: t('No Trading Fee'),
                 className: styles['gray'],
               },
               {
                 name: t('Settlement Fee'),
-                value: <>0 {quote.vault.depositCcy}</>,
+                value: <>0 {props.baseCcy || vault.depositCcy}</>,
                 desc: t('No Settlement Fee'),
                 className: styles['gray'],
               },
@@ -508,7 +518,10 @@ export const Calculation = (props: CalculationProps) => {
               {
                 name: t('Estimated RCH Price'),
                 value: (
-                  <>{amountFormatter(quote.pricesForCalculation['RCH'])} USDT</>
+                  <>
+                    {amountFormatter(props.quote.pricesForCalculation['RCH'])}{' '}
+                    USDT
+                  </>
                 ),
                 desc: t('Implied live RCH USDT price'),
                 className: styles['highlight'],
@@ -519,7 +532,7 @@ export const Calculation = (props: CalculationProps) => {
                   <>
                     {amountFormatter(
                       +quote.amounts.rchAirdrop *
-                        quote.pricesForCalculation['RCH']!,
+                        props.quote.pricesForCalculation['RCH']!,
                     )}{' '}
                     USDT
                   </>
@@ -570,7 +583,7 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Deposit Notional'),
                 value: (
                   <>
-                    {+quote.amounts.own} {quote.vault.depositCcy}
+                    {+quote.amounts.own} {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t("User's Deposit Amount"),
@@ -589,17 +602,17 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Execution Time (UTC{{z}})', { z }),
                 value: (
                   <>
-                    <Time time={quote.timestamp * 1000} />
+                    <Time time={props.quote.timestamp * 1000} />
                   </>
                 ),
                 desc: t('Recorded in EpochSeconds'),
               },
-              quote.vault.productType === ProductType.DNT
+              vault.productType === ProductType.DNT
                 ? {
                     name: t('Observation Start (UTC{{z}})', { z }),
                     value: (
                       <>
-                        <Time time={next8h(quote.timestamp * 1000)} />
+                        <Time time={next8h(props.quote.timestamp * 1000)} />
                       </>
                     ),
                     desc: t('Recorded in EpochSeconds'),
@@ -609,7 +622,7 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Expiry Time (UTC{{z}})', { z }),
                 value: (
                   <>
-                    <Time time={next8h(quote.expiry * 1000)} />
+                    <Time time={next8h(props.quote.expiry * 1000)} />
                   </>
                 ),
                 desc: t('Recorded in EpochSeconds'),
@@ -620,7 +633,7 @@ export const Calculation = (props: CalculationProps) => {
                   <>
                     {displayTenor(
                       (
-                        ((quote.expiry - quote.timestamp) * 1000) /
+                        ((props.quote.expiry - props.quote.timestamp) * 1000) /
                         MsIntervals.day
                       ).toFixed(2),
                       t,
@@ -630,14 +643,14 @@ export const Calculation = (props: CalculationProps) => {
                 desc: t('Expiry Time - Execution Time (in EpochSeconds)'),
               },
               {
-                name: t('Estimated Aave/Lido/Sofa/Curve Yield'),
+                name: t('Estimated Aave/Lido/Sofa/Curve/Avalon Yield'),
                 value: <>{displayPercentage(quote.apyInfo?.interest)}</>,
                 desc: t(
-                  'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
+                  'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)',
                 ),
               },
               {
-                name: t('Estimated Aave/Lido/Sofa/Curve Return'),
+                name: t('Estimated Aave/Lido/Sofa/Curve/Avalon Return'),
                 value: (
                   <>
                     {amountFormatter(
@@ -646,18 +659,18 @@ export const Calculation = (props: CalculationProps) => {
                         +quote.amounts.own,
                       4,
                     )}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t(
-                  '(Deposit * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Deposit)',
+                  '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)',
                 ),
               },
               {
                 name: t('Earn | Base Yield(APY)'),
                 value: <>{displayPercentage(quote.apyInfo?.min)}</>,
                 desc: t(
-                  "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve return is equal to current estimate",
+                  "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate",
                 ),
               },
               {
@@ -671,7 +684,7 @@ export const Calculation = (props: CalculationProps) => {
                       ),
                       4,
                     )}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t('(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)'),
@@ -682,12 +695,12 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.premium)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 // Premium Amount used for the following calculation.
                 desc: t(
-                  'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve Return) * Deposit Amount / (1 + Trading Fee Rate))',
+                  'Premium Amount to purchase options that can ensure Base Yield even after fee deduction. <br/>((Estimated Aave/Lido/Sofa/Curve/Avalon Return - Earn|Base Return) / (Deposit Amount + Estimated Aave/Lido/Sofa/Curve/Avalon Return) * Deposit Amount / (1 + Trading Fee Rate))',
                 ),
                 className: styles['gray'],
               },
@@ -696,7 +709,7 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(quote.amounts.counterparty)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t('From Market Maker Price'),
@@ -712,11 +725,11 @@ export const Calculation = (props: CalculationProps) => {
                         +quote.amounts.minRedeemable +
                         +quote.amounts.maxSettlementFee,
                     )}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t(
-                  '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365) - 1). From Market Maker Price',
+                  '(MM Collateral + Premium) * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365) - 1). From Market Maker Price',
                 ),
                 className: styles['gray'],
               },
@@ -763,22 +776,22 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.tradingFee)}{' '}
-                    {quote.vault.depositCcy}
+                    {props.baseCcy || vault.depositCcy}
                   </>
                 ),
                 desc: t(
-                  'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve interest rate) ^ (Tenor / 365)-1)',
+                  'Premium * Trading Fee Rate * ((1 + Aave/Lido/Sofa/Curve/Avalon interest rate) ^ (Tenor / 365)-1)',
                 ),
                 className: styles['gray'],
               },
-              ...(Date.now() > quote.expiry * 1000
+              ...(Date.now() > props.quote.expiry * 1000
                 ? [
                     {
                       name: t('Estimated Settlement Fee'),
                       value: (
                         <>
                           {amountFormatter(quote.amounts.settlementFee)}{' '}
-                          {quote.vault.depositCcy}
+                          {props.baseCcy || vault.depositCcy}
                         </>
                       ),
                       desc: t('Protocol Settlement Fee'),
@@ -791,7 +804,7 @@ export const Calculation = (props: CalculationProps) => {
                       value: (
                         <>
                           {amountFormatter(quote.amounts.settlementFee)}{' '}
-                          {quote.vault.depositCcy}
+                          {props.baseCcy || vault.depositCcy}
                         </>
                       ),
                       desc: t('Protocol Upside Fee (Winning Only)'),
@@ -809,7 +822,10 @@ export const Calculation = (props: CalculationProps) => {
               {
                 name: t('Estimated RCH Price'),
                 value: (
-                  <>{amountFormatter(quote.pricesForCalculation['RCH'])} USDT</>
+                  <>
+                    {amountFormatter(props.quote.pricesForCalculation['RCH'])}{' '}
+                    USDT
+                  </>
                 ),
                 desc: t('Implied live RCH USDT price'),
                 className: styles['highlight'],
@@ -820,7 +836,7 @@ export const Calculation = (props: CalculationProps) => {
                   <>
                     {amountFormatter(
                       +quote.amounts.rchAirdrop *
-                        quote.pricesForCalculation['RCH']!,
+                        props.quote.pricesForCalculation['RCH']!,
                     )}{' '}
                     USDT
                   </>
@@ -866,13 +882,15 @@ export const Calculation = (props: CalculationProps) => {
                 className: styles['highlight-1'],
               },
             ],
-    [quote, t, productRef, riskTypeRef, z, leverageInfo],
+    [quote, t, productRef, riskTypeRef, z, leverageInfo, vault],
   );
 
   const [visible, setVisible] = useState(false);
   const size = useSize(document.body);
   const windowWidth = size?.width || window.innerWidth;
   const useTable = windowWidth - 24 > 1000;
+
+  if (!quote) return <></>;
 
   return (
     <>

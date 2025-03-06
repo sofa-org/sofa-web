@@ -400,7 +400,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             />
                             <span className={styles['desc']}>
                               {t({
-                                enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
+                                enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve/Avalon',
                                 zhCN: '通过Aave/Lido/Sofa/Curve的累积收益',
                               })}
                             </span>
@@ -571,13 +571,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <div className={styles['amount']}>
                             <span className={styles['label']}>
                               {t({
-                                enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
+                                enUS: 'Estimated Aave/Lido/Sofa/Curve/Avalon Yield',
                                 zhCN: '预估Aave/Lido/Sofa/Curve收益',
                               })}
                             </span>
                             <span className={styles['desc']}>
                               {t({
-                                enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
+                                enUS: 'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)',
                                 zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve年化)。 （Aave/Lido/Sofa/Curve年化）',
                               })}
                             </span>
@@ -588,13 +588,13 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <div className={styles['amount']}>
                             <span className={styles['label']}>
                               {t({
-                                enUS: 'Estimated Aave/Lido/Sofa/Curve Interest',
+                                enUS: 'Estimated Aave/Lido/Sofa/Curve/Avalon Interest',
                                 zhCN: '预估Aave/Lido/Sofa/Curve利息',
                               })}
                             </span>
                             <span className={styles['desc']}>
                               {t({
-                                enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Pool Size)',
+                                enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Pool Size)',
                                 zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve年化预估) ^ (期限 / 365) - 池子大小）',
                               })}
                             </span>

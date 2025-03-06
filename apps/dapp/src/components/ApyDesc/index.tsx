@@ -55,7 +55,7 @@ const ApyDesc = (props: ApyDescProps) => {
         </p>
         <p className={styles['tips']}>
           {t(
-            '*Base yield and Potential Yield are subject to the actual Aave/Lido/Sofa/Curve yield',
+            '*Base yield and Potential Yield are subject to the actual Aave/Lido/Sofa/Curve/Avalon yield',
           )}
         </p>
       </Modal>
