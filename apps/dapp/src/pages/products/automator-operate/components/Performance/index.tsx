@@ -296,7 +296,7 @@ const PoolSize = () => {
                         ],
                       ],
                       prices,
-                      automator.vaultInfo.vaultDepositCcy,
+                      automator.vaultInfo.depositCcy,
                     )
               }
               ccy={automator?.vaultInfo?.vaultDepositCcy}
