@@ -101,6 +101,39 @@
   }
 }
 
+.share-btn {
+  @include bold;
+  @include pointer;
+
+  display: inline-block;
+  padding: 2px 16px;
+  border-radius: 100px;
+  background: #000;
+  font-size: 16px;
+  line-height: 36px;
+  margin-left: 16px;
+
+  span {
+    background: $color-main-gradient;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    &::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      background: url("./assets/icon-share.svg") no-repeat center / 100%;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+  }
+
+  &:hover {
+    opacity: 0.65;
+  }
+}
+
 @mixin rewrite {
   .head-title.head-title {
     width: 100%;
@@ -127,6 +160,11 @@
       border-radius: 16px;
       background-color: rgba(#fff, 0.12);
     }
+  }
+
+  .share-btn {
+    // 移动端分享暂时隐蔽-无UI
+    visibility: hidden;
   }
 }
 

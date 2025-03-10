@@ -25,6 +25,9 @@ const AutomatorPositions = React.lazy(
 const AutomatorCreate = React.lazy(
   () => import('@/pages/products/automator-create'),
 );
+const AutomatorSharePage = React.lazy(
+  () => import('@/pages/products/automator-operate/share'),
+);
 
 export const routes: {
   path: string;
@@ -98,5 +101,9 @@ export const routes: {
   {
     path: '/transactions',
     Component: OrderHistory,
+  },
+  {
+    path: '/a',
+    Component: AutomatorSharePage,
   },
 ];

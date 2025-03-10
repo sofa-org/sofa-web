@@ -230,6 +230,31 @@
   }
 }
 
+.share-btn {
+  background: #000 !important;
+  opacity: 1 !important;
+
+  :global(.semi-button-content) > span {
+    background: $color-main-gradient;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    &::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      background: url("../../assets/icon-share.svg") no-repeat center / 100%;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+  }
+
+  &:hover {
+    opacity: 0.65 !important;
+  }
+}
+
 .mobile-ui {
   &.card {
     max-width: unset;
