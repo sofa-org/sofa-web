@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type.ts';
@@ -148,7 +148,9 @@ export function markSelectedMenuItems(
           selected = true;
         }
       }
-      item.active = selected;
+      if (selected) {
+        item.active = true;
+      }
       anySelected = anySelected || selected;
     }
     return anySelected;
@@ -366,6 +368,7 @@ export const CommonHeader = (props: {
   ) => MenuItem[];
   moreIcons?: boolean;
   indexPrices?: boolean;
+  menuSurfix?: React.ReactNode;
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -415,6 +418,7 @@ export const CommonHeader = (props: {
               if (it.hide?.()) return <Fragment key={i} />;
               return <RenderMenu {...it} key={i} />;
             })}
+            {props.menuSurfix}
           </nav>
           <aside className={styles['right']}>
             <LangSelector className={styles['lang-selector']} />
