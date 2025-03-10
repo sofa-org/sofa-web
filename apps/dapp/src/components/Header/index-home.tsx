@@ -391,10 +391,15 @@ export const CommonHeader = (props: {
   return (
     <>
       <header
-        className={classNames(styles['header'], 'header', {
-          [styles['expanded']]: expanded,
-          ['expanded']: expanded,
-        })}
+        className={classNames(
+          styles['header'],
+          'header',
+          `header-pathname-${location.pathname.replace(/\W+/g, '-').replace(/^-+|-+$/, '')}`,
+          {
+            [styles['expanded']]: expanded,
+            ['expanded']: expanded,
+          },
+        )}
         id="header"
         style={{
           visibility: isMobile && headerHidden ? 'hidden' : undefined,

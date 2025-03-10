@@ -402,6 +402,16 @@
   }
 }
 
+:global(.header-pathname-a) {
+  .wallet {
+    display: none;
+  }
+
+  .index-prices {
+    display: none;
+  }
+}
+
 @media (orientation: portrait) {
   :global {
     .is-mobile {

@@ -26,6 +26,7 @@
   position: absolute;
   top: 40px;
   right: 0;
+  border: unset;
 
   &::before {
     content: "";
@@ -34,6 +35,9 @@
     display: inline-block;
     background: url("./assets/icon-download.svg") no-repeat center / 100%;
     vertical-align: middle;
+  }
+  &:hover {
+    opacity: 0.65;
   }
 }
 
@@ -323,11 +327,7 @@
     font-size: 16px;
     opacity: 0.45;
     border-radius: 4px;
-    background: linear-gradient(
-        0deg,
-        rgb(0 0 0 / 6%) 0%,
-        rgb(0 0 0 / 6%) 100%
-      ),
+    background: linear-gradient(0deg, rgb(0 0 0 / 6%) 0%, rgb(0 0 0 / 6%) 100%),
       #fff;
   }
 
