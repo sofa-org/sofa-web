@@ -1,13 +1,18 @@
 import { useMemo } from 'react';
+import { Radio, RadioGroup } from '@douyinfe/semi-ui';
 import { SelectProps } from '@douyinfe/semi-ui/lib/es/select';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
+import { PositionInfo } from '@sofa/services/positions';
+import { CalculatedInfo, ProductQuoteResult } from '@sofa/services/products';
 import { updateQuery } from '@sofa/utils/history';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
-import { unionBy } from 'lodash-es';
+import { isEqual, unionBy } from 'lodash-es';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import { CSelect } from '../CSelect';
 import {
@@ -33,8 +38,8 @@ export interface DepositCCYSelectorProps
 
 export function useForCcySelect() {
   const query = useQuery();
-  const setForCcy = useLazyCallback(
-    (v: VaultInfo['forCcy']) => updateQuery?.({ 'for-ccy': v }),
+  const setForCcy = useLazyCallback((v: VaultInfo['forCcy']) =>
+    updateQuery?.({ 'for-ccy': v }),
   );
   return [
     (query['for-ccy'] as VaultInfo['forCcy']) || 'WETH',
@@ -48,8 +53,8 @@ export function useDepositCcySelect() {
   const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const chainId = useWalletStore((state) => state.chainId);
-  const setDepositCcy = useLazyCallback(
-    (v: VaultInfo['depositCcy']) => updateQuery?.({ 'deposit-ccy': v }),
+  const setDepositCcy = useLazyCallback((v: VaultInfo['depositCcy']) =>
+    updateQuery?.({ 'deposit-ccy': v }),
   );
   const $ccy = (query['deposit-ccy'] as VaultInfo['depositCcy']) || 'USDT';
   const ccy = useMemo(
@@ -170,4 +175,101 @@ export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
       }}
     />
   );
+};
+
+const useBaseDepositCcyStore = Object.assign(
+  createWithEqualityFn(
+    persist(
+      () => ({
+        baseCcyConfig: {} as Record<
+          `${VaultInfo['chainId']}-${VaultInfo['depositCcy']}`,
+          VaultInfo['depositCcy'] | VaultInfo['depositBaseCcy']
+        >,
+      }),
+      {
+        name: 'baseDepositCcySelector-state-1',
+        storage: createJSONStorage(() => localStorage),
+      },
+    ),
+    isEqual,
+  ),
+  {
+    setBaseCcyConfig(
+      vault: VaultInfo,
+      baseCcy: VaultInfo['depositCcy'] | VaultInfo['depositBaseCcy'],
+    ) {
+      useBaseDepositCcyStore.setState({
+        baseCcyConfig: {
+          ...useBaseDepositCcyStore.getState().baseCcyConfig,
+          [`${vault.chainId}-${vault.depositCcy}`]: baseCcy,
+        },
+      });
+    },
+  },
+);
+
+export const BaseDepositCcySelector = ({
+  vault,
+  className,
+}: {
+  vault: VaultInfo;
+} & Omit<SelectProps, 'value' | 'onChange' | 'children'>) => {
+  const baseCcy = useBaseDepositCcyStore(
+    (s) => s.baseCcyConfig[`${vault.chainId}-${vault.depositCcy}`],
+  );
+  return vault.depositBaseCcy ? (
+    <RadioGroup
+      type="button"
+      buttonSize="small"
+      value={baseCcy === undefined ? vault.depositBaseCcy : baseCcy}
+      className={classNames(styles['base-ccy-select'], className)}
+      onChange={(v) =>
+        useBaseDepositCcyStore.setBaseCcyConfig(vault, v.target.value)
+      }
+    >
+      <Radio value={vault.depositBaseCcy}>{vault.depositBaseCcy}</Radio>
+      <Radio value={vault.depositCcy}>{vault.depositCcy}</Radio>
+    </RadioGroup>
+  ) : undefined;
+};
+
+export const useBaseDepositCcySelector = ({
+  vault,
+  quoteResult,
+  position,
+}: {
+  vault?: VaultInfo;
+  quoteResult?: ProductQuoteResult;
+  position?: Partial<PositionInfo>;
+}): {
+  depositCcy?: string;
+  apyInfo?: CalculatedInfo['apyInfo'];
+  calculatedInfo?: Partial<CalculatedInfo>;
+} => {
+  const useDepositBaseCcy = useBaseDepositCcyStore((s) => {
+    if (!vault?.depositBaseCcy) {
+      return false;
+    } else {
+      const res = s.baseCcyConfig[`${vault.chainId}-${vault.depositCcy}`];
+      if (res === undefined || res === vault.depositBaseCcy) {
+        return true;
+      }
+    }
+    return false;
+  });
+  return useDepositBaseCcy
+    ? {
+        depositCcy: vault?.depositBaseCcy,
+        calculatedInfo:
+          quoteResult?.convertedCalculatedInfoByDepositBaseCcy ||
+          position?.convertedCalculatedInfoByDepositBaseCcy,
+        apyInfo:
+          quoteResult?.convertedCalculatedInfoByDepositBaseCcy?.apyInfo ||
+          position?.convertedCalculatedInfoByDepositBaseCcy?.apyInfo,
+      }
+    : {
+        depositCcy: vault?.depositCcy,
+        calculatedInfo: quoteResult || position,
+        apyInfo: quoteResult?.apyInfo || position?.apyInfo,
+      };
 };
