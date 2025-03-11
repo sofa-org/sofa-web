@@ -8,10 +8,12 @@ import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useRequest } from 'ahooks';
+import classNames from 'classnames';
 import { parse } from 'qs';
 
 import AmountDisplay from '@/components/AmountDisplay';
 import AsyncButton from '@/components/AsyncButton';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { MsgDisplay } from '@/components/MsgDisplay';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { EnvLinks } from '@/env-links';
@@ -75,8 +77,13 @@ const Share = () => {
       refreshDeps: [automatorDetail],
     },
   );
+  const isMobileUI = useIsMobileUI();
   return (
-    <div className={styles['automator-share-page']}>
+    <div
+      className={classNames(styles['automator-share-page'], {
+        [styles['mobile-ui']]: isMobileUI,
+      })}
+    >
       <AsyncButton
         className={styles['btn-deposit']}
         onClick={() => {
