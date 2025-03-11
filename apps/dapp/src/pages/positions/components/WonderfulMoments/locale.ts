@@ -4,6 +4,7 @@ export default {
     Profits: 'Profits',
     'All History': 'All History',
     Deposit: 'Deposit',
+    'all-history.c382ac2f1e75ac3305cb539af499ff44': 'All History',
   },
   'ja-JP': {
     Cost: 'コスト',
@@ -22,6 +23,7 @@ export default {
     Profits: '利润',
     'All History': '全部历史',
     Deposit: '存入',
+    'all-history.c382ac2f1e75ac3305cb539af499ff44': '全部历史',
   },
   'zh-HK': {
     Cost: '成本',

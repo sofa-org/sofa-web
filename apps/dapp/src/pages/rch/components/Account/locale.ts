@@ -12,6 +12,8 @@ export default {
     'rch-game-center.e3ee826e8e7b8b19e9e6b672f4273606': 'RCH Game Center',
     'click-to-join-now-an.5afe1e75a2765e81328ca3be815da28c':
       'Click To Join Now and Win RCH',
+    'claim-all.632b4d074b338844f17fe1c3992af4e6': 'Claim All',
+    'claim-selected.5997fb92ddfe5b1ee23f2303d1c19421': 'Claim Selected',
   },
   'ja-JP': {
     'Contract Address': '契約アドレス',
@@ -53,6 +55,8 @@ export default {
     'Cumulative RCH Airdrops Received': '已收到的累積RCH空投',
     'rch-game-center.e3ee826e8e7b8b19e9e6b672f4273606': 'RCH 游戏中心',
     'click-to-join-now-an.5afe1e75a2765e81328ca3be815da28c': '点击参与赢 RCH',
+    'claim-all.632b4d074b338844f17fe1c3992af4e6': '领取全部',
+    'claim-selected.5997fb92ddfe5b1ee23f2303d1c19421': '领取选中的',
   },
   'zh-HK': {
     'Contract Address': '合約地址',

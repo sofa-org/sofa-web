@@ -10,6 +10,8 @@ export default {
     'Wallet Balance': 'Wallet Balance',
     'Max Profits': 'Max Profits',
     B1: 'B1',
+    'there-are-no-support.f0fd01ea00369366e6f0c6dedde1a0ca':
+      'There are no supported vaults on this chain. Please switch to another chain.',
   },
   'ja-JP': {
     Anchor: 'アンカー',
@@ -46,6 +48,8 @@ export default {
     'Deposit Amount': '存入金额',
     'Wallet Balance': '钱包余额',
     'Max Profits': '最大利润',
+    'there-are-no-support.f0fd01ea00369366e6f0c6dedde1a0ca':
+      '这条链上没有支持的合约，请切换到其它的链',
   },
   'zh-HK': {
     Anchor: '錨點',

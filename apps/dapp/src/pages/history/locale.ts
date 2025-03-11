@@ -17,6 +17,13 @@ export default {
     'In Range': 'In Range',
     Deposit: 'Deposit',
     Settled: 'Settled',
+    'reached-price-before.102bcf7f74399bb381a1df77c21c80b1':
+      'reached ${{price}} before {{time}}',
+    'transaction-history.0c0cbfc1c9c4db0c17b67c0698c8141c':
+      'Transaction History',
+    'automator-trade-hist.34fd5727f36729ba78638471ad2bc5a0':
+      'Automator Trade History',
+    'order-history.775236fedfba67715215f5e7901e4d93': 'Order History',
   },
   'ja-JP': {
     Product: '製品',
@@ -74,6 +81,12 @@ export default {
     'In Range': '在区间内',
     Deposit: '存入',
     Settled: '已结算',
+    'reached-price-before.102bcf7f74399bb381a1df77c21c80b1':
+      '在 {{time}} 之前到达 ${{price}}',
+    'transaction-history.0c0cbfc1c9c4db0c17b67c0698c8141c': '交易历史',
+    'automator-trade-hist.34fd5727f36729ba78638471ad2bc5a0':
+      'Automator 交易历史',
+    'order-history.775236fedfba67715215f5e7901e4d93': '订单历史',
   },
   'zh-HK': {
     Product: '產品',

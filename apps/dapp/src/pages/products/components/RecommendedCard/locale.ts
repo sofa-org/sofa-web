@@ -7,6 +7,7 @@ export default {
     Customize: 'Customize',
     More: 'More',
     Deposit: 'Deposit',
+    'payout.79cc5f1b8074c635343d1f557b13274e': 'Payout',
   },
   'ja-JP': {
     Reference: '参照',
@@ -25,6 +26,7 @@ export default {
     'Per Ticket': '每张票',
     win: '中奖',
     Deposit: '存入',
+    'payout.79cc5f1b8074c635343d1f557b13274e': '赔率',
   },
   'zh-HK': {
     Reference: '參考',

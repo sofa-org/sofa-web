@@ -86,6 +86,7 @@ const AutomatorShareModal = forwardRef<
                   t(
                     {
                       enUS: 'Over [[{{amount}}]] {{crypto}} in funds are sharing the profits',
+                      zhCN: '超过 [[{{amount}}]] {{crypto}} 的资金共享利润',
                     },
                     {
                       amount: amountFormatter(
@@ -134,9 +135,7 @@ const AutomatorShareModal = forwardRef<
               }
             >
               <span className={styles['icon']} />
-              {t({
-                enUS: 'Copy Image',
-              })}
+              {t({ enUS: 'Copy Image', zhCN: '复制图片' })}
             </a>
             <a
               className={classNames(styles['btn'], styles['copy-link'])}
@@ -156,9 +155,7 @@ const AutomatorShareModal = forwardRef<
               }}
             >
               <span className={styles['icon']} />
-              {t({
-                enUS: 'Copy Link',
-              })}
+              {t({ enUS: 'Copy Link', zhCN: '复制链接' })}
             </a>
           </div>
         </>
@@ -315,7 +312,7 @@ const AutomatorShareModal = forwardRef<
                 </div>
                 <div className={styles['deposit-ccy']}>
                   <div className={styles['label']}>
-                    {t({ enUS: 'Followers' })}
+                    {t({ enUS: 'Followers', zhCN: '关注者' })}
                   </div>
                   <div className={styles['value']}>
                     {props.automatorDetail.participantNum || '-'}
@@ -332,9 +329,11 @@ const AutomatorShareModal = forwardRef<
                 {(data && (
                   <>
                     <div className={styles['first-line']}>
-                      <span>{t({ enUS: `Address` })}</span>
-                      <span>{t({ enUS: `Days` })}</span>
-                      <span>{t({ enUS: `APY` })}</span>
+                      <span>{t({ enUS: 'Address', zhCN: '地址' })}</span>
+                      <span>{t({ enUS: 'Days', zhCN: '天' })}</span>
+                      <span>
+                        {t({ enUS: 'APY', zhCN: '年化收益率 (APY)' })}
+                      </span>
                     </div>
                     <div className={styles['value']}>
                       {data.map((row) => (
@@ -346,7 +345,7 @@ const AutomatorShareModal = forwardRef<
                             )}
                           </span>
                           <span className={styles['day']}>
-                            {row.followDay} {t({ enUS: `day` })}
+                            {row.followDay} {t({ enUS: 'day', zhCN: '天' })}
                           </span>
                           <span className={styles['percentage']}>
                             {displayPercentage(

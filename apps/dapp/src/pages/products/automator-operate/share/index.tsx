@@ -234,9 +234,7 @@ const Share = () => {
                     </div>
                     <div className={styles['deposit-ccy']}>
                       <div className={styles['label']}>
-                        {t({
-                          enUS: 'Followers',
-                        })}
+                        {t({ enUS: 'Followers', zhCN: '关注者' })}
                       </div>
                       <div className={styles['value']}>
                         {automatorDetail.participantNum || '-'}
@@ -252,9 +250,11 @@ const Share = () => {
                     {(data && (
                       <>
                         <div className={styles['first-line']}>
-                          <span>{t({ enUS: `Address` })}</span>
-                          <span>{t({ enUS: `Days` })}</span>
-                          <span>{t({ enUS: `APY` })}</span>
+                          <span>{t({ enUS: 'Address', zhCN: '地址' })}</span>
+                          <span>{t({ enUS: 'Days', zhCN: '天' })}</span>
+                          <span>
+                            {t({ enUS: 'APY', zhCN: '年化收益率 (APY)' })}
+                          </span>
                         </div>
                         <div className={styles['value']}>
                           {data.map((row) => (
@@ -266,7 +266,7 @@ const Share = () => {
                                 )}
                               </span>
                               <span className={styles['day']}>
-                                {row.followDay} {t({ enUS: `day` })}
+                                {row.followDay} {t({ enUS: 'day', zhCN: '天' })}
                               </span>
                               <span className={styles['percentage']}>
                                 {displayPercentage(
