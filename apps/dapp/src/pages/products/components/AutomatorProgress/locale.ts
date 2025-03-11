@@ -21,6 +21,11 @@ export default {
     'Balance is no enough!': 'Balance is no enough!',
     Deposit: 'Deposit',
     QuoteIds: 'QuoteIds',
+    Status: 'Status',
+    'Partial Success.  <a href="{{url}}">Go to transaction page</a> to see your successful records':
+      'Partial Success.  <a href="{{url}}">Go to transaction page</a> to see your successful records',
+    'successful-a-href-ur.2ae1a81456074b8cfb6a4696006ca57e':
+      'Successful. <a href="{{url}}">Go to transaction page</a> to see your successful records',
   },
   'ja-JP': {
     'Submitting...': '提出中...',
@@ -76,6 +81,8 @@ export default {
     'Purchase All Tickets': '购买所有票券',
     Deposit: '存入',
     QuoteIds: '报价编号',
+    'successful-a-href-ur.2ae1a81456074b8cfb6a4696006ca57e':
+      '操作成功。<a href="{{url}}">前往</a>查看您的成功记录。',
   },
   'zh-HK': {
     'Submitting...': '正在提交...',

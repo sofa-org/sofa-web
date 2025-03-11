@@ -16,7 +16,8 @@ export function useAutomatorShareInfo(options: {
       shareLink,
       shareText: options.t(
         {
-          enUS: `Create an Automator to become an investment leader / One-click follow investment to enjoy profit sharing:\n{{shareLink}}`,
+          enUS: 'Create an Automator to become an investment leader / One-click follow investment to enjoy profit sharing:\n{{shareLink}}',
+          zhCN: '创建一个Automator成为投资领袖 / 一键跟投享受利润分成：\n{{shareLink}}',
         },
         { shareLink },
       ),
