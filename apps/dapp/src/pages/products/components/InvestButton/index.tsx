@@ -9,7 +9,7 @@ import {
 } from '@sofa/services/positions';
 import {
   ProductQuoteParamsAll,
-  ProductQuoteResultAll,
+  ProductQuoteResult,
   ProductsService,
   RiskType,
 } from '@sofa/services/products';
@@ -105,10 +105,10 @@ export interface ProductInvestButtonProps extends BaseProps {
   >;
   useProductsState: ProductsStateType;
   products: PartialRequired<ProductQuoteParamsAll, 'id' | 'vault'>[];
-  quoteInfos: (ProductQuoteResultAll | undefined)[];
+  quoteInfos: (ProductQuoteResult | undefined)[];
   mint: (
     cb: (progress: TransactionProgress) => void,
-    data: ProductQuoteResultAll[],
+    data: ProductQuoteResult[],
   ) => Promise<void>;
   isInsufficientBalance: (amount: string | number) => boolean;
 }
@@ -116,7 +116,7 @@ export interface ProductInvestButtonProps extends BaseProps {
 function useShouldQuote(
   wallet: { address?: string },
   products: PartialRequired<ProductQuoteParamsAll, 'vault' | 'id'>[],
-  quoteInfos: (ProductQuoteResultAll | undefined)[],
+  quoteInfos: (ProductQuoteResult | undefined)[],
   _useProductsState: ProductsStateType,
 ) {
   // 每三秒触发一次检查，如果性能差可以再放宽些
@@ -275,7 +275,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       progressRef.current?.update(it);
       judgeConsumed(it);
       judgeSuccess(it);
-    }, quoteInfos as ProductQuoteResultAll[]);
+    }, quoteInfos as ProductQuoteResult[]);
   });
 
   if (!vault) return <></>;
@@ -348,10 +348,7 @@ const InvestButton = (
         if (data.length === 1) {
           return PositionsService.deposit(cb, data[0]!);
         }
-        return PositionsService.batchDeposit(
-          cb,
-          data as ProductQuoteResultAll[],
-        );
+        return PositionsService.batchDeposit(cb, data as ProductQuoteResult[]);
       }}
       isInsufficientBalance={(amount) =>
         !vault ||

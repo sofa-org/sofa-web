@@ -14,8 +14,7 @@ import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteParamsDual,
-  ProductQuoteResultAll,
-  ProductQuoteResultDual,
+  ProductQuoteResult,
   ProductsService,
   ProductType,
   RiskType,
@@ -71,7 +70,7 @@ export interface InvestModalPropsRef {
 }
 
 export interface InvestModalProps {
-  product: ProductQuoteResultDual;
+  product: ProductQuoteResult;
 }
 
 export const DualDepositModalContent = (
@@ -156,7 +155,7 @@ export const DualDepositModalContent = (
     $setVaultAddress(v);
   });
 
-  const preDataRef = useRef<ProductQuoteResultAll>();
+  const preDataRef = useRef<ProductQuoteResult>();
   const data = useProductsState((state) => {
     const val =
       product && state.quoteInfos[ProductsService.productKey(product)];
@@ -274,7 +273,11 @@ export const DualDepositModalContent = (
                 onChange={(v) => {
                   return (
                     product &&
-                    useProductsState.updateCart({ ...product, strike: v })
+                    !isNullLike(v) &&
+                    useProductsState.updateCart({
+                      ...product,
+                      anchorPrices: [Number(v)],
+                    })
                   );
                 }}
                 onBlur={() => product && useProductsState.quote(product)}

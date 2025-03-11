@@ -217,17 +217,6 @@ export function extractFromPPSKey(key: PPSKey) {
   };
 }
 
-export interface ProductQuoteResultDual
-  extends ProductInfo,
-    CalculatedInfo,
-    Pick<OriginProductQuoteResult, 'rfqId' | 'quote' | 'timestamp'> {
-  pricesForCalculation: Record<string, number | undefined>;
-  // 双币报价的额外参数
-  strike: number;
-}
-
-export type ProductQuoteResultAll = ProductQuoteResult | ProductQuoteResultDual;
-
 export interface ProductsRecommendRequest {
   productType: ProductType;
   riskType: RiskType;
@@ -264,7 +253,7 @@ export class ProductsService {
   static productKey(
     product?: PartialRequired<ProductQuoteParamsAll, 'vault'> & {
       protectedReturnApy?: number;
-      amounts?: ProductQuoteResultAll['amounts'];
+      amounts?: ProductQuoteResult['amounts'];
       apyInfo?: CalculatedInfo['apyInfo'];
     },
   ) {

@@ -7,7 +7,7 @@ import {
 import { ChainMap } from '@sofa/services/chains';
 import { ContractsService, InvalidVaultError } from '@sofa/services/contracts';
 import { ProductsService } from '@sofa/services/products';
-import { ProductQuoteResultAll } from '@sofa/services/products';
+import { ProductQuoteResult } from '@sofa/services/products';
 import {
   ProductsDIYConfig,
   ProductsDIYService,
@@ -93,7 +93,7 @@ const instant = createWithEqualityFn(
         Partial<DIYFormData> | undefined
       >,
       selectedQuote: [null, 0, 0] as [
-        ProductQuoteResultAll | null,
+        ProductQuoteResult | null,
         number /* index */,
         number /* refresh - count */,
       ],
@@ -229,7 +229,7 @@ export const useDIYState = Object.assign(instant, {
         throw e;
       });
   },
-  updateQuotes: (quotes: ProductQuoteResultAll[]) => {
+  updateQuotes: (quotes: ProductQuoteResult[]) => {
     useProductsState.updateQuotes(quotes, true);
     useDIYState.setState((pre) => ({
       quotes: {
@@ -301,7 +301,7 @@ export const useDIYState = Object.assign(instant, {
     const quotes = keys
       .flatMap((k) => pre.quotes[k]?.keys || [])
       .map((k) => quoteInfos[k])
-      .filter((it) => !!it) as ProductQuoteResultAll[];
+      .filter((it) => !!it) as ProductQuoteResult[];
     const { sortList, index } = (() => {
       if (formData.riskType === RiskType.RISKY) {
         if (!formData.oddsTarget)

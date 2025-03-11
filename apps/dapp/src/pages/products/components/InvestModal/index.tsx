@@ -14,8 +14,7 @@ import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   isCommonQuoteParams,
-  ProductQuoteResultAll,
-  ProductQuoteResultDual,
+  ProductQuoteResult,
   ProductsService,
   ProductType,
   RiskType,
@@ -66,7 +65,7 @@ export interface InvestModalPropsRef {
 }
 
 export interface InvestModalProps {
-  product: ProductQuoteResultAll;
+  product: ProductQuoteResult;
 }
 
 const DepositModalContent = (
@@ -148,7 +147,7 @@ const DepositModalContent = (
     $setVaultAddress(v);
   });
 
-  const preDataRef = useRef<ProductQuoteResultAll>();
+  const preDataRef = useRef<ProductQuoteResult>();
   const data = useProductsState((state) => {
     const val =
       product && state.quoteInfos[ProductsService.productKey(product)];
@@ -404,7 +403,7 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
       >
         {props.product.vault.riskType === RiskType.DUAL ? (
           <DualDepositModalContent
-            product={props.product as ProductQuoteResultDual}
+            product={props.product}
             setVisible={setVisible}
           />
         ) : (
