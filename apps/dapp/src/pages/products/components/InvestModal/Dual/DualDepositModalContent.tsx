@@ -173,12 +173,12 @@ export const DualDepositModalContent = (
 
   const diffPrice = useMemo(() => {
     // TODO
-    const currentPrice = product?.strike;
+    const currentPrice = product?.anchorPrices?.[0];
     if (currentPrice === undefined) {
       return undefined;
     }
     return (Math.random() * 0.2 - 0.1) * Number(currentPrice);
-  }, [product?.strike]);
+  }, [product?.anchorPrices?.[0]]);
   return (
     <>
       <ModalWrapper setVisible={props.setVisible} product={data}>
@@ -239,7 +239,7 @@ export const DualDepositModalContent = (
                 // TODO:
                 // min={vault?.depositMinAmount}
                 // tick={vault?.depositTickAmount}
-                value={product?.strike}
+                value={product?.anchorPrices?.[0]}
                 suffix={
                   <span className={styles['unit-1']}>
                     {formatHighlightedText(
