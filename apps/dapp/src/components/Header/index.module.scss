@@ -141,6 +141,9 @@
   color: rgba($color: #fff, $alpha: 45%);
   font-size: 14px;
   font-weight: 400;
+  border-left: rgba(#fff, 0.24) solid 1px;
+  padding-left: 14px;
+  margin-left: -14px;
 
   .amount {
     @include bold;

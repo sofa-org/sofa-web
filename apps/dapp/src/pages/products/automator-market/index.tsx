@@ -239,7 +239,7 @@ const Index = () => {
                   key={a.vaultInfo.vault.toLowerCase()}
                   info={a}
                   modalController={modalController}
-                  showShareBtn={tab === 'holding'}
+                  showShareBtn={true}
                   onShareClicked={(v) => {
                     setCurrentShareInfo(v);
                     setTimeout(() => {

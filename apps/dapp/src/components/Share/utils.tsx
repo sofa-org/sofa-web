@@ -10,7 +10,7 @@ export function useAutomatorShareInfo(options: {
   t: TFunction;
 }) {
   const r = useMemo(() => {
-    const shareLink = `${location.protocol}//${location.host}/a?v=${options.vault.vault}`;
+    const shareLink = `${location.protocol}//${location.host}/a?v=${options.vault.vault.toLowerCase()}&c=${options.vault.chainId}`;
 
     return {
       shareLink,
