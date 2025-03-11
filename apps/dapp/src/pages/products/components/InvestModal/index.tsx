@@ -13,7 +13,7 @@ import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  isCommonQuoteParams,
+  isDualQuoteParams,
   ProductQuoteResult,
   ProductsService,
   ProductType,
@@ -124,7 +124,8 @@ const DepositModalContent = (
     })!;
     const protectedApy = (() => {
       if (
-        isCommonQuoteParams(product) &&
+        product &&
+        !isDualQuoteParams(product) &&
         $vault.riskType === RiskType.PROTECTED
       ) {
         return product.protectedApy;

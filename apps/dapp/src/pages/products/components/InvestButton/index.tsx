@@ -8,7 +8,7 @@ import {
   TransactionProgress,
 } from '@sofa/services/positions';
 import {
-  ProductQuoteParamsAll,
+  ProductQuoteParams,
   ProductQuoteResult,
   ProductsService,
   RiskType,
@@ -104,7 +104,7 @@ export interface ProductInvestButtonProps extends BaseProps {
     'depositCcy' | 'riskType' | 'productType' | 'onlyForAutomator'
   >;
   useProductsState: ProductsStateType;
-  products: PartialRequired<ProductQuoteParamsAll, 'id' | 'vault'>[];
+  products: PartialRequired<ProductQuoteParams, 'id' | 'vault'>[];
   quoteInfos: (ProductQuoteResult | undefined)[];
   mint: (
     cb: (progress: TransactionProgress) => void,
@@ -115,7 +115,7 @@ export interface ProductInvestButtonProps extends BaseProps {
 
 function useShouldQuote(
   wallet: { address?: string },
-  products: PartialRequired<ProductQuoteParamsAll, 'vault' | 'id'>[],
+  products: PartialRequired<ProductQuoteParams, 'vault' | 'id'>[],
   quoteInfos: (ProductQuoteResult | undefined)[],
   _useProductsState: ProductsStateType,
 ) {

@@ -1,5 +1,5 @@
 import { useTranslation } from '@sofa/services/i18n';
-import { ProductQuoteResultDual, RiskType } from '@sofa/services/products';
+import { ProductQuoteResult, RiskType } from '@sofa/services/products';
 import classNames from 'classnames';
 
 import { useIsMobileUI } from '@/components/MobileOnly';
@@ -9,7 +9,7 @@ import { Comp as ImgContentMobile } from './assets/bg-content-mobile.svg';
 
 import styles from './DualDesc.module.scss';
 export const DualDesc = (
-  product: PartialRequired<ProductQuoteResultDual, 'vault'>,
+  product: PartialRequired<ProductQuoteResult, 'vault'>,
 ) => {
   const [t] = useTranslation('ProductStrategy'); //有问题
   const isMobileUI = useIsMobileUI();

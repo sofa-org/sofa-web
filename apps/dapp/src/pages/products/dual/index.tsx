@@ -2,11 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ProductType, ProjectType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import {
-  ProductQuoteResult,
-  ProductQuoteResultDual,
-  ProductsService,
-} from '@sofa/services/products';
+import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
 import { dualVaults } from '@sofa/services/vaults/dual';
 import { displayPercentage } from '@sofa/utils/amount';
 import { currQuery } from '@sofa/utils/history';
@@ -76,9 +72,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
   const [customPrice, setCustomPrice] = useState(defaultInput.price);
   const [customExpiry, setCustomExpiry] = useState(defaultInput.expiry);
   const investModalRef = useRef<InvestModalPropsRef>(null);
-  const [quote, setQuote] = useState<ProductQuoteResultDual | undefined>(
-    undefined,
-  );
+  const [quote, setQuote] = useState<ProductQuoteResult | undefined>(undefined);
   useEffect(() => {
     if (quote) {
       // TODO: mobile ui

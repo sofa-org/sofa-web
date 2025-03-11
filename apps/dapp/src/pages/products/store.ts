@@ -1,5 +1,4 @@
 import {
-  isCommonQuoteParams,
   isDualQuoteParams,
   ProductQuoteParams,
   ProductQuoteResult,
@@ -114,7 +113,8 @@ export const useProductsState = Object.assign(
       const vault = params.vault;
       if (!vault) return new Error('Please switch deposit currency');
       if (isDualQuoteParams(params)) {
-        if (!params.strike) return new Error('Please input the price');
+        if (!params?.anchorPrices?.[0])
+          return new Error('Please input the price');
       }
       if (
         vault.riskType === RiskType.PROTECTED &&

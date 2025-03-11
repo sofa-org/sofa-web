@@ -5,9 +5,8 @@ import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  isCommonQuoteParams,
+  isDualQuoteParams,
   ProductQuoteResult,
-  ProductQuoteResultDual,
   ProductsService,
   RiskType,
   VaultInfo,
@@ -221,7 +220,7 @@ export async function handleRecommendCardClick(
       if (!product) {
         const emptyId = currProducts?.find(
           ($it) =>
-            isCommonQuoteParams($it) &&
+            !isDualQuoteParams($it) &&
             !$it.anchorPrices?.every(Boolean) &&
             !$it.expiry,
         )?.id;
@@ -262,7 +261,7 @@ export async function handleRecommendCardClick(
         ...(vault.riskType === RiskType.DUAL
           ? {
               expiry: it.expiry,
-              strike: (it as ProductQuoteResultDual).strike,
+              strike: (it as ProductQuoteResult).anchorPrices?.[0],
             }
           : undefined),
         expanded: 1,

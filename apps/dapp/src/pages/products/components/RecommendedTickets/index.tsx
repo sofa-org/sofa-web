@@ -3,7 +3,7 @@ import { Spin } from '@douyinfe/semi-ui';
 import { VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  isCommonQuoteParams,
+  isDualQuoteParams,
   ProductQuoteParams,
   ProductQuoteResult,
   ProductsService,
@@ -134,7 +134,7 @@ const RecommendedTickets = (props: TicketsProps) => {
                     ];
                   const $id = currProducts?.find(
                     (it) =>
-                      isCommonQuoteParams(it) &&
+                      !isDualQuoteParams(it) &&
                       !it.anchorPrices?.every(Boolean) &&
                       !it.expiry,
                   )?.id;

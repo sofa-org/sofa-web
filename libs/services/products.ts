@@ -46,19 +46,6 @@ export interface OriginProductQuoteParams {
   takerWallet?: string; // 询价方钱包公共地址信息
 }
 
-export interface OriginProductQuoteParamsDual {
-  vault: string; // 合约信息
-  chainId: number; // int 链 ID
-  expiry: number; // 到期日对应的秒级时间戳，例如 1672387200
-  strike: string | number; // 价格
-  depositAmount: string | number; // rfq申购金额
-  takerWallet?: string; // 询价方钱包公共地址信息
-}
-
-export type OriginProductQuoteParamsAll =
-  | OriginProductQuoteParams
-  | OriginProductQuoteParamsDual;
-
 export interface QuoteInfo {
   quoteId?: string | number;
   anchorPrices: string[]; // 20000000000,30000000000
@@ -154,29 +141,8 @@ export type ProductQuoteParams = Omit<
   anchorPrices: (string | number)[];
 };
 
-export type ProductQuoteParamsDual = Omit<
-  OriginProductQuoteParamsDual,
-  'vault' | 'chainId'
-> & {
-  id: string; // UI 交互层生成的，用于标识产品
-  vault: VaultInfo;
-};
-export type ProductQuoteParamsAll = ProductQuoteParams | ProductQuoteParamsDual;
-export function isDualQuoteParams<T extends Partial<ProductQuoteParamsAll>>(
-  params?: T,
-): params is T & ProductQuoteParamsDual {
+export function isDualQuoteParams(params?: Partial<ProductQuoteParams>) {
   return params?.vault?.riskType === RiskType.DUAL;
-}
-export function isCommonQuoteParams<T extends Partial<ProductQuoteParamsAll>>(
-  params?: T,
-): params is T & ProductQuoteParams {
-  return (
-    (params?.vault?.riskType &&
-      [RiskType.LEVERAGE, RiskType.PROTECTED, RiskType.RISKY].includes(
-        params.vault.riskType,
-      )) ||
-    false
-  );
 }
 export interface ProductInfo {
   vault: VaultInfo; // 合约信息
@@ -228,30 +194,28 @@ export class ProductsService {
   static ccyEqual(ccy1: CCY | USDS, ccy2: CCY | USDS) {
     return ccy1 === ccy2 || `W${ccy1}` === ccy2 || ccy1 === `W${ccy2}`;
   }
-  static readyForQuote(params: Partial<ProductQuoteParamsAll>) {
+  static readyForQuote(params: Partial<ProductQuoteParams>) {
     if (isDualQuoteParams(params)) {
       if (
         !params.depositAmount ||
         !params.expiry ||
-        !params.strike ||
+        !params?.anchorPrices?.[0] ||
         !params.vault
       )
         return false;
       return true;
     }
-    if (isCommonQuoteParams(params)) {
-      if (
-        !params.depositAmount ||
-        !params.expiry ||
-        !params.anchorPrices?.length ||
-        !params.vault
-      )
-        return false;
-    }
+    if (
+      !params.depositAmount ||
+      !params.expiry ||
+      !params.anchorPrices?.length ||
+      !params.vault
+    )
+      return false;
     return true;
   }
   static productKey(
-    product?: PartialRequired<ProductQuoteParamsAll, 'vault'> & {
+    product?: PartialRequired<ProductQuoteParams, 'vault'> & {
       protectedReturnApy?: number;
       amounts?: ProductQuoteResult['amounts'];
       apyInfo?: CalculatedInfo['apyInfo'];
@@ -260,26 +224,23 @@ export class ProductsService {
     if (!product) return '';
     if (isDualQuoteParams(product)) {
       const depositAmount = product.depositAmount || product.amounts?.own;
-      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${(product as ProductQuoteParamsDual).strike}-${depositAmount}`;
+      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${(product as ProductQuoteParams)?.anchorPrices?.[0]}-${depositAmount}`;
     }
-    if (isCommonQuoteParams(product)) {
-      const vault = product.vault?.vault?.toLowerCase();
-      const prices = product.anchorPrices?.map(Number).join('-');
-      const protectedApy =
-        product.vault?.riskType === RiskType.LEVERAGE ||
-        product.vault?.riskType === RiskType.RISKY
-          ? 0
-          : (() => {
-              const v =
-                product.protectedApy ??
-                product.protectedReturnApy ??
-                product.apyInfo?.min;
-              return +(!v ? 0 : Number(v)).toFixed(3);
-            })();
-      const depositAmount = product.depositAmount || product.amounts?.own;
-      return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
-    }
-    throw new Error('not implemented yet');
+    const vault = product.vault?.vault?.toLowerCase();
+    const prices = product.anchorPrices?.map(Number).join('-');
+    const protectedApy =
+      product.vault?.riskType === RiskType.LEVERAGE ||
+      product.vault?.riskType === RiskType.RISKY
+        ? 0
+        : (() => {
+            const v =
+              product.protectedApy ??
+              product.protectedReturnApy ??
+              product.apyInfo?.min;
+            return +(!v ? 0 : Number(v)).toFixed(3);
+          })();
+    const depositAmount = product.depositAmount || product.amounts?.own;
+    return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
   }
 
   static async dealOriginQuotes(
@@ -500,7 +461,7 @@ export class ProductsService {
       productType: ProductType;
       riskType: RiskType;
     },
-    params: OriginProductQuoteParamsAll,
+    params: OriginProductQuoteParams,
   ) {
     let url: string;
     if (product.riskType == RiskType.DUAL) {
@@ -521,22 +482,7 @@ export class ProductsService {
   @asyncCache({
     until: (_, createdAt) => !createdAt || Date.now() - createdAt >= 30000,
   })
-  static async quote(data: ProductQuoteParamsAll) {
-    if (isDualQuoteParams(data)) {
-      return ProductsService.$quote(
-        {
-          productType: data.vault.productType,
-          riskType: data.vault.riskType,
-        },
-        {
-          ...pick(data, ['expiry', 'depositAmount', 'strike', 'takerWallet']),
-          vault: data.vault.vault,
-          chainId: data.vault.chainId,
-        },
-      )
-        .then((res) => ProductsService.dealOriginQuotes([res.value], undefined))
-        .then((r) => r[0]);
-    }
+  static async quote(data: ProductQuoteParams) {
     if (data.vault.riskType === RiskType.LEVERAGE) {
       delete data.fundingApy;
       delete data.protectedApy;
@@ -556,9 +502,13 @@ export class ProductsService {
         chainId: data.vault.chainId,
         inputApyDefinition: ApyDefinition.AaveLendingAPY,
         lowerBarrier: data.anchorPrices[0],
-        upperBarrier: data.anchorPrices[1],
+        upperBarrier: isDualQuoteParams(data)
+          ? data.anchorPrices[0]
+          : data.anchorPrices[1],
         lowerStrike: data.anchorPrices[0],
-        upperStrike: data.anchorPrices[1],
+        upperStrike: isDualQuoteParams(data)
+          ? data.anchorPrices[0]
+          : data.anchorPrices[1],
       },
     )
       .then((res) =>

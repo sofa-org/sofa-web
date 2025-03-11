@@ -13,7 +13,7 @@ import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  ProductQuoteParamsDual,
+  ProductQuoteParams,
   ProductQuoteResult,
   ProductsService,
   ProductType,
@@ -115,7 +115,7 @@ export const DualDepositModalContent = (
       vault &&
       (state.cart[
         `${vault.vault.toLowerCase()}-${vault.chainId}`
-      ]?.[0] as PartialRequired<ProductQuoteParamsDual, 'id' | 'vault'>),
+      ]?.[0] as PartialRequired<ProductQuoteParams, 'id' | 'vault'>),
   );
 
   const dateRange = useMemo(() => {

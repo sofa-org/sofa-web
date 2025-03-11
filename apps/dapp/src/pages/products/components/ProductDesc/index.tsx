@@ -1,11 +1,7 @@
 import { ReactNode } from 'react';
 import { Tabs } from '@douyinfe/semi-ui';
 import { t } from '@sofa/services/i18n';
-import {
-  ProductQuoteResult,
-  ProductQuoteResultDual,
-  RiskType,
-} from '@sofa/services/products';
+import { ProductQuoteResult, RiskType } from '@sofa/services/products';
 import classNames from 'classnames';
 
 import { ClaimWithdrawDesc } from '../ClaimWithdrawDesc';
@@ -48,7 +44,7 @@ const ProductDesc = (
           {props.product.vault.riskType === RiskType.RISKY ? (
             <OptionTrading {...props.product} />
           ) : props.product.vault.riskType === RiskType.DUAL ? (
-            <DualDesc {...(props.product as ProductQuoteResultDual)} />
+            <DualDesc {...props.product} />
           ) : (
             <YieldTower {...props.product} />
           )}

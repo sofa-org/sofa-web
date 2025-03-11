@@ -3,10 +3,7 @@ import { Table } from '@douyinfe/semi-ui';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
-import {
-  ProductQuoteResultDual,
-  ProductsService,
-} from '@sofa/services/products';
+import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
 import {
   amountFormatter,
   displayPercentage,
@@ -27,7 +24,7 @@ import styles from './RecommendedList.module.scss';
 export const RecommendedList = (props: {
   vault: VaultInfo;
   defaultExpiry?: number;
-  onSelectQuote: (q: ProductQuoteResultDual) => Promise<void>;
+  onSelectQuote: (q: ProductQuoteResult) => Promise<void>;
 }) => {
   const [t] = useTranslation('ProductDual');
 
@@ -47,7 +44,7 @@ export const RecommendedList = (props: {
       .map(
         (it) =>
           (state.quoteInfos[ProductsService.productKey(it)] ||
-            it) as ProductQuoteResultDual,
+            it) as ProductQuoteResult,
       );
   });
   const dates = useMemo(() => {
@@ -199,11 +196,16 @@ export const RecommendedList = (props: {
               render: (_, row) => {
                 const current = prices[props.vault.forCcy];
                 const diff =
-                  current === undefined ? undefined : row.strike - current;
+                  current === undefined || row.anchorPrices?.[0] === undefined
+                    ? undefined
+                    : Number(row.anchorPrices[0]) - current;
                 return (
                   <>
                     <span className={styles['target-price']}>
-                      {amountFormatter(row.strike, domCcyConfig?.precision)}
+                      {amountFormatter(
+                        row.anchorPrices?.[0],
+                        domCcyConfig?.precision,
+                      )}
                     </span>
                     <span className={styles['change-to-current-price']}>
                       {formatHighlightedText(
