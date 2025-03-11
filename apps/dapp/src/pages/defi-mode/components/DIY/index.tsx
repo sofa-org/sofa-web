@@ -187,6 +187,14 @@ const DepositToken = () => {
     () =>
       useDIYState
         .getVaultOptions({ chainId, ...formData }, ['depositCcy'])
+        .filter(
+          (it) =>
+            !ProductsDIYService.getSupportMatrix({
+              ...formData,
+              chainId,
+              depositCcy: it.data.depositCcy,
+            }).skipCurrentOptionValue,
+        )
         .map((it) => ({
           label: (
             <>
@@ -211,6 +219,38 @@ const DepositToken = () => {
           value={formData?.depositCcy}
           onChange={(_, it) => useDIYState.updateVaultOptions(chainId, it.data)}
         />
+      </div>
+    </div>
+  );
+};
+
+const DualOptions = () => {
+  const [t] = useTranslation('DIY');
+  const chainId = useWalletStore((state) => state.chainId);
+  const formData = useDIYState((state) => state.formData[chainId]);
+  const options = [
+    {
+      label: <>{t({ enUS: 'Buy {{crypto}}' }, { crypto: formData?.forCcy })}</>,
+      value: 'buy_crypto',
+    },
+  ];
+  const value = 'buy_crypto';
+  return (
+    <div className={styles['form-item']}>
+      <div className={styles['label']}>
+        {t(
+          { enUS: 'If the market {{direction}}, would you prefer to?' },
+          {
+            direction: ProductTypeRefs[
+              formData?.productType || ProductType.BearSpread
+            ]
+              .label1(t)
+              .toLowerCase(),
+          },
+        )}
+      </div>
+      <div className={styles['input-wrapper']}>
+        <RadioBtnGroup options={options} value={value} />
       </div>
     </div>
   );
@@ -436,6 +476,11 @@ export const DIY = () => {
   const [mobileNextStepBtnClickd, setMobileNextStepBtnClicked] =
     useState(false);
 
+  const supportMatrix = ProductsDIYService.getSupportMatrix({
+    ...formData,
+    chainId,
+  });
+
   return (
     <div className={styles['defi-mode-wrapper']}>
       <div className={styles['left']}>
@@ -443,13 +488,15 @@ export const DIY = () => {
         <MarketView />
         <HowLong />
         <DepositToken />
-        {ProductsDIYService.getSupportMatrix({
-          ...formData,
-          chainId,
-        }).skipOption?.includes('riskType') ? (
+        {supportMatrix.skipOption?.includes('riskType') ? (
           <></>
         ) : (
           <RiskTolerance />
+        )}
+        {supportMatrix.skipOption?.includes('dualOptions') ? (
+          <></>
+        ) : (
+          <DualOptions />
         )}
         {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>

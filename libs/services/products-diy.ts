@@ -77,7 +77,7 @@ export class ProductsDIYService {
 
   static getSupportMatrix(v: Partial<VaultInfo>): {
     skipCurrentOptionValue?: boolean;
-    skipOption?: 'riskType'[];
+    skipOption?: ('riskType' | 'dualOptions')[];
   } {
     const vaults = ProductsService.filterVaults(ContractsService.vaults, {
       chainId: v.chainId,
@@ -86,9 +86,45 @@ export class ProductsDIYService {
     if (vaults.length && vaults.every((v) => v.depositBaseCcy)) {
       return {
         skipCurrentOptionValue: v.productType === ProductType.DNT,
+        skipOption: ['riskType', 'dualOptions'],
+      };
+    }
+    if (vaults.length && vaults.every((v) => v.riskType == RiskType.DUAL)) {
+      // 选双币时，depositCcy 只显示双币的
+      const allPossibleDepositCcys = vaults.reduce(
+        (ccys, v) => ({
+          ...ccys,
+          [v.depositCcy]: true,
+          [v.forCcy]: true,
+        }),
+        {} as Record<string, boolean>,
+      );
+      return {
+        skipCurrentOptionValue:
+          v.productType === ProductType.DNT ||
+          (v.depositCcy && !allPossibleDepositCcys[v.depositCcy]) ||
+          false,
         skipOption: ['riskType'],
       };
     }
-    return {};
+    // 去掉所有双币的 depositCcy
+    const depositCcyOnlyHasDual = vaults.reduce(
+      (ccys, v) => ({
+        ...ccys,
+        [v.depositCcy]:
+          v.riskType !== RiskType.DUAL
+            ? false
+            : ccys[v.depositCcy] === undefined
+              ? true
+              : undefined,
+      }),
+      {} as Record<string, boolean | undefined>,
+    );
+    return {
+      skipCurrentOptionValue: !!(
+        v.depositCcy && depositCcyOnlyHasDual[v.depositCcy] !== false
+      ),
+      skipOption: ['dualOptions'],
+    };
   }
 }
