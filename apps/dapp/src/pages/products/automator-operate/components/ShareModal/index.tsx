@@ -324,13 +324,13 @@ const AutomatorShareModal = forwardRef<
             <div className={styles['automator-follower']}>
               <div className={styles['followers-pnl']}>
                 <div className={styles['label']}>
-                  {t({ enUS: `Followers' PnL`, zhCN: '参与者 PnL' })}
+                  {t({ enUS: `Best performance`, zhCN: '最佳表现' })}
                 </div>
                 {(data && (
                   <>
                     <div className={styles['first-line']}>
                       <span>{t({ enUS: 'Address', zhCN: '地址' })}</span>
-                      <span>{t({ enUS: 'Days', zhCN: '天' })}</span>
+                      <span>{t({ enUS: 'Days', zhCN: '持有时间' })}</span>
                       <span>
                         {t({ enUS: 'APY', zhCN: '年化收益率 (APY)' })}
                       </span>
@@ -345,12 +345,21 @@ const AutomatorShareModal = forwardRef<
                             )}
                           </span>
                           <span className={styles['day']}>
-                            {row.followDay} {t({ enUS: 'day', zhCN: '天' })}
+                            {row.followDay} {t({ enUS: 'days', zhCN: '天' })}
                           </span>
-                          <span className={styles['percentage']}>
+                          <span
+                            className={styles['percentage']}
+                            style={{
+                              color:
+                                Number(row.pnlPercentage) >= 0
+                                  ? 'var(--color-rise)'
+                                  : 'var(--color-fall)',
+                            }}
+                          >
                             {displayPercentage(
                               Number(row.pnlPercentage) / 100,
                               1,
+                              true,
                             )}
                           </span>
                         </div>
