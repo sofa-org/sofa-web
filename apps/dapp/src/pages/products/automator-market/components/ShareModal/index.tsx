@@ -97,7 +97,7 @@ const AutomatorUserShareModal = forwardRef<
                   t(
                     {
                       enUS: 'Over [[{{amount}}]] {{crypto}} in funds are sharing the profits',
-                      zhCN: '超过[[{{amount}}]] {{crypto}}的资金正在共享利润',
+                      zhCN: '和超过 [[{{amount}}]] {{crypto}} 的资金共享利润',
                     },
                     {
                       amount: amountFormatter(
