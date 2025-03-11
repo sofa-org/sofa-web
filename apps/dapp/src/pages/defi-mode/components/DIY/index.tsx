@@ -26,67 +26,6 @@ import { useDIYConfigState, useDIYState } from './store';
 
 import styles from './index.module.scss';
 
-const configDualFormData: (
-  config: boolean,
-  data: Pick<VaultInfo, 'forCcy' | 'domCcy'>,
-  fields?: ('productType' | 'depositCcy')[],
-) => Partial<
-  Pick<
-    VaultInfo,
-    | 'forCcy'
-    | 'domCcy'
-    | 'trackingSource'
-    | 'depositCcy'
-    | 'productType'
-    | 'riskType'
-  >
-> = (config, data, fields) => {
-  const currentForm = {
-    ...useDIYState.getState().formData?.[useWalletStore.getState().chainId],
-    ...data,
-  };
-  if (config) {
-    const res: ReturnType<typeof configDualFormData> = {};
-    if (!fields || fields.includes('productType')) {
-      res.productType =
-        !currentForm?.productType ||
-        ![ProductType.BearSpread, ProductType.BullSpread].includes(
-          currentForm.productType,
-        )
-          ? ProductType.BullSpread
-          : currentForm.productType;
-    }
-    if (!fields || fields.includes('depositCcy')) {
-      res.depositCcy = getDualDepositCcy({
-        ...currentForm,
-        ...res,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
-    }
-    return {
-      ...data,
-      riskType: RiskType.DUAL,
-      ...res,
-    };
-  } else {
-    // unconfig dual
-    if (currentForm?.riskType != RiskType.DUAL) {
-      return {
-        ...data,
-      };
-    }
-    const res = {
-      productType: undefined,
-      depositCcy: undefined,
-    };
-    return {
-      ...data,
-      riskType: undefined,
-      ...(fields ? pick(res, fields) : {}),
-    };
-  }
-};
-
 const BettingOn = () => {
   const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
@@ -137,20 +76,7 @@ const BettingOn = () => {
             formData &&
             `${formData.forCcy}-${formData.domCcy}-${formData.trackingSource}`
           }
-          onChange={(_, it) => {
-            if (it.isDual) {
-              // 目前双币的 forCcy 和其他是互斥的，我们可以认为有双币则不是 Earn/Surge/DNT，也不需要显示风险
-              useDIYState.updateVaultOptions(
-                chainId,
-                configDualFormData(true, it.data),
-              );
-            } else {
-              useDIYState.updateVaultOptions(
-                chainId,
-                configDualFormData(false, it.data),
-              );
-            }
-          }}
+          onChange={(_, it) => useDIYState.updateVaultOptions(chainId, it.data)}
         />
       </div>
     </div>
@@ -195,16 +121,7 @@ const MarketView = () => {
         <RadioBtnGroup
           options={options}
           value={formData?.productType}
-          onChange={(_, it) => {
-            if (formData?.riskType == RiskType.DUAL) {
-              useDIYState.updateVaultOptions(
-                chainId,
-                configDualFormData(true, it.data, ['depositCcy']),
-              );
-              return;
-            }
-            useDIYState.updateVaultOptions(chainId, it.data);
-          }}
+          onChange={(_, it) => useDIYState.updateVaultOptions(chainId, it.data)}
         />
       </div>
     </div>
@@ -292,16 +209,7 @@ const DepositToken = () => {
         <RadioBtnGroup
           options={options}
           value={formData?.depositCcy}
-          onChange={(_, it) => {
-            if (formData?.riskType == RiskType.DUAL) {
-              useDIYState.updateVaultOptions(
-                chainId,
-                configDualFormData(true, it.data, ['productType']),
-              );
-              return;
-            }
-            useDIYState.updateVaultOptions(chainId, it.data);
-          }}
+          onChange={(_, it) => useDIYState.updateVaultOptions(chainId, it.data)}
         />
       </div>
     </div>

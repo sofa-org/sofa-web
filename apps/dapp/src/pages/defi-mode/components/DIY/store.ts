@@ -12,6 +12,7 @@ import {
   ProductsDIYConfig,
   ProductsDIYService,
 } from '@sofa/services/products-diy';
+import { getDualDepositCcy } from '@sofa/services/vaults/dual';
 import { next8h } from '@sofa/utils/expiry';
 import { getNearestItemIndex, isLegalNum } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
@@ -121,7 +122,7 @@ const instant = createWithEqualityFn(
 type AggreatedVault = {
   key: string;
   data: Partial<VaultInfo>;
-  isDual?: 'all' | 'partial';
+  isDual: 'all' | 'partial' | false;
 };
 export const useDIYState = Object.assign(instant, {
   getVaultOptions: (
@@ -148,11 +149,16 @@ export const useDIYState = Object.assign(instant, {
       .reduce((pre, it) => {
         const key = genKey(it);
         const matching = pre.find((it) => it.key === key);
-        if (!matching) pre.push({ key, data: pick(it, fields) });
+        if (!matching)
+          pre.push({
+            key,
+            data: pick(it, fields),
+            isDual: it.riskType == RiskType.DUAL ? 'all' : false,
+          });
         else {
           if (it.riskType == RiskType.DUAL) {
             if (!matching.isDual) {
-              matching.isDual = 'all';
+              matching.isDual = 'partial';
             }
           } else {
             if (matching.isDual === 'all') {
@@ -491,12 +497,62 @@ export const useDIYState = Object.assign(instant, {
       >
     >,
   ) => {
+    const originForm =
+      useDIYState.getState().formData?.[useWalletStore.getState().chainId];
+    const newFormData = {
+      ...formData,
+    };
+    const currentForm = {
+      ...originForm,
+      ...formData,
+    };
+    if (formData.forCcy) {
+      if (
+        ProductsService.filterVaults(
+          ContractsService.vaults,
+          pick(formData, ['forCcy']),
+          false,
+          true,
+        ).every((v) => v.riskType == RiskType.DUAL)
+      ) {
+        // 切换 forCcy 的时候，如果切到只有双币的币种，自动选择其余选项
+        newFormData.productType =
+          !currentForm?.productType ||
+          ![ProductType.BearSpread, ProductType.BullSpread].includes(
+            currentForm.productType,
+          )
+            ? ProductType.BullSpread
+            : currentForm.productType;
+
+        newFormData.depositCcy = getDualDepositCcy({
+          ...currentForm,
+          ...newFormData,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
+        newFormData.riskType = RiskType.DUAL;
+      } else {
+        // 如果切到其他币种，自动取消其他双币的锁定
+        if (originForm?.riskType == RiskType.DUAL) {
+          newFormData.productType = undefined;
+          newFormData.depositCcy = undefined;
+          originForm.riskType = undefined;
+        }
+      }
+    } else if (formData.productType) {
+      if (originForm?.riskType == RiskType.DUAL) {
+        newFormData.depositCcy = getDualDepositCcy({
+          ...currentForm,
+          ...newFormData,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
+      }
+    }
     useDIYState.setState((pre) => {
       if (
         pre.formData[chainId] &&
-        Object.keys(formData).every(
+        Object.keys(newFormData).every(
           (k) =>
-            formData[k as keyof typeof formData] ===
+            newFormData[k as keyof typeof formData] ===
             pre.formData[chainId]![k as keyof typeof formData],
         )
       )
@@ -505,7 +561,7 @@ export const useDIYState = Object.assign(instant, {
         ...pre,
         formData: {
           ...pre.formData,
-          [chainId]: { ...pre.formData[chainId], ...formData },
+          [chainId]: { ...pre.formData[chainId], ...newFormData },
         },
         selectedQuote: [null, 0, 0],
         selectedQuoteProbabilities: undefined,
