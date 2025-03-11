@@ -1,7 +1,8 @@
 import { cvtAmountsInCcy } from '@sofa/utils/amount';
-import { safeRun } from '@sofa/utils/fns';
-import { http } from '@sofa/utils/http';
+import { getErrorMsg, safeRun } from '@sofa/utils/fns';
+import { http, pollingUntil } from '@sofa/utils/http';
 import { ethers } from 'ethers';
+import { uniqBy } from 'lodash-es';
 
 import {
   AutomatorDepositStatus,
@@ -9,10 +10,15 @@ import {
   AutomatorService,
   AutomatorTransaction,
 } from './automator';
+import { AutomatorCreatorService } from './automator-creator';
 import { AutomatorVaultInfo, TransactionStatus } from './base-type';
 import { ContractsService } from './contracts';
 import { MarketService } from './market';
-import { TransactionProgress } from './positions';
+import {
+  PositionInfo,
+  PositionsService,
+  TransactionProgress,
+} from './positions';
 import { PositionStatus } from './the-graph';
 import { WalletService } from './wallet';
 
@@ -117,10 +123,10 @@ export class AutomatorUserService {
   }) {
     const [list, vaults, prices] = await Promise.all([
       http
-        .get<unknown, HttpResponse<OriginAutomatorUserPosition[]>>(
-          `/users/automator/list`,
-          { params },
-        )
+        .get<
+          unknown,
+          HttpResponse<OriginAutomatorUserPosition[]>
+        >(`/users/automator/list`, { params })
         .then((res) => res.value),
       AutomatorService.automatorList({ chainId: params.chainId }),
       MarketService.fetchIndexPx(),
@@ -356,7 +362,7 @@ export class AutomatorUserService {
     return ContractsService.dirtyCall(Automator, 'claimRedemptions', genArgs);
   }
 
-  static claim = AutomatorUserService.progressWrap(
+  private static $$claim = AutomatorUserService.progressWrap(
     AutomatorUserService.$claim,
     {
       before: PositionStatus.CLAIMING,
@@ -364,4 +370,62 @@ export class AutomatorUserService {
       success: PositionStatus.CLAIMED,
     },
   );
+
+  static async claim(
+    cb: (progress: TransactionProgress) => void,
+    vault: AutomatorVaultInfo,
+    toast: { info(msg: string): void },
+  ) {
+    const { provider } = await WalletService.connect(vault.chainId);
+    const chainId = await provider
+      .getNetwork()
+      .then((res) => Number(res.chainId));
+    const positions = await pollingUntil<
+      PromiseVal<ReturnType<typeof PositionsService.history>>
+    >(
+      (_, preRes) =>
+        PositionsService.history(
+          { chainId, owner: vault.vault, claimed: false },
+          { limit: 300, cursor: preRes?.cursor },
+        ),
+      (lastRes) => !lastRes?.hasMore,
+    ).then((resList) =>
+      uniqBy(
+        resList.flatMap((it) => it.list),
+        (it: PositionInfo) =>
+          `${it.id}-${it.product.vault.vault.toLowerCase()}-${it.createdAt}`,
+      ),
+    );
+    const claimablePositions = positions.filter(
+      (it) => Date.now() > it.product.expiry * 1000,
+    );
+    if (claimablePositions.length) {
+      toast.info(
+        'The automator has some trades to settle. Please complete the settlement before claiming you amount',
+      );
+      const data = claimablePositions.map((it) => ({
+        positionId: it.id,
+        vault: it.product.vault.vault,
+        productType: it.product.vault.productType,
+        chainId: it.product.vault.chainId,
+        owner: it.wallet,
+        term: it.claimParams.term,
+        expiry: it.product.expiry,
+        anchorPrices: it.claimParams.anchorPrices,
+        collateralAtRiskPercentage: it.claimParams.collateralAtRiskPercentage,
+        isMaker: it.claimParams.maker,
+        redeemableAmount: it.amounts.redeemable || 0,
+      }));
+      await AutomatorCreatorService.claimPositions(() => {}, vault, data)
+        .then(() =>
+          toast.info(
+            'Settlement successful. Now proceeding to claim your amount.',
+          ),
+        )
+        .catch((err) =>
+          Promise.reject(new Error(`Settlement failed: ${getErrorMsg(err)}`)),
+        );
+    }
+    return AutomatorUserService.$$claim(cb, vault);
+  }
 }

@@ -1,4 +1,5 @@
 import { RefObject, useMemo } from 'react';
+import { Toast } from '@douyinfe/semi-ui';
 import { AutomatorUserService } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
@@ -81,12 +82,16 @@ export const AutomatorClaim = (props: {
         className={classNames(styles['button'], styles['btn-claim'])}
         onClick={async () => {
           if (!vault) return;
-          return AutomatorUserService.claim((it) => {
-            props.progressRef.current?.update(it);
-            if (it.status === 'Success') {
-              props.onSuccess?.();
-            }
-          }, vault);
+          return AutomatorUserService.claim(
+            (it) => {
+              props.progressRef.current?.update(it);
+              if (it.status === 'Success') {
+                props.onSuccess?.();
+              }
+            },
+            vault,
+            Toast,
+          );
         }}
       >
         {t({ enUS: 'Claim', zhCN: '赎回' })}

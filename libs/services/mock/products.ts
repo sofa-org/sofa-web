@@ -4,10 +4,8 @@ import { nanoid } from 'nanoid';
 import { ContractsService } from '../contracts';
 import {
   ApyDefinition,
-  OriginProductQuoteParamsAll,
-  OriginProductQuoteParamsDual,
+  OriginProductQuoteParams,
   OriginProductQuoteResult,
-  ProductQuoteResultAll,
   ProductsRecommendRequest,
   ProductType,
   RiskType,
@@ -22,7 +20,7 @@ function mockProductQuote(
     productType: ProductType;
     riskType: RiskType;
   },
-  params: OriginProductQuoteParamsAll,
+  params: OriginProductQuoteParams,
 ): OriginProductQuoteResult {
   const vault = ContractsService.vaults.find((it) => it.vault == params.vault)!;
   const res: OriginProductQuoteResult = {
@@ -80,11 +78,6 @@ function mockProductQuote(
       max: Math.random() * 10, // 对赌全赢的情况对应的赔率
     },
     relevantDollarPrices: [{ ccy: 'RCH', price: Math.random() * 10 }], // 计算 RCH 年化时的币种价格
-
-    strike:
-      (params as OriginProductQuoteParamsDual).strike === undefined
-        ? undefined
-        : Number((params as OriginProductQuoteParamsDual).strike),
   };
   return res;
 }
@@ -96,7 +89,7 @@ window.mockData.productQuote = ((
     productType: ProductType;
     riskType: RiskType;
   },
-  params: OriginProductQuoteParamsAll,
+  params: OriginProductQuoteParams,
 ) => ({
   code: 0,
   value: mockProductQuote(product, params),

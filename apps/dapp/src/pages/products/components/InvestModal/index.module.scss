@@ -113,6 +113,12 @@
   padding: 0 0 0 2px;
 }
 
+.amount-in-base-ccy {
+  color: rgba(#000, 0.85);
+  font-size: 14px;
+  margin-top: 6px;
+}
+
 .balance {
   @include flex-center;
 

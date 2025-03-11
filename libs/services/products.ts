@@ -1,8 +1,10 @@
-import { getPrecision } from '@sofa/utils/amount';
+import { calc_apy, calc_yield } from '@sofa/alg';
+import { cvtAmountsInUsd, getPrecision } from '@sofa/utils/amount';
 import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
+import { simplePlus } from '@sofa/utils/object';
 import Big from 'big.js';
 import { omit, pick, uniq, uniqBy } from 'lodash-es';
 
@@ -12,6 +14,7 @@ import {
   RiskType,
   VaultInfo,
 } from './contracts';
+import { MarketService } from './market';
 import { WalletService } from './wallet';
 
 export { ProductType };
@@ -197,6 +200,21 @@ export interface ProductQuoteResult
     CalculatedInfo,
     Pick<OriginProductQuoteResult, 'rfqId' | 'quote' | 'timestamp'> {
   pricesForCalculation: Record<string, number | undefined>;
+
+  // 对于存入之后没有利息的 earn 的 vault（比如 sUSDa 的几个 Earn 合约）来讲，需要计算以底层价值币种来转换数据
+  convertedCalculatedInfoByDepositBaseCcy?: CalculatedInfo;
+}
+
+export type PPSKey = `${CCY | USDS}-${CCY | USDS}`;
+export type PPSValue = Record<number /* timestamp */ | 'now', number>;
+export function genPPSKey(v: VaultInfo) {
+  return `${v.depositCcy}-${v.depositBaseCcy}` as PPSKey;
+}
+export function extractFromPPSKey(key: PPSKey) {
+  return {
+    depositCcy: key.split('-')[0] as CCY | USDS,
+    depositBaseCcy: key.split('-')[1] as CCY | USDS,
+  };
 }
 
 export interface ProductQuoteResultDual
@@ -275,11 +293,75 @@ export class ProductsService {
     throw new Error('not implemented yet');
   }
 
-  static dealOriginQuote(
+  static async dealOriginQuotes(
+    quotes: OriginProductQuoteResult[],
+    fixProtectedApy?: string | number,
+  ) {
+    const list = quotes.map((it) => ({
+      quote: it,
+      vault: ContractsService.getVaultInfo(it.vault, it.chainId),
+    }));
+    const depositCcyList = uniq(
+      list.map((it) => (it.vault.depositBaseCcy ? genPPSKey(it.vault) : false)),
+    ).filter(Boolean) as PPSKey[];
+    const expiryList = uniq(list.map((it) => it.quote.expiry * 1000));
+    const [ppsMapAtNow, apyMap] = await Promise.all([
+      Promise.all(
+        depositCcyList.map((c) =>
+          MarketService.getPPS({
+            fromCcy: extractFromPPSKey(c).depositCcy,
+            toCcy: extractFromPPSKey(c).depositBaseCcy,
+            includeNow: true,
+            timeList: expiryList,
+          }).then((prices) => [c, prices] as const),
+        ),
+      ).then((res) => Object.fromEntries(res)),
+      MarketService.interestRate(quotes[0].chainId),
+    ]);
+    const ppsMap = list.reduce((pre, it) => {
+      const expiry = it.quote.expiry * 1000;
+      if (!it.vault.depositBaseCcy) return pre;
+      const apy = apyMap[it.vault.depositBaseCcy];
+      if (isNullLike(apy))
+        throw new Error(`Can not find apy of ${it.vault.depositBaseCcy}`);
+      const key = genPPSKey(it.vault);
+      if (!pre[key][expiry]) {
+        pre[key][expiry] = simplePlus(
+          pre[key]['now'],
+          calc_yield(apy.apyUsed, pre[key]['now'], Date.now(), expiry),
+        )!;
+      }
+      return pre;
+    }, ppsMapAtNow);
+    return list.map((it) =>
+      ProductsService.$dealOriginQuote(it.quote, fixProtectedApy, ppsMap),
+    );
+  }
+
+  static $dealOriginQuote(
     it: OriginProductQuoteResult,
     fixProtectedApy?: string | number,
-  ): ProductQuoteResultAll {
+    ppsMap?: Record<PPSKey, PPSValue>,
+  ): ProductQuoteResult {
     const vault = ContractsService.getVaultInfo(it.vault, it.chainId);
+    const convertedCalculatedInfoByDepositBaseCcy = vault.depositBaseCcy
+      ? (() => {
+          const key = genPPSKey(vault);
+          if (!ppsMap?.[key]) return undefined;
+          const pps = {
+            atTrade: ppsMap[key]['now'],
+            afterExpire: ppsMap[key][it.expiry * 1000],
+          };
+          if (!pps.atTrade || !pps.afterExpire) return undefined;
+          return ProductsService.cvtCalculatedInfoToDepositBaseCcy(
+            vault,
+            it,
+            Date.now(),
+            it.expiry * 1000,
+            pps,
+          );
+        })()
+      : undefined;
     return {
       ...it,
       vault,
@@ -296,6 +378,7 @@ export class ProductsService {
         (pre, it) => ({ ...pre, [it.ccy]: it.price }),
         {},
       ),
+      convertedCalculatedInfoByDepositBaseCcy,
     };
   }
 
@@ -407,9 +490,7 @@ export class ProductsService {
       .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(url, {
         params: pick(req, ['chainId', 'vault']),
       })
-      .then((res) =>
-        res.value.map((it) => ProductsService.dealOriginQuote(it)),
-      );
+      .then((res) => ProductsService.dealOriginQuotes(res.value));
   }
 
   static TicketTypeOptions = uniqBy(
@@ -452,37 +533,6 @@ export class ProductsService {
     until: (_, createdAt) => !createdAt || Date.now() - createdAt >= 30000,
   })
   static async quote(data: ProductQuoteParamsAll) {
-    if (isCommonQuoteParams(data)) {
-      if (data.vault.riskType === RiskType.LEVERAGE) {
-        delete data.fundingApy;
-        delete data.protectedApy;
-      }
-
-      return ProductsService.$quote(
-        {
-          productType: data.vault.productType,
-          riskType: data.vault.riskType,
-        },
-        {
-          ...pick(data, [
-            'expiry',
-            'depositAmount',
-            'protectedApy',
-            'fundingApy',
-            'takerWallet',
-          ]),
-          vault: data.vault.vault,
-          chainId: data.vault.chainId,
-          inputApyDefinition: ApyDefinition.AaveLendingAPY,
-          lowerBarrier: data.anchorPrices[0],
-          upperBarrier: data.anchorPrices[1],
-          lowerStrike: data.anchorPrices[0],
-          upperStrike: data.anchorPrices[1],
-        },
-      ).then((res) =>
-        ProductsService.dealOriginQuote(res.value, data.protectedApy),
-      );
-    }
     if (isDualQuoteParams(data)) {
       return ProductsService.$quote(
         {
@@ -494,9 +544,38 @@ export class ProductsService {
           vault: data.vault.vault,
           chainId: data.vault.chainId,
         },
-      ).then((res) => ProductsService.dealOriginQuote(res.value, undefined));
+      )
+        .then((res) => ProductsService.dealOriginQuotes([res.value], undefined))
+        .then((r) => r[0]);
     }
-    throw new Error('unimplemented');
+    if (data.vault.riskType === RiskType.LEVERAGE) {
+      delete data.fundingApy;
+      delete data.protectedApy;
+    }
+
+    return ProductsService.$quote(
+      pick(data.vault, ['productType', 'riskType']),
+      {
+        ...pick(data, [
+          'expiry',
+          'depositAmount',
+          'protectedApy',
+          'fundingApy',
+          'takerWallet',
+        ]),
+        vault: data.vault.vault,
+        chainId: data.vault.chainId,
+        inputApyDefinition: ApyDefinition.AaveLendingAPY,
+        lowerBarrier: data.anchorPrices[0],
+        upperBarrier: data.anchorPrices[1],
+        lowerStrike: data.anchorPrices[0],
+        upperStrike: data.anchorPrices[1],
+      },
+    )
+      .then((res) =>
+        ProductsService.dealOriginQuotes([res.value], data.protectedApy),
+      )
+      .then((res) => res[0]);
   }
 
   @asyncCache({
@@ -551,7 +630,8 @@ export class ProductsService {
     // 1. 保证用户 1% 的保底年化
     // 2. 至少让用户拿 3% 的年化去赌
     // 2. 保证用户 3% 的保底年化
-    if (!apy) return [];
+    if (isNullLike(apy)) return [];
+    if (!apy) return [-0.01];
     const max = Math.max(Math.floor(apy * 100) - 3, 1);
     const min = Math.min(1, max);
     if (min === max) return [max / 100];
@@ -586,5 +666,85 @@ export class ProductsService {
   static delRfq(rfqId: string) {
     if (!rfqId) return;
     return http.post<unknown, HttpResponse<unknown>>('/rfq/remove', { rfqId });
+  }
+
+  static cvtCalculatedInfoToDepositBaseCcy(
+    vault: VaultInfo,
+    data: CalculatedInfo,
+    createdAt: number, // ms
+    expiredAt: number, // ms
+    pps: { atTrade: number; afterExpire: number }, // depositCcy 与 depositBaseCcy 的汇率
+  ): CalculatedInfo {
+    const total = +data.amounts.counterparty + +data.amounts.own;
+    const amounts = {
+      counterparty: +data.amounts.counterparty * pps.atTrade,
+      own: +data.amounts.own * pps.atTrade,
+      premium: +data.amounts.premium * pps.atTrade,
+      forRchAirdrop: +data.amounts.forRchAirdrop * pps.atTrade,
+      rchAirdrop: data.amounts.rchAirdrop,
+      totalInterest:
+        (total + +data.amounts.totalInterest) * pps.afterExpire -
+        total * pps.atTrade,
+      minRedeemable: +data.amounts.minRedeemable * pps.afterExpire,
+      maxRedeemable: +data.amounts.maxRedeemable * pps.afterExpire,
+      redeemable: Number(data.amounts.redeemable) * pps.afterExpire,
+      tradingFee: +data.amounts.tradingFee * pps.afterExpire,
+      settlementFee: +data.amounts.settlementFee * pps.afterExpire,
+      maxSettlementFee: +data.amounts.maxSettlementFee * pps.afterExpire,
+      borrow: +data.amounts.borrow * pps.afterExpire,
+      borrowCost: +data.amounts.borrowCost * pps.afterExpire,
+      spreadCost: +data.amounts.spreadCost * pps.afterExpire,
+    };
+
+    const prices = Object.fromEntries(
+      data.relevantDollarPrices.map((it) => [it.ccy, it.price]),
+    );
+
+    const rchValueInUSD = cvtAmountsInUsd(
+      [['RCH', amounts.rchAirdrop]],
+      prices,
+    );
+
+    const oddsInfo = {
+      rch: rchValueInUSD / amounts.own,
+      min: amounts.minRedeemable / amounts.own,
+      max: amounts.maxRedeemable / amounts.own,
+    };
+
+    const rchApy = calc_apy(rchValueInUSD, amounts.own, createdAt, expiredAt);
+    const minApy = calc_apy(
+      amounts.minRedeemable - amounts.own + rchValueInUSD,
+      amounts.own,
+      createdAt,
+      expiredAt,
+    );
+    const maxApy = calc_apy(
+      amounts.maxRedeemable - amounts.own + rchValueInUSD,
+      amounts.own,
+      createdAt,
+      expiredAt,
+    );
+    const apyInfo = {
+      // Earn 产品
+      outputApyDefinition: ApyDefinition.AaveLendingAPY,
+      interest: calc_apy(
+        amounts.totalInterest,
+        amounts.counterparty + amounts.own,
+        createdAt,
+        expiredAt,
+      ),
+      rch: rchApy,
+      min: minApy,
+      max: maxApy,
+    };
+
+    return {
+      amounts,
+      feeRate: data.feeRate,
+      leverageInfo: data.leverageInfo,
+      apyInfo,
+      oddsInfo,
+      relevantDollarPrices: data.relevantDollarPrices,
+    };
   }
 }

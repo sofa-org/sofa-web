@@ -113,7 +113,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                           ],
                         ],
                         prices,
-                        props.vault.vaultDepositCcy,
+                        props.vault.depositCcy,
                       )
                 }
                 ccy={props.vault?.vaultDepositCcy}

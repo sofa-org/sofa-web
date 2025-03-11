@@ -61,12 +61,12 @@ export interface OriginAutomatorDetail extends OriginAutomatorInfo {
   redemptionPeriodDay: number; // 赎回观察时间 (单位：天)
   positionSize?: number | string; // 当前未到期的头寸数量
   pastAvailableBalanceExcludingPrincipal: number | string; // Available Balance Excluding Principal-vaultDepositCcy
-  historicalInterestPlusNetPnL: number | string; // Historical Interest Earned(The cumulative interest earned through Aave/Lido/Sofa/Curve)-vaultDepositCcy
+  historicalInterestPlusNetPnL: number | string; // Historical Interest Earned(The cumulative interest earned through Aave/Lido/Sofa/Curve/Avalon)-vaultDepositCcy
   lockedByUnclaimedPosition: number | string; // Current Position(Value of open & Unclaimed positions.)-vaultDepositCcy
   estimatedFutureInterestByVaultCcy: number | string; // Estimated (estimatedTenorInDays)-Day Interest-vaultDepositCcy
   estimatedTenorInDays: number | string; // estimated Tenor In Days-vaultDepositCcy
   poolSizeForFutureInterestByVaultCcy: number | string; // Net PnL (RCH not included)-vaultDepositCcy
-  estimatedFundingApyPercentage: number | string; // Estimated Aave/Lido/Sofa/Curve Yield(百分比)
+  estimatedFundingApyPercentage: number | string; // Estimated Aave/Lido/Sofa/Curve/Avalon Yield(百分比)
 }
 
 export interface AutomatorInfo

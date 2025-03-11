@@ -1,12 +1,13 @@
 import { useMemo, useRef } from 'react';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
+import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionInfo,
   PositionsService,
   TransactionProgress,
 } from '@sofa/services/positions';
-import { ProductType, RiskType } from '@sofa/services/products';
+import { ProductType, RiskType, VaultInfo } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
@@ -38,9 +39,10 @@ addI18nResources(locale, 'PositionCard');
 
 export interface PositionCardProps {
   isAutomator?: boolean;
-  position: PositionInfo;
+  position: PositionInfo & { vault: VaultInfo };
   onStatusChange?(status: PositionStatus): void;
   onClick?(): void;
+  showBaseCcyEst: boolean;
 }
 
 export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 5;
@@ -87,7 +89,11 @@ const ProtectedAmounts = (
   const claimable = Number(position.amounts.redeemable) > 0 && hasSettled;
 
   return !hasSettled ? (
-    <div className={styles['amounts']}>
+    <div
+      className={classNames(styles['amounts'], {
+        [styles['has-deposit-base-ccy']]: !!position.vault.depositBaseCcy,
+      })}
+    >
       <div className={styles['amount']}>
         <span>
           <AmountDisplay
@@ -97,6 +103,17 @@ const ProtectedAmounts = (
           {product.vault.depositCcy}
         </span>
       </div>
+      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
+        <div className={styles['base-ccy-amount-own']}>
+          ≈{' '}
+          {amountFormatter(
+            position.convertedCalculatedInfoByDepositBaseCcy?.amounts?.own,
+            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
+          )}{' '}
+          {position.vault.depositBaseCcy}
+        </div>
+      )) ||
+        undefined}
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Min Payout')}</span>{' '}
         <span>
@@ -104,6 +121,18 @@ const ProtectedAmounts = (
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
+      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
+        <div className={styles['base-ccy-amount']}>
+          ≈{' '}
+          {amountFormatter(
+            position.convertedCalculatedInfoByDepositBaseCcy?.amounts
+              ?.minRedeemable,
+            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
+          )}{' '}
+          {position.vault.depositBaseCcy}
+        </div>
+      )) ||
+        undefined}
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Max Payout')}</span>{' '}
         <span>
@@ -111,9 +140,26 @@ const ProtectedAmounts = (
           <span className={styles['unit']}>{product.vault.depositCcy}</span>
         </span>
       </div>
+      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
+        <div className={styles['base-ccy-amount']}>
+          ≈{' '}
+          {amountFormatter(
+            position.convertedCalculatedInfoByDepositBaseCcy?.amounts
+              ?.maxRedeemable,
+            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
+          )}{' '}
+          {position.vault.depositBaseCcy}
+        </div>
+      )) ||
+        undefined}
     </div>
   ) : (
-    <div className={styles['amounts']}>
+    <div
+      className={classNames(styles['amounts'], {
+        [styles['has-deposit-base-ccy']]:
+          !!position.vault.depositBaseCcy && props.showBaseCcyEst,
+      })}
+    >
       <div className={classNames(styles['amount'], styles['amount-for-claim'])}>
         <AmountDisplay
           amount={+position.amounts.own + pnl}
@@ -332,6 +378,8 @@ const PositionCard = (props: PositionCardProps) => {
       <div
         className={classNames(styles['card'], {
           [styles['has-rch-amount']]: !position.claimParams.maker,
+          [styles['has-deposit-base-ccy']]:
+            !!product.vault.depositBaseCcy && props.showBaseCcyEst,
         })}
         onClick={() => props.onClick?.()}
       >

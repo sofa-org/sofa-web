@@ -131,7 +131,7 @@ function useShouldQuote(
       const shouldQuote =
         !quoteInfo ||
         (wallet.address && !quoteInfo.quote.signature) ||
-        quoteInfo.quote.deadline * 1000 - 0.5 * MsIntervals.min <= time || // 提前
+        quoteInfo.quote.deadline * 1000 - 0.3 * MsIntervals.min <= time || // 提前
         (it && quoteInfo.amounts.own != it.depositAmount);
       if (shouldQuote && quoteInfo) _useProductsState.delQuote(quoteInfo);
       return shouldQuote;
@@ -285,11 +285,13 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       <BaseInvestButton
         shouldPrepare={shouldQuote || !products.length}
         preparing={
-          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+          vault.riskType === RiskType.PROTECTED &&
+          interestRate?.apyUsed === undefined
         }
         prepare={quote}
         prepareText={
-          vault.riskType === RiskType.PROTECTED && !interestRate?.apyUsed
+          vault.riskType === RiskType.PROTECTED &&
+          interestRate?.apyUsed === undefined
             ? t('In Preparation...')
             : t('Request For Quote')
         }

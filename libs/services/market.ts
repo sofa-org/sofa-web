@@ -7,6 +7,7 @@ import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
 import Big from 'big.js';
 import { Contract, formatUnits } from 'ethers';
+import { max, min, pick, uniq } from 'lodash-es';
 
 import stRCHAbis from './abis/StRCH.json';
 import zRCHAbis from './abis/ZenRCH.json';
@@ -28,6 +29,13 @@ export interface CandleInfo {
   open: number;
   close: number;
   volume?: number;
+}
+
+interface PPSEntry {
+  fromCcy: string;
+  toCcy: string;
+  dateTime: number;
+  exchangeRate: number;
 }
 
 export class MarketService {
@@ -299,11 +307,12 @@ export class MarketService {
     >
   > {
     const ccyList = ContractsService.vaults.reduce((pre, it) => {
-      const shouldAdd =
-        it.riskType !== RiskType.RISKY &&
-        it.chainId === chainId &&
-        !pre.includes(it.depositCcy);
-      return shouldAdd ? pre.concat(it.depositCcy) : pre;
+      if (it.riskType === RiskType.RISKY || it.chainId !== chainId) return pre;
+      if (it.depositBaseCcy && !pre.includes(it.depositBaseCcy))
+        pre.push(it.depositBaseCcy);
+      if (it.depositCcy && !pre.includes(it.depositCcy))
+        pre.push(it.depositCcy);
+      return pre;
     }, [] as string[]);
     const defaultApy = {
       current: 0,
@@ -355,5 +364,96 @@ export class MarketService {
     ]);
     if (!+zRCHTotalSupply) return 1;
     return Big(balanceOfStRCH).div(zRCHTotalSupply).toString();
+  }
+
+  @asyncCache({
+    until: (it, createdAt) =>
+      !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
+  })
+  static async $getPPSNow(params: { fromCcy: string; toCcy: string }) {
+    return http
+      .get<unknown, HttpResponse<PPSEntry>>(`/rfq/exchange-rate`, { params })
+      .then((res) => res.value);
+  }
+
+  @asyncCache({
+    until: (it, createdAt) =>
+      !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
+  })
+  static async $getPPSHistory(params: {
+    fromCcy: string;
+    toCcy: string;
+    endDateTime: number;
+    startDateTime: number;
+  }) {
+    return http
+      .get<
+        unknown,
+        HttpResponse<PPSEntry[]>
+      >(`/rfq/exchange-rate/history-list`, { params })
+      .then((res) => res.value);
+  }
+
+  @applyMock('getPPS')
+  static async getPPS(params: {
+    fromCcy: string;
+    toCcy: string;
+    timeList?: number[];
+    includeNow: boolean;
+  }): Promise<Record<number | 'now', number>> {
+    if (!params.timeList && !params.includeNow) {
+      throw new Error('Either timeList/includeNow must be non-empty');
+    }
+    const result = {} as Record<number | 'now', number>;
+    await Promise.all(
+      [
+        params.includeNow
+          ? MarketService.$getPPSNow(pick(params, ['toCcy', 'fromCcy'])).then(
+              (res) => {
+                result.now = res.exchangeRate;
+                result[res.dateTime * 1000] = res.exchangeRate;
+              },
+            )
+          : undefined,
+        params.timeList && params.timeList.length
+          ? MarketService.$getPPSHistory({
+              fromCcy: params.fromCcy,
+              toCcy: params.toCcy,
+              startDateTime: min(params.timeList)! / 1000 - 86400,
+              endDateTime: max(params.timeList)! / 1000 + 86400,
+            }).then((res) => {
+              if (!res.length) {
+                console.error(
+                  `Cannot get any exchange-rate from ${params.fromCcy} to ${params.toCcy} between ${min(params.timeList)! / 1000} & ${max(params.timeList)! / 1000}`,
+                );
+                return;
+              }
+              const sorttedRes = res.sort((a, b) => a.dateTime - b.dateTime);
+              let startIndex = 0;
+              for (const it of uniq(params.timeList!).sort()) {
+                const itInSec = it / 1000;
+                /* eslint-disable no-constant-condition */
+                while (true) {
+                  const tHead = sorttedRes[startIndex].dateTime;
+                  const tNext = sorttedRes[startIndex + 1]?.dateTime;
+                  if (
+                    tNext === undefined ||
+                    tHead == itInSec ||
+                    Math.abs(itInSec - tHead) <= Math.abs(itInSec - tNext)
+                  ) {
+                    // 距离 tHead 更近
+                    result[it] = sorttedRes[startIndex].exchangeRate;
+                    break;
+                  }
+                  // 距离 tNext 更近
+                  // 更新 startIndex
+                  startIndex += 1;
+                }
+              }
+            })
+          : undefined,
+      ].filter(Boolean),
+    );
+    return result;
   }
 }

@@ -16,6 +16,7 @@ import {
 import vaults_1 from './1';
 import vaults_56 from './56';
 import vaults_137 from './137';
+import vaults_1329 from './1329';
 import vaults_42161 from './42161';
 import vaults_421614 from './421614';
 import vaults_11155111 from './11155111';
@@ -25,6 +26,7 @@ const vaults = [
   ...vaults_56,
   ...vaults_42161,
   ...vaults_137,
+  ...vaults_1329,
   ...vaults_421614,
   ...vaults_11155111,
 ];

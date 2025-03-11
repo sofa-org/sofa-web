@@ -3,6 +3,7 @@ import { http } from '@sofa/utils/http';
 
 import {
   ContractsService,
+  InvalidVaultError,
   ProductType,
   RiskType,
   VaultInfo,
@@ -47,7 +48,7 @@ export class ProductsDIYService {
         }),
       )
       .filter(Boolean) as VaultInfo[];
-    if (!vaultInfoList.length) throw new Error('Invalid vault');
+    if (!vaultInfoList.length) throw new InvalidVaultError();
     const fetch = (vaultInfo: VaultInfo) => {
       let url: string;
       if (vaultInfo.riskType == RiskType.DUAL) {
@@ -62,12 +63,32 @@ export class ProductsDIYService {
       }
       return http
         .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(url, { params })
-        .then((res) =>
-          res.value.map((it) => ProductsService.dealOriginQuote(it)),
-        );
+        .then((res) => ProductsService.dealOriginQuotes(res.value));
     };
-    return Promise.all(vaultInfoList.map((it) => fetch(it))).then((res) =>
-      res.flat(),
-    );
+    return Promise.all(vaultInfoList.map((it) => fetch(it))).then((res) => {
+      const result = res.flat();
+      if (params.chainId == 1329 && result.length == 0) {
+        // TODO: remove this block when server supports SEI
+        throw new Error('SEI(1329) chain not supported by server');
+      }
+      return result;
+    });
+  }
+
+  static getSupportMatrix(v: Partial<VaultInfo>): {
+    skipCurrentOptionValue?: boolean;
+    skipOption?: 'riskType'[];
+  } {
+    const vaults = ProductsService.filterVaults(ContractsService.vaults, {
+      chainId: v.chainId,
+      forCcy: v.forCcy,
+    });
+    if (vaults.length && vaults.every((v) => v.depositBaseCcy)) {
+      return {
+        skipCurrentOptionValue: v.productType === ProductType.DNT,
+        skipOption: ['riskType'],
+      };
+    }
+    return {};
   }
 }

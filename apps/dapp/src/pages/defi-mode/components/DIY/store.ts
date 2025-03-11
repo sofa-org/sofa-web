@@ -4,7 +4,8 @@ import {
   RiskType,
   VaultInfo,
 } from '@sofa/services/base-type';
-import { ContractsService } from '@sofa/services/contracts';
+import { ChainMap } from '@sofa/services/chains';
+import { ContractsService, InvalidVaultError } from '@sofa/services/contracts';
 import { ProductsService } from '@sofa/services/products';
 import { ProductQuoteResultAll } from '@sofa/services/products';
 import {
@@ -19,6 +20,7 @@ import { isEqual, omit, pick } from 'lodash-es';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+import { useWalletStore } from '@/components/WalletConnector/store';
 import { useProductsState } from '@/pages/products/store';
 
 export interface DIYFormData
@@ -214,11 +216,18 @@ export const useDIYState = Object.assign(instant, {
       chainId,
       vaults: vaults.map((it) => it.vault).join(','), // 合约组合，以","区分
       expiryDateTime: formData.expiry! / 1000, // 选择的到期日
-    }).then((res) => {
-      useDIYState.updateQuotes(res);
-      setTimeout(() => useDIYState.selectQuote(chainId, true), 100);
-      return res;
-    });
+    })
+      .then((res) => {
+        useDIYState.updateQuotes(res);
+        setTimeout(() => useDIYState.selectQuote(chainId, true), 100);
+        return res;
+      })
+      .catch((e) => {
+        if (e instanceof InvalidVaultError) {
+          useDIYState.resetFormData();
+        }
+        throw e;
+      });
   },
   updateQuotes: (quotes: ProductQuoteResultAll[]) => {
     useProductsState.updateQuotes(quotes, true);
@@ -237,17 +246,23 @@ export const useDIYState = Object.assign(instant, {
                 oddsRange: [Infinity, 0],
               };
             pre[key].keys.push(ProductsService.productKey(it));
+            const apyInfo = it.convertedCalculatedInfoByDepositBaseCcy
+              ? it.convertedCalculatedInfoByDepositBaseCcy.apyInfo
+              : it.apyInfo;
             const apy = (() => {
-              const v = simplePlus(it.apyInfo?.rch, it.apyInfo?.max);
+              const v = simplePlus(apyInfo?.rch, apyInfo?.max);
               if (!v) return v;
               return Math.round(v * 100) / 100;
             })();
+            const oddsInfo = it.convertedCalculatedInfoByDepositBaseCcy
+              ? it.convertedCalculatedInfoByDepositBaseCcy.oddsInfo
+              : it.oddsInfo;
             if (isLegalNum(apy)) {
               pre[key].apyRange[0] = Math.min(pre[key].apyRange[0], apy);
               pre[key].apyRange[1] = Math.max(pre[key].apyRange[1], apy);
             }
             const odds = (() => {
-              const v = simplePlus(it.oddsInfo?.rch, it.oddsInfo?.max);
+              const v = simplePlus(oddsInfo?.rch, oddsInfo?.max);
               if (!v) return v;
               return +v.toFixed(2);
             })();
@@ -296,7 +311,7 @@ export const useDIYState = Object.assign(instant, {
             simplePlus(it.oddsInfo?.max, it.oddsInfo?.rch) || 0,
         });
       }
-      if (!formData.apyTarget)
+      if (formData.apyTarget === undefined)
         throw new Error(`Invalid apyTarget(${formData.apyTarget})`);
       return getNearestItemIndex(quotes, formData.apyTarget, {
         calcCompareNum: (it) =>
@@ -357,21 +372,60 @@ export const useDIYState = Object.assign(instant, {
         ]?.oddsRange || [],
     );
   },
+  resetFormData: () => {
+    const chainId = useWalletStore.getState().chainId;
+    useDIYState.initFormData(chainId, undefined, undefined, undefined);
+  },
   initFormData: (
     chainId: number,
     config?: ProductsDIYConfig,
     apyList?: number[],
     oddsList?: number[],
   ) => {
-    const defaultFormData: DIYFormData = {
+    const allVaults = ContractsService.vaults.filter(
+      (v) => v.chainId == chainId,
+    );
+    if (!allVaults?.length) {
+      throw new Error(
+        `No products available on chain ${ChainMap[chainId]?.name || chainId}, please switch to other chain.`,
+      );
+    }
+    const defaultValue: Partial<VaultInfo> = {
       forCcy: 'WBTC',
-      domCcy: 'USD',
-      depositCcy: 'USDT',
-      productType: ProductType.BullSpread,
       riskType:
         currQuery().project === ProjectType.Surge
           ? RiskType.RISKY
           : RiskType.PROTECTED,
+      domCcy: 'USD',
+      depositCcy: 'USDT',
+      productType: ProductType.BullSpread,
+    };
+    const sorttedVaults = allVaults.sort((a, b) => {
+      for (const k in defaultValue) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const defaultV = (defaultValue as Record<string, any>)[k];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const aa = a as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const bb = b as any;
+        if (aa[k] === bb[k]) {
+          continue;
+        }
+        if (aa[k] === defaultV) {
+          return -1;
+        }
+        if (bb[k] === defaultV) {
+          return 1;
+        }
+      }
+      return 0;
+    });
+    const defaultFormData: DIYFormData = {
+      forCcy: sorttedVaults[0].forCcy,
+      domCcy: sorttedVaults[0].domCcy,
+      depositCcy: sorttedVaults[0].depositCcy,
+      productType: sorttedVaults[0].productType,
+      riskType: sorttedVaults[0].riskType,
       apyTarget: 0.15,
       oddsTarget: 4,
       expiry: next8h(undefined, 7),

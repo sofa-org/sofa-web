@@ -5,6 +5,7 @@ import IconArb from './assets/icon-arb.svg?url';
 import IconBNB from './assets/icon-bnb.webp';
 import IconETH from './assets/icon-eth.svg?url';
 import IconPol from './assets/icon-pol.webp';
+import IconSei from './assets/icon-sei.webp';
 import IconSepolia from './assets/icon-sepolia.svg?url';
 import IconSepoliaArb from './assets/icon-sepolia-arb.svg?url';
 
@@ -223,6 +224,50 @@ export const ChainMap: Record<
       automatorFeeContractAddress: '', // TODO
       rchBurnForAutomatorGraphUrl: '',
       uniswapUrl: 'https://app.uniswap.org/explore/tokens/polygon/{address}',
+      // TODO
+      hlPriceOracle: {
+        BTC: '',
+        ETH: '',
+      },
+      spotPriceOracle: {
+        BTC: '0x05A60aE5705411EF03f162FeAb8fAbde77fb4597',
+        ETH: '0x0ce8B7C78491C3db37179B80ac95212fcb611858',
+      },
+      stRCHAddress: '', // 只有 defaultChain 有
+      zRCHAddress: '', // 只有 defaultChain 有
+    },
+    1329: {
+      chainId: 1329,
+      isTest: false,
+      name: 'Sei',
+      currency: 'SEI',
+      icon: IconSei,
+      explorerUrl: 'https://www.seiscan.app',
+      rpcUrl: 'https://sei.drpc.org',
+      rpcUrlsForAddNetwork: [
+        'https://sei.drpc.org',
+        'wss://evm-ws.sei-apis.com',
+        'wss://sei.drpc.org',
+        'https://evm-rpc.sei-apis.com',
+        'https://node.histori.xyz/sei-mainnet/8ry9f6t9dct1se2hlagxnd9n2a',
+      ],
+      nativeCurrency: {
+        name: 'SEI',
+        symbol: 'SEI', // 2-6 characters long
+        decimals: 18,
+      },
+      vaultGraphUrl: '', // TODO
+      automatorTheGraphUrl: '', // TODO
+      usdtAddress: '', // 只有 defaultChain 有
+      rchAddress: '', // 只有 defaultChain 有
+      rchAirdropAddress: '', // 只有 defaultChain 有
+      rchUniswapAddress: '', // 只有 defaultChain 有
+      rchUniswapVersion: 'v3',
+      bonusAirdropAddress: '', // 只有 defaultChain 有
+      feeContractAddress: '0x6a7F97eD710A162cf5F1Eb8024e613FC9Ce9d563',
+      automatorFeeContractAddress: '', // TODO
+      rchBurnForAutomatorGraphUrl: '',
+      uniswapUrl: 'https://app.uniswap.org/explore/tokens/sei/{address}',
       // TODO
       hlPriceOracle: {
         BTC: '',

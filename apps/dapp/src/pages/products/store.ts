@@ -113,20 +113,16 @@ export const useProductsState = Object.assign(
       if (!params.expiry) return new Error('Please select expiry');
       const vault = params.vault;
       if (!vault) return new Error('Please switch deposit currency');
-      if (isCommonQuoteParams(params)) {
-        if (
-          !params.anchorPrices?.length ||
-          params.anchorPrices.some((it) => !it)
-        )
-          return new Error('Please select the prices');
-        if (vault.riskType === RiskType.PROTECTED && !params.fundingApy)
-          return new Error(
-            'Please wait for the yield from Aave/Lido/Sofa/Curve to be successfully retrieved',
-          );
-      }
       if (isDualQuoteParams(params)) {
         if (!params.strike) return new Error('Please input the price');
       }
+      if (
+        vault.riskType === RiskType.PROTECTED &&
+        params.fundingApy === undefined
+      )
+        return new Error(
+          'Please wait for the yield from Aave/Lido/Sofa/Curve/Avalon to be successfully retrieved',
+        );
       return null;
     },
     updateQuotes: (

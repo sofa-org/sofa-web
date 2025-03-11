@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Spin } from '@douyinfe/semi-ui';
+import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -33,6 +34,7 @@ import { stringify } from 'qs';
 import AmountInput from '@/components/AmountInput';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { PayoffChart } from '@/components/Payoff';
+import { usePPSNow } from '@/components/PPS/hooks';
 import {
   ProductTypeRefs,
   RiskTypeRefs,
@@ -162,6 +164,18 @@ const DepositModalContent = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ProductsService.productKey(product), wallet.address]);
 
+  const [baseCcy, setBaseCcy] = useState<CCY | USDS | undefined>(undefined);
+  useEffect(() => {
+    if (
+      !baseCcy &&
+      data.vault.depositBaseCcy &&
+      data.convertedCalculatedInfoByDepositBaseCcy
+    ) {
+      setBaseCcy(data.vault.depositBaseCcy);
+    }
+  }, [baseCcy, data]);
+  const pps = usePPSNow(product?.vault);
+
   return (
     <>
       <ModalWrapper setVisible={props.setVisible} product={data}>
@@ -184,12 +198,29 @@ const DepositModalContent = (
               depositCcy={data.vault.depositCcy}
               productType={data.vault.productType}
               anchorPrices={data.anchorPrices}
-              protectedYield={Number(data.apyInfo?.min)}
+              protectedYield={Number(
+                baseCcy && baseCcy === data.vault.depositBaseCcy
+                  ? data.convertedCalculatedInfoByDepositBaseCcy?.apyInfo?.min
+                  : data.apyInfo?.min,
+              )}
               enhancedYield={
-                (Number(data.apyInfo?.max) || 0) -
-                (Number(data.apyInfo?.min) || 0)
+                baseCcy && baseCcy === data.vault.depositBaseCcy
+                  ? (Number(
+                      data.convertedCalculatedInfoByDepositBaseCcy?.apyInfo
+                        ?.max,
+                    ) || 0) -
+                    (Number(
+                      data.convertedCalculatedInfoByDepositBaseCcy?.apyInfo
+                        ?.min,
+                    ) || 0)
+                  : (Number(data.apyInfo?.max) || 0) -
+                    (Number(data.apyInfo?.min) || 0)
               }
-              rchYield={Number(data.apyInfo?.rch)}
+              rchYield={Number(
+                baseCcy && baseCcy === data.vault.depositBaseCcy
+                  ? data.convertedCalculatedInfoByDepositBaseCcy?.apyInfo?.rch
+                  : data.apyInfo?.rch,
+              )}
               showYAxis
               showK1K2={data.vault.productType !== ProductType.DNT}
               displayRchYield
@@ -247,6 +278,19 @@ const DepositModalContent = (
             }}
             onBlur={() => product && useProductsState.quote(product)}
           />
+          {(product?.vault.depositBaseCcy && pps != undefined && (
+            <div className={styles['amount-in-base-ccy']}>
+              ≈{' '}
+              {amountFormatter(
+                isNullLike(product?.depositAmount)
+                  ? undefined
+                  : Number(product?.depositAmount) * pps,
+                CCYService.ccyConfigs[product.vault.depositBaseCcy]?.precision,
+              )}{' '}
+              {product?.vault.depositBaseCcy}
+            </div>
+          )) ||
+            undefined}
           <div className={styles['balance']}>
             <span className={styles['label']}>{t('wallet.balance')}</span>
             <span className={styles['value']}>
@@ -266,7 +310,11 @@ const DepositModalContent = (
             wrapperClassName={styles['estimated-profits']}
             spinning={loading}
           >
-            <ProfitsRender data={{ ...data, product: data }} />
+            <ProfitsRender
+              data={data}
+              baseCcy={baseCcy}
+              setBaseCcy={setBaseCcy}
+            />
             <Calculation quote={data} className={styles['calculation']} />
           </Spin>
           <InvestButton

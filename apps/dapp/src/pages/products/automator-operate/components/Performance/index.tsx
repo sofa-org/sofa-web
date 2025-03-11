@@ -62,7 +62,9 @@ const PoolSize = () => {
       Date.now() + MsIntervals.day * 7,
     );
     const byVaultDepositCcy = (() => {
-      if (!InterestTypeRefs[automator.vaultInfo.interestType!].isRebase) {
+      if (
+        !InterestTypeRefs[automator.vaultInfo.interestType!].isRebaseInAutomator
+      ) {
         return cvtAmountsInCcy(
           [[automator.vaultInfo.depositCcy, byDepositCcy]],
           prices,
@@ -294,7 +296,7 @@ const PoolSize = () => {
                         ],
                       ],
                       prices,
-                      automator.vaultInfo.vaultDepositCcy,
+                      automator.vaultInfo.depositCcy,
                     )
               }
               ccy={automator?.vaultInfo?.vaultDepositCcy}

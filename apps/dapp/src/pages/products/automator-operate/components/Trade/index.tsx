@@ -180,7 +180,9 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
       Date.now() + MsIntervals.day * 7,
     );
     const byVaultDepositCcy = (() => {
-      if (!InterestTypeRefs[automator.vaultInfo.interestType!].isRebase) {
+      if (
+        !InterestTypeRefs[automator.vaultInfo.interestType!].isRebaseInAutomator
+      ) {
         return cvtAmountsInCcy(
           [[automator.vaultInfo.depositCcy, byDepositCcy]],
           prices,
@@ -398,7 +400,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             />
                             <span className={styles['desc']}>
                               {t({
-                                enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve',
+                                enUS: 'The cumulative interest earned through Aave/Lido/Sofa/Curve/Avalon',
                                 zhCN: '通过Aave/Lido/Sofa/Curve的累积收益',
                               })}
                             </span>
@@ -535,7 +537,7 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                             </span>
                             {!InterestTypeRefs[
                               automator.vaultInfo.interestType!
-                            ].isRebase ? (
+                            ].isRebaseInAutomator ? (
                               <span className={styles['value']}>
                                 {amountFormatter(
                                   automator.aumByClientDepositCcy,
@@ -569,14 +571,14 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <div className={styles['amount']}>
                             <span className={styles['label']}>
                               {t({
-                                enUS: 'Estimated Aave/Lido/Sofa/Curve Yield',
+                                enUS: 'Estimated Aave/Lido/Sofa/Curve/Avalon Yield',
                                 zhCN: '预估Aave/Lido/Sofa/Curve收益',
                               })}
                             </span>
                             <span className={styles['desc']}>
                               {t({
-                                enUS: 'Min(1 Month Aave/Lido/Sofa/Curve Average, current Aave/Lido/Sofa/Curve Apy). (Aave/Lido/Sofa/Curve APY)',
-                                zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve年化)。 （Aave/Lido/Sofa/Curve年化）',
+                                enUS: 'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)',
+                                zhCN: '最小值 (1个月Aave/Lido/Sofa/Curve的平均收益，当前Aave/Lido/Sofa/Curve/Avalon年化)。 （Aave/Lido/Sofa/Curve/Avalon年化）',
                               })}
                             </span>
                             <span className={styles['value']}>
@@ -586,14 +588,14 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                           <div className={styles['amount']}>
                             <span className={styles['label']}>
                               {t({
-                                enUS: 'Estimated Aave/Lido/Sofa/Curve Interest',
+                                enUS: 'Estimated Aave/Lido/Sofa/Curve/Avalon Interest',
                                 zhCN: '预估Aave/Lido/Sofa/Curve利息',
                               })}
                             </span>
                             <span className={styles['desc']}>
                               {t({
-                                enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve APY Estimate) ^ (Tenor / 365) - Pool Size)',
-                                zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve年化预估) ^ (期限 / 365) - 池子大小）',
+                                enUS: '(Pool Size * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Pool Size)',
+                                zhCN: '（池子大小 * (1 + Aave/Lido/Sofa/Curve/Avalon年化预估) ^ (期限 / 365) - 池子大小）',
                               })}
                             </span>
                             <span className={styles['value']}>

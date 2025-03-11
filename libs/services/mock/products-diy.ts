@@ -4,7 +4,8 @@ import { nanoid } from 'nanoid';
 import { ContractsService, RiskType, VaultInfo } from '../contracts';
 import {
   ApyDefinition,
-  ProductQuoteResultAll,
+  OriginProductQuoteResult,
+  ProductQuoteResult,
   ProductsService,
 } from '../products';
 import {
@@ -27,8 +28,8 @@ function mockDIYConfig(params: ProductsDIYConfigRequest) {
   }));
 }
 
-function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
-  return params.vaults
+async function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
+  const origin = params.vaults
     .split(',')
     .map((it) => it.trim())
     .flatMap((vault) => {
@@ -40,7 +41,7 @@ function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
       if (params.expiryDateTime) {
         return [...Array(2)].map(() => mockProductQuote(vaultInfo, params));
       } else {
-        const result: ProductQuoteResultAll[] = [];
+        const result: OriginProductQuoteResult[] = [];
         for (const expiryDateTime of [
           next8h(undefined, 7) / 1000,
           next8h(undefined, 7) / 1000,
@@ -87,20 +88,26 @@ function mockDIYRecommendedList(params: ProductsDIYRecommendRequest) {
       }
     })
     .filter(Boolean);
+  if (!origin.length) {
+    return [];
+  }
+  return ProductsService.dealOriginQuotes(origin as OriginProductQuoteResult[]);
 }
 
 function mockProductQuote(
   vaultInfo: PartialRequired<VaultInfo, 'forCcy' | 'riskType'>,
   params: ProductsDIYRecommendRequest,
-): ProductQuoteResultAll {
+): OriginProductQuoteResult {
   const prices: PartialRecord<CCY, number> = {
-    RCH: Math.random() * 10,
-    CRV: Math.random() * 10,
+    RCH: 0.3,
+    WBTC: 95000,
   };
-  return {
+  const vault = ProductsService.findVault(ContractsService.vaults, vaultInfo)!;
+  const origin: OriginProductQuoteResult = {
+    chainId: vault.chainId,
+    depositAmount: 100,
     rfqId: '',
-    anchorPrices: [2000, 3000],
-    vault: ProductsService.findVault(ContractsService.vaults, vaultInfo)!, // 合约地址
+    vault: vault.vault, // 合约地址
     expiry: params.expiryDateTime || next8h(undefined, 18) / 1000, // 到期日对应的秒级时间戳，例如 1672387200
     timestamp: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前定价对应的触发时间；下一个观察开始时间基于此逻辑计算
     observationStart: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前产品根据timestamp预估的开始观察敲入敲出时间
@@ -155,11 +162,8 @@ function mockProductQuote(
       ccy: e[0],
       price: e[1],
     })), // 计算 RCH 年化时的币种价格
-    pricesForCalculation: prices,
-
-    // 给 Dual 的属性
-    strike: 1 + Math.random(),
   };
+  return origin;
 }
 
 if (!window.mockData) window.mockData = {};

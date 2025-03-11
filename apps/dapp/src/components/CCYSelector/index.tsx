@@ -73,7 +73,7 @@ export function useDepositCcySelect() {
   const $ccy = (query['deposit-ccy'] as VaultInfo['depositCcy']) || 'USDT';
   const ccy = useMemo(
     () =>
-      ContractsService.vaults.find(
+      ContractsService.vaults.some(
         (it) =>
           !it.tradeDisable &&
           it.chainId === chainId &&
@@ -82,7 +82,13 @@ export function useDepositCcySelect() {
           it.depositCcy === $ccy,
       )
         ? $ccy
-        : 'USDT',
+        : ContractsService.vaults.find(
+            (it) =>
+              !it.tradeDisable &&
+              it.chainId === chainId &&
+              it.riskType === riskType &&
+              it.productType === productType,
+          )?.depositCcy || 'USDT',
     [$ccy, chainId, productType, riskType],
   );
   return [ccy, setDepositCcy] as const;

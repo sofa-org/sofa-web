@@ -1,4 +1,5 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { Radio, RadioGroup } from '@douyinfe/semi-ui';
 import { ProductType, RiskType, VaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';
@@ -143,9 +144,7 @@ const ProfitScenario = (props: ProfitRenderProps) => {
   );
 };
 
-export const ProjectedReturns = (
-  props: BaseProps & { data: Partial<PositionInfo> },
-) => {
+const Right = (props: BaseProps & { data: Partial<PositionInfo> }) => {
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
   const product = position.product;
@@ -185,6 +184,179 @@ export const ProjectedReturns = (
     min: !hasExpired || !isTrend || Number(position.takerAllocationRate) === 0,
   };
   return (
+    <>
+      {showScenario.max && (
+        <ProfitScenario
+          {...commonProps}
+          prices={prices}
+          className={classNames({
+            [styles['highlight']]:
+              hasExpired &&
+              isRangebound &&
+              Number(position.takerAllocationRate) > 0,
+          })}
+          title={returnSituationsDesc.max}
+          img={isRangebound && <RangeboundImg data={position} type="win" />}
+          rchReturnAmount={+position.amounts.rchAirdrop}
+          amount={
+            simplePlus(
+              position.amounts.maxRedeemable,
+              isRisky ? 0 : -position.amounts.own,
+            )!
+          }
+          amountLabel={
+            isRisky ? (
+              t('Payout')
+            ) : (
+              <>
+                {t('Profits')}
+                <span className={styles['badge-est']}>| {t('Est.')}</span>
+              </>
+            )
+          }
+          alias={
+            isRisky
+              ? maxMultiplier
+              : [
+                  Number(position.apyInfo?.max) || 0,
+                  Number(position.apyInfo?.rch) || 0,
+                ]
+          }
+          aliasLabel={
+            isRisky ? (
+              t('Return')
+            ) : (
+              <>
+                {t('Annualized Yield(APY)')}
+                <span className={styles['badge-est']}>| {t('Est.')}</span>
+              </>
+            )
+          }
+        />
+      )}
+      {showScenario.middle && returnSituationsDesc.middle && (
+        <ProfitScenario
+          {...commonProps}
+          prices={prices}
+          title={returnSituationsDesc.middle.situation}
+          rchReturnAmount={+position.amounts.rchAirdrop}
+          amount={`(${amountFormatter(
+            simplePlus(
+              position.amounts.minRedeemable,
+              isRisky ? 0 : -position.amounts.own,
+            ),
+            2,
+          )}~${amountFormatter(
+            simplePlus(
+              position.amounts.maxRedeemable,
+              isRisky ? 0 : -position.amounts.own,
+            ),
+            2,
+          )})`}
+          amountLabel={
+            isRisky ? (
+              t('Payout')
+            ) : (
+              <>
+                {t('Profits')}
+                <span className={styles['badge-est']}>| {t('Est.')}</span>
+              </>
+            )
+          }
+          alias={
+            isRisky
+              ? [`(0x~${amountFormatter(maxMultiplier[0], 1)}x)`, rchMultiplier]
+              : [
+                  `(${displayPercentage(
+                    position.apyInfo?.min,
+                  )}~${displayPercentage(position.apyInfo?.max)})`,
+                  Number(position.apyInfo?.rch) || 0,
+                ]
+          }
+          aliasLabel={
+            isRisky ? (
+              t('Return')
+            ) : (
+              <>
+                {t('Annualized Yield(APY)')}
+                <span className={styles['badge-est']}>| {t('Est.')}</span>
+              </>
+            )
+          }
+        />
+      )}
+      {showScenario.min && (
+        <ProfitScenario
+          {...commonProps}
+          prices={prices}
+          className={classNames({
+            [styles['highlight-red']]:
+              hasExpired &&
+              isRangebound &&
+              Number(position.takerAllocationRate) <= 0,
+          })}
+          title={returnSituationsDesc.min}
+          img={isRangebound && <RangeboundImg data={position} type="lose" />}
+          rchReturnAmount={+position.amounts.rchAirdrop}
+          amount={
+            simplePlus(
+              position.amounts.minRedeemable,
+              isRisky ? 0 : -position.amounts.own,
+            )!
+          }
+          amountLabel={
+            isRisky ? (
+              t('Payout')
+            ) : (
+              <>
+                {t('Profits')}
+                <span className={styles['badge-est']}>| {t('Est.')}</span>
+              </>
+            )
+          }
+          alias={
+            isRisky
+              ? minMultiplier
+              : [
+                  Number(position.apyInfo?.min) || 0,
+                  Number(position.apyInfo?.rch) || 0,
+                ]
+          }
+          aliasLabel={
+            isRisky ? (
+              t('Return')
+            ) : (
+              <>
+                {t('Annualized Yield(APY)')}
+                <span className={styles['badge-est']}>| {t('Est.')}</span>
+              </>
+            )
+          }
+        />
+      )}
+    </>
+  );
+};
+export const ProjectedReturns = (
+  props: BaseProps & { data: Partial<PositionInfo> & { vault: VaultInfo } },
+) => {
+  const [t] = useTranslation('ProjectedReturns');
+  const position = props.data;
+  const product = position.product;
+  const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
+  useEffect(() => {
+    if (!basedCcy && position.vault.depositBaseCcy) {
+      setBasedCcy(position.vault.depositBaseCcy);
+    }
+  }, [basedCcy, position]);
+  if (!position.amounts || !position.pricesForCalculation || !product)
+    return <div className={styles['profit-scenarios']} />;
+  const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
+    product.vault.productType,
+  );
+  const hasExpired = Number(product.expiry) * 1000 <= Date.now();
+
+  return (
     <section className={styles['section']}>
       <h2 className={styles['h']}>
         {/* <span className={styles['icon']}>♦</span> */}
@@ -202,163 +374,55 @@ export const ProjectedReturns = (
       >
         {isTrend && (
           <div className={styles['out-left']}>
-            <TrendImg data={position} />
+            <TrendImg
+              data={
+                basedCcy == position.vault.depositBaseCcy
+                  ? {
+                      ...position,
+                      ...position.convertedCalculatedInfoByDepositBaseCcy,
+                    }
+                  : position
+              }
+            />
           </div>
         )}
         <div className={styles['out-right']}>
-          {showScenario.max && (
-            <ProfitScenario
-              {...commonProps}
-              prices={prices}
-              className={classNames({
-                [styles['highlight']]:
-                  hasExpired &&
-                  isRangebound &&
-                  Number(position.takerAllocationRate) > 0,
-              })}
-              title={returnSituationsDesc.max}
-              img={isRangebound && <RangeboundImg data={position} type="win" />}
-              rchReturnAmount={+position.amounts.rchAirdrop}
-              amount={
-                simplePlus(
-                  position.amounts.maxRedeemable,
-                  isRisky ? 0 : -position.amounts.own,
-                )!
-              }
-              amountLabel={
-                isRisky ? (
-                  t('Payout')
-                ) : (
-                  <>
-                    {t('Profits')}
-                    <span className={styles['badge-est']}>| {t('Est.')}</span>
-                  </>
-                )
-              }
-              alias={
-                isRisky
-                  ? maxMultiplier
-                  : [
-                      Number(position.apyInfo?.max) || 0,
-                      Number(position.apyInfo?.rch) || 0,
-                    ]
-              }
-              aliasLabel={
-                isRisky ? (
-                  t('Return')
-                ) : (
-                  <>
-                    {t('Annualized Yield(APY)')}
-                    <span className={styles['badge-est']}>| {t('Est.')}</span>
-                  </>
-                )
-              }
-            />
-          )}
-          {showScenario.middle && returnSituationsDesc.middle && (
-            <ProfitScenario
-              {...commonProps}
-              prices={prices}
-              title={returnSituationsDesc.middle.situation}
-              rchReturnAmount={+position.amounts.rchAirdrop}
-              amount={`(${amountFormatter(
-                simplePlus(
-                  position.amounts.minRedeemable,
-                  isRisky ? 0 : -position.amounts.own,
-                ),
-                2,
-              )}~${amountFormatter(
-                simplePlus(
-                  position.amounts.maxRedeemable,
-                  isRisky ? 0 : -position.amounts.own,
-                ),
-                2,
-              )})`}
-              amountLabel={
-                isRisky ? (
-                  t('Payout')
-                ) : (
-                  <>
-                    {t('Profits')}
-                    <span className={styles['badge-est']}>| {t('Est.')}</span>
-                  </>
-                )
-              }
-              alias={
-                isRisky
-                  ? [
-                      `(0x~${amountFormatter(maxMultiplier[0], 1)}x)`,
-                      rchMultiplier,
-                    ]
-                  : [
-                      `(${displayPercentage(
-                        position.apyInfo?.min,
-                      )}~${displayPercentage(position.apyInfo?.max)})`,
-                      Number(position.apyInfo?.rch) || 0,
-                    ]
-              }
-              aliasLabel={
-                isRisky ? (
-                  t('Return')
-                ) : (
-                  <>
-                    {t('Annualized Yield(APY)')}
-                    <span className={styles['badge-est']}>| {t('Est.')}</span>
-                  </>
-                )
-              }
-            />
-          )}
-          {showScenario.min && (
-            <ProfitScenario
-              {...commonProps}
-              prices={prices}
-              className={classNames({
-                [styles['highlight-red']]:
-                  hasExpired &&
-                  isRangebound &&
-                  Number(position.takerAllocationRate) <= 0,
-              })}
-              title={returnSituationsDesc.min}
-              img={
-                isRangebound && <RangeboundImg data={position} type="lose" />
-              }
-              rchReturnAmount={+position.amounts.rchAirdrop}
-              amount={
-                simplePlus(
-                  position.amounts.minRedeemable,
-                  isRisky ? 0 : -position.amounts.own,
-                )!
-              }
-              amountLabel={
-                isRisky ? (
-                  t('Payout')
-                ) : (
-                  <>
-                    {t('Profits')}
-                    <span className={styles['badge-est']}>| {t('Est.')}</span>
-                  </>
-                )
-              }
-              alias={
-                isRisky
-                  ? minMultiplier
-                  : [
-                      Number(position.apyInfo?.min) || 0,
-                      Number(position.apyInfo?.rch) || 0,
-                    ]
-              }
-              aliasLabel={
-                isRisky ? (
-                  t('Return')
-                ) : (
-                  <>
-                    {t('Annualized Yield(APY)')}
-                    <span className={styles['badge-est']}>| {t('Est.')}</span>
-                  </>
-                )
-              }
-            />
+          {basedCcy ? (
+            <>
+              <RadioGroup
+                type="button"
+                buttonSize="small"
+                value={basedCcy}
+                className={styles['base-ccy-select']}
+                onChange={(v) => setBasedCcy(v.target.value)}
+              >
+                <Radio value={position.vault.depositBaseCcy}>
+                  {position?.vault.depositBaseCcy}
+                </Radio>
+                <Radio value={position.vault.depositCcy}>
+                  {position.vault.depositCcy}
+                </Radio>
+              </RadioGroup>
+              {basedCcy == position.vault?.depositBaseCcy ? (
+                <Right
+                  data={{
+                    ...position,
+                    ...position.convertedCalculatedInfoByDepositBaseCcy,
+                    product: {
+                      ...position.product!,
+                      vault: {
+                        ...position.product!.vault,
+                        depositCcy: basedCcy,
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <Right {...props} />
+              )}
+            </>
+          ) : (
+            <Right {...props} />
           )}
         </div>
       </div>
