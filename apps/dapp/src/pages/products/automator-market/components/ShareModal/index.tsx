@@ -97,6 +97,7 @@ const AutomatorUserShareModal = forwardRef<
                   t(
                     {
                       enUS: 'Over [[{{amount}}]] {{crypto}} in funds are sharing the profits',
+                      zhCN: '超过[[{{amount}}]] {{crypto}}的资金正在共享利润',
                     },
                     {
                       amount: amountFormatter(
@@ -145,9 +146,7 @@ const AutomatorUserShareModal = forwardRef<
               }
             >
               <span className={styles['icon']} />
-              {t({
-                enUS: 'Copy Image',
-              })}
+              {t({ enUS: 'Copy Image', zhCN: '复制图片' })}
             </a>
             <a
               className={classNames(styles['btn'], styles['copy-link'])}
@@ -167,9 +166,7 @@ const AutomatorUserShareModal = forwardRef<
               }}
             >
               <span className={styles['icon']} />
-              {t({
-                enUS: 'Share Automator',
-              })}
+              {t({ enUS: 'Share Automator', zhCN: '分享Automator' })}
             </a>
           </div>
         </>
@@ -181,9 +178,7 @@ const AutomatorUserShareModal = forwardRef<
         <div className={styles['share-info']}>
           <div className={styles['title']}>
             <div className={styles['label']}>
-              {t({
-                enUS: 'My PnL',
-              })}
+              {t({ enUS: 'My PnL', zhCN: '我的PnL' })}
             </div>
             <div className={styles['address']}>{address}</div>
           </div>
@@ -281,7 +276,9 @@ const AutomatorUserShareModal = forwardRef<
             </div>
 
             <div className={styles['deposit-ccy']}>
-              <div className={styles['label']}>{t({ enUS: 'Followers:' })}</div>
+              <div className={styles['label']}>
+                {t({ enUS: 'Followers:', zhCN: '粉丝数：' })}
+              </div>
               <div className={styles['value']}>
                 {props.automatorInfo.participantNum || '-'}
               </div>
