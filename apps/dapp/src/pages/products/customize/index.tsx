@@ -30,6 +30,7 @@ import AmountInput from '@/components/AmountInput';
 import {
   CCYSelector,
   DepositCCYSelector,
+  useBaseDepositCcySelector,
   useDepositCcySelect,
   useForCcySelect,
 } from '@/components/CCYSelector';
@@ -253,18 +254,12 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
       anchorPrices: product.anchorPrices,
     });
   }, [product]);
-  const [baseCcy, setBaseCcy] = useState<CCY | USDS | undefined>(undefined);
-  useEffect(() => {
-    if (
-      !baseCcy &&
-      product?.vault.depositBaseCcy &&
-      quoteInfo?.convertedCalculatedInfoByDepositBaseCcy
-    ) {
-      setBaseCcy(product.vault.depositBaseCcy);
-    }
-  }, [baseCcy, product, quoteInfo]);
   const pps = usePPSNow(product?.vault);
 
+  const { depositCcy: baseCcy, apyInfo } = useBaseDepositCcySelector({
+    vault,
+    quoteResult: quoteInfo,
+  });
   return (
     <div
       className={classNames(styles['customize'], {
@@ -458,7 +453,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                 <IconExpand />
               </div>
             )}
-            {quoteInfo && (
+            {quoteInfo && baseCcy && (
               <div
                 className={classNames(styles['quote-infos'], {
                   [styles['expanded']]: expanded,
@@ -468,15 +463,15 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                 <div className={styles['details']}>
                   <PayoffChart
                     className={styles['chart']}
-                    depositCcy={quoteInfo.vault.depositCcy}
+                    depositCcy={baseCcy}
                     productType={quoteInfo.vault.productType}
                     anchorPrices={quoteInfo.anchorPrices}
-                    protectedYield={Number(quoteInfo.apyInfo?.min)}
+                    protectedYield={Number(apyInfo?.min)}
                     enhancedYield={simplePlus(
-                      quoteInfo.apyInfo?.max,
-                      -(quoteInfo.apyInfo?.min || 0),
+                      apyInfo?.max,
+                      -(apyInfo?.min || 0),
                     )}
-                    rchYield={Number(quoteInfo.apyInfo?.rch)}
+                    rchYield={Number(apyInfo?.rch)}
                     showYAxis
                     displayRchYield
                     atm={prices?.[quoteInfo.vault.forCcy]}
@@ -485,7 +480,6 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                     data={quoteInfo}
                     style={{ marginBottom: 40 }}
                     baseCcy={baseCcy}
-                    setBaseCcy={setBaseCcy}
                   />
                   <QuoteExplain
                     riskType={quoteInfo.vault.riskType}

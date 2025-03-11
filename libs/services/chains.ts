@@ -5,7 +5,7 @@ import IconArb from './assets/icon-arb.svg?url';
 import IconBNB from './assets/icon-bnb.webp';
 import IconETH from './assets/icon-eth.svg?url';
 import IconPol from './assets/icon-pol.webp';
-import IconSei from './assets/icon-sei.png';
+import IconSei from './assets/icon-sei.webp';
 import IconSepolia from './assets/icon-sepolia.svg?url';
 import IconSepoliaArb from './assets/icon-sepolia-arb.svg?url';
 

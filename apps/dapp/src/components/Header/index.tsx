@@ -1,10 +1,14 @@
 import { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { AutomatorService } from '@sofa/services/automator';
 import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
+import { amountFormatter } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { useIsPortrait } from '@sofa/utils/hooks';
+import { formatHighlightedText } from '@sofa/utils/string';
 import { joinUrl } from '@sofa/utils/url';
+import { useRequest } from 'ahooks';
 import classNames from 'classnames';
 
 import { EnvLinks } from '@/env-links';
@@ -32,6 +36,8 @@ import styles from './index.module.scss';
 
 addI18nResources(locale, 'Header');
 
+const isAutomatorSharePage = (location: ReturnType<typeof useLocation>) =>
+  location.pathname.toLowerCase() == '/a';
 const allMenuItems = (
   options: { hasCreateAutomator: boolean; isPortrait?: boolean },
   project: ProjectType,
@@ -39,6 +45,7 @@ const allMenuItems = (
 ): MenuItem[] => {
   // 下面这行被注释掉的code 告诉 ai18n 下面的 t 都是在 Header 包下
   // const [t] = useTranslation('Header');
+  const _isAutomatorSharePage = () => isAutomatorSharePage(location);
   const campaign = {
     label: (t: TFunction) =>
       t({
@@ -47,13 +54,14 @@ const allMenuItems = (
       }),
     target: '_blank',
     path: EnvLinks.config.VITE_CAMPAIGN_LINK,
-    hide: () => Env.isTelegram,
+    hide: () => Env.isTelegram || _isAutomatorSharePage(),
   };
   return markSelectedMenuItems(
     [
       {
         label: (t: TFunction) => t('Trade'),
         path: '',
+        hide: _isAutomatorSharePage,
         children: [
           {
             icon: <IconDefiMode />,
@@ -105,6 +113,7 @@ const allMenuItems = (
         label: (t: TFunction) =>
           ProjectTypeRefs[ProjectType.Automator].label(t),
         path: '',
+        active: _isAutomatorSharePage() ? true : undefined,
         children: [
           {
             icon: ProjectTypeRefs[ProjectType.Automator].icon,
@@ -179,6 +188,7 @@ const allMenuItems = (
       {
         label: (t: TFunction) => t({ enUS: 'Community', zhCN: '联系我们' }),
         path: '',
+        hide: _isAutomatorSharePage,
         children: [
           {
             icon: <IconUsers />,
@@ -203,6 +213,7 @@ const allMenuItems = (
         label: (t: TFunction) => t('Docs'),
         path: 'https://docs.sofa.org',
         type: 1,
+        hide: _isAutomatorSharePage,
       },
     ],
     location,
@@ -214,7 +225,9 @@ const DappHeader = () => {
   const location = useLocation();
   const isPortrait = useIsPortrait();
   const more = useMemo(() => true, []);
-
+  const { data: globalAutomatorStatus } = useRequest(() =>
+    AutomatorService.automatorShareGlobalStatus(),
+  );
   const wallet = useWalletStore();
 
   useEffect(() => {
@@ -253,6 +266,30 @@ const DappHeader = () => {
           { hasCreateAutomator: !!myAutomators?.length, isPortrait },
           ...args,
         )
+      }
+      menuSurfix={
+        isAutomatorSharePage(location) && globalAutomatorStatus ? (
+          <>
+            <span className={styles['automator-status']}>
+              {formatHighlightedText(
+                t(
+                  {
+                    enUS: 'Over [[{{amount}}]] {{crypto}} in funds are sharing the profits',
+                  },
+                  {
+                    amount: amountFormatter(
+                      globalAutomatorStatus.totalDepositAmount,
+                    ),
+                    crypto: globalAutomatorStatus.crypto,
+                  },
+                ),
+                {
+                  hightlightedClassName: styles['amount'],
+                },
+              )}
+            </span>
+          </>
+        ) : undefined
       }
       moreIcons={more}
     />

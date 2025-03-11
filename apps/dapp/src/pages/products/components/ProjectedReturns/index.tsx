@@ -12,6 +12,10 @@ import {
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
+import {
+  BaseDepositCcySelector,
+  useBaseDepositCcySelector,
+} from '@/components/CCYSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
@@ -343,12 +347,10 @@ export const ProjectedReturns = (
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
   const product = position.product;
-  const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
-  useEffect(() => {
-    if (!basedCcy && position.vault.depositBaseCcy) {
-      setBasedCcy(position.vault.depositBaseCcy);
-    }
-  }, [basedCcy, position]);
+  const { depositCcy, calculatedInfo } = useBaseDepositCcySelector({
+    vault: position.vault,
+    position: position,
+  });
   if (!position.amounts || !position.pricesForCalculation || !product)
     return <div className={styles['profit-scenarios']} />;
   const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
@@ -375,55 +377,31 @@ export const ProjectedReturns = (
         {isTrend && (
           <div className={styles['out-left']}>
             <TrendImg
-              data={
-                basedCcy == position.vault.depositBaseCcy
-                  ? {
-                      ...position,
-                      ...position.convertedCalculatedInfoByDepositBaseCcy,
-                    }
-                  : position
-              }
+              data={{
+                ...position,
+                ...calculatedInfo,
+              }}
             />
           </div>
         )}
         <div className={styles['out-right']}>
-          {basedCcy ? (
-            <>
-              <RadioGroup
-                type="button"
-                buttonSize="small"
-                value={basedCcy}
-                className={styles['base-ccy-select']}
-                onChange={(v) => setBasedCcy(v.target.value)}
-              >
-                <Radio value={position.vault.depositBaseCcy}>
-                  {position?.vault.depositBaseCcy}
-                </Radio>
-                <Radio value={position.vault.depositCcy}>
-                  {position.vault.depositCcy}
-                </Radio>
-              </RadioGroup>
-              {basedCcy == position.vault?.depositBaseCcy ? (
-                <Right
-                  data={{
-                    ...position,
-                    ...position.convertedCalculatedInfoByDepositBaseCcy,
-                    product: {
-                      ...position.product!,
-                      vault: {
-                        ...position.product!.vault,
-                        depositCcy: basedCcy,
-                      },
-                    },
-                  }}
-                />
-              ) : (
-                <Right {...props} />
-              )}
-            </>
-          ) : (
-            <Right {...props} />
-          )}
+          <BaseDepositCcySelector
+            vault={position.vault}
+            className={styles['base-ccy-select']}
+          />
+          <Right
+            data={{
+              ...position,
+              ...calculatedInfo,
+              product: {
+                ...position.product!,
+                vault: {
+                  ...position.product!.vault,
+                  depositCcy: depositCcy!,
+                },
+              },
+            }}
+          />
         </div>
       </div>
     </section>

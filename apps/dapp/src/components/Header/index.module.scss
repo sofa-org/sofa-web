@@ -137,6 +137,22 @@
   }
 }
 
+.automator-status {
+  color: rgba($color: #fff, $alpha: 45%);
+  font-size: 14px;
+  font-weight: 400;
+
+  .amount {
+    @include bold;
+
+    opacity: 1;
+    font-size: 16px;
+    background: linear-gradient(270deg, #d98a54 0%, #fffa00 0%, #ffa82e 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
 .nav-selector-item {
   max-width: none;
   width: min($width-content, 560px);
@@ -383,6 +399,16 @@
         }
       }
     }
+  }
+}
+
+:global(.header-pathname-a) {
+  .wallet {
+    display: none;
+  }
+
+  .index-prices {
+    display: none;
   }
 }
 

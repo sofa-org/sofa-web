@@ -494,13 +494,13 @@ export default {
     '((Deposit+Base Return + RCH Return + Enhanced Amount - Upside Settlement Fee)/Deposit)^(365/Tenor)-1':
       '((存款+基礎回報+RCH回報+增強額-結算手續費)/存款)^(365/期限)-1',
     'Estimated Aave/Lido/Sofa/Curve/Avalon Yield':
-      '預計Aave/Lido/Sofa/Curve年化收益率',
+      '預計Aave/Lido/Sofa/Curve/Avalon年化收益率',
     'Min(1 Month Aave/Lido/Sofa/Curve/Avalon Average, current Aave/Lido/Sofa/Curve/Avalon Apy). (Aave/Lido/Sofa/Curve/Avalon APY)':
-      '最小值(1個月Aave/Lido/Sofa/Curve平均收益,當前Aave/Lido/Sofa/Curve年化).^（Aave/Lido/Sofa/Curve年化利率）',
+      '最小值(1個月Aave/Lido/Sofa/Curve平均收益,當前Aave/Lido/Sofa/Curve/Avalon年化).^（Aave/Lido/Sofa/Curve/Avalon年化利率）',
     'Estimated Aave/Lido/Sofa/Curve/Avalon Return':
       '預計Aave/Lido/Sofa/Curve收益回報',
     '(Deposit * (1 + Aave/Lido/Sofa/Curve/Avalon APY Estimate) ^ (Tenor / 365) - Deposit)':
-      '(存款*(1+Aave/Lido/Sofa/Curve年化預估)^(期限/365)-存款)',
+      '(存款*(1+Aave/Lido/Sofa/Curve/Avalon年化預估)^(期限/365)-存款)',
     'Earn | Base Yield(APY)': 'Earn | 基礎收益',
     "User's Selection. Base Yield can be achieved if actual Aave/Lido/Sofa/Curve/Avalon return is equal to current estimate":
       '用戶選擇。如果實際Aave/Lido/Sofa/Curve收益等於當前預估，則可實現基礎收益',

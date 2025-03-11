@@ -223,6 +223,16 @@ const List = (props: {
                 styles['deposit-ccy-section'],
                 e[0].toLowerCase(),
               )}
+              style={{
+                // 如果只有一个币种，且没有 depositBaseCcy ，不显示 section header
+                display:
+                  Object.entries(dataGroupByDepositCcy).length > 1 ||
+                  Object.values(dataGroupByDepositCcy).find(
+                    (p) => p[0]?.vault?.depositBaseCcy,
+                  )
+                    ? undefined
+                    : 'none',
+              }}
             >
               <img
                 className={styles['logo']}
@@ -251,6 +261,7 @@ const List = (props: {
                     t(
                       {
                         enUS: 'Show [[{{baseCcy}}]] Potential Profits',
+                        zhCN: '显示 [[{{baseCcy}}]] 预计收益',
                       },
                       {
                         baseCcy: e[1][0].vault.depositBaseCcy,

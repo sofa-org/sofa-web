@@ -69,7 +69,7 @@ export default {
     '<b>Base Yield</b>:  Minimum fixed floor yield %\n\r<b>RCH Airdrops</b>:  Additional income derived from RCH token airdrops\n\r<b>Upside</b>: Excess income from favourable market outcomes':
       '<b>基礎年化</b>：最低固定收益%\n\n<b>RCH空投</b>：來自RCH代幣空投的額外收入\n\n<b>增益收益</b>：有利市場結果帶來的超額收入',
     '*Base yield and Potential Yield are subject to the actual Aave/Lido/Sofa/Curve/Avalon yield':
-      '*基礎年化和潛在年化受實際Aave/Lido/Sofa/Curve年化的影響',
+      '*基礎年化和潛在年化受實際Aave/Lido/Sofa/Curve/Avalon年化的影響',
   },
   'zh-TW': {
     'Potential Yield(APY)': '潛在年化收益',

@@ -73,7 +73,17 @@ export function useAutomatorModal() {
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
   return [
-    <AutomatorModal value={visible} onChange={(v) => setVisible(!!v)} />,
+    <AutomatorModal
+      value={visible}
+      onChange={(v) => {
+        if (!v) {
+          updateQuery({
+            'automator-vault': undefined,
+          });
+        }
+        setVisible(!!v);
+      }}
+    />,
     {
       open: (vault: AutomatorVaultInfo, type?: 'deposit' | 'redeem') => {
         const query = type
