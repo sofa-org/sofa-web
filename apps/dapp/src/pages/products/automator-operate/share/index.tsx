@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { Spin } from '@douyinfe/semi-ui';
 import { AutomatorService } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
@@ -248,58 +249,66 @@ const Share = () => {
                     <div className={styles['label']}>
                       {t({ enUS: `Best performance`, zhCN: '最佳表现' })}
                     </div>
-                    {(data && (
-                      <>
-                        <div className={styles['first-line']}>
-                          <span>{t({ enUS: 'Address', zhCN: '地址' })}</span>
-                          <span>{t({ enUS: 'Days', zhCN: '持有时间' })}</span>
-                          <span>
-                            {t({ enUS: 'APY', zhCN: '年化收益率 (APY)' })}
-                          </span>
-                        </div>
-                        <div className={styles['value']}>
-                          {data.map((row) => (
-                            <div className={styles['follower']}>
-                              <span className={styles['wallet']}>
-                                {row.wallet.replace(
-                                  /^(\w{8})\w+$/,
-                                  (_, s) => `${s}...`,
-                                )}
-                              </span>
-                              <span className={styles['day']}>
-                                {row.followDay}{' '}
-                                {t({ enUS: 'days', zhCN: '天' })}
-                              </span>
-                              <span
-                                className={styles['percentage']}
-                                style={{
-                                  color:
-                                    Number(row.pnlPercentage) >= 0
-                                      ? 'var(--color-rise)'
-                                      : 'var(--color-fall)',
-                                }}
-                              >
-                                {displayPercentage(
-                                  Number(row.pnlPercentage) / 100,
-                                  1,
-                                  true,
-                                )}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    )) || (
+                    {!data ? (
                       <>
                         <div className={styles['empty-line']}>
-                          <span>
-                            {t({
-                              enUS: `No followers yet`,
-                              zhCN: '还没有参与者',
-                            })}
-                          </span>
+                          <Spin />
                         </div>
                       </>
+                    ) : (
+                      (data?.length && (
+                        <>
+                          <div className={styles['first-line']}>
+                            <span>{t({ enUS: 'Address', zhCN: '地址' })}</span>
+                            <span>{t({ enUS: 'Days', zhCN: '持有时间' })}</span>
+                            <span>
+                              {t({ enUS: 'APY', zhCN: '年化收益率 (APY)' })}
+                            </span>
+                          </div>
+                          <div className={styles['value']}>
+                            {data.map((row) => (
+                              <div className={styles['follower']}>
+                                <span className={styles['wallet']}>
+                                  {row.wallet.replace(
+                                    /^(\w{8})\w+$/,
+                                    (_, s) => `${s}...`,
+                                  )}
+                                </span>
+                                <span className={styles['day']}>
+                                  {row.followDay}{' '}
+                                  {t({ enUS: 'days', zhCN: '天' })}
+                                </span>
+                                <span
+                                  className={styles['percentage']}
+                                  style={{
+                                    color:
+                                      Number(row.pnlPercentage) >= 0
+                                        ? 'var(--color-rise)'
+                                        : 'var(--color-fall)',
+                                  }}
+                                >
+                                  {displayPercentage(
+                                    Number(row.pnlPercentage) / 100,
+                                    1,
+                                    true,
+                                  )}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )) || (
+                        <>
+                          <div className={styles['empty-line']}>
+                            <span>
+                              {t({
+                                enUS: `No followers yet`,
+                                zhCN: '还没有参与者',
+                              })}
+                            </span>
+                          </div>
+                        </>
+                      )
                     )}
                   </div>
                 </div>
