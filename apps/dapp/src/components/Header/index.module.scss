@@ -315,6 +315,10 @@
 }
 
 @mixin rewrite-header-menu-mobile {
+  .automator-status {
+    display: none;
+  }
+
   :global {
     #header-menu-container {
       .semi-portal {
@@ -416,10 +420,8 @@
 }
 
 @media (orientation: portrait) {
-  :global {
-    .is-mobile {
-      @include rewrite-header-menu-mobile;
-    }
+  :global(.is-mobile) {
+    @include rewrite-header-menu-mobile;
   }
 
   .header {
@@ -562,9 +564,7 @@
 }
 
 @media screen and (width <=500px) {
-  :global {
-    .is-pc {
-      @include rewrite-header-menu-mobile;
-    }
+  :global(.is-pc) {
+    @include rewrite-header-menu-mobile;
   }
 }

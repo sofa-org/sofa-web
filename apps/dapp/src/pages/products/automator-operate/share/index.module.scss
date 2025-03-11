@@ -348,3 +348,68 @@
     color: #6ad837;
   }
 }
+
+.mobile-ui {
+  @include flex-center;
+  padding-top: 20px;
+  width: calc(100vw - 32px);
+  .btn-deposit {
+    top: 15px;
+  }
+
+  .automator-name {
+    margin-left: 10px;
+    margin-bottom: 20px;
+  }
+
+  .automator-infos {
+    width: calc(100vw - 20px);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 10px;
+    .automator-risk {
+      .label {
+        margin-left: -2px;
+        margin-top: -4px;
+      }
+    }
+    .automator-address {
+      font-size: 12px;
+      .address {
+        &::before {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+  .automator-desc {
+    margin-bottom: 0;
+    margin-left: 10px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .flex-gap {
+    @include flex-center;
+    flex-direction: column;
+    gap: 0;
+
+    .automator-performance {
+      height: calc((100vw - 32px) / 480 * 394);
+      width: calc(100vw - 32px);
+      padding-top: 4vh;
+      margin: 16px 0;
+    }
+    .automator-size {
+      width: calc(100vw - 32px);
+      .optivisor-info {
+        display: flex;
+        gap: 5vw;
+      }
+    }
+    .automator-follower {
+      width: calc(100vw - 32px);
+    }
+  }
+}
