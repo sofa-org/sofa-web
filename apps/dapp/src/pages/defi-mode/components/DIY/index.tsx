@@ -264,6 +264,14 @@ const RiskTolerance = () => {
     () =>
       useDIYState
         .getVaultOptions({ chainId, ...formData }, ['riskType'])
+        .filter(
+          (it) =>
+            !ProductsDIYService.getSupportMatrix({
+              ...formData,
+              chainId,
+              riskType: it.data.riskType,
+            }).skipCurrentOptionValue,
+        )
         .map((it) => ({
           label: <>{RiskTypeRefs[it.data.riskType!].desc(t)}</>,
           value: it.key,

@@ -121,9 +121,9 @@ export class ProductsDIYService {
       {} as Record<string, boolean | undefined>,
     );
     return {
-      skipCurrentOptionValue: !!(
-        v.depositCcy && depositCcyOnlyHasDual[v.depositCcy] !== false
-      ),
+      skipCurrentOptionValue:
+        !!(v.depositCcy && depositCcyOnlyHasDual[v.depositCcy] !== false) ||
+        !!(v.riskType && v.riskType === RiskType.DUAL),
       skipOption: ['dualOptions'],
     };
   }
