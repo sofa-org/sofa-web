@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
-import { VaultInfo } from '@sofa/services/base-type';
+import { ProductType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';
@@ -10,11 +10,10 @@ import classNames from 'classnames';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
-import styles from './index.module.scss';
+import styles from './DualProjectReturns.module.scss';
 
-export interface ProfitRenderProps extends BaseProps {
-  img?: ReactNode;
-  forCcy: VaultInfo['forCcy'];
+export interface DualProfitRenderProps extends BaseProps {
+  forCcy: VaultInfo['forCcy'] | VaultInfo['domCcy'];
   forCcyAmountWhenSuccessfulExecuted: number; // 要交换目标币种金额(如果成功兑换)
   forCcyExtraRewardWhenSuccessfulExecuted: number; // 要交换目标币种奖励金额(如果成功兑换)
   depositCcy: VaultInfo['depositCcy'];
@@ -24,7 +23,7 @@ export interface ProfitRenderProps extends BaseProps {
   productType: VaultInfo['productType'];
 }
 
-const ProfitScenarios = (props: ProfitRenderProps) => {
+export const DualProfitScenarios = (props: DualProfitRenderProps) => {
   const [t] = useTranslation('ProjectedReturns');
   const desc = useMemo(
     () => ProductTypeRefs[props.productType].dualDesc(t),
@@ -340,19 +339,51 @@ const ProfitScenarios = (props: ProfitRenderProps) => {
   );
 };
 
-export const ProjectedReturns = (
+export const DualProjectedReturns = (
   props: BaseProps & { data: Partial<PositionInfo> & { vault: VaultInfo } },
 ) => {
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
   const product = position.product;
+  const profitsProps = useMemo(() => {
+    if (!product || !position.amounts) {
+      return undefined;
+    }
+    const res = {
+      productType: product?.vault.productType,
+    } as DualProfitRenderProps;
+    if (product?.vault.productType == ProductType.BullSpread) {
+      res.forCcy = product.vault.forCcy;
+      // TODO:
+      // (anchorPrice[0] * depositAmount)
+      res.forCcyAmountWhenSuccessfulExecuted = 1000;
+      // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
+      res.forCcyExtraRewardWhenSuccessfulExecuted = 100;
+      res.depositCcy = product.vault.depositCcy;
+
+      res.depositAmount = Number(position.amounts.own || 0);
+      // maxRedeemable - own
+      res.depositCcyExtraRewardWhenNoExecuted = 100;
+      res.rchReturnAmount = Number(position.amounts.rchAirdrop || 0);
+    } else {
+      res.forCcy = product.vault.domCcy;
+      // 倒过来，只不过小心一下 anchorPrice
+      res.forCcyAmountWhenSuccessfulExecuted = 1000;
+      res.forCcyExtraRewardWhenSuccessfulExecuted = 100;
+      res.depositCcy = product.vault.forCcy;
+      res.depositAmount = Number(position.amounts.own || 0);
+      res.depositCcyExtraRewardWhenNoExecuted = 100;
+      res.rchReturnAmount = Number(position.amounts.rchAirdrop || 0);
+    }
+    return res;
+  }, [product, position]);
   const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
   useEffect(() => {
     if (!basedCcy && position.vault.depositBaseCcy) {
       setBasedCcy(position.vault.depositBaseCcy);
     }
   }, [basedCcy, position]);
-  if (!position.amounts || !position.pricesForCalculation || !product)
+  if (!product || !profitsProps)
     return <div className={styles['profit-scenarios']} />;
   const hasExpired = Number(product.expiry) * 1000 <= Date.now();
 
@@ -367,7 +398,7 @@ export const ProjectedReturns = (
         })}
         style={props.style}
       >
-        {/* TODO */}
+        <DualProfitScenarios {...profitsProps} />
       </div>
     </section>
   );

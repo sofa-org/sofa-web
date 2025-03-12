@@ -19,6 +19,7 @@ import {
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
+import { DualProfitsRender } from './Dual/DualProfitsRender';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -203,6 +204,13 @@ export const ProfitsRender = (
     vault: data.vault,
     quoteResult: data,
   });
+  if (props.data.vault.riskType == RiskType.DUAL) {
+    return (
+      <>
+        <DualProfitsRender {...props} />
+      </>
+    );
+  }
   return (
     <>
       <BaseDepositCcySelector

@@ -1,14 +1,6 @@
-import {
-  Dispatch,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Dispatch, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DatePicker, Modal, Spin } from '@douyinfe/semi-ui';
+import { DatePicker } from '@douyinfe/semi-ui';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
@@ -16,49 +8,28 @@ import {
   ProductQuoteParams,
   ProductQuoteResult,
   ProductsService,
-  ProductType,
-  RiskType,
 } from '@sofa/services/products';
-import {
-  amountFormatter,
-  displayPercentage,
-  roundWith,
-} from '@sofa/utils/amount';
-import { displayExpiry, next8h } from '@sofa/utils/expiry';
+import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
+import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
-import { currQuery } from '@sofa/utils/history';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import { formatHighlightedText } from '@sofa/utils/string';
-import { displayTenor } from '@sofa/utils/time';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
 import { omit } from 'lodash-es';
 import { nanoid } from 'nanoid';
-import { stringify } from 'qs';
 
 import AmountInput from '@/components/AmountInput';
 import { useIndexPrices } from '@/components/IndexPrices/store';
-import { PayoffChart } from '@/components/Payoff';
-import {
-  ProductTypeRefs,
-  RiskTypeRefs,
-} from '@/components/ProductSelector/enums';
-import { Time } from '@/components/TimezoneSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import { useGlobalState } from '@/store';
 
 import { useProductsState } from '../../../store';
-import { Calculation } from '../../Calculation';
-import { CheckboxBorrow } from '../../CheckboxBorrow';
 import InvestButton from '../../InvestButton';
 import { ProfitsRender } from '../../ProfitsRender';
-import { QuoteExplain } from '../../QuoteExplain';
 import locale from '../locale';
 import { ModalWrapper } from '../ModalWrapper';
-
-import { Comp as IconEdit } from './assets/icon-edit.svg';
 
 import styles from './DualDepositModalContent.module.scss';
 
@@ -356,7 +327,7 @@ export const DualDepositModalContent = (
         </div>
         <div className={styles['right']}>
           {/* 数据展示 */}
-          TODO: right
+          <ProfitsRender data={data} />
         </div>
       </ModalWrapper>
     </>

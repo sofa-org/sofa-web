@@ -19,6 +19,7 @@ import {
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
+import { DualProjectedReturns } from './Dual/DualProjectReturns';
 import locale from './locale';
 import { RangeboundImg } from './RangeboundImg';
 import { TrendImg } from './TrendImg';
@@ -351,6 +352,9 @@ export const ProjectedReturns = (
     vault: position.vault,
     position: position,
   });
+  if (position.vault.riskType == RiskType.DUAL) {
+    return <DualProjectedReturns {...props} />;
+  }
   if (!position.amounts || !position.pricesForCalculation || !product)
     return <div className={styles['profit-scenarios']} />;
   const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(

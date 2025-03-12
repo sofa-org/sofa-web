@@ -127,9 +127,6 @@ export interface OriginProductQuoteResult extends CalculatedInfo {
   timestamp: number; // 目前定价对应的触发时间；下一个观察开始时间基于此逻辑计算
   observationStart: number; // 目前产品根据 timestamp 预估的开始观察敲入敲出时间，需要持续观测的产品有这个
   quote: QuoteInfo & { quoteId: string | number };
-
-  // Dual 的部分
-  strike?: number;
 }
 
 export type ProductQuoteParams = Omit<

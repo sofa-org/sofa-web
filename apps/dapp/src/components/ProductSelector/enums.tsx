@@ -176,7 +176,7 @@ export const ProductTypeRefs = {
     }),
     dualDesc: (t: TFunction) => ({
       executed: t({ enUS: 'Buy Low Executed' }),
-      limited: t({ enUS: 'Limit Buy {{amount}} {{crypto}}' }),
+      limited: t({ enUS: 'Limit Buy' }),
       partialExecuted: t({ enUS: 'Partial Buy' }),
     }),
     extraDesc: (t: TFunction) =>
@@ -403,7 +403,7 @@ export const ProductTypeRefs = {
     }),
     dualDesc: (t: TFunction) => ({
       executed: t({ enUS: 'Sell High Executed' }),
-      limited: t({ enUS: 'Limit Sell {{amount}} {{crypto}}' }),
+      limited: t({ enUS: 'Limit Sell' }),
       partialExecuted: t({ enUS: 'Partial Sell' }),
     }),
     extraDesc: (t: TFunction) =>
