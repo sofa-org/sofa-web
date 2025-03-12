@@ -7,6 +7,8 @@ export default {
     'With RCH': 'With RCH',
     'Potential Yield': 'Potential Yield',
     Now: 'Now',
+    '-depositccy-potentia.ceb94b88dcbda32f06e0bc45ffbcb582':
+      '({{depositCcy}} Potential Yield: {{apy}} APY)',
   },
   'ja-JP': {
     'Base Yield': '基本利回り',
@@ -32,6 +34,8 @@ export default {
     'Potential Yield': '潜在收益率',
     Now: '现在',
     type: '潜在收益',
+    '-depositccy-potentia.ceb94b88dcbda32f06e0bc45ffbcb582':
+      '({{depositCcy}} 潜在年化收益: {{apy}})',
   },
   'zh-HK': {
     'Base Yield': '基本收益',

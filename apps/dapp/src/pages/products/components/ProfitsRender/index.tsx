@@ -12,6 +12,10 @@ import {
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
+import {
+  BaseDepositCcySelector,
+  useBaseDepositCcySelector,
+} from '@/components/CCYSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
@@ -192,48 +196,33 @@ export const ProfitsRender = (
   props: BaseProps & {
     data: ProductQuoteResult;
     baseCcy?: CCY | USDS;
-    setBaseCcy: (ccy: CCY | USDS) => void;
   },
 ) => {
   const data = props.data;
+  const { depositCcy, calculatedInfo } = useBaseDepositCcySelector({
+    vault: data.vault,
+    quoteResult: data,
+  });
   return (
     <>
-      {props.baseCcy ? (
-        <>
-          <RadioGroup
-            type="button"
-            buttonSize="small"
-            value={props.baseCcy}
-            className={styles['base-ccy-select']}
-            onChange={(v) => props.setBaseCcy(v.target.value)}
-          >
-            <Radio value={data.vault.depositBaseCcy}>
-              {data.vault.depositBaseCcy}
-            </Radio>
-            <Radio value={data.vault.depositCcy}>{data.vault.depositCcy}</Radio>
-          </RadioGroup>
-          {props.baseCcy == data.vault.depositBaseCcy ? (
-            <ProfitsRenderNoBaseCcySelect
-              data={{
-                ...data,
-                ...data.convertedCalculatedInfoByDepositBaseCcy,
-                product: {
-                  ...data,
-                  ...data.convertedCalculatedInfoByDepositBaseCcy,
-                  vault: {
-                    ...data.vault,
-                    depositCcy: data.vault.depositBaseCcy,
-                  },
-                },
-              }}
-            />
-          ) : (
-            <ProfitsRenderNoBaseCcySelect data={{ ...data, product: data }} />
-          )}
-        </>
-      ) : (
-        <ProfitsRenderNoBaseCcySelect data={{ ...data, product: data }} />
-      )}
+      <BaseDepositCcySelector
+        vault={data.vault}
+        className={styles['base-ccy-select']}
+      />
+      <ProfitsRenderNoBaseCcySelect
+        data={{
+          ...data,
+          ...calculatedInfo,
+          product: {
+            ...data,
+            ...calculatedInfo,
+            vault: {
+              ...data.vault,
+              depositCcy: depositCcy!,
+            },
+          },
+        }}
+      />
     </>
   );
 };

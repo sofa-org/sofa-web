@@ -1,13 +1,72 @@
+.share-btn {
+  @include bold;
+  @include pointer;
+
+  min-width: 100px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 80px;
+  background: #000;
+  font-size: 14px;
+  display: inline-block;
+
+  span {
+    background: $color-main-gradient;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    &::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      background: url("../../assets/icon-share.svg") no-repeat center / 100%;
+      vertical-align: middle;
+      margin-right: 8px;
+      margin-top: -2px;
+    }
+  }
+
+  &:hover {
+    opacity: 0.65;
+  }
+}
+
+.share-btn-mask {
+  display: none;
+  text-align: center;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 159px;
+  border-bottom-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+  background: rgba(#fff, 0.4);
+  backdrop-filter: blur(5px);
+}
+
 .card {
   @include pointer;
 
   flex: 1;
+  position: relative;
   max-width: 258px;
   min-width: max(calc(100% / 4 - 16px * 3), 200px);
   margin: 0;
   padding: 16px;
   border-radius: 16px;
   background: #fff;
+
+  &:hover {
+    .share-btn-mask {
+      display: flex;
+    }
+  }
 }
 
 .header {
@@ -168,4 +227,22 @@
 
 @media (width <=720px) {
   @include rewrite;
+
+  .share-btn-mask {
+    display: flex;
+    background: none;
+    backdrop-filter: unset;
+    position: static;
+    height: 0;
+    padding: 0;
+    border-radius: 0;
+
+    .share-btn {
+      // mobile UI 暂时不支持分享
+      // position: absolute;
+      // top: 10px;
+      // right: 10px;
+      display: none;
+    }
+  }
 }

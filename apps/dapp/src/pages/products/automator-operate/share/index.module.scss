@@ -1,0 +1,425 @@
+.automator-share-page {
+  color: #fff;
+
+  @include flex-center;
+
+  flex-direction: column;
+  width: 1000px;
+  margin: 0 auto;
+  padding-top: 40px;
+  position: relative;
+}
+
+.btn-deposit {
+  @include flex-center;
+  @include pointer;
+  @include bold;
+
+  color: #000;
+  font-size: 16px;
+  padding: 0 36px;
+  height: 40px;
+  gap: 4px;
+  border-radius: 100px;
+  background: $color-main-gradient;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  border: unset;
+
+  &::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: url("./assets/icon-download.svg") no-repeat center / 100%;
+    vertical-align: middle;
+  }
+
+  &:hover {
+    opacity: 0.65;
+  }
+}
+
+.amount {
+  @include bold;
+
+  background: var(
+    linear-gradient(270deg, #d98a54 0%, #fffa00 0%, #ffa82e 100%)
+  );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.automator-name {
+  @include bold;
+
+  color: #fff;
+  font-size: 24px;
+}
+
+.automator-infos {
+  display: flex;
+  margin: 16px 0;
+  height: 20px;
+}
+
+.automator-address {
+  font-size: 16px;
+
+  .address {
+    font-weight: 510;
+    color: #fff;
+
+    &::before {
+      width: 12px;
+      height: 16px;
+      display: inline-block;
+      content: "";
+      background: url("./assets/icon-address.svg") no-repeat center / 100%;
+      margin: -4px 6px 0 24px;
+      vertical-align: middle;
+    }
+
+    &::after {
+      width: 15px;
+      height: 15px;
+      display: inline-block;
+      content: "";
+      background: url("./assets/icon-share.svg") no-repeat center / 100%;
+      margin: -4px 6px 0;
+      vertical-align: middle;
+      opacity: 0.45;
+    }
+
+    &:hover {
+      color: rgba(#fff, 0.65);
+    }
+  }
+
+  .logo {
+    margin-top: -4px;
+    width: 19px;
+    height: 19px;
+    vertical-align: middle;
+  }
+}
+
+.automator-risk {
+  line-height: 20px;
+
+  svg {
+    color: #737373;
+  }
+
+  .label {
+    width: 20px;
+  }
+
+  .risk-desc {
+    color: #fff;
+
+    &::before {
+      content: "|";
+      color: fff;
+      opacity: 0.3;
+      margin: 0 8px;
+    }
+  }
+}
+
+.optivisor-info {
+  display: flex;
+  gap: 73px;
+}
+
+.flex-gap {
+  display: flex;
+  gap: 16px;
+}
+
+.display-flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.automator-desc {
+  font-size: 14px;
+  color: #fff;
+  opacity: 0.65;
+  margin-bottom: 26px;
+  max-width: 1000px;
+}
+
+.modal-capturing {
+  margin: 0 !important;
+
+  :global(.semi-modal-footer) {
+    display: none !important;
+  }
+}
+
+.automator-size {
+  width: 491px;
+  height: 129px;
+  padding: 24px;
+  border-radius: 16px;
+  border: 0.871px solid #e0e0e0;
+  background: #fff;
+
+  .label {
+    color: #000;
+    font-size: 16px;
+    opacity: 0.45;
+    margin-bottom: 23px;
+  }
+
+  .value {
+    @include bold;
+
+    color: #000;
+    opacity: 0.85;
+    font-size: 24px;
+    display: inline;
+
+    .unit {
+      font-size: 16px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .percent {
+      margin-left: 12px;
+      font-size: 16px;
+      background: linear-gradient(
+        270deg,
+        #fffa00 -30.43%,
+        #ffdec3 -30.43%,
+        #e88947 100%
+      );
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+.automator-performance {
+  width: 480px;
+  height: 394px;
+  background: url("./assets/bg-treasure.png") no-repeat center / 100%;
+  text-align: center;
+  padding-top: 80px;
+
+  .label {
+    color: #fff;
+    font-size: 16px;
+    opacity: 0.65;
+    display: block;
+    margin-bottom: 24px;
+  }
+
+  .value {
+    @include bold;
+
+    font-size: 48px;
+  }
+}
+
+.pool-size {
+  margin: 48px;
+
+  .value {
+    font-size: 24px;
+    opacity: 0.85;
+    background: linear-gradient(270deg, #d98a54 0%, #fffa00 0%, #ffa82e 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    .logo {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 8px;
+      margin-top: -3px;
+    }
+
+    .unit {
+      font-size: 16px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  }
+}
+
+.automator-follower {
+  width: 491px;
+  height: 249px;
+  padding: 24px;
+  border-radius: 16px;
+  border: 0.871px solid #e0e0e0;
+  background: #fff;
+  margin-top: 16px;
+
+  .label {
+    color: #000;
+    font-size: 16px;
+    opacity: 0.45;
+    margin-bottom: 12px;
+  }
+}
+
+.followers-pnl {
+  .follower {
+    color: #000;
+    font-size: 16px;
+    display: flex;
+    align-items: flex-start;
+    border-radius: 4px;
+
+    // margin-top: 12px;
+    font-weight: 500;
+
+    span {
+      height: 31px;
+    }
+
+    > span:first-child {
+      &::before {
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        content: "";
+        background: url("./assets/icon-user.svg") no-repeat center / 100%;
+        margin: -4px 6px 0 0;
+        vertical-align: middle;
+      }
+    }
+
+    > span:last-child {
+      @include bold;
+    }
+  }
+
+  .value {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .first-line,
+  .follower {
+    > span:first-child {
+      width: 40%;
+    }
+
+    > span:nth-child(2) {
+      width: 30%;
+    }
+
+    > span:last-child {
+      width: 30%;
+    }
+  }
+
+  .first-line {
+    padding: 4px;
+    height: 27px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    color: #000;
+    font-size: 16px;
+    opacity: 0.45;
+    border-radius: 4px;
+    background: linear-gradient(0deg, rgb(0 0 0 / 6%) 0%, rgb(0 0 0 / 6%) 100%),
+      #fff;
+  }
+
+  .empty-line {
+    @include flex-center;
+
+    color: rgba(#000, 0.65);
+    height: 160px;
+  }
+
+  .percentage {
+    @include bold;
+
+    color: #6ad837;
+  }
+}
+
+.mobile-ui {
+  @include flex-center;
+
+  padding-top: 20px;
+  width: calc(100vw - 32px);
+
+  .btn-deposit {
+    top: 15px;
+  }
+
+  .automator-name {
+    margin-left: 10px;
+    margin-bottom: 20px;
+  }
+
+  .automator-infos {
+    width: calc(100vw - 20px);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-left: 10px;
+
+    .automator-risk {
+      .label {
+        margin-left: -2px;
+        margin-top: -4px;
+      }
+    }
+
+    .automator-address {
+      font-size: 12px;
+
+      .address {
+        &::before {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+
+  .automator-desc {
+    margin-bottom: 0;
+    margin-left: 10px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .flex-gap {
+    @include flex-center;
+
+    flex-direction: column;
+    gap: 0;
+
+    .automator-performance {
+      height: calc((100vw - 32px) / 480 * 394);
+      width: calc(100vw - 32px);
+      padding-top: 4vh;
+      margin: 16px 0;
+    }
+
+    .automator-size {
+      width: calc(100vw - 32px);
+
+      .optivisor-info {
+        display: flex;
+        gap: 5vw;
+      }
+    }
+
+    .automator-follower {
+      width: calc(100vw - 32px);
+    }
+  }
+}

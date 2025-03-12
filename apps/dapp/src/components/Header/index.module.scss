@@ -137,6 +137,25 @@
   }
 }
 
+.automator-status {
+  color: rgba($color: #fff, $alpha: 45%);
+  font-size: 14px;
+  font-weight: 400;
+  border-left: rgba(#fff, 0.24) solid 1px;
+  padding-left: 14px;
+  margin-left: -14px;
+
+  .amount {
+    @include bold;
+
+    opacity: 1;
+    font-size: 16px;
+    background: linear-gradient(270deg, #d98a54 0%, #fffa00 0%, #ffa82e 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
 .nav-selector-item {
   max-width: none;
   width: min($width-content, 560px);
@@ -296,6 +315,10 @@
 }
 
 @mixin rewrite-header-menu-mobile {
+  .automator-status {
+    display: none;
+  }
+
   :global {
     #header-menu-container {
       .semi-portal {
@@ -386,11 +409,19 @@
   }
 }
 
+:global(.header-pathname-a) {
+  .wallet {
+    display: none;
+  }
+
+  .index-prices {
+    display: none;
+  }
+}
+
 @media (orientation: portrait) {
-  :global {
-    .is-mobile {
-      @include rewrite-header-menu-mobile;
-    }
+  :global(.is-mobile) {
+    @include rewrite-header-menu-mobile;
   }
 
   .header {
@@ -533,9 +564,7 @@
 }
 
 @media screen and (width <=500px) {
-  :global {
-    .is-pc {
-      @include rewrite-header-menu-mobile;
-    }
+  :global(.is-pc) {
+    @include rewrite-header-menu-mobile;
   }
 }

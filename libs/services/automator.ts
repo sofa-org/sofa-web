@@ -176,6 +176,12 @@ export interface AutomatorFollower {
   pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
 }
 
+export interface AutomatorTopFollower {
+  wallet: string; // wallet
+  followDay: number; // 加入天数
+  pnlPercentage: number | string; // Yield (百分比) (基于crvUSD)
+}
+
 export class AutomatorService {
   static cvtAutomatorInfo<T extends OriginAutomatorInfo>(
     it: T,
@@ -363,5 +369,38 @@ export class AutomatorService {
           list: res.value.values,
         } as PageResult<AutomatorFollower>;
       });
+  }
+
+  @asyncShare(
+    5000,
+    (name, [vault]) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `${name}-${vault.chainId}-${vault.vault.toLowerCase()}`,
+  )
+  static async topFollowers(vault: AutomatorVaultInfo) {
+    return http
+      .get<unknown, HttpResponse<AutomatorTopFollower[]>>(
+        `/automator/user/top-list`,
+        {
+          params: {
+            chainId: vault.chainId,
+            automatorVault: vault.vault,
+          },
+        },
+      )
+      .then((res) => res.value);
+  }
+
+  @asyncShare(300000)
+  static async automatorShareGlobalStatus() {
+    return http
+      .get<
+        unknown,
+        HttpResponse<{ totalDepositAmount: string | number; crypto: USDS }>
+      >(`/automator/aum`, {
+        params: {},
+      })
+      .then((res) => res.value);
   }
 }

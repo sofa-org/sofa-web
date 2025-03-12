@@ -1,15 +1,20 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Spin } from '@douyinfe/semi-ui';
-import { AutomatorInfo } from '@sofa/services/automator';
+import { Button, Spin, Toast } from '@douyinfe/semi-ui';
+import {
+  AutomatorDetail,
+  AutomatorInfo,
+  AutomatorService,
+} from '@sofa/services/automator';
 import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
 import { t, TFunction, useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
+import { getErrorMsg } from '@sofa/utils/fns';
 import { updateQuery } from '@sofa/utils/history';
-import { useQuery } from '@sofa/utils/hooks';
+import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import { arrToDict, objectValCvt } from '@sofa/utils/object';
 import classNames from 'classnames';
 
@@ -20,8 +25,14 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 
 import { useAutomatorModal } from '../automator/index-modal';
 import { useAutomatorStore } from '../automator/store';
+import AutomatorShareModal, {
+  AutomatorShareModalPropsRef,
+} from '../automator-operate/components/ShareModal';
 
 import { AutomatorCard } from './components/Card';
+import AutomatorUserShareModal, {
+  AutomatorUserShareModalPropsRef,
+} from './components/ShareModal';
 
 import styles from './index.module.scss';
 
@@ -170,7 +181,41 @@ const Index = () => {
         .join(', '),
     [],
   );
+  // 自动打开url里的automator
+  const vaultAddress = useQuery(
+    (q) => q['automator-vault'] as string | undefined,
+  );
+  const [lastOpenVault, setLastOpenVault] = useState('');
+  useEffect(
+    useLazyCallback(() => {
+      if (vaultAddress) {
+        const v = data?.find(
+          (v) => v.vaultInfo.vault.toLowerCase() == vaultAddress.toLowerCase(),
+        );
+        if (v && v.vaultInfo.vault.toLowerCase() != lastOpenVault) {
+          setLastOpenVault(v.vaultInfo.vault.toLowerCase());
+          modalController.open(v.vaultInfo, undefined);
+        }
+      }
+    }),
+    [data],
+  );
+  const shareUserModalRef = useRef<AutomatorUserShareModalPropsRef>(null);
+  const shareModalRef = useRef<AutomatorShareModalPropsRef>(null);
+  const [currentShareInfo, setCurrentShareInfo] = useState<
+    AutomatorInfo | undefined
+  >(undefined);
 
+  const [currentShareDetail, setCurrentShareDetail] = useState<
+    AutomatorDetail | undefined
+  >(undefined);
+  useEffect(() => {
+    if (currentShareDetail) {
+      setTimeout(() => {
+        shareModalRef.current?.show();
+      }, 0);
+    }
+  }, [currentShareDetail]);
   return (
     <TopTabs
       type={'banner-expandable-tab'}
@@ -214,6 +259,22 @@ const Index = () => {
                   key={a.vaultInfo.vault.toLowerCase()}
                   info={a}
                   modalController={modalController}
+                  showShareBtn={true}
+                  onShareClicked={(v) => {
+                    setCurrentShareInfo(v);
+                    if (tab === 'holding') {
+                      setTimeout(() => {
+                        shareUserModalRef.current?.show();
+                      }, 0);
+                    } else {
+                      setCurrentShareDetail(undefined);
+                      AutomatorService.info(v.vaultInfo)
+                        .then((d) => {
+                          setCurrentShareDetail(d);
+                        })
+                        .catch((e) => Toast.error(getErrorMsg(e)));
+                    }
+                  }}
                 />
               ))}
             </div>
@@ -237,6 +298,21 @@ const Index = () => {
         )}
       </Spin>
       {modal}
+
+      {(currentShareInfo && (
+        <AutomatorUserShareModal
+          automatorInfo={currentShareInfo}
+          ref={shareUserModalRef}
+        />
+      )) ||
+        undefined}
+      {(currentShareDetail && (
+        <AutomatorShareModal
+          automatorDetail={currentShareDetail}
+          ref={shareModalRef}
+        />
+      )) ||
+        undefined}
     </TopTabs>
   );
 };
