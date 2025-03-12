@@ -82,6 +82,20 @@ const PositionDetails = (props: PositionDetailsProps) => {
 
   const infos = useMemo(
     () => [
+      ...(product.vault.riskType == RiskType.DUAL
+        ? [
+            {
+              label: t({
+                enUS: 'Asset Pair',
+                zhCN: '币对',
+              }),
+              value:
+                product.vault.productType == ProductType.BullSpread
+                  ? `${product.vault.forCcy} / ${product.vault.depositCcy}`
+                  : `${product.vault.forCcy} / ${product.vault.domCcy}`,
+            },
+          ]
+        : []),
       {
         label: t('Expiration'),
         value: displayExpiry(product.expiry * 1000),

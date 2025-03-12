@@ -174,6 +174,11 @@ export const ProductTypeRefs = {
         ),
       } as { situation: string; description: string } | undefined,
     }),
+    dualDesc: (t: TFunction) => ({
+      executed: t({ enUS: 'Buy Low Executed' }),
+      limited: t({ enUS: 'Limit Buy {{amount}} {{crypto}}' }),
+      partialExecuted: t({ enUS: 'Partial Buy' }),
+    }),
     extraDesc: (t: TFunction) =>
       t(
         'Users expressing a bullish market view can benefit from the Bull Trend .<br/>If the asset price is within the range [K1 ~ K2] at expiry, payouts increase from the lower strike [K1] to the maximum at the upper strike [K2].<br/>If the price drops below [K1], investors still receive the Base Yield and RCH tokens.',
@@ -283,6 +288,9 @@ export const ProductTypeRefs = {
         | { situation: string; description: string }
         | undefined,
     }),
+    dualDesc: (t: TFunction) => {
+      throw new Error('Not suported scenario');
+    },
     extraDesc: (t: TFunction) =>
       t(
         'Users can take advantage of sideways markets with the Rangebound.<br/>If the asset price remains within the preset range during the period, users will earn Potential Yield.<br/>Should the price touch either the lower or upper barriers, users will still receive the Base Yield and RCH tokens.',
@@ -392,6 +400,11 @@ export const ProductTypeRefs = {
           'The payoff will be derived based on a sliding scale between <b>Potential</b> and <b>Base+ Profits</b>.',
         ),
       } as { situation: string; description: string } | undefined,
+    }),
+    dualDesc: (t: TFunction) => ({
+      executed: t({ enUS: 'Sell High Executed' }),
+      limited: t({ enUS: 'Limit Sell {{amount}} {{crypto}}' }),
+      partialExecuted: t({ enUS: 'Partial Sell' }),
     }),
     extraDesc: (t: TFunction) =>
       t(
