@@ -122,6 +122,21 @@ const AutomatorShareModal = forwardRef<
                   filter: (e) => {
                     return e.getAttribute?.('aria-label') != 'close';
                   },
+                  getCapturingElement: () => {
+                    const res =
+                      document.querySelector<HTMLElement>('.semi-modal')!;
+                    const portal =
+                      document.querySelector<HTMLElement>('.semi-portal')!;
+                    portal.setAttribute('origin-z-index', portal.style.zIndex);
+                    portal.style.zIndex = '-1';
+                    return res;
+                  },
+                  onCaptured: () => {
+                    const portal =
+                      document.querySelector<HTMLElement>('.semi-portal')!;
+                    portal.style.zIndex =
+                      portal.getAttribute('origin-z-index')!;
+                  },
                 })
                   .then(() =>
                     Toast.success(

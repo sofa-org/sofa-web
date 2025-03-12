@@ -31,6 +31,8 @@ export async function captureAndCopyImage(options: {
   capturingClassName: string;
   filter?: (domNode: HTMLElement) => boolean;
   maskElementClassName?: string;
+  getCapturingElement: () => HTMLElement;
+  onCaptured?: (success: boolean) => void;
 }) {
   let maskElement: HTMLDivElement | undefined = undefined;
   let reactRoot: ReturnType<typeof createRoot> | undefined = undefined;
@@ -39,10 +41,10 @@ export async function captureAndCopyImage(options: {
     maskElement.className = options.maskElementClassName;
     document.body.appendChild(maskElement);
     reactRoot = createRoot(maskElement);
-    reactRoot.render(<Spin />);
+    reactRoot.render(<Spin size="large" />);
     await new Promise((resolve) => setTimeout(resolve, 350));
   }
-  const element = document.querySelector<HTMLElement>('.semi-modal')!;
+  const element = options.getCapturingElement();
   element.className = element.className + ' ' + options.capturingClassName;
   await new Promise((resolve) => setTimeout(resolve, 0));
   // window.devicePixelRatio = 2;
@@ -61,9 +63,11 @@ export async function captureAndCopyImage(options: {
   const downloadLink = document.createElement('a');
   downloadLink.setAttribute('download', 'ShareImage.png');
   if (!blob) {
+    options.onCaptured?.(false);
     Toast.error('Save picture failed');
     return;
   }
+  options.onCaptured?.(true);
   try {
     navigator.clipboard.write([
       new ClipboardItem({

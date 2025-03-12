@@ -227,6 +227,7 @@
 
 .modal-capturing {
   margin: 0 !important;
+  z-index: -1;
 
   :global(.semi-modal-footer) {
     display: none !important;
@@ -239,7 +240,6 @@
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background-color: #fff;
   transition: opacity 0.3s ease;
 }
 
