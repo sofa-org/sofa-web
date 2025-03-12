@@ -125,7 +125,7 @@ const Share = () => {
                           enUS: 'Max Risk Exposure',
                           zhCN: '最大风险敞口',
                         })}
-                        : {displayPercentage(ref.value)}
+                        : {displayPercentage(ref.value, 0)}
                       </span>
                     </>
                   ) : (
