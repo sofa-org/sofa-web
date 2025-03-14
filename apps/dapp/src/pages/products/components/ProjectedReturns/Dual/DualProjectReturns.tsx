@@ -46,35 +46,37 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
           styles['executed'],
         )}
       >
-        <div className={styles['title']}>
-          <span className={styles['emoji']}>🎉</span>
-          {desc.executed}
-        </div>
-        <div className={styles['subtitle']}>
-          {t(
-            {
-              enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
-            },
-            {
-              amount: amountFormatter(
-                simplePlus(
-                  props.forCcyAmountWhenSuccessfulExecuted,
-                  props.forCcyExtraRewardWhenSuccessfulExecuted,
+        <div className={styles['title-info']}>
+          <div className={styles['title']}>
+            <span className={styles['emoji']}>🎉</span>
+            {desc.executed}
+          </div>
+          <div className={styles['subtitle']}>
+            {t(
+              {
+                enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
+              },
+              {
+                amount: amountFormatter(
+                  simplePlus(
+                    props.forCcyAmountWhenSuccessfulExecuted,
+                    props.forCcyExtraRewardWhenSuccessfulExecuted,
+                  ),
+                  forCcyConfig?.precision,
                 ),
-                forCcyConfig?.precision,
-              ),
-              crypto: forCcyConfig?.name || props.forCcy,
-              rchAmount: amountFormatter(
-                props.rchReturnAmount,
-                rchConfig?.precision,
-              ),
-            },
-          )}
-          |
-          {t({
-            enUS: 'Est.',
-            zhCN: '预估',
-          })}
+                crypto: forCcyConfig?.name || props.forCcy,
+                rchAmount: amountFormatter(
+                  props.rchReturnAmount,
+                  rchConfig?.precision,
+                ),
+              },
+            )}
+            |
+            {t({
+              enUS: 'Est.',
+              zhCN: '预估',
+            })}
+          </div>
         </div>
         <div
           className={classNames(styles['profit-scenario'], styles['executed'])}
@@ -102,7 +104,8 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
                 ),
               )}
             </span>
-            <span className={styles['result']}>
+            <div className={styles['line']} />
+            <div className={styles['result']}>
               {(forCcyConfig && <img src={forCcyConfig.icon} />) || undefined}
               <span className={styles['amount']}>
                 {amountFormatter(
@@ -113,9 +116,9 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
               <span className={styles['unit']}>
                 {forCcyConfig?.name || props.forCcy}
               </span>
-            </span>
+            </div>
           </div>
-          <span className="plus-sign">+</span>
+          <span className={styles['plus-sign']}>+</span>
           <div className={styles['right']}>
             <div className={styles['label']}>
               {t({
@@ -193,38 +196,40 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
           styles['no-executed'],
         )}
       >
-        <div className={styles['title']}>
-          <span className={styles['emoji']}>️️✌️</span>
-          {t({
-            enUS: 'No Executed, Premium Earned',
-            zhCN: '未成交，获得额外奖励',
-          })}
-        </div>
-        <div className={styles['subtitle']}>
-          {t(
-            {
-              enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
-            },
-            {
-              amount: amountFormatter(
-                simplePlus(
-                  props.depositAmount,
-                  props.depositCcyExtraRewardWhenNoExecuted,
+        <div className={styles['title-info']}>
+          <div className={styles['title']}>
+            <span className={styles['emoji']}>️️✌️</span>
+            {t({
+              enUS: 'No Executed, Premium Earned',
+              zhCN: '未成交，获得额外奖励',
+            })}
+          </div>
+          <div className={styles['subtitle']}>
+            {t(
+              {
+                enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
+              },
+              {
+                amount: amountFormatter(
+                  simplePlus(
+                    props.depositAmount,
+                    props.depositCcyExtraRewardWhenNoExecuted,
+                  ),
+                  forCcyConfig?.precision,
                 ),
-                forCcyConfig?.precision,
-              ),
-              crypto: depositCcyConfig?.name || props.depositCcy,
-              rchAmount: amountFormatter(
-                props.rchReturnAmount,
-                rchConfig?.precision,
-              ),
-            },
-          )}
-          |
-          {t({
-            enUS: 'Est.',
-            zhCN: '预估',
-          })}
+                crypto: depositCcyConfig?.name || props.depositCcy,
+                rchAmount: amountFormatter(
+                  props.rchReturnAmount,
+                  rchConfig?.precision,
+                ),
+              },
+            )}
+            |
+            {t({
+              enUS: 'Est.',
+              zhCN: '预估',
+            })}
+          </div>
         </div>
         <div
           className={classNames(styles['profit-scenario'], styles['executed'])}
@@ -355,6 +360,7 @@ export const DualProjectedReturns = (
     if (product?.vault.productType == ProductType.BullSpread) {
       res.forCcy = product.vault.forCcy;
       // TODO:
+      // 低买： anchorPrice[0] = RCH/USDT
       // (anchorPrice[0] * depositAmount)
       res.forCcyAmountWhenSuccessfulExecuted = 1000;
       // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
@@ -367,6 +373,7 @@ export const DualProjectedReturns = (
       res.rchReturnAmount = Number(position.amounts.rchAirdrop || 0);
     } else {
       res.forCcy = product.vault.domCcy;
+      // 高卖： anchorPrice[0] = USDT/RCH
       // 倒过来，只不过小心一下 anchorPrice
       res.forCcyAmountWhenSuccessfulExecuted = 1000;
       res.forCcyExtraRewardWhenSuccessfulExecuted = 100;

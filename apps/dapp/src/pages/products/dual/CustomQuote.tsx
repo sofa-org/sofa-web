@@ -67,7 +67,7 @@ export const CustomQuote = (props: {
               )
             }
           />
-          {!!props.expiry && ( //有疑问,少了一天
+          {!!props.expiry && (
             <span className={styles['term']}>
               {Math.abs(dayjs().diff(props.expiry * 1000, 'day'))}d
             </span>

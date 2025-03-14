@@ -18,6 +18,7 @@ export const ModalWrapper = (props: {
   children: ReactNode;
   setVisible: Dispatch<boolean>;
   product: PartialRequired<ProductQuoteResult, 'vault'>;
+  className?: string;
 }) => {
   const [t] = useTranslation('InvestModal');
 
@@ -25,7 +26,7 @@ export const ModalWrapper = (props: {
 
   return (
     <>
-      <div className={styles['form']}>
+      <div className={classNames(styles['form'], props.className)}>
         {props.children}
         <div
           className={classNames(styles['expand-widget'], {

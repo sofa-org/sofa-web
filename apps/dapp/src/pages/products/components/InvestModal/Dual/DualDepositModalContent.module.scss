@@ -1,1 +1,189 @@
 // TODO
+.form {
+  gap: 20px;
+}
+
+.left {
+  margin: 12px 0 0 16px;
+
+  :global {
+    .semi-button {
+      width: 360px;
+      margin-left: 10px;
+    }
+  }
+
+  .field {
+    .label {
+      display: inline-block;
+      margin: 24px 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+
+  .left-form {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 0.871px solid #e0e0e0;
+    width: 380px;
+    margin-bottom: 24px;
+    height: 520px;
+
+    .balance {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0 0;
+
+      span {
+        font-size: 14px;
+        color: rgb(0 0 0 / 65%);
+      }
+
+      .label {
+        margin: 0;
+        color: rgb(0 0 0 / 35%);
+      }
+    }
+
+    .amount-input {
+      font-size: 20px;
+
+      .unit-1 {
+        line-height: 48px;
+        font-size: 14px;
+        height: 48px;
+        margin: 0 -16px 0 0;
+        background: #d7d7d7;
+        padding: 0 15px;
+
+        &::after {
+          content: "▼";
+          margin-left: 8px;
+        }
+      }
+    }
+
+    .price {
+      .unit-2 {
+        font-size: 10px;
+        color: #bbb;
+
+        .amount {
+          @include bold;
+
+          color: #999;
+        }
+
+        .increased {
+          &::before {
+            content: "▲";
+          }
+        }
+
+        .decreased {
+          &::before {
+            content: "▼";
+          }
+        }
+      }
+    }
+
+    .expiry {
+      .value {
+        position: relative;
+
+        .date-picker {
+          width: 100%;
+          height: 48px;
+        }
+
+        :global {
+          .semi-input {
+            padding-left: 16px;
+          }
+
+          .semi-input-wrapper {
+            border-radius: 40px;
+            height: 48px;
+          }
+
+          .semi-input-wrapper:hover {
+            background-color: #f0f0f0;
+            border-color: transparent;
+          }
+        }
+
+        .term {
+          color: #000;
+          font-size: 12px;
+          opacity: 0.5;
+          position: absolute;
+          right: 34px;
+          top: 11px;
+          transform: translate(0, -50%);
+        }
+      }
+    }
+
+    .line {
+      height: 1px;
+      margin: 24px 0;
+      background: linear-gradient(
+        to left,
+        transparent 0%,
+        transparent 50%,
+        #d8d8d8 50%,
+        #d8d8d8 100%
+      );
+      background-size: 5px 1px;
+      background-repeat: repeat-x;
+    }
+
+    .reward {
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+      font-weight: 500;
+      color: rgb(0 0 0 / 65%);
+
+      .value {
+        @include bold;
+
+        font-size: 24px;
+        color: #50d113;
+      }
+    }
+  }
+}
+
+.vertical-line {
+  width: 1px;
+  height: 520px;
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    transparent 50%,
+    #d8d8d8 50%,
+    #d8d8d8 100%
+  );
+  margin-top: 12px;
+  background-size: 1px 5px;
+  background-repeat: repeat-y;
+}
+
+.right {
+  margin: 12px 16px 0 0;
+  width: 598px;
+  height: 509px;
+  padding: 32px 24px;
+  border-radius: 8px;
+  background: linear-gradient(
+    96deg,
+    rgb(80 209 19 / 12%) 0.36%,
+    rgb(255 229 0 / 12%) 100%
+  );
+}
