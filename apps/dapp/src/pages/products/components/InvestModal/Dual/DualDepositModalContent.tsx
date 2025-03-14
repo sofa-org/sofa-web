@@ -16,6 +16,7 @@ import { useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import { formatHighlightedText } from '@sofa/utils/string';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { omit } from 'lodash-es';
 import { nanoid } from 'nanoid';
 

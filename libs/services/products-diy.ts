@@ -58,7 +58,6 @@ export class ProductsDIYService {
           [ProductType.DNT]: '/rfq/diy/dnt/recommended-list',
           [ProductType.BearSpread]: '/rfq/diy/smart-trend/recommended-list',
           [ProductType.BullSpread]: '/rfq/diy/smart-trend/recommended-list',
-          // TODO: dual api endpoint
         }[vaultInfo.productType];
       }
       return http
@@ -67,10 +66,6 @@ export class ProductsDIYService {
     };
     return Promise.all(vaultInfoList.map((it) => fetch(it))).then((res) => {
       const result = res.flat();
-      if (params.chainId == 1329 && result.length == 0) {
-        // TODO: remove this block when server supports SEI
-        throw new Error('SEI(1329) chain not supported by server');
-      }
       return result;
     });
   }
