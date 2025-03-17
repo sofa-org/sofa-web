@@ -98,7 +98,7 @@ const instant = createWithEqualityFn(
         number /* index */,
         number /* refresh - count */,
       ],
-      selectedQuoteProbability: null as {
+      selectedQuoteProbabilities: null as {
         productType: ProductType;
         anchorPrices: (string | number)[];
         probability: number;
@@ -390,6 +390,7 @@ export const useDIYState = Object.assign(instant, {
     options?: {
       defaultValue?: Partial<VaultInfo>;
       resetFormData?: boolean;
+      clearQuote?: boolean;
     },
   ) => {
     const allVaults = ContractsService.vaults.filter(
@@ -471,7 +472,7 @@ export const useDIYState = Object.assign(instant, {
               Math.min(expiryList[expiryList.length - 1] * 1000, data.expiry),
             )
           : data.expiry || next8h(undefined, 7);
-      return {
+      const res = {
         ...pre,
         formData: {
           ...pre.formData,
@@ -495,6 +496,11 @@ export const useDIYState = Object.assign(instant, {
           },
         },
       };
+      if (options?.clearQuote) {
+        res.selectedQuote = [null, 0, 0];
+        res.selectedQuoteProbabilities = undefined!;
+      }
+      return res;
     });
   },
   updateVaultOptions: (
@@ -559,6 +565,7 @@ export const useDIYState = Object.assign(instant, {
               productType: originForm?.productType || ProductType.BullSpread,
             },
             resetFormData: true,
+            clearQuote: true,
           });
           return;
         }

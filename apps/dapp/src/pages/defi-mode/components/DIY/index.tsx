@@ -228,13 +228,19 @@ const DualOptions = () => {
   const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
   const formData = useDIYState((state) => state.formData[chainId]);
+  if (!formData?.productType) {
+    return undefined;
+  }
+  const ref = ProductTypeRefs[formData.productType].dualOp(t, {
+    forCcy: formData.forCcy!,
+  });
   const options = [
     {
-      label: <>{t({ enUS: 'Buy {{crypto}}' }, { crypto: formData?.forCcy })}</>,
-      value: 'buy_crypto',
+      label: <>{ref.opCrypto}</>,
+      value: ref.opValue,
     },
   ];
-  const value = 'buy_crypto';
+  const value = options[0].value;
   return (
     <div className={styles['form-item']}>
       <div className={styles['label']}>

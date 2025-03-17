@@ -26,9 +26,9 @@ export function getDualDepositCcy(
   vault: Pick<VaultInfo, 'forCcy' | 'domCcy' | 'productType'>,
 ) {
   if (vault.productType == ProductType.BearSpread) {
-    return vault.forCcy;
-  } else {
     return vault.domCcy;
+  } else {
+    return vault.forCcy;
   }
 }
 
@@ -36,9 +36,9 @@ export function getDualProductType(
   vault: Pick<VaultInfo, 'forCcy' | 'depositCcy'>,
 ) {
   if (vault.forCcy == vault.depositCcy) {
-    return ProductType.BearSpread;
+    return ProductType.BullSpread;
   }
-  return ProductType.BullSpread;
+  return ProductType.BearSpread;
 }
 
 export const dualVaults = vaults.map((it) => {

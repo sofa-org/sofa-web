@@ -110,7 +110,6 @@ export const RiskTypeRefs = {
       t({ enUS: 'No losses, please', zhCN: '不接受损失' }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.PROTECTED,
-    buyModalTitle: undefined,
   },
   [RiskType.LEVERAGE]: {
     label: (t: TFunction) => t('Leverage'),
@@ -120,7 +119,6 @@ export const RiskTypeRefs = {
       t({ enUS: 'No pain, no gain', zhCN: '能接受少量损失' }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.LEVERAGE,
-    buyModalTitle: undefined,
   },
   [RiskType.RISKY]: {
     label: (t: TFunction) => t('Surge'),
@@ -130,7 +128,6 @@ export const RiskTypeRefs = {
       t({ enUS: 'Risking it all', zhCN: '能接受全部损失' }),
     icon: <img src={IconHighYield} width="24px" />,
     value: RiskType.RISKY,
-    buyModalTitle: undefined,
   },
   [RiskType.DUAL]: {
     label: (t: TFunction) => t('Dual'),
@@ -140,16 +137,6 @@ export const RiskTypeRefs = {
       t({ enUS: '[DUAL]Risking it all', zhCN: '[DUAL]能接受全部损失' }),
     icon: <img src={IconHighYield} width="24px" />,
     value: RiskType.DUAL,
-    buyModalTitle: (v: VaultInfo) =>
-      v.productType == ProductType.BullSpread
-        ? t({
-            enUS: 'Buy crypto at a discount and get bonus rewards',
-            zhCN: '低价买入加密货币并获得奖励',
-          })
-        : t({
-            enUS: 'Sell crypto for high price and get bonus rewards',
-            zhCN: '高价卖出加密货币并获得奖励',
-          }),
   },
 };
 
@@ -192,10 +179,23 @@ export const ProductTypeRefs = {
         ),
       } as { situation: string; description: string } | undefined,
     }),
+    dualOp: (t: TFunction, vault: { forCcy: string }) => ({
+      helpMeOp: t({ enUS: 'Help Me Sell' }),
+      op: t({ enUS: 'Sell High', zhCN: '高卖' }),
+      opCrypto: t(
+        { enUS: 'Sell {{crypto}}', zhCN: '卖出 {{crypto}}' },
+        { crypto: vault.forCcy },
+      ),
+      opValue: 'buy_crypto',
+      title: t({
+        enUS: 'Sell crypto for high price and get bonus rewards',
+        zhCN: '高价卖出加密货币并获得奖励',
+      }),
+    }),
     dualDesc: (t: TFunction) => ({
-      executed: t({ enUS: 'Buy Low Executed' }),
-      limited: t({ enUS: 'Limit Buy' }),
-      partialExecuted: t({ enUS: 'Partial Buy' }),
+      executed: t({ enUS: 'Sell High Executed' }),
+      limited: t({ enUS: 'Limit Sell' }),
+      partialExecuted: t({ enUS: 'Partial Sell' }),
     }),
     extraDesc: (t: TFunction) =>
       t(
@@ -306,6 +306,9 @@ export const ProductTypeRefs = {
         | { situation: string; description: string }
         | undefined,
     }),
+    dualOp: (t: TFunction, params: { forCcy: string }) => {
+      throw new Error('Not suported scenario');
+    },
     dualDesc: (t: TFunction) => {
       throw new Error('Not suported scenario');
     },
@@ -419,10 +422,23 @@ export const ProductTypeRefs = {
         ),
       } as { situation: string; description: string } | undefined,
     }),
+    dualOp: (t: TFunction, vault: { forCcy: string }) => ({
+      helpMeOp: t({ enUS: 'Help Me Buy' }),
+      op: t({ enUS: 'Buy Low', zhCN: '低买' }),
+      opCrypto: t(
+        { enUS: 'Buy {{crypto}}', zhCN: '买入 {{crypto}}' },
+        { crypto: vault.forCcy },
+      ),
+      opValue: 'buy_crypto',
+      title: t({
+        enUS: 'Buy crypto at a discount and get bonus rewards',
+        zhCN: '低价买入加密货币并获得奖励',
+      }),
+    }),
     dualDesc: (t: TFunction) => ({
-      executed: t({ enUS: 'Sell High Executed' }),
-      limited: t({ enUS: 'Limit Sell' }),
-      partialExecuted: t({ enUS: 'Partial Sell' }),
+      executed: t({ enUS: 'Buy Low Executed' }),
+      limited: t({ enUS: 'Limit Buy' }),
+      partialExecuted: t({ enUS: 'Partial Buy' }),
     }),
     extraDesc: (t: TFunction) =>
       t(

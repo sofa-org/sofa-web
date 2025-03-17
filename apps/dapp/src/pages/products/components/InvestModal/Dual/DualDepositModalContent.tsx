@@ -2,7 +2,7 @@ import { Dispatch, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DatePicker, Spin } from '@douyinfe/semi-ui';
 import { CCYService } from '@sofa/services/ccy';
-import { ContractsService } from '@sofa/services/contracts';
+import { ContractsService, ProductType } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteParams,
@@ -23,6 +23,7 @@ import { nanoid } from 'nanoid';
 import AmountInput from '@/components/AmountInput';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
+import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import { useGlobalState } from '@/store';
@@ -98,9 +99,6 @@ export const DualDepositModalContent = (
       max: Date.now() + 20 * 86400 * 1000,
     };
   }, []);
-  useMemo(() => {
-    console.log(wallet?.balance);
-  }, [wallet?.address]);
   const preDataRef = useRef<ProductQuoteResult>();
   const data = useProductsState((state) => {
     const val =
@@ -126,6 +124,9 @@ export const DualDepositModalContent = (
     return (Math.random() * 0.2 - 0.1) * Number(currentPrice);
   }, [product?.anchorPrices?.[0]]);
   const isMobileUI = useIsMobileUI();
+  if (!vault) {
+    return undefined;
+  }
   return (
     <>
       <ModalWrapper
@@ -141,9 +142,7 @@ export const DualDepositModalContent = (
             {/* depositCcy 数量 */}
             <div className={classNames(styles['field'], styles['amount'])}>
               <span className={styles['label']}>
-                {t({
-                  enUS: 'Help Me Buy',
-                })}
+                {ProductTypeRefs[vault.productType].dualOp(t, vault).helpMeOp}
               </span>
               <span className={styles['value']}>
                 <AmountInput

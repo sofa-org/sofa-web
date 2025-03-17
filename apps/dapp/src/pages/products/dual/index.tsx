@@ -16,7 +16,10 @@ import { useForCcySelect } from '@/components/CCYSelector';
 import { C_Select, CSelect } from '@/components/CSelect';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { useProductSelect } from '@/components/ProductSelector';
-import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
+import {
+  ProductTypeRefs,
+  ProjectTypeRefs,
+} from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
@@ -173,20 +176,26 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
             label: (
               <>
                 <span className={styles['icon']} />
-                {t({ enUS: 'Buy Low', zhCN: '低买' })}
+                {
+                  ProductTypeRefs[ProductType.BearSpread].dualOp(t, { forCcy })
+                    .op
+                }
               </>
             ),
-            value: ProductType.BullSpread,
+            value: ProductType.BearSpread,
             className: styles['buy-low'],
           },
           {
             label: (
               <>
                 <span className={styles['icon']} />
-                {t({ enUS: 'Sell High', zhCN: '高卖' })}
+                {
+                  ProductTypeRefs[ProductType.BullSpread].dualOp(t, { forCcy })
+                    .op
+                }
               </>
             ),
-            value: ProductType.BearSpread,
+            value: ProductType.BullSpread,
             className: styles['sell-high'],
           },
         ]}

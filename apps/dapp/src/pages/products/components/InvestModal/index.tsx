@@ -304,7 +304,7 @@ const DepositModalContent = (
 const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
   (props, ref) => {
     const [visible, setVisible] = useState(false);
-
+    const [t] = useTranslation('InvestModal');
     const wallet = useWalletStore();
     const balance = wallet.balance?.[props.product.vault.depositCcy];
     const shouldInit = !wallet.address || (!isNullLike(balance) && visible);
@@ -356,9 +356,12 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
         title={
           <>
             <span>{RiskTypeRefs[props.product.vault.riskType].icon}</span>
-            {RiskTypeRefs[props.product.vault.riskType].buyModalTitle?.(
-              props.product.vault,
-            ) || (
+            {props.product.vault.riskType == RiskType.DUAL ? (
+              ProductTypeRefs[props.product.vault.productType].dualOp(
+                t,
+                props.product.vault,
+              ).title
+            ) : (
               <>
                 <span>
                   {ProductTypeRefs[props.product.vault.productType].alias}

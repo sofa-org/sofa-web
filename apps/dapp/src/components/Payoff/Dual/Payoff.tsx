@@ -7,6 +7,7 @@ import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
 import { PayoffProps } from '..';
 
@@ -42,9 +43,7 @@ const DualPayoff = (
           <span>{t({ enUS: 'APY' })}</span>
         </div>
         <div className={styles['payoff-chart']}>
-          {props.productType == ProductType.BullSpread
-            ? t({ enUS: 'Buy Low', zhCN: '低买' })
-            : t({ enUS: 'Sell High', zhCN: '高卖' })}
+          {ProductTypeRefs[props.productType].dualOp(t, props).op}
         </div>
         <div className={styles['ccys']}>
           <img src={CCYService.ccyConfigs[props.depositCcy]?.icon} />

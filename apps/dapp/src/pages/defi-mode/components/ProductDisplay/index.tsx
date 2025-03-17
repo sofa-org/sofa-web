@@ -95,14 +95,9 @@ export const DIYProductDisplay = () => {
         <>
           <div className={styles['risk-type']}>
             {ProjectTypeRefs.Dual.label(t)}{' '}
-            {quote?.vault.productType == ProductType.BullSpread
-              ? t({ enUS: 'Buy Low', zhCN: '低买' })
-              : t({ enUS: 'Sell High', zhCN: '高卖' })}
+            {ProductTypeRefs[quote.vault.productType].dualOp(t, quote.vault).op}
             {' - '}
-            {quote?.vault.depositCcy}/
-            {quote?.vault.productType == ProductType.BearSpread
-              ? quote?.vault.domCcy
-              : quote?.vault.forCcy}
+            {quote?.vault.forCcy}/{quote?.vault.domCcy}
           </div>
         </>
       ) : (
