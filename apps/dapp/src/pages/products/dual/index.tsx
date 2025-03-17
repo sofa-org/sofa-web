@@ -204,6 +204,17 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                         alt=""
                       />
                       {CCYService.ccyConfigs[it.forCcy]?.name || it.forCcy}
+
+                      <div className={styles['apy']}>
+                        {it.minApy == it.maxApy ? (
+                          <>{displayPercentage(it.maxApy)}</>
+                        ) : (
+                          <>
+                            {displayPercentage(it.minApy)}～
+                            {displayPercentage(it.maxApy)}
+                          </>
+                        )}
+                      </div>
                     </span>
                   </>
                 ),
