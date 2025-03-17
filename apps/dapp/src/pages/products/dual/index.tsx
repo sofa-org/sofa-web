@@ -6,18 +6,24 @@ import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
 import { dualVaults } from '@sofa/services/vaults/dual';
 import { displayPercentage } from '@sofa/utils/amount';
 import { currQuery } from '@sofa/utils/history';
+import { useLazyCallback } from '@sofa/utils/hooks';
+import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 import { uniq } from 'lodash-es';
 
 import { useForCcySelect } from '@/components/CCYSelector';
+import { C_Select, CSelect } from '@/components/CSelect';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { useProductSelect } from '@/components/ProductSelector';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
+import enUS from '@/locales/en-US';
 
 import InvestModal, { InvestModalPropsRef } from '../components/InvestModal';
+import { useProductsState } from '../store';
 
 import { CustomQuote } from './CustomQuote';
 import locale from './locale';
@@ -79,6 +85,73 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
       investModalRef.current?.show();
     }
   }, [quote]);
+
+  const data = useProductsState((state) => {
+    if (!vault) return [];
+    const list =
+      state.recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
+    if (!list) return [];
+    return list
+      .filter((it) => Date.now() < it.expiry * 1000)
+      .sort((a, b) => {
+        const index = (it: typeof a) =>
+          simplePlus(it.apyInfo?.max, it.apyInfo?.rch)!;
+        return index(b) - index(a);
+      })
+      .map(
+        (it) =>
+          (state.quoteInfos[ProductsService.productKey(it)] ||
+            it) as ProductQuoteResult,
+      );
+  });
+  const dates = useMemo(() => {
+    const expiries = data.reduce(
+      (prev, v) => {
+        if (!prev[v.expiry]) {
+          const time = dayjs(v.expiry * 1000);
+          const diffDays = time.diff(Date.now(), 'day');
+          prev[v.expiry] = {
+            expiry: v.expiry,
+            time: time.toDate().getTime(),
+            text: time.format('YYYY-MM-DD'),
+            diffText: diffDays + 'D',
+            diffDays,
+          };
+        }
+        return prev;
+      },
+      {} as Record<
+        number,
+        {
+          expiry: number;
+          time: number;
+          text: string;
+          diffText: string;
+          diffDays: number;
+        }
+      >,
+    );
+    return Object.values(expiries);
+  }, [data]);
+  const [date, setDate] = useState<(typeof dates)[0] | undefined>(undefined);
+  useEffect(
+    useLazyCallback(() => {
+      if (!date && dates.length) {
+        setDate(dates[0]);
+        return;
+      }
+    }),
+    [dates, date],
+  );
+  useEffect(
+    useLazyCallback(() => {
+      if (!date) {
+        setDate(undefined);
+        return;
+      }
+    }),
+    [vault],
+  );
   return (
     <>
       <TopTabs
@@ -114,6 +187,54 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         onChange={(v) => setProduct(v as ProductType)}
         extraTopContent={<div className={styles['title']}>{t('My RCH')}</div>}
       >
+        {isMobileUI ? (
+          <>
+            <C_Select
+              prefix={t({ enUS: 'Anchor', zhCN: '锚点' })}
+              className={classNames(styles['for-ccy-select'], {
+                'semi-always-dark': true,
+              })}
+              value={forCcy}
+              optionList={forCcys.map((it) => ({
+                label: (
+                  <>
+                    <span className={styles['ccy-item']}>
+                      <img
+                        src={CCYService.ccyConfigs[it.forCcy]?.icon}
+                        alt=""
+                      />
+                      {CCYService.ccyConfigs[it.forCcy]?.name || it.forCcy}
+                    </span>
+                  </>
+                ),
+                value: it.forCcy,
+              }))}
+              onChange={(v) => setForCcy(String(v) as typeof forCcy)}
+            />
+
+            <C_Select
+              prefix={t({ enUS: 'Settlement Date', zhCN: '结算日期' })}
+              className={classNames(styles['settlement-dates-select'], {
+                'semi-always-dark': true,
+              })}
+              value={date?.expiry}
+              optionList={dates.map((it) => ({
+                label: (
+                  <>
+                    <span className={styles['date-item']}>
+                      {it.text}
+                      <span className={styles['diff']}>{it.diffText}</span>
+                    </span>
+                  </>
+                ),
+                value: it.expiry,
+              }))}
+              onChange={(v) =>
+                setDate(dates.find((d) => d.expiry === Number(v)))
+              }
+            />
+          </>
+        ) : undefined}
         <div className={styles['form']}>
           <div className={styles['sub-title']}>
             {t({
@@ -121,43 +242,49 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
             })}
           </div>
           <div className={styles['content']}>
-            <div className={styles['for-ccy-select']}>
-              {forCcys.map((i) => (
-                <div
-                  key={i.forCcy}
-                  className={classNames(styles['ccy'], {
-                    [styles['selected']]: i.forCcy == forCcy,
-                  })}
-                  onClick={() => setForCcy(i.forCcy)}
-                >
-                  <img
-                    src={CCYService.ccyConfigs[i.forCcy]?.icon}
-                    className={classNames({
-                      [styles['rch']]:
-                        i.forCcy == CCYService.ccyConfigs['RCH']?.name,
+            {isMobileUI ? undefined : (
+              <div className={styles['for-ccy-select']}>
+                {forCcys.map((i) => (
+                  <div
+                    key={i.forCcy}
+                    className={classNames(styles['ccy'], {
+                      [styles['selected']]: i.forCcy == forCcy,
                     })}
-                  />
-                  <div className={styles['ccy-infos']}>
-                    <div className={styles['name']}>
-                      {CCYService.ccyConfigs[i.forCcy]?.name || i.forCcy}
-                    </div>
-                    <div className={styles['apy']}>
-                      {i.minApy == i.maxApy ? (
-                        <>{displayPercentage(i.maxApy)}</>
-                      ) : (
-                        <>
-                          {displayPercentage(i.minApy)}～
-                          {displayPercentage(i.maxApy)}
-                        </>
-                      )}
+                    onClick={() => setForCcy(i.forCcy)}
+                  >
+                    <img
+                      src={CCYService.ccyConfigs[i.forCcy]?.icon}
+                      className={classNames({
+                        [styles['rch']]:
+                          i.forCcy == CCYService.ccyConfigs['RCH']?.name,
+                      })}
+                    />
+                    <div className={styles['ccy-infos']}>
+                      <div className={styles['name']}>
+                        {CCYService.ccyConfigs[i.forCcy]?.name || i.forCcy}
+                      </div>
+                      <div className={styles['apy']}>
+                        {i.minApy == i.maxApy ? (
+                          <>{displayPercentage(i.maxApy)}</>
+                        ) : (
+                          <>
+                            {displayPercentage(i.minApy)}～
+                            {displayPercentage(i.maxApy)}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             {vault === undefined ? undefined : (
               <RecommendedList
+                data={data}
+                dates={dates}
                 vault={vault}
+                date={date}
+                setDate={setDate}
                 defaultExpiry={defaultInput.expiry}
                 onSelectQuote={async (q) => {
                   if (quote === q) {

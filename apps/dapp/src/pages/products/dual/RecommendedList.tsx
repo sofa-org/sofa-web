@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Table } from '@douyinfe/semi-ui';
+import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
@@ -17,70 +18,34 @@ import dayjs from 'dayjs';
 
 import AsyncButton from '@/components/AsyncButton';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 
 import { useProductsState } from '../store';
 
 import styles from './RecommendedList.module.scss';
+type DateInfo = {
+  expiry: number;
+  time: number;
+  text: string;
+  diffText: string;
+  diffDays: number;
+};
 export const RecommendedList = (props: {
   vault: VaultInfo;
   defaultExpiry?: number;
   onSelectQuote: (q: ProductQuoteResult) => Promise<void>;
+  dates: DateInfo[];
+  date?: DateInfo;
+  data: ProductQuoteResult[];
+  setDate: (d: DateInfo) => void;
 }) => {
   const [t] = useTranslation('ProductDual');
-
-  const data = useProductsState((state) => {
-    const list =
-      state.recommendedList[
-        `${props.vault.vault.toLowerCase()}-${props.vault.chainId}`
-      ];
-    if (!list) return [];
-    return list
-      .filter((it) => Date.now() < it.expiry * 1000)
-      .sort((a, b) => {
-        const index = (it: typeof a) =>
-          simplePlus(it.apyInfo?.max, it.apyInfo?.rch)!;
-        return index(b) - index(a);
-      })
-      .map(
-        (it) =>
-          (state.quoteInfos[ProductsService.productKey(it)] ||
-            it) as ProductQuoteResult,
-      );
-  });
-  const dates = useMemo(() => {
-    const expiries = data.reduce(
-      (prev, v) => {
-        if (!prev[v.expiry]) {
-          const time = dayjs(v.expiry * 1000);
-          const diffDays = time.diff(Date.now(), 'day');
-          prev[v.expiry] = {
-            expiry: v.expiry,
-            time: time.toDate().getTime(),
-            text: time.format('YYYY-MM-DD'),
-            diffText: diffDays + 'D',
-            diffDays,
-          };
-        }
-        return prev;
-      },
-      {} as Record<
-        number,
-        {
-          expiry: number;
-          time: number;
-          text: string;
-          diffText: string;
-          diffDays: number;
-        }
-      >,
-    );
-    return Object.values(expiries);
-  }, [data]);
+  const { data, dates, date, setDate } = props;
+  const isMobileUI = useIsMobileUI();
   const domCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.vault.domCcy],
     [props.vault],
   );
-  const [date, setDate] = useState<(typeof dates)[0] | undefined>(undefined);
   useEffect(() => {
     if (date === undefined && dates.length) {
       let d: (typeof dates)[0] | undefined = undefined;
@@ -134,20 +99,22 @@ export const RecommendedList = (props: {
   return (
     <>
       <div className={styles['current-infos']}>
-        <div className={styles['settlement-dates']}>
-          {dates.map((d) => (
-            <div
-              key={d.time}
-              className={classNames(styles['date'], {
-                [styles['selected']]: d.time == date?.time,
-              })}
-              onClick={() => setDate(d)}
-            >
-              {d.text}
-              <span className={styles['diff']}>{d.diffText}</span>
-            </div>
-          ))}
-        </div>
+        {isMobileUI ? undefined : (
+          <div className={styles['settlement-dates']}>
+            {dates.map((d) => (
+              <div
+                key={d.time}
+                className={classNames(styles['date'], {
+                  [styles['selected']]: d.time == date?.time,
+                })}
+                onClick={() => setDate(d)}
+              >
+                {d.text}
+                <span className={styles['diff']}>{d.diffText}</span>
+              </div>
+            ))}
+          </div>
+        )}
         <div
           className={classNames(
             styles['current-price'],
@@ -182,93 +149,108 @@ export const RecommendedList = (props: {
       <div className={styles['quotes-table']}>
         <Table
           dataSource={quotes}
-          columns={[
-            {
-              title: t(
-                {
-                  enUS: 'Target Price ({{forCcy}}/{{domCcy}})',
-                },
-                {
-                  forCcy: props.vault?.forCcy,
-                  domCcy: props.vault?.domCcy,
-                },
-              ),
-              render: (_, row) => {
-                const current = prices[props.vault.forCcy];
-                const diff =
-                  current === undefined || row.anchorPrices?.[0] === undefined
-                    ? undefined
-                    : Number(row.anchorPrices[0]) - current;
-                return (
-                  <>
-                    <span className={styles['target-price']}>
-                      {amountFormatter(
-                        row.anchorPrices?.[0],
-                        domCcyConfig?.precision,
-                      )}
-                    </span>
-                    <span className={styles['change-to-current-price']}>
-                      {formatHighlightedText(
-                        t(
+          onRow={(record, index) => {
+            return {
+              onClick: (event) => {
+                if (!isMobileUI || !record) {
+                  event.stopPropagation();
+                  return;
+                }
+                props.onSelectQuote(record);
+              },
+            };
+          }}
+          columns={(
+            [
+              {
+                title: t(
+                  {
+                    enUS: 'Target Price ({{forCcy}}/{{domCcy}})',
+                  },
+                  {
+                    forCcy: props.vault?.forCcy,
+                    domCcy: props.vault?.domCcy,
+                  },
+                ),
+                render: (_, row) => {
+                  const current = prices[props.vault.forCcy];
+                  const diff =
+                    current === undefined || row.anchorPrices?.[0] === undefined
+                      ? undefined
+                      : Number(row.anchorPrices[0]) - current;
+                  return (
+                    <>
+                      <span className={styles['target-price']}>
+                        {amountFormatter(
+                          row.anchorPrices?.[0],
+                          domCcyConfig?.precision,
+                        )}
+                      </span>
+                      <span className={styles['change-to-current-price']}>
+                        {formatHighlightedText(
+                          t(
+                            {
+                              enUS: '(Current price: [[{{changePercentage}}]])',
+                            },
+                            {
+                              changePercentage: displayPercentage(
+                                diff === undefined ? undefined : Math.abs(diff),
+                              ),
+                            },
+                          ),
                           {
-                            enUS: '(Current price: [[{{changePercentage}}]])',
-                          },
-                          {
-                            changePercentage: displayPercentage(
-                              diff === undefined ? undefined : Math.abs(diff),
+                            hightlightedClassName: classNames(
+                              styles['amount'],
+                              diff === undefined || diff === 0
+                                ? 'unchanged'
+                                : diff > 0
+                                  ? styles['increased']
+                                  : styles['decreased'],
                             ),
                           },
-                        ),
-                        {
-                          hightlightedClassName: classNames(
-                            styles['amount'],
-                            diff === undefined || diff === 0
-                              ? 'unchanged'
-                              : diff > 0
-                                ? styles['increased']
-                                : styles['decreased'],
-                          ),
-                        },
-                      )}
-                    </span>
-                  </>
-                );
+                        )}
+                      </span>
+                    </>
+                  );
+                },
               },
-            },
-            {
-              title: (
-                <span className={styles['reward-column']}>
-                  {t({
-                    enUS: 'Extra Reward (APY)',
-                  })}
-                </span>
-              ),
-              render: (_, row) => (
-                <div className={styles['reward']}>
-                  {displayPercentage(
-                    simplePlus(row.apyInfo?.max, row.apyInfo?.rch),
-                  )}
-                </div>
-              ),
-            },
-            {
-              title: (
-                <div className={styles['operate']}>
-                  {t({
-                    enUS: 'Operate',
-                  })}
-                </div>
-              ),
-              render: (_, row) => (
-                <AsyncButton
-                  className={styles['deposit-btn']}
-                  onClick={() => props.onSelectQuote(row)}
-                >
-                  {t({ enUS: 'Deposit' })}
-                </AsyncButton>
-              ),
-            },
-          ]}
+              {
+                title: (
+                  <span className={styles['reward-column']}>
+                    {t({
+                      enUS: 'Extra Reward (APY)',
+                    })}
+                  </span>
+                ),
+                render: (_, row) => (
+                  <div className={styles['reward']}>
+                    {displayPercentage(
+                      simplePlus(row.apyInfo?.max, row.apyInfo?.rch),
+                    )}
+                  </div>
+                ),
+              },
+              isMobileUI
+                ? undefined!
+                : {
+                    title: (
+                      <div className={styles['operate']}>
+                        {t({
+                          enUS: 'Operate',
+                        })}
+                      </div>
+                    ),
+                    render: (_, row) => (
+                      <AsyncButton
+                        className={styles['deposit-btn']}
+                        onClick={() => props.onSelectQuote(row)}
+                      >
+                        {t({ enUS: 'Deposit' })}
+                      </AsyncButton>
+                    ),
+                  },
+            ] as ColumnProps<ProductQuoteResult>[]
+          ).filter(Boolean)}
           pagination={false}
         />
       </div>

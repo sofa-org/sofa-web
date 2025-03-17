@@ -47,6 +47,7 @@ export const CustomQuote = (props: {
         <span className={styles['label']}>
           {t({
             enUS: 'Settlement Date',
+            zhCN: '结算日期',
           })}
         </span>
         <span className={styles['value']}>
