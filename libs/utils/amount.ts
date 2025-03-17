@@ -121,7 +121,7 @@ export function displayPercentage(
   const v = +val * 100;
   if (v > 1) return `${signal}${v.toFixed(precision)}%`;
   const exponent = -Number(v).toExponential().split('e')[1] || 0;
-  return `${signal}${v.toFixed(Math.max(precision, exponent))}%`;
+  return `${signal}${v.toFixed(Math.min(Math.max(precision, exponent), 12))}%`;
 }
 
 export function cvtAmountsInUsd(
