@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
+import { getDualProfitRenderProps } from '@sofa/services/dual';
 import { ProductQuoteResult } from '@sofa/services/products';
 
 import { addI18nResources } from '@/locales';
 
-import {
-  DualProfitScenarios,
-  getDualProfitRenderProps,
-} from '../../ProjectedReturns/Dual/DualProjectReturns';
+import { DualProfitScenarios } from '../../ProjectedReturns/Dual/DualProjectReturns';
 import locale from '../locale';
 addI18nResources(locale, 'ProfitsRenders');
 
