@@ -543,7 +543,6 @@ export const useDIYState = Object.assign(instant, {
           )
             ? ProductType.BullSpread
             : currentForm.productType;
-
         newFormData.depositCcy = getDualDepositCcy({
           ...currentForm,
           ...newFormData,

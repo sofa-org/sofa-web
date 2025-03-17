@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 
 // TODO: change ABIs to actual dual
 import DNTVaultAbis from '../../abis/DNTVault.json';
-import { ProductType, ProjectType, RiskType, VaultInfo } from '../../base-type';
+import { ProductType, ProjectType, VaultInfo } from '../../base-type';
 import {
   getCollateralDecimal,
   getDepositMinAmount,
@@ -25,10 +25,12 @@ function getDualAbis(
 export function getDualDepositCcy(
   vault: Pick<VaultInfo, 'forCcy' | 'domCcy' | 'productType'>,
 ) {
-  if (vault.productType == ProductType.BearSpread) {
-    return vault.domCcy;
-  } else {
+  if (vault.productType == ProductType.BullSpread) {
+    // go up, sell crypto
     return vault.forCcy;
+  } else {
+    // go down, buy crypto w/ USDS
+    return vault.domCcy;
   }
 }
 
