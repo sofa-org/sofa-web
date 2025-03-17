@@ -240,11 +240,11 @@
 .mobile-ui {
   flex-direction: column;
   position: relative;
-  padding: 20px 16px;
   width: 100vw;
 
   .left {
-    width: 93vw;
+    width: 100vw;
+    padding: 0 16px;
     margin: 0;
 
     .left-form {
@@ -256,7 +256,7 @@
 
     .left-button {
       position: absolute;
-      bottom: 6vh;
+      bottom: 60px;
       width: 90vw;
     }
 
@@ -274,7 +274,7 @@
   .right {
     width: 100vw;
     height: auto;
-    margin: 0 0 13vh;
+    margin: 0 0 120px;
     padding: 24px 16px;
     border-radius: 0;
   }

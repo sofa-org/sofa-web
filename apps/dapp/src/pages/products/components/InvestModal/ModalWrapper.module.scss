@@ -37,3 +37,22 @@
   border-radius: 0 0 24px 24px;
   overflow: hidden;
 }
+
+@mixin rewrite() {
+  .form {
+    margin: -24px 0 0;
+    padding: 0;
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <= 1000px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}

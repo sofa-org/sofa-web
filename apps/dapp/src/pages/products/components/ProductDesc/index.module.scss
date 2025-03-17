@@ -44,6 +44,8 @@
 @media (orientation: portrait) {
   .product-desc {
     padding: 0 12px;
+    margin-left: 0;
+    margin-right: 0;
 
     :global {
       .semi-tabs-bar {

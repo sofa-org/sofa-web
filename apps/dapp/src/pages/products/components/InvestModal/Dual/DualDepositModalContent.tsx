@@ -131,13 +131,10 @@ export const DualDepositModalContent = (
       <ModalWrapper
         setVisible={props.setVisible}
         product={data}
-        className={classNames(
-          styles['form'],
-          isMobileUI ? styles['mobile-ui'] : undefined,
-          {
-            [styles['quoting']]: loading,
-          },
-        )}
+        className={classNames(styles['form'], {
+          [styles['mobile-ui']]: isMobileUI,
+          [styles['quoting']]: loading,
+        })}
       >
         <div className={styles['left']}>
           <div className={styles['left-form']}>

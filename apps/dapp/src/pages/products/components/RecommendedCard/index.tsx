@@ -201,7 +201,10 @@ export async function handleRecommendCardClick(
 ) {
   const { vault } = it;
   const { riskType } = it.vault;
-  if (riskType !== RiskType.RISKY && window.innerHeight < window.innerWidth) {
+  if (
+    riskType === RiskType.DUAL ||
+    (riskType !== RiskType.RISKY && window.innerHeight < window.innerWidth)
+  ) {
     setTimeout(() => investModalRef.current?.show());
   } else {
     if (riskType === RiskType.RISKY) {

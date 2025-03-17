@@ -221,3 +221,40 @@
   top: 8px;
   right: 8px;
 }
+
+@mixin rewrite() {
+  .deposit-modal {
+    :global {
+      .semi-modal {
+        max-width: 100vw;
+        .semi-modal-content.semi-modal-content {
+          padding: 0;
+        }
+        .semi-modal-header.semi-modal-header {
+          h5 {
+            font-size: 14px;
+            margin-left: -10px;
+            img {
+              display: none;
+            }
+          }
+        }
+        button[aria-label="close"] {
+          right: 16px;
+        }
+      }
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    @include rewrite;
+  }
+}
+
+@media (width <= 1000px) {
+  :global(.is-pc) {
+    @include rewrite;
+  }
+}
