@@ -387,6 +387,10 @@ export const useDIYState = Object.assign(instant, {
     config?: ProductsDIYConfig,
     apyList?: number[],
     oddsList?: number[],
+    options?: {
+      defaultValue?: Partial<VaultInfo>;
+      resetFormData?: boolean;
+    },
   ) => {
     const allVaults = ContractsService.vaults.filter(
       (v) => v.chainId == chainId,
@@ -396,8 +400,9 @@ export const useDIYState = Object.assign(instant, {
         `No products available on chain ${ChainMap[chainId]?.name || chainId}, please switch to other chain.`,
       );
     }
-    const defaultValue: Partial<VaultInfo> = {
-      forCcy: 'WBTC',
+    const currentFormData = useDIYState.getState().formData[chainId];
+    const defaultValue = options?.defaultValue || {
+      forCcy: currentFormData?.forCcy || 'WBTC',
       riskType:
         currQuery().project === ProjectType.Surge
           ? RiskType.RISKY
@@ -406,6 +411,7 @@ export const useDIYState = Object.assign(instant, {
       depositCcy: 'USDT',
       productType: ProductType.BullSpread,
     };
+
     const sorttedVaults = allVaults.sort((a, b) => {
       for (const k in defaultValue) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -439,9 +445,17 @@ export const useDIYState = Object.assign(instant, {
     };
     return useDIYState.setState((pre) => {
       const formData = pre.formData[chainId];
+      const _data = options?.resetFormData
+        ? {
+            ...formData,
+            ...defaultFormData,
+          }
+        : {
+            ...defaultFormData,
+            ...formData,
+          };
       const data = {
-        ...defaultFormData,
-        ...formData,
+        ..._data,
         expiry:
           Number(formData?.expiry) >= next8h(undefined, 2)
             ? formData!.expiry!
@@ -531,11 +545,22 @@ export const useDIYState = Object.assign(instant, {
         } as any);
         newFormData.riskType = RiskType.DUAL;
       } else {
-        // 如果切到其他币种，自动取消其他双币的锁定
+        // 如果切到其他币种，自动取消其他双币的锁定，并选择尽可能相似的vault
         if (originForm?.riskType == RiskType.DUAL) {
-          newFormData.productType = undefined;
-          newFormData.depositCcy = undefined;
-          originForm.riskType = undefined;
+          useDIYState.initFormData(chainId, undefined, undefined, undefined, {
+            defaultValue: {
+              forCcy: formData?.forCcy || 'WBTC',
+              riskType:
+                currQuery().project === ProjectType.Surge
+                  ? RiskType.RISKY
+                  : RiskType.PROTECTED,
+              domCcy: 'USD',
+              depositCcy: originForm?.depositCcy || 'USDT',
+              productType: originForm?.productType || ProductType.BullSpread,
+            },
+            resetFormData: true,
+          });
+          return;
         }
       }
     } else if (formData.productType) {
