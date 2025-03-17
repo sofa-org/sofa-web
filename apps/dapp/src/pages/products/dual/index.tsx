@@ -20,7 +20,6 @@ import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
-import enUS from '@/locales/en-US';
 
 import InvestModal, { InvestModalPropsRef } from '../components/InvestModal';
 import { useProductsState } from '../store';
@@ -157,7 +156,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
       <TopTabs
         bannerClassName={styles['banner']}
         className={classNames(styles['container'], {
-          [styles['mobile']]: isMobileUI,
+          [styles['mobile-ui']]: isMobileUI,
         })}
         banner={
           <>
@@ -171,12 +170,22 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         }
         options={[
           {
-            label: t({ enUS: 'Buy Low' }),
+            label: (
+              <>
+                <span className={styles['icon']} />
+                {t({ enUS: 'Buy Low', zhCN: '低买' })}
+              </>
+            ),
             value: ProductType.BullSpread,
             className: styles['buy-low'],
           },
           {
-            label: t({ enUS: 'Sell High' }),
+            label: (
+              <>
+                <span className={styles['icon']} />
+                {t({ enUS: 'Sell High', zhCN: '高卖' })}
+              </>
+            ),
             value: ProductType.BearSpread,
             className: styles['sell-high'],
           },

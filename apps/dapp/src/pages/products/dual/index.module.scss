@@ -23,6 +23,35 @@
   }
 }
 
+.buy-low {
+  gap: 6px;
+  > .icon {
+    background: url(./assets/icon-buylow-off.svg) no-repeat center;
+    background-size: contain;
+    width: 32px;
+    height: 32px;
+  }
+  &:global(.active) {
+    > .icon.icon {
+      background-image: url(./assets/icon-buylow.svg);
+    }
+  }
+}
+
+.sell-high {
+  gap: 6px;
+  > .icon {
+    background: url(./assets/icon-sellhigh-off.svg) no-repeat center;
+    background-size: contain;
+    width: 32px;
+    height: 32px;
+  }
+  &:global(.active) {
+    > .icon.icon {
+      background-image: url(./assets/icon-sellhigh.svg);
+    }
+  }
+}
 .content {
   align-items: stretch;
   justify-content: space-between;
@@ -103,9 +132,15 @@
   padding: 20px 40px;
   font-size: 14px;
 }
-.mobile {
+.mobile-ui {
   .custom-quote {
     flex-direction: column;
     align-items: start;
+  }
+  .buy-low,
+  .sell-high {
+    > .icon {
+      display: none;
+    }
   }
 }
