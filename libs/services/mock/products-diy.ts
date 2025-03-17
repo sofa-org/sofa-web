@@ -130,6 +130,7 @@ function mockProductQuote(
       totalInterest: Math.random() * 10, // totalCollateral 产生的总利息，非 Earn 合约为 0
       minRedeemable: Math.random() * 10, // 对赌输了的情况能赎回的钱，包含本金
       maxRedeemable: Math.random() * 10, // 对赌全赢的情况能赎回的钱，包含本金
+      maxRedeemableOfLinkedCcy: Math.random() * 10,
       redeemable: Math.random() * 10, // 能赎回的钱，包含本金，如果未到期表示为根据当前的价格情况预估能赎回的钱，pending 状态下不存在这个值
       tradingFee: Math.random() * 10, // 付出给合约的交易手续费，做市商为不付交易手续费
       settlementFee: Math.random() * 10, // 赎回时付出给合约的结算手续费，做市商为不付结算手续费

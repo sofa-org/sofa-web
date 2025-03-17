@@ -3,11 +3,13 @@ import { ProductType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';
+import { ProductQuoteResult } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
 import styles from './DualProjectReturns.module.scss';
@@ -33,11 +35,14 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
   const forCcyConfig = CCYService.ccyConfigs[props.forCcy];
   const depositCcyConfig = CCYService.ccyConfigs[props.depositCcy];
   const priceIndex = useIndexPrices();
+  const isMobileUI = useIsMobileUI();
+
   return (
     <div
       className={classNames(
         styles['profit-scenarios-wrapper'],
         props.className,
+        isMobileUI ? styles['mobile-ui'] : undefined,
       )}
     >
       <div
@@ -94,17 +99,24 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
                 {depositCcyConfig?.name || props.depositCcy}
               </span>
             </div>
-            <span className={styles['divide-icon']} />
-            <span className={styles['exchange-rate']}>
-              {amountFormatter(
-                props.depositAmount / props.forCcyAmountWhenSuccessfulExecuted,
-                Math.max(
-                  forCcyConfig?.precision || 6,
-                  depositCcyConfig?.precision || 6,
-                ),
-              )}
-            </span>
-            <div className={styles['line']} />
+            <div className={styles['exchange-rate-info']}>
+              <span className={styles['exchange-rate']}>
+                {amountFormatter(
+                  props.depositAmount /
+                    props.forCcyAmountWhenSuccessfulExecuted,
+                  Math.max(
+                    forCcyConfig?.precision || 6,
+                    depositCcyConfig?.precision || 6,
+                  ),
+                )}
+              </span>
+            </div>
+            <div
+              className={styles['line']}
+              style={{
+                display: isMobileUI ? 'none' : undefined,
+              }}
+            />
             <div className={styles['result']}>
               {(forCcyConfig && <img src={forCcyConfig.icon} />) || undefined}
               <span className={styles['amount']}>
@@ -175,7 +187,7 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
                           {amountFormatter(
                             (props.rchReturnAmount * priceIndex.prices['RCH']) /
                               priceIndex.prices[props.forCcy]!,
-                            forCcyConfig?.precision,
+                            rchConfig?.precision,
                           )}
                         </span>
                         <span className={styles['unit']}>
@@ -312,11 +324,11 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
                           {amountFormatter(
                             (props.rchReturnAmount * priceIndex.prices['RCH']) /
                               priceIndex.prices[props.depositCcy]!,
-                            forCcyConfig?.precision,
+                            rchConfig?.precision,
                           )}
                         </span>
                         <span className={styles['unit']}>
-                          {forCcyConfig?.name || props.depositCcy}
+                          {depositCcyConfig?.name || props.depositCcy}
                         </span>
                       </span>
                     )) ||
@@ -327,22 +339,72 @@ export const DualProfitScenarios = (props: DualProfitRenderProps) => {
           </div>
         </div>
       </div>
-      <div
-        className={classNames(
-          styles['profit-scenario-wrapper'],
-          styles['partial-executed'],
-        )}
-      >
+      <div className={styles['partial-executed']}>
         <div className={styles['title']}>{desc.partialExecuted}</div>
         <div className={styles['subtitle']}>
           {t({
             enUS: 'Still Get Deposit Rewards and RCH Airdrops',
           })}
         </div>
+        <div className={styles['line']} />
       </div>
     </div>
   );
 };
+
+export function getDualProfitRenderProps(
+  data:
+    | (Partial<PositionInfo> & {
+        vault: VaultInfo;
+      })
+    | ProductQuoteResult,
+) {
+  const product =
+    (data as Partial<PositionInfo>).product || (data as ProductQuoteResult);
+  if (!data || !data.amounts || !data.vault || !product) {
+    return undefined;
+  }
+  const res = {
+    productType: data.vault.productType,
+  } as DualProfitRenderProps;
+  if (data.vault.productType == ProductType.BullSpread) {
+    res.forCcy = data.vault.forCcy;
+    // 低买： anchorPrice[0] = RCH/USDT
+    res.depositAmount = Number(data.amounts.own || 0);
+    // anchorPrice[0] * depositAmount(usdt)
+    res.forCcyAmountWhenSuccessfulExecuted =
+      Number(product.anchorPrices[0]) * res.depositAmount;
+    // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
+    res.forCcyExtraRewardWhenSuccessfulExecuted =
+      Number(data.amounts.maxRedeemableOfLinkedCcy) -
+      res.forCcyAmountWhenSuccessfulExecuted;
+    res.depositCcy = data.vault.depositCcy;
+
+    // maxRedeemable - own
+    res.depositCcyExtraRewardWhenNoExecuted =
+      Number(data.amounts.maxRedeemable) - res.depositAmount;
+    res.rchReturnAmount = Number(data.amounts.rchAirdrop || 0);
+  } else {
+    res.forCcy = data.vault.domCcy;
+    // 高卖： anchorPrice[0] = USDT/RCH
+    res.depositAmount = Number(data.amounts.own || 0);
+    // (anchorPrice[0] * depositAmount(rch))
+    res.forCcyAmountWhenSuccessfulExecuted =
+      Number(product.anchorPrices[0]) * res.depositAmount;
+    // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
+    res.forCcyExtraRewardWhenSuccessfulExecuted =
+      Number(data.amounts.maxRedeemableOfLinkedCcy) -
+      res.forCcyAmountWhenSuccessfulExecuted;
+
+    res.depositCcy = product.vault.forCcy;
+
+    // maxRedeemable - own
+    res.depositCcyExtraRewardWhenNoExecuted =
+      Number(data.amounts.maxRedeemable) - res.depositAmount;
+    res.rchReturnAmount = Number(data.amounts.rchAirdrop || 0);
+  }
+  return res;
+}
 
 export const DualProjectedReturns = (
   props: BaseProps & { data: Partial<PositionInfo> & { vault: VaultInfo } },
@@ -350,40 +412,10 @@ export const DualProjectedReturns = (
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
   const product = position.product;
-  const profitsProps = useMemo(() => {
-    if (!product || !position.amounts) {
-      return undefined;
-    }
-    const res = {
-      productType: product?.vault.productType,
-    } as DualProfitRenderProps;
-    if (product?.vault.productType == ProductType.BullSpread) {
-      res.forCcy = product.vault.forCcy;
-      // TODO:
-      // 低买： anchorPrice[0] = RCH/USDT
-      // (anchorPrice[0] * depositAmount)
-      res.forCcyAmountWhenSuccessfulExecuted = 1000;
-      // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
-      res.forCcyExtraRewardWhenSuccessfulExecuted = 100;
-      res.depositCcy = product.vault.depositCcy;
-
-      res.depositAmount = Number(position.amounts.own || 0);
-      // maxRedeemable - own
-      res.depositCcyExtraRewardWhenNoExecuted = 100;
-      res.rchReturnAmount = Number(position.amounts.rchAirdrop || 0);
-    } else {
-      res.forCcy = product.vault.domCcy;
-      // 高卖： anchorPrice[0] = USDT/RCH
-      // 倒过来，只不过小心一下 anchorPrice
-      res.forCcyAmountWhenSuccessfulExecuted = 1000;
-      res.forCcyExtraRewardWhenSuccessfulExecuted = 100;
-      res.depositCcy = product.vault.forCcy;
-      res.depositAmount = Number(position.amounts.own || 0);
-      res.depositCcyExtraRewardWhenNoExecuted = 100;
-      res.rchReturnAmount = Number(position.amounts.rchAirdrop || 0);
-    }
-    return res;
-  }, [product, position]);
+  const profitsProps = useMemo(
+    () => getDualProfitRenderProps(position),
+    [product, position],
+  );
   const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
   useEffect(() => {
     if (!basedCcy && position.vault.depositBaseCcy) {

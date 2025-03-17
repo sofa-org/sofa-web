@@ -32,7 +32,13 @@ function mockProductQuote(
     observationStart: (Date.now() + 3 * 60 * 60 * 1000) / 1000, // 目前产品根据timestamp预估的开始观察敲入敲出时间
     quote: {
       quoteId: '',
-      anchorPrices: ['20000000000', '30000000000'], // 20000000000,30000000000
+      anchorPrices:
+        vault.riskType == RiskType.DUAL
+          ? [
+              String(Number(params.lowerStrike) * 100000000),
+              String(Number(params.upperStrike) * 100000000),
+            ]
+          : ['20000000000', '30000000000'], // 20000000000,30000000000
       makerCollateral: '10000000', // Maker对赌抵押的金额
       totalCollateral: '1010000000', // 总的质押的金额（Taker+Maker）
       collateralAtRisk: '300000', // 保底时必填（可空）
@@ -49,6 +55,7 @@ function mockProductQuote(
       totalInterest: Math.random() * 10, // totalCollateral 产生的总利息，非 Earn 合约为 0
       minRedeemable: Math.random() * 10, // 对赌输了的情况能赎回的钱，包含本金
       maxRedeemable: Math.random() * 10, // 对赌全赢的情况能赎回的钱，包含本金
+      maxRedeemableOfLinkedCcy: Math.random() * 10,
       redeemable: Math.random() * 10, // 能赎回的钱，包含本金，如果未到期表示为根据当前的价格情况预估能赎回的钱，pending 状态下不存在这个值
       tradingFee: Math.random() * 10, // 付出给合约的交易手续费，做市商为不付交易手续费
       settlementFee: Math.random() * 10, // 赎回时付出给合约的结算手续费，做市商为不付结算手续费

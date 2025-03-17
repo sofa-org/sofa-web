@@ -1,9 +1,106 @@
-.label {
-  img {
+.executed {
+  .title-info {
+    background: #dbffa4;
+  }
+
+  .target {
+    margin-bottom: 8px;
+  }
+
+  .exchange-rate-info {
+    @include flex-center;
+
+    justify-content: start;
+
+    .exchange-rate {
+      border-radius: 4px;
+      color: #fff;
+      background: #6d6d6d;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 4px;
+    }
+
+    &::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      background: url("./assets/icon-division-sign.svg") no-repeat center / 100%;
+    }
+
+    &::after {
+      content: "";
+      width: 6px;
+      height: 4px;
+      display: inline-block;
+      background: url("./assets/icon-approximately.svg") no-repeat center / 100%;
+    }
+  }
+}
+
+.no-executed {
+  .title-info {
+    background: #ffe0c4;
+  }
+
+  .result {
+    img {
+      display: block;
+      margin: 10px 0 4px;
+    }
+  }
+}
+
+.partial-executed {
+  align-items: center;
+  display: inline-flex;
+  border-left: 2px solid #aaa;
+  position: relative;
+
+  &::after {
+    content: "";
     width: 16px;
     height: 16px;
-    vertical-align: middle;
-    margin-right: 4px;
+    display: inline-block;
+    margin-left: 7px;
+    background: url("./assets/icon-info.svg") no-repeat center / 100%;
+  }
+
+  .title {
+    margin-left: 7px;
+    color: #000;
+    font-size: 14px;
+    font-weight: 500;
+
+    &::after {
+      content: "|";
+      margin: 0 10px;
+      font-size: 10px;
+      vertical-align: middle;
+    }
+  }
+
+  .subtitle {
+    color: rgb(0 0 0 / 65%);
+    font-weight: 500;
+  }
+
+  .line {
+    position: absolute;
+    left: 7px;
+    bottom: -7px;
+    width: calc(100% - 7px);
+    height: 1px;
+    background: linear-gradient(
+      to left,
+      transparent 0%,
+      transparent 50%,
+      #d8d8d8 50%,
+      #d8d8d8 100%
+    );
+    background-size: 5px 1px;
+    background-repeat: repeat-x;
   }
 }
 
@@ -115,10 +212,23 @@
       }
 
       .item {
+        height: 61px;
         display: flex;
         flex-direction: column;
         align-items: end;
         gap: 5px;
+
+        .label {
+          @include flex-center;
+
+          align-items: start;
+          gap: 4px;
+
+          img {
+            width: 16px;
+            height: 16px;
+          }
+        }
       }
 
       .item:last-child {
@@ -141,18 +251,142 @@
   }
 }
 
-.executed {
-  .title-info {
-    background: #dbffa4;
-  }
-}
-
-.no-executed {
-  .title-info {
-    background: #ffe0c4;
-  }
-}
-
-.partial-executed {
+.mobile-ui {
   display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .executed {
+    .title {
+      background: #dbffa4;
+    }
+  }
+
+  .no-executed {
+    .title {
+      background: #ffe0c4;
+    }
+
+    .left {
+      justify-content: start;
+
+      .result {
+        @include flex-center;
+
+        height: auto;
+        align-items: start;
+
+        .icon {
+          display: inline;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .partial-executed {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: start;
+    position: relative;
+
+    &::after {
+      display: none;
+    }
+
+    .title {
+      &::after {
+        display: none;
+      }
+    }
+
+    .subtitle {
+      margin-left: 7px;
+
+      &::after {
+        content: "";
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        margin-left: 7px;
+        background: url("./assets/icon-info.svg") no-repeat center / 100%;
+      }
+    }
+  }
+
+  .profit-scenario-wrapper {
+    background-color: #fff;
+    padding: 8px;
+    border-radius: 8px;
+
+    .title-info {
+      width: calc(100vw - 32px);
+      flex-direction: column;
+      align-items: start;
+      background: none;
+      padding: 0;
+      margin: -8px;
+
+      .title {
+        width: calc(100vw - 32px);
+        padding: 8px 16px;
+        display: block;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .subtitle {
+        width: calc(100vw - 32px);
+        text-align: center;
+        margin: 16px 0;
+      }
+    }
+
+    .profit-scenario {
+      margin-bottom: 0;
+      flex-direction: column;
+
+      .left {
+        @include flex-center;
+
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        background: #f7f7f7;
+        flex-wrap: wrap;
+        padding: 8px;
+        gap: 12px;
+
+        .action {
+          display: block;
+          width: 100%;
+        }
+
+        .target {
+          margin: 0;
+        }
+
+        .result {
+          img {
+            margin-right: 8px;
+          }
+        }
+      }
+
+      .right {
+        width: 100%;
+        height: auto;
+        padding: 8px;
+        border-radius: 8px;
+        background: #f7f7f7;
+
+        .rewards {
+          background: none;
+
+          .item {
+            // height: auto;
+          }
+        }
+      }
+    }
+  }
 }

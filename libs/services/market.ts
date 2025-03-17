@@ -207,6 +207,9 @@ export class MarketService {
       MarketService.fetchPxFromCoinGecko('USDC')
         .catch(() => 1)
         .then((price) => ({ USDC: price })),
+      MarketService.fetchPxFromCoinGecko('CRV')
+        .catch(() => 1)
+        .then((price) => ({ CRV: price })),
     ]).then(([scrvPPS, zrchPPS, ...prices]) => {
       const obj = prices.reduce(
         (pre, it) => Object.assign(pre, it),

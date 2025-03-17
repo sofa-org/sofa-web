@@ -1,6 +1,6 @@
 import { Dispatch, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DatePicker } from '@douyinfe/semi-ui';
+import { DatePicker, Spin } from '@douyinfe/semi-ui';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
@@ -22,6 +22,7 @@ import { nanoid } from 'nanoid';
 
 import AmountInput from '@/components/AmountInput';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import { useGlobalState } from '@/store';
@@ -97,36 +98,9 @@ export const DualDepositModalContent = (
       max: Date.now() + 20 * 86400 * 1000,
     };
   }, []);
-  const setVaultAddress = useLazyCallback((v?: string) => {
-    if (!$vault) return;
-    const nextVault = ProductsService.findVault(ContractsService.vaults, {
-      ...omit($vault, [
-        'abis',
-        'vault',
-        'riskType',
-        'usePermit2',
-        'balanceDecimal',
-      ]),
-      ...(!v ? { riskType: $vault?.riskType } : { vault: v }),
-    })!;
-    const protectedApy = (() => {
-      const interestRate =
-        useGlobalState.getState().interestRate[nextVault.chainId]?.[
-          nextVault.depositCcy
-        ]?.apyUsed;
-      return isNullLike(interestRate)
-        ? 0.01
-        : (Math.floor(interestRate * 100) - 3) / 100;
-    })();
-    useProductsState.updateCart({
-      id: nanoid(),
-      ...product,
-      vault: nextVault,
-      protectedApy,
-    });
-    $setVaultAddress(v);
-  });
-
+  useMemo(() => {
+    console.log(wallet?.balance);
+  }, [wallet?.address]);
   const preDataRef = useRef<ProductQuoteResult>();
   const data = useProductsState((state) => {
     const val =
@@ -151,12 +125,19 @@ export const DualDepositModalContent = (
     }
     return (Math.random() * 0.2 - 0.1) * Number(currentPrice);
   }, [product?.anchorPrices?.[0]]);
+  const isMobileUI = useIsMobileUI();
   return (
     <>
       <ModalWrapper
         setVisible={props.setVisible}
         product={data}
-        className={styles['form']}
+        className={classNames(
+          styles['form'],
+          isMobileUI ? styles['mobile-ui'] : undefined,
+          {
+            [styles['quoting']]: loading,
+          },
+        )}
       >
         <div className={styles['left']}>
           <div className={styles['left-form']}>
@@ -171,10 +152,39 @@ export const DualDepositModalContent = (
                 <AmountInput
                   className={styles['amount-input']}
                   min={vault?.depositMinAmount}
+                  max={
+                    Number(wallet.balance?.[data.vault.depositCcy]) >
+                    Number(vault?.depositMinAmount)
+                      ? wallet.balance![data.vault.depositCcy]
+                      : undefined
+                  }
                   tick={vault?.depositTickAmount}
                   value={product?.depositAmount}
                   suffix={
                     <span className={styles['unit-1']}>
+                      <button
+                        className={styles['max']}
+                        onClick={() => {
+                          if (
+                            Number(wallet.balance?.[data.vault.depositCcy]) >
+                              Number(vault?.depositMinAmount) &&
+                            product
+                          ) {
+                            useProductsState.updateCart({
+                              ...product,
+                              depositAmount:
+                                wallet.balance?.[data.vault.depositCcy],
+                            });
+                            setTimeout(() => {
+                              if (product) {
+                                useProductsState.quote(product);
+                              }
+                            }, 0);
+                          }
+                        }}
+                      >
+                        {t({ enUS: 'Max', zhCN: '最大' })}
+                      </button>
                       {vault?.depositCcy}
                     </span>
                   }
@@ -321,16 +331,24 @@ export const DualDepositModalContent = (
               </span>
             </div>
           </div>
-          <InvestButton
-            vault={data.vault.vault.toLowerCase()}
-            chainId={data.vault.chainId}
-            afterInvest={() => props.setVisible(false)}
-          />
+          <div className={styles['left-button']}>
+            <InvestButton
+              vault={data.vault.vault.toLowerCase()}
+              chainId={data.vault.chainId}
+              afterInvest={() => props.setVisible(false)}
+            />
+          </div>
         </div>
-        <div className={styles['vertical-line']} />
+        <div
+          className={styles['vertical-line']}
+          style={{
+            display: isMobileUI ? 'none' : undefined,
+          }}
+        />
         <div className={styles['right']}>
           {/* 数据展示 */}
           <ProfitsRender data={data} />
+          <Spin size="large" wrapperClassName={styles['loading-spin']} />
         </div>
       </ModalWrapper>
     </>

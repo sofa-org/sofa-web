@@ -87,6 +87,7 @@ export interface CalculatedInfo {
     totalInterest: string | number; // totalCollateral 产生的总利息，非 Earn 合约为 0
     minRedeemable: string | number; // 对赌输了的情况能赎回的钱，包含本金
     maxRedeemable: string | number; // 对赌全赢的情况能赎回的钱，包含本金
+    maxRedeemableOfLinkedCcy: string | number; // 如果换币，能赎回的挂钩货币的金额，只有 Dual 产品有，其它产品为 0
     redeemable?: string | number; // 能赎回的钱，包含本金，如果未到期表示为根据当前的价格情况预估能赎回的钱，pending 状态下不存在这个值
     tradingFee: string | number; // 付出给合约的交易手续费，做市商为不付交易手续费
     settlementFee: string | number; // 赎回时付出给合约的结算手续费，做市商为不付结算手续费
@@ -623,6 +624,8 @@ export class ProductsService {
         total * pps.atTrade,
       minRedeemable: +data.amounts.minRedeemable * pps.afterExpire,
       maxRedeemable: +data.amounts.maxRedeemable * pps.afterExpire,
+      // TODO: dual 和 depositBaseCcy 暂时不能共存
+      maxRedeemableOfLinkedCcy: data.amounts.maxRedeemableOfLinkedCcy,
       redeemable: Number(data.amounts.redeemable) * pps.afterExpire,
       tradingFee: +data.amounts.tradingFee * pps.afterExpire,
       settlementFee: +data.amounts.settlementFee * pps.afterExpire,

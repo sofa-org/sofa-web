@@ -1,5 +1,10 @@
-import { ProjectType, VisibleRiskType } from '@sofa/services/base-type';
+import {
+  ProjectType,
+  VaultInfo,
+  VisibleRiskType,
+} from '@sofa/services/base-type';
 import { TFunction } from '@sofa/services/i18n';
+import { t } from '@sofa/services/i18n';
 import {
   ProductType,
   RiskType,
@@ -105,6 +110,7 @@ export const RiskTypeRefs = {
       t({ enUS: 'No losses, please', zhCN: '不接受损失' }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.PROTECTED,
+    buyModalTitle: undefined,
   },
   [RiskType.LEVERAGE]: {
     label: (t: TFunction) => t('Leverage'),
@@ -114,6 +120,7 @@ export const RiskTypeRefs = {
       t({ enUS: 'No pain, no gain', zhCN: '能接受少量损失' }),
     icon: <img src={IconLowRisk} width="24px" />,
     value: RiskType.LEVERAGE,
+    buyModalTitle: undefined,
   },
   [RiskType.RISKY]: {
     label: (t: TFunction) => t('Surge'),
@@ -123,6 +130,7 @@ export const RiskTypeRefs = {
       t({ enUS: 'Risking it all', zhCN: '能接受全部损失' }),
     icon: <img src={IconHighYield} width="24px" />,
     value: RiskType.RISKY,
+    buyModalTitle: undefined,
   },
   [RiskType.DUAL]: {
     label: (t: TFunction) => t('Dual'),
@@ -132,6 +140,16 @@ export const RiskTypeRefs = {
       t({ enUS: '[DUAL]Risking it all', zhCN: '[DUAL]能接受全部损失' }),
     icon: <img src={IconHighYield} width="24px" />,
     value: RiskType.DUAL,
+    buyModalTitle: (v: VaultInfo) =>
+      v.productType == ProductType.BullSpread
+        ? t({
+            enUS: 'Buy crypto at a discount and get bonus rewards',
+            zhCN: '低价买入加密货币并获得奖励',
+          })
+        : t({
+            enUS: 'Sell crypto for high price and get bonus rewards',
+            zhCN: '高价卖出加密货币并获得奖励',
+          }),
   },
 };
 

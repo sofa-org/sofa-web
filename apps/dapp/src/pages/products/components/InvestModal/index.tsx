@@ -356,16 +356,22 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
         title={
           <>
             <span>{RiskTypeRefs[props.product.vault.riskType].icon}</span>
-            <span>
-              {ProductTypeRefs[props.product.vault.productType].alias}
-            </span>{' '}
-            <span>{props.product.vault.forCcy.replace(/^W/, '')}</span>
-            <span>{displayExpiry(props.product.expiry * 1000)}</span>
-            <span>
-              {props.product.anchorPrices
-                .map((it) => amountFormatter(it, 0))
-                .join('-')}
-            </span>
+            {RiskTypeRefs[props.product.vault.riskType].buyModalTitle?.(
+              props.product.vault,
+            ) || (
+              <>
+                <span>
+                  {ProductTypeRefs[props.product.vault.productType].alias}
+                </span>{' '}
+                <span>{props.product.vault.forCcy.replace(/^W/, '')}</span>
+                <span>{displayExpiry(props.product.expiry * 1000)}</span>
+                <span>
+                  {props.product.anchorPrices
+                    .map((it) => amountFormatter(it, 0))
+                    .join('-')}
+                </span>
+              </>
+            )}
           </>
         }
         width={1080}
