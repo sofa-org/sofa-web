@@ -7,11 +7,13 @@
 
   justify-content: flex-start;
   gap: 12px;
-  line-height: min(22px, 4.4vw);
+  line-height: min(17px, 4.4vw);
   font-size: min(14px, 2.4vw);
 
   .expiry,
   .prices {
+    line-height: min(17px, 4.4vw);
+    font-size: min(14px, 2.4vw);
     padding: min(4px, 0.8vw);
     color: #000;
     background: #f2f2f2;
@@ -130,12 +132,15 @@
 
 .dual-status {
   @include bold;
+  @include flex-center;
 
   padding: 0;
   font-size: 12px;
-  display: flex;
+  gap: 0;
 
   .op {
+    white-space: nowrap;
+    line-height: 15px;
     border-radius: 4px 0 0 4px;
     padding: 4px 6px;
     color: white;
@@ -143,9 +148,10 @@
   }
 
   .status {
+    height: 23px;
     border-radius: 0 4px 4px 0;
     border: 1px solid black;
-    padding: 4px 6px;
+    padding: 2px 6px;
     color: #000;
   }
 }
@@ -198,17 +204,11 @@
       opacity: 0.65;
     }
 
-    .up {
-      @include flex-center;
-
-      flex-direction: column;
-      align-items: start;
-      height: 45px;
-    }
-
+    .up,
     .down {
       @include flex-center;
 
+      gap: 4px;
       flex-direction: column;
       align-items: start;
       height: 45px;
