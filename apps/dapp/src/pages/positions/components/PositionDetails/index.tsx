@@ -1,8 +1,13 @@
 import { useMemo, useRef } from 'react';
 import { Modal, Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
+import { CCYService } from '@sofa/services/ccy';
 import { ProductType, RiskType, VaultInfo } from '@sofa/services/contracts';
-import { getDualSettlementTime } from '@sofa/services/dual';
+import {
+  DualPositionClaimStatus,
+  getDualPositionClaimStatus,
+  getDualSettlementTime,
+} from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionInfo,
@@ -29,6 +34,7 @@ import { Time } from '@/components/TimezoneSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 import { Calculation } from '@/pages/products/components/Calculation';
+import { DualProfitsRender } from '@/pages/products/components/ProfitsRender/Dual/DualProfitsRender';
 import { ProjectedReturns } from '@/pages/products/components/ProjectedReturns';
 import { TicketTypeOptions } from '@/pages/products/components/TicketTypeSelector';
 
@@ -81,6 +87,8 @@ const PositionDetails = (props: PositionDetailsProps) => {
     return Math.min(1 - leftTime / totalTime, 0.8);
   }, [leftTime, observationStart, product.expiry]);
 
+  const productTypeRef = ProductTypeRefs[product.vault.productType];
+
   const infos = useMemo(
     () => [
       ...(product.vault.riskType == RiskType.DUAL
@@ -90,10 +98,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                 enUS: 'Asset Pair',
                 zhCN: '币对',
               }),
-              value:
-                product.vault.productType == ProductType.BullSpread
-                  ? `${product.vault.forCcy} / ${product.vault.depositCcy}`
-                  : `${product.vault.forCcy} / ${product.vault.domCcy}`,
+              value: `${product.vault.forCcy} / ${product.vault.domCcy}`,
             },
           ]
         : []),
@@ -109,7 +114,18 @@ const PositionDetails = (props: PositionDetailsProps) => {
         ),
       },
       ...(product.vault.riskType == RiskType.DUAL
-        ? []
+        ? [
+            {
+              label: t({
+                enUS: 'Target Price',
+                zhCN: '目标价格',
+              }),
+              value: amountFormatter(
+                productTypeRef.dualGetPrice(product),
+                CCYService.ccyConfigs[product.vault.depositCcy]?.precision,
+              ),
+            },
+          ]
         : [
             {
               label: t('Underlying'),
@@ -430,6 +446,14 @@ const PositionDetails = (props: PositionDetailsProps) => {
           />
         </div>
       )}
+      {(product.vault.riskType == RiskType.DUAL && (
+        <>
+          <div className={styles['dual-returns']}>
+            <DualProfitsRender data={position} scenario={'position'} />
+          </div>
+        </>
+      )) ||
+        undefined}
       {!position.claimParams.maker && (
         <div className={styles['returns']}>
           <ProjectedReturns data={position} />
@@ -451,6 +475,7 @@ const PositionDetailsModal = (
     onHide?(): void;
   },
 ) => {
+  const [t] = useTranslation('PositionDetails');
   const position = props.position;
   const product = position?.product;
   const riskTypeRef =
@@ -473,9 +498,20 @@ const PositionDetailsModal = (
       title={
         <>
           {riskTypeRef?.icon}
-          {productTypeRef?.alias}
-          {product?.vault.riskType === RiskType.LEVERAGE && (
-            <span className={styles['badge-leverage']}>Lev.</span>
+          {product?.vault.riskType === RiskType.DUAL ? (
+            <>
+              {t({
+                enUS: 'DualFlex',
+                zhCN: '双币交易',
+              })}
+            </>
+          ) : (
+            <>
+              {productTypeRef?.alias}
+              {product?.vault.riskType === RiskType.LEVERAGE && (
+                <span className={styles['badge-leverage']}>Lev.</span>
+              )}
+            </>
           )}
         </>
       }

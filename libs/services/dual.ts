@@ -11,6 +11,10 @@ export interface DualProfitRenderProps {
   rchReturnAmount: number; // RCH 空投金额
   depositCcyExtraRewardWhenNoExecuted: number; // 如果没交换成功，得到的金额
   productType: VaultInfo['productType'];
+  executionResult?:
+    | DualPositionExecutionStatus.Executed
+    | DualPositionExecutionStatus.NotExecuted
+    | DualPositionExecutionStatus.PartialExecuted;
 }
 export enum DualPositionExecutionStatus {
   NotExpired = 'NotExpired',
@@ -18,12 +22,8 @@ export enum DualPositionExecutionStatus {
   NotExecuted = 'NotExecuted',
   PartialExecuted = 'PartialExecuted',
 }
-export function getDualLinkedCcy(
-  vault: VaultInfo
-) {
-  return vault.forCcy == vault.depositCcy
-    ? vault.domCcy
-    : vault.forCcy;
+export function getDualLinkedCcy(vault: VaultInfo) {
+  return vault.forCcy == vault.depositCcy ? vault.domCcy : vault.forCcy;
 }
 
 export function getDualPositionExecutionStatus(
@@ -91,6 +91,13 @@ export function getDualProfitRenderProps(
 
   const res = {
     productType: data.vault.productType,
+    executionResult: [
+      DualPositionExecutionStatus.Executed,
+      DualPositionExecutionStatus.NotExecuted,
+      DualPositionExecutionStatus.PartialExecuted,
+    ].includes(executionStatus)
+      ? executionStatus
+      : undefined,
   } as DualProfitRenderProps;
   if (data.vault.productType == ProductType.BearSpread) {
     res.linkedCcy = data.vault.forCcy;

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { getDualProfitRenderProps } from '@sofa/services/dual';
-import { ProductQuoteResult } from '@sofa/services/products';
+import { PositionInfo } from '@sofa/services/positions';
+import { ProductQuoteResult, VaultInfo } from '@sofa/services/products';
 
 import { addI18nResources } from '@/locales';
 
@@ -10,8 +11,13 @@ addI18nResources(locale, 'ProfitsRenders');
 
 export const DualProfitsRender = (
   props: BaseProps & {
-    data: ProductQuoteResult;
+    data:
+      | ProductQuoteResult
+      | (PositionInfo & {
+          vault: VaultInfo;
+        });
     baseCcy?: CCY | USDS;
+    scenario: 'quote' | 'position';
   },
 ) => {
   const data = props.data;
@@ -22,7 +28,7 @@ export const DualProfitsRender = (
   }
   return (
     <>
-      <DualProfitScenarios {...profitsProps} />
+      <DualProfitScenarios {...profitsProps} scenario={props.scenario} />
     </>
   );
 };

@@ -207,7 +207,7 @@ export const ProfitsRender = (
   if (props.data.vault.riskType == RiskType.DUAL) {
     return (
       <>
-        <DualProfitsRender {...props} />
+        <DualProfitsRender {...props} scenario="quote" />
       </>
     );
   }

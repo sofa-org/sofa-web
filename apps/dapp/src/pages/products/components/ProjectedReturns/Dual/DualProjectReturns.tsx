@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { ProductType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import {
+  DualPositionExecutionStatus,
   DualProfitRenderProps,
   getDualProfitRenderProps,
 } from '@sofa/services/dual';
@@ -19,7 +20,10 @@ import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import styles from './DualProjectReturns.module.scss';
 
 export const DualProfitScenarios = (
-  props: DualProfitRenderProps & BaseProps,
+  props: DualProfitRenderProps &
+    BaseProps & {
+      scenario: 'quote' | 'position';
+    },
 ) => {
   const [t] = useTranslation('ProjectedReturns');
   const desc = useMemo(
@@ -36,162 +40,261 @@ export const DualProfitScenarios = (
     <div
       className={classNames(
         styles['profit-scenarios-wrapper'],
+        styles['for-' + props.scenario],
         props.className,
         isMobileUI ? styles['mobile-ui'] : undefined,
+        {
+          [styles['settled']]: !!props.executionResult,
+        },
       )}
     >
+      {props.executionResult == DualPositionExecutionStatus.PartialExecuted ? (
+        <div
+          className={classNames(
+            styles['profit-scenario-bg'],
+            styles['partial-executed'],
+            {
+              [styles['scenario-selected']]: true,
+            },
+          )}
+        >
+          <div className={classNames(styles['profit-scenario-wrapper'])}>
+            <div className={styles['title']}>{desc.partialExecuted}</div>
+            <div className={styles['subtitle']}>
+              {t({
+                enUS: 'Still Get Deposit Rewards and RCH Airdrops',
+              })}
+            </div>
+            <div className={classNames(styles['profit-scenario'])}>
+              <div className={styles['left']}>
+                <div className={styles['profit-title']}>
+                  {t({
+                    enUS: 'Deposit Reward+Partial Buy-in',
+                  })}
+                </div>
+                <div className={styles['result']}>
+                  <div className={styles['partial-ccys']}>
+                    <img src={forCcyConfig?.icon} /> {props.linkedCcy}
+                    +
+                    <img src={depositCcyConfig?.icon} /> {props.depositCcy}
+                  </div>
+                  ≈
+                  <span className={styles['amount']}>
+                    {amountFormatter(
+                      simplePlus(
+                        props.depositAmount,
+                        props.depositCcyExtraRewardWhenNoExecuted,
+                      ),
+                      depositCcyConfig?.precision,
+                    )}
+                  </span>
+                  <span className={styles['unit']}>
+                    {depositCcyConfig?.name || props.depositCcy}
+                  </span>
+                </div>
+              </div>
+              <span className={styles['plus-sign']}>+</span>
+              <div className={styles['right']}>
+                <div className={styles['profit-title']}>
+                  {t({
+                    enUS: 'RCH Airdrop | Est.',
+                  })}
+                </div>
+
+                <div className={styles['result']}>
+                  <div className={styles['partial-ccys']}>
+                    <img src={rchConfig?.icon} />
+                  </div>
+                  <span className={styles['amount']}>
+                    {amountFormatter(
+                      props.rchReturnAmount,
+                      rchConfig?.precision,
+                    )}
+                  </span>
+                  <span className={styles['unit']}>RCH</span>
+                </div>
+                {(priceIndex.prices[props.depositCcy] &&
+                  priceIndex.prices['RCH'] && (
+                    <span className={styles['est']}>
+                      ≈
+                      <span className={styles['amount']}>
+                        {amountFormatter(
+                          (props.rchReturnAmount * priceIndex.prices['RCH']) /
+                            priceIndex.prices[props.depositCcy]!,
+                          rchConfig?.precision,
+                        )}
+                      </span>
+                      <span className={styles['unit']}>
+                        {depositCcyConfig?.name || props.depositCcy}
+                      </span>
+                    </span>
+                  )) ||
+                  undefined}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : undefined}
       <div
         className={classNames(
-          styles['profit-scenario-wrapper'],
+          styles['profit-scenario-bg'],
           styles['executed'],
+          {
+            [styles['scenario-selected']]:
+              props.executionResult == DualPositionExecutionStatus.Executed,
+            [styles['scenario-invalid']]:
+              props.executionResult &&
+              props.executionResult != DualPositionExecutionStatus.Executed,
+          },
         )}
       >
-        <div className={styles['title-info']}>
-          <div className={styles['title']}>
-            <span className={styles['emoji']}>🎉</span>
-            {desc.executed}
-          </div>
-          <div className={styles['subtitle']}>
-            {t(
-              {
-                enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
-              },
-              {
-                amount: amountFormatter(
-                  simplePlus(
-                    props.linkedCcyAmountWhenSuccessfulExecuted,
-                    props.linkedCcyExtraRewardWhenSuccessfulExecuted,
+        <div className={classNames(styles['profit-scenario-wrapper'])}>
+          <div className={styles['title-info']}>
+            <div className={styles['title']}>
+              <span className={styles['emoji']}>🎉</span>
+              {desc.executed}
+            </div>
+            <div className={styles['subtitle']}>
+              {t(
+                {
+                  enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
+                },
+                {
+                  amount: amountFormatter(
+                    simplePlus(
+                      props.linkedCcyAmountWhenSuccessfulExecuted,
+                      props.linkedCcyExtraRewardWhenSuccessfulExecuted,
+                    ),
+                    forCcyConfig?.precision,
                   ),
-                  forCcyConfig?.precision,
-                ),
-                crypto: forCcyConfig?.name || props.linkedCcy,
-                rchAmount: amountFormatter(
-                  props.rchReturnAmount,
-                  rchConfig?.precision,
-                ),
-              },
-            )}
-            |
-            {t({
-              enUS: 'Est.',
-              zhCN: '预估',
-            })}
-          </div>
-        </div>
-        <div
-          className={classNames(styles['profit-scenario'], styles['executed'])}
-        >
-          <div className={styles['left']}>
-            <div className={styles['action']}>{desc.limited}</div>
-            <div className={styles['target']}>
-              <span className={styles['amount']}>
-                {amountFormatter(
-                  props.depositAmount,
-                  depositCcyConfig?.precision,
-                )}
-              </span>
-              <span className={styles['unit']}>
-                {depositCcyConfig?.name || props.depositCcy}
-              </span>
-            </div>
-            <div className={styles['exchange-rate-info']}>
-              <span className={styles['exchange-rate']}>
-                {amountFormatter(
-                  props.depositAmount /
-                    props.linkedCcyAmountWhenSuccessfulExecuted,
-                  Math.max(
-                    forCcyConfig?.precision || 6,
-                    depositCcyConfig?.precision || 6,
+                  crypto: forCcyConfig?.name || props.linkedCcy,
+                  rchAmount: amountFormatter(
+                    props.rchReturnAmount,
+                    rchConfig?.precision,
                   ),
-                )}
-              </span>
-            </div>
-            <div
-              className={styles['line']}
-              style={{
-                display: isMobileUI ? 'none' : undefined,
-              }}
-            />
-            <div className={styles['result']}>
-              {(forCcyConfig && <img src={forCcyConfig.icon} />) || undefined}
-              <span className={styles['amount']}>
-                {amountFormatter(
-                  props.linkedCcyAmountWhenSuccessfulExecuted,
-                  forCcyConfig?.precision,
-                )}
-              </span>
-              <span className={styles['unit']}>
-                {forCcyConfig?.name || props.linkedCcy}
-              </span>
-            </div>
-          </div>
-          <span className={styles['plus-sign']}>+</span>
-          <div className={styles['right']}>
-            <div className={styles['label']}>
+                },
+              )}
+              |
               {t({
-                enUS: 'Extra rewards',
-                zhCN: '额外收益',
+                enUS: 'Est.',
+                zhCN: '预估',
               })}
             </div>
-            <div className={styles['rewards']}>
-              <div className={styles['item']}>
-                <span className={styles['label']}>
-                  {(forCcyConfig && <img src={forCcyConfig.icon} />) ||
-                    undefined}
-                  {t({
-                    enUS: 'Deposit Reward',
-                    zhCN: '充值奖励',
-                  })}
+          </div>
+          <div className={classNames(styles['profit-scenario'])}>
+            <div className={styles['left']}>
+              <div className={styles['action']}>{desc.limited}</div>
+              <div className={styles['target']}>
+                <span className={styles['amount']}>
+                  {amountFormatter(
+                    props.depositAmount,
+                    depositCcyConfig?.precision,
+                  )}
                 </span>
-                <span className={styles['value']}>
-                  <span className={styles['amount']}>
-                    {amountFormatter(
-                      props.linkedCcyExtraRewardWhenSuccessfulExecuted,
-                      forCcyConfig?.precision,
-                    )}
-                  </span>
-                  <span className={styles['unit']}>
-                    {forCcyConfig?.name || props.linkedCcy}
-                  </span>
+                <span className={styles['unit']}>
+                  {depositCcyConfig?.name || props.depositCcy}
                 </span>
               </div>
-              <span className="plus-sign">+</span>
-              <div className={styles['item']}>
-                <span className={styles['label']}>
-                  {(rchConfig && <img src={rchConfig.icon} />) || undefined}
-                  {t({
-                    enUS: 'RCH Airdrop | Est.',
-                    zhCN: 'RCH 空投 | 预估',
-                  })}
+              <div className={styles['exchange-rate-info']}>
+                <span className={styles['exchange-rate']}>
+                  {amountFormatter(
+                    props.depositAmount /
+                      props.linkedCcyAmountWhenSuccessfulExecuted,
+                    Math.max(
+                      forCcyConfig?.precision || 6,
+                      depositCcyConfig?.precision || 6,
+                    ),
+                  )}
                 </span>
-                <span className={styles['value']}>
-                  <span className={styles['amount']}>
-                    {amountFormatter(
-                      props.rchReturnAmount,
-                      rchConfig?.precision,
-                    )}
-                  </span>
-                  <span className={styles['unit']}>
-                    {rchConfig?.name || 'RCH'}
-                  </span>
-                  {(priceIndex.prices[props.linkedCcy] &&
-                    priceIndex.prices['RCH'] && (
-                      <span className={styles['est']}>
-                        ≈
-                        <span className={styles['amount']}>
-                          {amountFormatter(
-                            (props.rchReturnAmount * priceIndex.prices['RCH']) /
-                              priceIndex.prices[props.linkedCcy]!,
-                            rchConfig?.precision,
-                          )}
-                        </span>
-                        <span className={styles['unit']}>
-                          {forCcyConfig?.name || props.linkedCcy}
-                        </span>
-                      </span>
-                    )) ||
-                    undefined}
+              </div>
+              <div
+                className={styles['line']}
+                style={{
+                  display: isMobileUI ? 'none' : undefined,
+                }}
+              />
+              <div className={styles['result']}>
+                {(forCcyConfig && <img src={forCcyConfig.icon} />) || undefined}
+                <span className={styles['amount']}>
+                  {amountFormatter(
+                    props.linkedCcyAmountWhenSuccessfulExecuted,
+                    forCcyConfig?.precision,
+                  )}
                 </span>
+                <span className={styles['unit']}>
+                  {forCcyConfig?.name || props.linkedCcy}
+                </span>
+              </div>
+            </div>
+            <span className={styles['plus-sign']}>+</span>
+            <div className={styles['right']}>
+              <div className={styles['label']}>
+                {t({
+                  enUS: 'Extra rewards',
+                  zhCN: '额外收益',
+                })}
+              </div>
+              <div className={styles['rewards']}>
+                <div className={styles['item']}>
+                  <span className={styles['label']}>
+                    {(forCcyConfig && <img src={forCcyConfig.icon} />) ||
+                      undefined}
+                    {t({
+                      enUS: 'Deposit Reward',
+                      zhCN: '充值奖励',
+                    })}
+                  </span>
+                  <span className={styles['value']}>
+                    <span className={styles['amount']}>
+                      {amountFormatter(
+                        props.linkedCcyExtraRewardWhenSuccessfulExecuted,
+                        forCcyConfig?.precision,
+                      )}
+                    </span>
+                    <span className={styles['unit']}>
+                      {forCcyConfig?.name || props.linkedCcy}
+                    </span>
+                  </span>
+                </div>
+                <span className="plus-sign">+</span>
+                <div className={styles['item']}>
+                  <span className={styles['label']}>
+                    {(rchConfig && <img src={rchConfig.icon} />) || undefined}
+                    {t({
+                      enUS: 'RCH Airdrop | Est.',
+                      zhCN: 'RCH 空投 | 预估',
+                    })}
+                  </span>
+                  <span className={styles['value']}>
+                    <span className={styles['amount']}>
+                      {amountFormatter(
+                        props.rchReturnAmount,
+                        rchConfig?.precision,
+                      )}
+                    </span>
+                    <span className={styles['unit']}>
+                      {rchConfig?.name || 'RCH'}
+                    </span>
+                    {(priceIndex.prices[props.linkedCcy] &&
+                      priceIndex.prices['RCH'] && (
+                        <span className={styles['est']}>
+                          ≈
+                          <span className={styles['amount']}>
+                            {amountFormatter(
+                              (props.rchReturnAmount *
+                                priceIndex.prices['RCH']) /
+                                priceIndex.prices[props.linkedCcy]!,
+                              rchConfig?.precision,
+                            )}
+                          </span>
+                          <span className={styles['unit']}>
+                            {forCcyConfig?.name || props.linkedCcy}
+                          </span>
+                        </span>
+                      )) ||
+                      undefined}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -199,156 +302,180 @@ export const DualProfitScenarios = (
       </div>
       <div
         className={classNames(
-          styles['profit-scenario-wrapper'],
+          styles['profit-scenario-bg'],
           styles['no-executed'],
+          {
+            [styles['scenario-selected']]:
+              props.executionResult == DualPositionExecutionStatus.NotExecuted,
+            [styles['scenario-invalid']]:
+              props.executionResult &&
+              props.executionResult != DualPositionExecutionStatus.NotExecuted,
+          },
         )}
       >
-        <div className={styles['title-info']}>
-          <div className={styles['title']}>
-            <span className={styles['emoji']}>️️✌️</span>
-            {t({
-              enUS: 'No Executed, Premium Earned',
-              zhCN: '未成交，获得额外奖励',
-            })}
-          </div>
-          <div className={styles['subtitle']}>
-            {t(
-              {
-                enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
-              },
-              {
-                amount: amountFormatter(
-                  simplePlus(
-                    props.depositAmount,
-                    props.depositCcyExtraRewardWhenNoExecuted,
-                  ),
-                  forCcyConfig?.precision,
-                ),
-                crypto: depositCcyConfig?.name || props.depositCcy,
-                rchAmount: amountFormatter(
-                  props.rchReturnAmount,
-                  rchConfig?.precision,
-                ),
-              },
-            )}
-            |
-            {t({
-              enUS: 'Est.',
-              zhCN: '预估',
-            })}
-          </div>
-        </div>
-        <div
-          className={classNames(styles['profit-scenario'], styles['executed'])}
-        >
-          <div className={styles['left']}>
-            <div className={styles['action']}>
+        <div className={classNames(styles['profit-scenario-wrapper'])}>
+          <div className={styles['title-info']}>
+            <div className={styles['title']}>
+              <span className={styles['emoji']}>️️✌️</span>
               {t({
-                enUS: 'Deposit',
-                zhCN: '存入',
+                enUS: 'No Executed, Premium Earned',
+                zhCN: '未成交，获得额外奖励',
               })}
             </div>
-            <span className={styles['result']}>
-              {(depositCcyConfig && <img src={depositCcyConfig.icon} />) ||
-                undefined}
-              <span className={styles['amount']}>
-                {amountFormatter(
-                  props.depositAmount,
-                  depositCcyConfig?.precision,
-                )}
-              </span>
-              <span className={styles['unit']}>
-                {depositCcyConfig?.name || props.depositAmount}
-              </span>
-            </span>
-          </div>
-          <span className="plus-sign">+</span>
-          <div className={styles['right']}>
-            <div className={styles['label']}>
-              {t({
-                enUS: 'Extra rewards',
-                zhCN: '额外收益',
-              })}
-            </div>
-            <div className={styles['rewards']}>
-              <div className={styles['item']}>
-                <span className={styles['label']}>
-                  {(forCcyConfig && <img src={forCcyConfig.icon} />) ||
-                    undefined}
-                  {t({
-                    enUS: 'Deposit Reward',
-                    zhCN: '存入奖励',
-                  })}
-                </span>
-                <span className={styles['value']}>
-                  <span className={styles['amount']}>
-                    {amountFormatter(
+            <div className={styles['subtitle']}>
+              {t(
+                {
+                  enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
+                },
+                {
+                  amount: amountFormatter(
+                    simplePlus(
+                      props.depositAmount,
                       props.depositCcyExtraRewardWhenNoExecuted,
-                      forCcyConfig?.precision,
-                    )}
-                  </span>
-                  <span className={styles['unit']}>
-                    {forCcyConfig?.name || props.linkedCcy}
-                  </span>
-                </span>
+                    ),
+                    depositCcyConfig?.precision,
+                  ),
+                  crypto: depositCcyConfig?.name || props.depositCcy,
+                  rchAmount: amountFormatter(
+                    props.rchReturnAmount,
+                    rchConfig?.precision,
+                  ),
+                },
+              )}
+              |
+              {t({
+                enUS: 'Est.',
+                zhCN: '预估',
+              })}
+            </div>
+          </div>
+          <div className={classNames(styles['profit-scenario'])}>
+            <div className={styles['left']}>
+              <div className={styles['action']}>
+                {t({
+                  enUS: 'Deposit',
+                  zhCN: '存入',
+                })}
               </div>
-              <span className="plus-sign">+</span>
-              <div className={styles['item']}>
-                <span className={styles['label']}>
-                  {(rchConfig && <img src={rchConfig.icon} />) || undefined}
-                  {t({
-                    enUS: 'RCH Airdrop | Est.',
-                    zhCN: 'RCH 空投 | 预估',
-                  })}
+              <span className={styles['result']}>
+                {(depositCcyConfig && <img src={depositCcyConfig.icon} />) ||
+                  undefined}
+                <span className={styles['amount']}>
+                  {amountFormatter(
+                    props.depositAmount,
+                    depositCcyConfig?.precision,
+                  )}
                 </span>
-                <span className={styles['value']}>
-                  <span className={styles['amount']}>
-                    {amountFormatter(
-                      props.rchReturnAmount,
-                      rchConfig?.precision,
-                    )}
-                  </span>
-                  <span className={styles['unit']}>
-                    {rchConfig?.name || 'RCH'}
-                  </span>
-                  {(priceIndex.prices[props.depositCcy] &&
-                    priceIndex.prices['RCH'] && (
-                      <span className={styles['est']}>
-                        ≈
-                        <span className={styles['amount']}>
-                          {amountFormatter(
-                            (props.rchReturnAmount * priceIndex.prices['RCH']) /
-                              priceIndex.prices[props.depositCcy]!,
-                            rchConfig?.precision,
-                          )}
-                        </span>
-                        <span className={styles['unit']}>
-                          {depositCcyConfig?.name || props.depositCcy}
-                        </span>
-                      </span>
-                    )) ||
-                    undefined}
+                <span className={styles['unit']}>
+                  {depositCcyConfig?.name || props.depositAmount}
                 </span>
+              </span>
+            </div>
+            <span className="plus-sign">+</span>
+            <div className={styles['right']}>
+              <div className={styles['label']}>
+                {t({
+                  enUS: 'Extra rewards',
+                  zhCN: '额外收益',
+                })}
+              </div>
+              <div className={styles['rewards']}>
+                <div className={styles['item']}>
+                  <span className={styles['label']}>
+                    {(forCcyConfig && <img src={forCcyConfig.icon} />) ||
+                      undefined}
+                    {t({
+                      enUS: 'Deposit Reward',
+                      zhCN: '存入奖励',
+                    })}
+                  </span>
+                  <span className={styles['value']}>
+                    <span className={styles['amount']}>
+                      {amountFormatter(
+                        props.depositCcyExtraRewardWhenNoExecuted,
+                        forCcyConfig?.precision,
+                      )}
+                    </span>
+                    <span className={styles['unit']}>
+                      {forCcyConfig?.name || props.linkedCcy}
+                    </span>
+                  </span>
+                </div>
+                <span className="plus-sign">+</span>
+                <div className={styles['item']}>
+                  <span className={styles['label']}>
+                    {(rchConfig && <img src={rchConfig.icon} />) || undefined}
+                    {t({
+                      enUS: 'RCH Airdrop | Est.',
+                      zhCN: 'RCH 空投 | 预估',
+                    })}
+                  </span>
+                  <span className={styles['value']}>
+                    <span className={styles['amount']}>
+                      {amountFormatter(
+                        props.rchReturnAmount,
+                        rchConfig?.precision,
+                      )}
+                    </span>
+                    <span className={styles['unit']}>
+                      {rchConfig?.name || 'RCH'}
+                    </span>
+                    {(priceIndex.prices[props.depositCcy] &&
+                      priceIndex.prices['RCH'] && (
+                        <span className={styles['est']}>
+                          ≈
+                          <span className={styles['amount']}>
+                            {amountFormatter(
+                              (props.rchReturnAmount *
+                                priceIndex.prices['RCH']) /
+                                priceIndex.prices[props.depositCcy]!,
+                              rchConfig?.precision,
+                            )}
+                          </span>
+                          <span className={styles['unit']}>
+                            {depositCcyConfig?.name || props.depositCcy}
+                          </span>
+                        </span>
+                      )) ||
+                      undefined}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className={styles['partial-executed']}>
-        <div className={styles['title']}>{desc.partialExecuted}</div>
-        <div className={styles['subtitle']}>
-          {t({
-            enUS: 'Still Get Deposit Rewards and RCH Airdrops',
-          })}
+      {props.executionResult ==
+      DualPositionExecutionStatus.PartialExecuted ? undefined : (
+        <div
+          className={classNames(
+            styles['profit-scenario-bg'],
+            styles['partial-executed'],
+            {
+              [styles['scenario-invalid']]: props.executionResult,
+            },
+          )}
+        >
+          <div>
+            <div className={styles['title']}>{desc.partialExecuted}</div>
+            <div className={styles['subtitle']}>
+              {t({
+                enUS: 'Still Get Deposit Rewards and RCH Airdrops',
+              })}
+            </div>
+            <div className={styles['line']} />
+          </div>
         </div>
-        <div className={styles['line']} />
-      </div>
+      )}
     </div>
   );
 };
 
 export const DualProjectedReturns = (
-  props: BaseProps & { data: Partial<PositionInfo> & { vault: VaultInfo } },
+  props: BaseProps & {
+    data: Partial<PositionInfo> & { vault: VaultInfo };
+    scenario: 'quote' | 'position';
+  },
 ) => {
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
@@ -378,7 +505,7 @@ export const DualProjectedReturns = (
         })}
         style={props.style}
       >
-        <DualProfitScenarios {...profitsProps} />
+        <DualProfitScenarios {...profitsProps} scenario={props.scenario} />
       </div>
     </section>
   );
