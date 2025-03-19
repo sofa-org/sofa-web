@@ -49,6 +49,7 @@ export const DualProfitScenarios = (
       )}
     >
       {props.executionResult == DualPositionExecutionStatus.PartialExecuted ? (
+        // 如果是部分执行，顶部显示特殊UI
         <div
           className={classNames(
             styles['profit-scenario-bg'],
@@ -137,6 +138,7 @@ export const DualProfitScenarios = (
       ) : undefined}
       {[
         [
+          // 执行成功的情况
           <div
             key="executed"
             className={classNames(
@@ -309,6 +311,7 @@ export const DualProfitScenarios = (
           1,
         ],
         [
+          // 未执行成功的情况
           <div
             key="no-executed"
             className={classNames(
@@ -482,6 +485,7 @@ export const DualProfitScenarios = (
 
       {props.executionResult ==
       DualPositionExecutionStatus.PartialExecuted ? undefined : (
+        // 如果不是部分执行，下方简单介绍下部分执行
         <div
           className={classNames(
             styles['profit-scenario-bg'],
