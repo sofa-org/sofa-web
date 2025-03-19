@@ -255,7 +255,9 @@ export class PositionsService {
     const dualVaults = params.vaults
       .map((v) =>
         ContractsService.vaults.find(
-          (vault) => vault.vault.toLowerCase() == v.toLowerCase(),
+          (vault) =>
+            vault.vault.toLowerCase() == v.toLowerCase() &&
+            vault.riskType == RiskType.DUAL,
         ),
       )
       .filter(Boolean) as VaultInfo[];
@@ -263,7 +265,10 @@ export class PositionsService {
     if (dualVaults.length) {
       dualRes = await http.post<unknown, HttpResponse<PositionInfo[]>>(
         '/rfq/dual/position-list',
-        params,
+        {
+          ...params,
+          vaults: dualVaults,
+        },
       );
     }
     if (dualRes) {
