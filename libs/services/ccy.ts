@@ -15,6 +15,7 @@ export interface CCYConfig {
   icon: string;
   color: string;
   precision: number; // 数值精度
+  priceInputPrecision?: number;
 }
 
 export class CCYService {
@@ -36,36 +37,42 @@ export class CCYService {
       icon: IconUSD,
       color: '#FFD639',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     crvUSD: {
       name: 'crvUSD',
       icon: IconCrvUSD,
       color: '#366f49',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     scrvUSD: {
       name: 'scrvUSD',
       icon: IconCrvUSD,
       color: '#366f49',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     USDC: {
       name: 'USDC',
       icon: IconUSDC,
       color: '#2675CA',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     USDT: {
       name: 'USDT',
       icon: IconUSDT,
       color: '#1BA27A',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     RCH: {
       name: 'RCH',
       icon: IconRCH,
       color: '#FFD639',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     stETH: {
       name: 'ETH',
@@ -90,18 +97,28 @@ export class CCYService {
       icon: IconCRV,
       color: '#FFA800',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     sUSDa: {
       name: 'sUSDa',
       icon: IconsUSDa,
       color: '#FFA800',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
     USDa: {
       name: 'USDa',
       icon: IconUSDa,
       color: '#FFA800',
       precision: 4,
+      priceInputPrecision: 0.002,
     },
   };
+  static getPriceInputTick(ccy: string) {
+    const res =
+      this.ccyConfigs[ccy]?.priceInputPrecision ||
+      1 / Math.pow(10, this.ccyConfigs[ccy]?.precision || 4);
+    // debugger;
+    return res;
+  }
 }

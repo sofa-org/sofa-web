@@ -116,13 +116,20 @@ export const DualDepositModalContent = (
   }, [ProductsService.productKey(product), wallet.address]);
 
   const diffPrice = useMemo(() => {
-    // TODO
     const currentPrice = product?.anchorPrices?.[0];
-    if (currentPrice === undefined) {
+    if (
+      currentPrice === undefined ||
+      !product?.vault.forCcy ||
+      prices[product.vault.forCcy] === undefined
+    ) {
       return undefined;
     }
-    return (Math.random() * 0.2 - 0.1) * Number(currentPrice);
-  }, [product?.anchorPrices?.[0]]);
+    return Number(currentPrice) - Number(prices[product.vault.forCcy]);
+  }, [
+    product?.anchorPrices?.[0],
+    product?.vault.forCcy,
+    prices[product?.vault.forCcy || ''],
+  ]);
   const isMobileUI = useIsMobileUI();
   if (!vault) {
     return undefined;
@@ -159,29 +166,33 @@ export const DualDepositModalContent = (
                     value={product?.depositAmount}
                     suffix={
                       <span className={styles['unit-1']}>
-                        <button
-                          className={styles['max']}
-                          onClick={() => {
-                            if (
-                              Number(wallet.balance?.[data.vault.depositCcy]) >
-                                Number(vault?.depositMinAmount) &&
-                              product
-                            ) {
-                              useProductsState.updateCart({
-                                ...product,
-                                depositAmount:
+                        {(wallet.balance?.[data.vault.depositCcy] && (
+                          <button
+                            className={styles['max']}
+                            onClick={() => {
+                              if (
+                                Number(
                                   wallet.balance?.[data.vault.depositCcy],
-                              });
-                              setTimeout(() => {
-                                if (product) {
-                                  useProductsState.quote(product);
-                                }
-                              }, 0);
-                            }
-                          }}
-                        >
-                          {t({ enUS: 'Max', zhCN: '最大' })}
-                        </button>
+                                ) > Number(vault?.depositMinAmount) &&
+                                product
+                              ) {
+                                useProductsState.updateCart({
+                                  ...product,
+                                  depositAmount:
+                                    wallet.balance?.[data.vault.depositCcy],
+                                });
+                                setTimeout(() => {
+                                  if (product) {
+                                    useProductsState.quote(product);
+                                  }
+                                }, 0);
+                              }
+                            }}
+                          >
+                            {t({ enUS: 'Max', zhCN: '最大' })}
+                          </button>
+                        )) ||
+                          undefined}
                         {vault?.depositCcy}
                       </span>
                     }
@@ -224,9 +235,8 @@ export const DualDepositModalContent = (
                 <span className={styles['value']}>
                   <AmountInput
                     className={styles['amount-input']}
-                    // TODO:
-                    // min={vault?.depositMinAmount}
-                    // tick={vault?.depositTickAmount}
+                    // min={}
+                    tick={CCYService.getPriceInputTick(vault.depositCcy)}
                     value={product?.anchorPrices?.[0]}
                     suffix={
                       <span className={styles['unit-2']}>
