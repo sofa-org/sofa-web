@@ -4,7 +4,7 @@ const RCHVaults = [
   // buy low
   {
     chainId: 11155111,
-    vault: '0xd8d1335589C53bFFc6B84ffc7bf6c8655321A8eb',
+    vault: '0x3d257cBFC6d70885EDD30238EbA861fD43368143',
     riskType: RiskType.DUAL,
     forCcy: 'RCH',
     domCcy: 'USDT',
@@ -15,7 +15,7 @@ const RCHVaults = [
   // sell high
   {
     chainId: 11155111,
-    vault: '0xEC3bc82cc30Be386B86D1976C5E7FAE2A5D26905',
+    vault: '0x81E6DBbFC3C45A03EACe08D55E2fCB5674Fa2830',
     riskType: RiskType.DUAL,
     forCcy: 'RCH',
     domCcy: 'USDT',
