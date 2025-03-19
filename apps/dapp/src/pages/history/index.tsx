@@ -7,7 +7,7 @@ import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
 import { getErrorMsg } from '@sofa/utils/fns';
-import { useQuery } from '@sofa/utils/hooks';
+import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import { displayTenor } from '@sofa/utils/time';
 import { useInfiniteScroll } from 'ahooks';
 import dayjs from 'dayjs';
@@ -28,13 +28,16 @@ import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
-import { judgeSettled } from '../positions/components/PositionCard';
+import { judgeSettled } from '../positions/components/PositionCard/common';
 
 import { Comp as IconDetails } from './assets/icon-details.svg';
 import { AutomatorHistory } from './automator';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { CCYService } from '@sofa/services/ccy';
+import { DualPositionClaimStatus, getDualLinkedCcy, getDualPositionClaimStatus, getDualSettlementTime } from '@sofa/services/dual';
+import classNames from 'classnames';
 
 addI18nResources(locale, 'History');
 
@@ -85,8 +88,140 @@ const OrderHistory = () => {
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>(() => []);
 
+  const getDualColumns = useLazyCallback(() => {
+    return [
+      {
+        title: t({
+          enUS: 'Assets'
+        }),
+        render: (_, record) => <>
+          <img src={CCYService.ccyConfigs[record.product.vault.forCcy]?.icon} />
+          <span>{record.product.vault.forCcy}</span>
+        </>,
+      },
+      {
+        title: t('Product'),
+        render: (_, record) => ProductTypeRefs[record.product.vault.productType].dualOp(t, record.product.vault).op,
+      },
+      {
+        title: t('Expiration'),
+        render: (_, record) => displayExpiry(record.product.expiry * 1000),
+      },
+      {
+        title: t('Term'),
+        render: (_, record) =>
+          displayTenor(
+            dayjs(record.product.expiry * 1000).diff(
+              next8h(record.createdAt * 1000),
+              'day',
+            ),
+            t,
+          ),
+      },
+      {
+        title: t({
+          enUS: 'Target Price',
+          zhCN: '目标价格',
+        }),
+        render: (_, record) =>
+          amountFormatter(
+            ProductTypeRefs[record.product.vault.productType].dualGetPrice(record.product),
+            CCYService.ccyConfigs[record.product.vault.depositCcy]?.precision
+          ),
+      } ,
+      {
+        title: t('Deposit'),
+        render: (_, record) =>
+          `${amountFormatter(record.amounts.own, 2)} ${
+            record.product.vault.depositCcy
+          }`,
+      },
+      {
+        title: t({
+          enUS: 'Settlement Results',
+        }),
+        render: (_, record) => {
+          if (!judgeSettled(record)) {
+            return '-';
+          }
+          if (!record.amounts.redeemable && !record.amounts.redeemableOfLinkedCcy) {
+            return '-';
+          }
+          return <>
+            {record.amounts.redeemable &&
+              <span
+                className={classNames(styles['amount'], styles['deposit-ccy'])}
+              >
+                <AmountDisplay
+                  amount={record.amounts.redeemable}
+                  ccy={record.product.vault.depositCcy}
+                />{' '}
+                {record.product.vault.depositCcy}
+              </span> || undefined}
+            {record.amounts.redeemableOfLinkedCcy &&
+              <span
+                className={classNames(styles['amount'], styles['linked-ccy'])}
+              >
+                <AmountDisplay
+                  amount={record.amounts.redeemableOfLinkedCcy}
+                  ccy={getDualLinkedCcy(record.product.vault)}
+                />{' '}
+                {getDualLinkedCcy(record.product.vault)}
+              </span> || undefined}
+          </>;
+        },
+      },
+      {
+        title: t('RCH PnL'),
+        render: (_, record) =>
+          record.claimParams.maker ||
+          Date.now() - next8h() > MsIntervals.min * 10 ? (
+            '-'
+          ) : (
+            <span className={styles['amount-rch']}>
+              {amountFormatter(record.amounts.rchAirdrop, 4)} RCH
+            </span>
+          ),
+      },
+      {
+        title: t('Created Time'),
+        render: (_, record) => (
+          <Time time={record.createdAt * 1000} format="YYYY-MM-DD HH:mm" />
+        ),
+      },
+      {
+        title: t('Settlement Time'),
+        render: (_, record) => (
+          <Time
+            time={getDualSettlementTime(record.product).getTime()}
+            format="YYYY-MM-DD HH:mm"
+          />
+        ),
+      },
+      {
+        title: t({
+          enUS: 'State'
+        }),
+        render: (_, record) => {
+          const {status} = getDualPositionClaimStatus({...record, vault: record.product.vault}, new Date());
+          return <span className={styles['dual-state']}>
+            {status == DualPositionClaimStatus.NotExpired ? t({
+              enUS: 'Active',
+            }) : status == DualPositionClaimStatus.ExpiredButNotClaimable ? t({
+              enUS: 'Settling',
+            }) : status == DualPositionClaimStatus.Claimable ? t({
+              enUS: 'Unclaimed',
+            }) : status == DualPositionClaimStatus.Claimed ? t({
+              enUS: 'Claimed',
+            }) : ''}
+          </span>
+        },
+      },
+    ] as ColumnProps<PositionInfo>[]
+  });
+
   const columns = useMemo(
-    () =>
+    () => riskType == RiskType.DUAL ? getDualColumns() :
       [
         {
           title: t('Product'),
@@ -217,6 +352,7 @@ const OrderHistory = () => {
       expandedRowKeys={expandedRowKeys}
       expandedRowRender={(record) => {
         if (!record) return null;
+        if (record.product.vault.riskType == RiskType.DUAL) return null;
         const hasSettled = judgeSettled(record);
         const returnInDepositCcy = !hasSettled
           ? undefined

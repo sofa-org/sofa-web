@@ -18,6 +18,13 @@ export enum DualPositionExecutionStatus {
   NotExecuted = 'NotExecuted',
   PartialExecuted = 'PartialExecuted',
 }
+export function getDualLinkedCcy(
+  vault: VaultInfo
+) {
+  return vault.forCcy == vault.depositCcy
+    ? vault.domCcy
+    : vault.forCcy;
+}
 
 export function getDualPositionExecutionStatus(
   position: PositionInfo & { vault: VaultInfo },

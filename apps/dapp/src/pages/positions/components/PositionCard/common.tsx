@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { PositionInfo } from '@sofa/services/positions';
-import { ProductType, VaultInfo } from '@sofa/services/products';
+import { ProductType, RiskType, VaultInfo } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { currQuery } from '@sofa/utils/history';
+import { DualPositionClaimStatus, getDualPositionClaimStatus } from '@sofa/services/dual';
 
 export interface PositionCardProps {
   isAutomator?: boolean;
@@ -16,6 +17,10 @@ export interface PositionCardProps {
 export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 5;
 export function judgeSettled(position: PositionInfo) {
   const product = position.product;
+  if (product.vault.riskType == RiskType.DUAL) {
+    const {status} = getDualPositionClaimStatus({...position, vault: position.product.vault}, new Date());
+    return [DualPositionClaimStatus.Claimable, DualPositionClaimStatus.Claimed].includes(status);
+  }
 
   if (currQuery().settled) return Date.now() - product.expiry * 1000 > 0;
 

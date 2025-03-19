@@ -3,6 +3,7 @@ import { CCYService } from '@sofa/services/ccy';
 import {
   DualPositionClaimStatus,
   DualPositionExecutionStatus,
+  getDualLinkedCcy,
   getDualPositionClaimStatus,
   getDualPositionExecutionStatus,
   getDualProfitRenderProps,
@@ -51,10 +52,7 @@ const DualPositionCard = (
     product.vault.forCcy == product.vault.depositCcy
       ? domCcyConfig
       : forCcyConfig;
-  const linkedCcy =
-    product.vault.forCcy == product.vault.depositCcy
-      ? product.vault.domCcy
-      : product.vault.forCcy;
+  const linkedCcy = getDualLinkedCcy(product.vault);
 
   const executionStatus = getDualPositionExecutionStatus(position);
   const { status: claimStatus, leftTime } = getDualPositionClaimStatus(

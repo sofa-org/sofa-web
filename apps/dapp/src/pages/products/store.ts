@@ -13,6 +13,8 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { useWalletStore } from '@/components/WalletConnector/store';
+import { Toast } from '@douyinfe/semi-ui';
+import { getErrorMsg } from '@sofa/utils/fns';
 
 export const useProductsState = Object.assign(
   createWithEqualityFn(
@@ -156,6 +158,9 @@ export const useProductsState = Object.assign(
       } as ProductQuoteParams).then((res) => {
         useProductsState.updateQuotes(res);
         return res;
+      }).catch(e => {
+        console.error(e);
+        Toast.error(getErrorMsg(e));
       });
     },
     delQuote: (quoteInfo: ProductQuoteResult) => {
