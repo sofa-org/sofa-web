@@ -1,4 +1,5 @@
 import { calc_yield } from '@sofa/alg';
+import { applyMock } from '@sofa/utils/decorators';
 import { isNullLike, safeRun } from '@sofa/utils/fns';
 import { http, pollingUntil } from '@sofa/utils/http';
 import { simplePlus } from '@sofa/utils/object';
@@ -243,6 +244,21 @@ export class PositionsService {
     };
   }
 
+  @applyMock('positionList')
+  static async $positionList(params: PositionParams) {
+    if (
+      params.vaults?.find(
+        (r) => r.startsWith('0xaaaaaaa') || r.startsWith('0xbbbbbb'),
+      )
+    ) {
+      throw new Error('Dual position API not working, use mock');
+    }
+    return await http.post<unknown, HttpResponse<PositionInfo[]>>(
+      '/rfq/position-list',
+      params,
+    );
+  }
+
   static async history(
     params: {
       chainId: number;
@@ -266,22 +282,19 @@ export class PositionsService {
     ).map((it) => it.vault.toLowerCase());
     const limit = extra?.limit ?? 20;
     if (!vault_in.length) return { hasMore: false, cursor: 0, limit, list: [] };
-    const res = await http.post<unknown, HttpResponse<PositionInfo[]>>(
-      '/rfq/position-list',
-      {
-        chainId: params.chainId,
-        wallet: params.owner,
-        endDateTime: extra?.cursor ?? params.expiry_lte,
-        claimed: params.claimed,
-        expired: params.expired,
-        concealed: params.concealed,
-        positiveReturn: params.positiveReturn,
-        positiveProfit: params.positiveProfit,
-        vaults: vault_in,
-        limit,
-        orderBy: extra?.orderBy,
-      } as PositionParams,
-    );
+    const res = await PositionsService.$positionList({
+      chainId: params.chainId,
+      wallet: params.owner,
+      endDateTime: extra?.cursor ?? params.expiry_lte,
+      claimed: params.claimed,
+      expired: params.expired,
+      concealed: params.concealed,
+      positiveReturn: params.positiveReturn,
+      positiveProfit: params.positiveProfit,
+      vaults: vault_in,
+      limit,
+      orderBy: extra?.orderBy,
+    } as PositionParams);
 
     const list = res.value.map((it) => ({
       position: it,

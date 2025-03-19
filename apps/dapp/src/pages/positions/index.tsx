@@ -25,6 +25,7 @@ addI18nResources(locale, 'Positions');
 export const PositionsEl = (props: { automator?: AutomatorVaultInfo }) => {
   const [t] = useTranslation('Positions');
   const query = useQuery();
+  const [project] = useProjectChange();
   const tab = (query.tab as string) || '1';
   const tabs = [
     {
@@ -49,13 +50,15 @@ export const PositionsEl = (props: { automator?: AutomatorVaultInfo }) => {
 
   return (
     <div className={styles['content']}>
-      <RadioBtnGroup
-        className={styles['btn-group']}
-        options={tabs}
-        value={tab}
-        onChange={(v) => updateQuery({ tab: v })}
-      />
-      {tab === '1' ? (
+      {project == ProjectType.Dual ? undefined : (
+        <RadioBtnGroup
+          className={styles['btn-group']}
+          options={tabs}
+          value={tab}
+          onChange={(v) => updateQuery({ tab: v })}
+        />
+      )}
+      {tab === '1' || project == ProjectType.Dual ? (
         <PositionList {...props} />
       ) : (
         <WonderfulMoments {...props} />
@@ -70,7 +73,7 @@ const Positions = () => {
   const [project, setProject] = useProjectChange();
   const projects = useMemo(
     () =>
-      [ProjectType.Earn, ProjectType.Surge].map((it) => ({
+      [ProjectType.Earn, ProjectType.Surge, ProjectType.Dual].map((it) => ({
         label: (
           <>
             {ProjectTypeRefs[it].icon}

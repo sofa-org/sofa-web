@@ -192,9 +192,11 @@ export const ProductTypeRefs = {
         zhCN: '高价卖出加密货币并获得奖励',
       }),
     }),
+    dualIsBuy: false,
     dualDesc: (t: TFunction) => ({
       executed: t({ enUS: 'Sell High Executed' }),
       limited: t({ enUS: 'Limit Sell' }),
+      op: t({ enUS: 'Sell' }),
       partialExecuted: t({ enUS: 'Partial Sell' }),
     }),
     extraDesc: (t: TFunction) =>
@@ -309,6 +311,7 @@ export const ProductTypeRefs = {
     dualOp: (t: TFunction, params: { forCcy: string }) => {
       throw new Error('Not suported scenario');
     },
+    dualIsBuy: false,
     dualDesc: (t: TFunction) => {
       throw new Error('Not suported scenario');
     },
@@ -435,9 +438,11 @@ export const ProductTypeRefs = {
         zhCN: '低价买入加密货币并获得奖励',
       }),
     }),
+    dualIsBuy: true,
     dualDesc: (t: TFunction) => ({
       executed: t({ enUS: 'Buy Low Executed' }),
       limited: t({ enUS: 'Limit Buy' }),
+      op: t({ enUS: 'Buy' }),
       partialExecuted: t({ enUS: 'Partial Buy' }),
     }),
     extraDesc: (t: TFunction) =>

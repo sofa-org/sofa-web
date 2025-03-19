@@ -1,15 +1,17 @@
 .form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.content {
+  display: flex;
   gap: 20px;
 }
 
 .left {
   width: 370px;
   margin: 12px 0 0 16px;
-
-  .left-button {
-    width: 350px;
-    margin-left: 10px;
-  }
 
   .field {
     .label {
@@ -27,7 +29,6 @@
     border-radius: 8px;
     border: 0.871px solid #e0e0e0;
     margin-bottom: 24px;
-    height: 520px;
 
     .balance {
       display: flex;
@@ -77,6 +78,7 @@
           background-clip: text;
           -webkit-text-fill-color: transparent;
           border: none;
+          outline: 0;
 
           &:hover,
           &:active {
@@ -193,7 +195,8 @@
 
 .vertical-line {
   width: 1px;
-  height: 520px;
+  height: auto;
+  margin-bottom: 24px;
   background: linear-gradient(
     to top,
     transparent 0%,
@@ -237,10 +240,18 @@
   }
 }
 
+.left-button {
+  width: 350px;
+  margin-left: 26px;
+}
+
 .mobile-ui {
   flex-direction: column;
-  position: relative;
   width: 100vw;
+
+  .content {
+    flex-direction: column;
+  }
 
   .left {
     width: 100vw;
@@ -254,28 +265,22 @@
       height: auto;
     }
 
-    .left-button {
-      position: absolute;
-      bottom: 60px;
-      width: 90vw;
-    }
-
     .expiry {
       .value {
         position: relative;
-
-        .date-picker {
-          width: auto;
-        }
       }
     }
+  }
+
+  .left-button {
+    margin-bottom: 5vh;
   }
 
   .right {
     width: 100vw;
     height: auto;
-    margin: 0 0 120px;
     padding: 24px 16px;
     border-radius: 0;
+    margin-bottom: 10px;
   }
 }

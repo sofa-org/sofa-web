@@ -40,7 +40,7 @@ const DualPayoff = (
       <div className={styles['payoff-infos']}>
         <div className={styles['apy']}>
           {displayPercentage(maxApy)}
-          <span>{t({ enUS: 'APY' })}</span>
+          <span>{t({ enUS: 'APY', zhCN: '年华' })}</span>
         </div>
         <div className={styles['payoff-chart']}>
           {ProductTypeRefs[props.productType].dualOp(t, props).op}
@@ -52,9 +52,7 @@ const DualPayoff = (
           <img
             src={
               CCYService.ccyConfigs[
-                props.productType == ProductType.BearSpread
-                  ? props.domCcy
-                  : props.forCcy
+                props.depositCcy == props.forCcy ? props.domCcy : props.forCcy
               ]?.icon
             }
           />

@@ -137,215 +137,218 @@ export const DualDepositModalContent = (
           [styles['quoting']]: loading,
         })}
       >
-        <div className={styles['left']}>
-          <div className={styles['left-form']}>
-            {/* depositCcy 数量 */}
-            <div className={classNames(styles['field'], styles['amount'])}>
-              <span className={styles['label']}>
-                {ProductTypeRefs[vault.productType].dualOp(t, vault).helpMeOp}
-              </span>
-              <span className={styles['value']}>
-                <AmountInput
-                  className={styles['amount-input']}
-                  min={vault?.depositMinAmount}
-                  max={
-                    Number(wallet.balance?.[data.vault.depositCcy]) >
-                    Number(vault?.depositMinAmount)
-                      ? wallet.balance![data.vault.depositCcy]
-                      : undefined
-                  }
-                  tick={vault?.depositTickAmount}
-                  value={product?.depositAmount}
-                  suffix={
-                    <span className={styles['unit-1']}>
-                      <button
-                        className={styles['max']}
-                        onClick={() => {
-                          if (
-                            Number(wallet.balance?.[data.vault.depositCcy]) >
-                              Number(vault?.depositMinAmount) &&
-                            product
-                          ) {
-                            useProductsState.updateCart({
-                              ...product,
-                              depositAmount:
-                                wallet.balance?.[data.vault.depositCcy],
-                            });
-                            setTimeout(() => {
-                              if (product) {
-                                useProductsState.quote(product);
-                              }
-                            }, 0);
-                          }
-                        }}
-                      >
-                        {t({ enUS: 'Max', zhCN: '最大' })}
-                      </button>
-                      {vault?.depositCcy}
-                    </span>
-                  }
-                  onChange={(v) => {
-                    return (
-                      product &&
-                      useProductsState.updateCart({
-                        ...product,
-                        depositAmount: v,
-                      })
-                    );
-                  }}
-                  onBlur={() => product && useProductsState.quote(product)}
-                />
-              </span>
-              <div className={styles['balance']}>
-                <span className={styles['label']}>{t('wallet.balance')}</span>
+        <div className={styles['content']}>
+          <div className={styles['left']}>
+            <div className={styles['left-form']}>
+              {/* depositCcy 数量 */}
+              <div className={classNames(styles['field'], styles['amount'])}>
+                <span className={styles['label']}>
+                  {ProductTypeRefs[vault.productType].dualOp(t, vault).helpMeOp}
+                </span>
                 <span className={styles['value']}>
-                  {amountFormatter(wallet.balance?.[data.vault.depositCcy])}
-                  <span className={styles['unit']}>
-                    {data.vault.depositCcy}
+                  <AmountInput
+                    className={styles['amount-input']}
+                    min={vault?.depositMinAmount}
+                    max={
+                      Number(wallet.balance?.[data.vault.depositCcy]) >
+                      Number(vault?.depositMinAmount)
+                        ? wallet.balance![data.vault.depositCcy]
+                        : undefined
+                    }
+                    tick={vault?.depositTickAmount}
+                    value={product?.depositAmount}
+                    suffix={
+                      <span className={styles['unit-1']}>
+                        <button
+                          className={styles['max']}
+                          onClick={() => {
+                            if (
+                              Number(wallet.balance?.[data.vault.depositCcy]) >
+                                Number(vault?.depositMinAmount) &&
+                              product
+                            ) {
+                              useProductsState.updateCart({
+                                ...product,
+                                depositAmount:
+                                  wallet.balance?.[data.vault.depositCcy],
+                              });
+                              setTimeout(() => {
+                                if (product) {
+                                  useProductsState.quote(product);
+                                }
+                              }, 0);
+                            }
+                          }}
+                        >
+                          {t({ enUS: 'Max', zhCN: '最大' })}
+                        </button>
+                        {vault?.depositCcy}
+                      </span>
+                    }
+                    onChange={(v) => {
+                      return (
+                        product &&
+                        useProductsState.updateCart({
+                          ...product,
+                          depositAmount: v,
+                        })
+                      );
+                    }}
+                    onBlur={() => product && useProductsState.quote(product)}
+                  />
+                </span>
+                <div className={styles['balance']}>
+                  <span className={styles['label']}>{t('wallet.balance')}</span>
+                  <span className={styles['value']}>
+                    {amountFormatter(wallet.balance?.[data.vault.depositCcy])}
+                    <span className={styles['unit']}>
+                      {data.vault.depositCcy}
+                    </span>
                   </span>
+                </div>
+              </div>
+              {/* 价格 */}
+
+              <div className={classNames(styles['field'], styles['price'])}>
+                <span className={styles['label']}>
+                  {t(
+                    {
+                      enUS: 'with price({{forCcy}} / {{domCcy}})',
+                    },
+                    {
+                      forCcy: product?.vault.forCcy,
+                      domCcy: product?.vault.domCcy,
+                    },
+                  )}
+                </span>
+                <span className={styles['value']}>
+                  <AmountInput
+                    className={styles['amount-input']}
+                    // TODO:
+                    // min={vault?.depositMinAmount}
+                    // tick={vault?.depositTickAmount}
+                    value={product?.anchorPrices?.[0]}
+                    suffix={
+                      <span className={styles['unit-2']}>
+                        {formatHighlightedText(
+                          t(
+                            {
+                              enUS: '(Current price: [[{{currentPrice}}]])',
+                            },
+                            {
+                              currentPrice: amountFormatter(
+                                vault?.forCcy === undefined
+                                  ? undefined
+                                  : prices[vault?.forCcy],
+                                CCYService.ccyConfigs[vault?.domCcy || '']
+                                  ?.precision,
+                              ),
+                            },
+                          ),
+                          {
+                            hightlightedClassName: classNames(
+                              styles['amount'],
+                              diffPrice === undefined || diffPrice === 0
+                                ? 'unchanged'
+                                : diffPrice > 0
+                                  ? styles['increased']
+                                  : styles['decreased'],
+                            ),
+                          },
+                        )}
+                      </span>
+                    }
+                    onChange={(v) => {
+                      return (
+                        product &&
+                        !isNullLike(v) &&
+                        useProductsState.updateCart({
+                          ...product,
+                          anchorPrices: [Number(v)],
+                        })
+                      );
+                    }}
+                    onBlur={() => product && useProductsState.quote(product)}
+                  />
+                </span>
+              </div>
+              {/* 到期日 */}
+
+              <div className={classNames(styles['field'], styles['expiry'])}>
+                <span className={styles['label']}>
+                  {t({
+                    enUS: 'Settlement Date',
+                    zhCN: '结算日期',
+                  })}
+                </span>
+                <span className={styles['value']}>
+                  <DatePicker
+                    className={styles['date-picker']}
+                    dropdownClassName={styles['date-picker-dropdown']}
+                    type="date"
+                    disabledDate={(d) => {
+                      if (!d) return true;
+                      const curr8h = next8h(d.getTime());
+                      return curr8h < dateRange.min || curr8h > dateRange.max;
+                    }}
+                    presetPosition="top"
+                    value={
+                      product?.expiry === undefined
+                        ? undefined
+                        : product.expiry * 1000
+                    }
+                    onChange={(v) => {
+                      return (
+                        product &&
+                        useProductsState.updateCart({
+                          ...product,
+                          expiry:
+                            v === undefined ? undefined : Number(v) / 1000,
+                        })
+                      );
+                    }}
+                    onBlur={() => product && useProductsState.quote(product)}
+                  />
+                  {!!product?.expiry && (
+                    <span className={styles['term']}>
+                      {Math.abs(dayjs().diff(product?.expiry * 1000, 'day'))}d
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className={styles['line']} />
+              <div className={styles['reward']}>
+                <span className={styles['label']}>
+                  {t({
+                    enUS: 'Yield (Deposit Reward + RCH Airdorp)',
+                  })}
+                </span>
+                <span className={styles['value']}>
+                  {displayPercentage(
+                    simplePlus(data?.apyInfo?.max, data?.apyInfo?.rch),
+                  )}
                 </span>
               </div>
             </div>
-            {/* 价格 */}
-
-            <div className={classNames(styles['field'], styles['price'])}>
-              <span className={styles['label']}>
-                {t(
-                  {
-                    enUS: 'with price({{forCcy}} / {{domCcy}})',
-                  },
-                  {
-                    forCcy: product?.vault.forCcy,
-                    domCcy: product?.vault.domCcy,
-                  },
-                )}
-              </span>
-              <span className={styles['value']}>
-                <AmountInput
-                  className={styles['amount-input']}
-                  // TODO:
-                  // min={vault?.depositMinAmount}
-                  // tick={vault?.depositTickAmount}
-                  value={product?.anchorPrices?.[0]}
-                  suffix={
-                    <span className={styles['unit-2']}>
-                      {formatHighlightedText(
-                        t(
-                          {
-                            enUS: '(Current price: [[{{currentPrice}}]])',
-                          },
-                          {
-                            currentPrice: amountFormatter(
-                              vault?.forCcy === undefined
-                                ? undefined
-                                : prices[vault?.forCcy],
-                              CCYService.ccyConfigs[vault?.domCcy || '']
-                                ?.precision,
-                            ),
-                          },
-                        ),
-                        {
-                          hightlightedClassName: classNames(
-                            styles['amount'],
-                            diffPrice === undefined || diffPrice === 0
-                              ? 'unchanged'
-                              : diffPrice > 0
-                                ? styles['increased']
-                                : styles['decreased'],
-                          ),
-                        },
-                      )}
-                    </span>
-                  }
-                  onChange={(v) => {
-                    return (
-                      product &&
-                      !isNullLike(v) &&
-                      useProductsState.updateCart({
-                        ...product,
-                        anchorPrices: [Number(v)],
-                      })
-                    );
-                  }}
-                  onBlur={() => product && useProductsState.quote(product)}
-                />
-              </span>
-            </div>
-            {/* 到期日 */}
-
-            <div className={classNames(styles['field'], styles['expiry'])}>
-              <span className={styles['label']}>
-                {t({
-                  enUS: 'Settlement Date',
-                  zhCN: '结算日期',
-                })}
-              </span>
-              <span className={styles['value']}>
-                <DatePicker
-                  className={styles['date-picker']}
-                  dropdownClassName={styles['date-picker-dropdown']}
-                  type="date"
-                  disabledDate={(d) => {
-                    if (!d) return true;
-                    const curr8h = next8h(d.getTime());
-                    return curr8h < dateRange.min || curr8h > dateRange.max;
-                  }}
-                  presetPosition="top"
-                  value={
-                    product?.expiry === undefined
-                      ? undefined
-                      : product.expiry * 1000
-                  }
-                  onChange={(v) => {
-                    return (
-                      product &&
-                      useProductsState.updateCart({
-                        ...product,
-                        expiry: v === undefined ? undefined : Number(v) / 1000,
-                      })
-                    );
-                  }}
-                  onBlur={() => product && useProductsState.quote(product)}
-                />
-                {!!product?.expiry && (
-                  <span className={styles['term']}>
-                    {Math.abs(dayjs().diff(product?.expiry * 1000, 'day'))}d
-                  </span>
-                )}
-              </span>
-            </div>
-            <div className={styles['line']} />
-            <div className={styles['reward']}>
-              <span className={styles['label']}>
-                {t({
-                  enUS: 'Yield (Deposit Reward + RCH Airdorp)',
-                })}
-              </span>
-              <span className={styles['value']}>
-                {displayPercentage(
-                  simplePlus(data?.apyInfo?.max, data?.apyInfo?.rch),
-                )}
-              </span>
-            </div>
           </div>
-          <div className={styles['left-button']}>
-            <InvestButton
-              vault={data.vault.vault.toLowerCase()}
-              chainId={data.vault.chainId}
-              afterInvest={() => props.setVisible(false)}
-            />
+          <div
+            className={styles['vertical-line']}
+            style={{
+              display: isMobileUI ? 'none' : undefined,
+            }}
+          />
+          <div className={styles['right']}>
+            {/* 数据展示 */}
+            <ProfitsRender data={data} />
+            <Spin size="large" wrapperClassName={styles['loading-spin']} />
           </div>
         </div>
-        <div
-          className={styles['vertical-line']}
-          style={{
-            display: isMobileUI ? 'none' : undefined,
-          }}
-        />
-        <div className={styles['right']}>
-          {/* 数据展示 */}
-          <ProfitsRender data={data} />
-          <Spin size="large" wrapperClassName={styles['loading-spin']} />
+        <div className={styles['left-button']}>
+          <InvestButton
+            vault={data.vault.vault.toLowerCase()}
+            chainId={data.vault.chainId}
+            afterInvest={() => props.setVisible(false)}
+          />
         </div>
       </ModalWrapper>
     </>

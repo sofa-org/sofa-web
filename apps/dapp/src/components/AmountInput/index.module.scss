@@ -6,6 +6,10 @@
   margin: 0;
 }
 
+.amount-input-wrapper:has(> div.quick-widget) {
+  height: auto;
+}
+
 .input-wrapper {
   @include flex-center;
 

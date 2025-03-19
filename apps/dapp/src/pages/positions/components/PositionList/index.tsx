@@ -34,7 +34,8 @@ import {
   PositionClaimProgress,
   PositionClaimProgressRef,
 } from '../ClaimProgress';
-import PositionCard, { judgeSettled } from '../PositionCard';
+import PositionCard from '../PositionCard';
+import { judgeSettled } from '../PositionCard/common';
 import PositionDetailsModal from '../PositionDetails';
 
 import { Comp as SelectedBg } from './assets/selected.svg';
@@ -73,11 +74,14 @@ const List = (props: {
           productType: props.automator ? undefined : props.productType,
         },
         { limit: 300, cursor: d?.cursor },
-      ).then((res) => ({
-        ...res,
-        chainId: wallet.chainId,
-        owner: address,
-      }));
+      ).then((res) => {
+        // debugger;
+        return {
+          ...res,
+          chainId: wallet.chainId,
+          owner: address,
+        };
+      });
     },
     {
       target: () => document.querySelector('#root'),

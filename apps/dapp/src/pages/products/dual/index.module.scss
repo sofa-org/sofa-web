@@ -25,33 +25,38 @@
 
 .buy-low {
   gap: 6px;
+
   > .icon {
-    background: url(./assets/icon-buylow-off.svg) no-repeat center;
+    background: url("./assets/icon-buylow-off.svg") no-repeat center;
     background-size: contain;
     width: 32px;
     height: 32px;
   }
+
   &:global(.active) {
     > .icon.icon {
-      background-image: url(./assets/icon-buylow.svg);
+      background-image: url("./assets/icon-buylow.svg");
     }
   }
 }
 
 .sell-high {
   gap: 6px;
+
   > .icon {
-    background: url(./assets/icon-sellhigh-off.svg) no-repeat center;
+    background: url("./assets/icon-sellhigh-off.svg") no-repeat center;
     background-size: contain;
     width: 32px;
     height: 32px;
   }
+
   &:global(.active) {
     > .icon.icon {
-      background-image: url(./assets/icon-sellhigh.svg);
+      background-image: url("./assets/icon-sellhigh.svg");
     }
   }
 }
+
 .content {
   align-items: stretch;
   justify-content: space-between;
@@ -104,6 +109,7 @@
         height: 40px;
         margin-right: 6px;
         z-index: 4;
+
         &.rch {
           margin-top: -3px;
         }
@@ -132,15 +138,40 @@
   padding: 20px 40px;
   font-size: 14px;
 }
+
 .mobile-ui {
+  display: flex;
+  flex-direction: column;
+
   .custom-quote {
     flex-direction: column;
     align-items: start;
   }
+
   .buy-low,
   .sell-high {
     > .icon {
       display: none;
+    }
+  }
+
+  .top-tabs-content {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .for-ccy-select {
+    display: flex;
+    justify-content: end;
+    height: auto;
+
+    .ccy-item {
+      text-align: end;
+
+      img {
+        width: 17px;
+        height: 18px;
+      }
     }
   }
 }

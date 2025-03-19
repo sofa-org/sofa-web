@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { Modal, Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { ProductType, RiskType, VaultInfo } from '@sofa/services/contracts';
+import { getDualSettlementTime } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionInfo,
@@ -35,7 +36,7 @@ import {
   PositionClaimProgress,
   PositionClaimProgressRef,
 } from '../ClaimProgress';
-import { usePositionSettled } from '../PositionCard';
+import { usePositionSettled } from '../PositionCard/common';
 
 import locale from './locale';
 
@@ -107,16 +108,20 @@ const PositionDetails = (props: PositionDetailsProps) => {
           t,
         ),
       },
-      {
-        label: t('Underlying'),
-        value: product.vault.forCcy.replace(/^w/i, ''),
-      },
-      {
-        label: t('Price Range'),
-        value: product.anchorPrices
-          .map((it) => amountFormatter(it, 0))
-          .join('-'),
-      },
+      ...(product.vault.riskType == RiskType.DUAL
+        ? []
+        : [
+            {
+              label: t('Underlying'),
+              value: product.vault.forCcy.replace(/^w/i, ''),
+            },
+            {
+              label: t('Price Range'),
+              value: product.anchorPrices
+                .map((it) => amountFormatter(it, 0))
+                .join('-'),
+            },
+          ]),
       {
         label: t('Subscription Time'),
         value: (
@@ -130,7 +135,14 @@ const PositionDetails = (props: PositionDetailsProps) => {
             {
               label: t('Settlement Time'),
               value: (
-                <Time time={product.expiry * 1000} format="YYYY-MM-DD HH:mm" />
+                <Time
+                  time={
+                    product.vault.riskType == RiskType.DUAL
+                      ? getDualSettlementTime(product).getTime()
+                      : product.expiry * 1000
+                  }
+                  format="YYYY-MM-DD HH:mm"
+                />
               ),
             },
             ...(position.triggerPrice

@@ -1,16 +1,69 @@
 import { ProductType, VaultInfo } from './base-type';
 import { PositionInfo } from './positions';
-import { ProductQuoteResult } from './products';
+import { ProductInfo, ProductQuoteResult } from './products';
 
 export interface DualProfitRenderProps {
-  forCcy: VaultInfo['forCcy'] | VaultInfo['domCcy'];
-  forCcyAmountWhenSuccessfulExecuted: number; // 要交换目标币种金额(如果成功兑换)
-  forCcyExtraRewardWhenSuccessfulExecuted: number; // 要交换目标币种奖励金额(如果成功兑换)
+  linkedCcy: VaultInfo['forCcy'] | VaultInfo['domCcy'];
+  linkedCcyAmountWhenSuccessfulExecuted: number; // 要交换目标币种金额(如果成功兑换)
+  linkedCcyExtraRewardWhenSuccessfulExecuted: number; // 要交换目标币种奖励金额(如果成功兑换)
   depositCcy: VaultInfo['depositCcy'];
   depositAmount: number; // 本金
   rchReturnAmount: number; // RCH 空投金额
   depositCcyExtraRewardWhenNoExecuted: number; // 如果没交换成功，得到的金额
   productType: VaultInfo['productType'];
+}
+export enum DualPositionExecutionStatus {
+  NotExpired = 'NotExpired',
+  Executed = 'Executed',
+  NotExecuted = 'NotExecuted',
+  PartialExecuted = 'PartialExecuted',
+}
+
+export function getDualPositionExecutionStatus(
+  position: PositionInfo & { vault: VaultInfo },
+) {
+  if (position.amounts.redeemable && !position.amounts.redeemableOfLinkedCcy) {
+    return DualPositionExecutionStatus.NotExecuted;
+  }
+  if (!position.amounts.redeemable && position.amounts.redeemableOfLinkedCcy) {
+    return DualPositionExecutionStatus.Executed;
+  }
+  if (position.amounts.redeemable && position.amounts.redeemableOfLinkedCcy) {
+    return DualPositionExecutionStatus.PartialExecuted;
+  }
+  return DualPositionExecutionStatus.NotExpired;
+}
+
+export function getDualSettlementTime(product: ProductInfo) {
+  return new Date((product.expiry + 2 * 3600) * 1000);
+}
+
+export enum DualPositionClaimStatus {
+  NotExpired = 'NotExpired',
+  ExpiredButNotClaimable = 'ExpiredButNotClaimable',
+  Claimable = 'Claimable',
+  Claimed = 'Claimed',
+}
+export function getDualPositionClaimStatus(
+  position: PositionInfo & { vault: VaultInfo },
+  now: Date,
+) {
+  if (position.claimed) {
+    return { status: DualPositionClaimStatus.Claimed, leftTime: 0 };
+  }
+  if (now.getTime() < position.product.expiry * 1000) {
+    return {
+      status: DualPositionClaimStatus.NotExpired,
+      leftTime: position.product.expiry * 1000 - now.getTime(),
+    };
+  }
+  if (now < getDualSettlementTime(position.product)) {
+    return {
+      status: DualPositionClaimStatus.ExpiredButNotClaimable,
+      leftTime: 0,
+    };
+  }
+  return { status: DualPositionClaimStatus.Claimable, leftTime: 0 };
 }
 
 export function getDualProfitRenderProps(
@@ -25,20 +78,27 @@ export function getDualProfitRenderProps(
   if (!data || !data.amounts || !data.vault || !product) {
     return undefined;
   }
+  const executionStatus = getDualPositionExecutionStatus(
+    data as PositionInfo & { vault: VaultInfo },
+  );
+
   const res = {
     productType: data.vault.productType,
   } as DualProfitRenderProps;
   if (data.vault.productType == ProductType.BearSpread) {
-    res.forCcy = data.vault.forCcy;
+    res.linkedCcy = data.vault.forCcy;
     // 低买： anchorPrice[0] = RCH/USDT
     res.depositAmount = Number(data.amounts.own || 0);
     // anchorPrice[0] * depositAmount(usdt)
-    res.forCcyAmountWhenSuccessfulExecuted =
+    res.linkedCcyAmountWhenSuccessfulExecuted =
       Number(product.anchorPrices[0]) * res.depositAmount;
     // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
-    res.forCcyExtraRewardWhenSuccessfulExecuted =
-      Number(data.amounts.maxRedeemableOfLinkedCcy) -
-      res.forCcyAmountWhenSuccessfulExecuted;
+    res.linkedCcyExtraRewardWhenSuccessfulExecuted =
+      Number(
+        executionStatus == DualPositionExecutionStatus.NotExpired
+          ? data.amounts.maxRedeemableOfLinkedCcy
+          : data.amounts.redeemableOfLinkedCcy,
+      ) - res.linkedCcyAmountWhenSuccessfulExecuted;
     res.depositCcy = data.vault.depositCcy;
 
     // maxRedeemable - own
@@ -46,16 +106,19 @@ export function getDualProfitRenderProps(
       Number(data.amounts.maxRedeemable) - res.depositAmount;
     res.rchReturnAmount = Number(data.amounts.rchAirdrop || 0);
   } else {
-    res.forCcy = data.vault.domCcy;
+    res.linkedCcy = data.vault.domCcy;
     // 高卖： anchorPrice[0] = USDT/RCH
     res.depositAmount = Number(data.amounts.own || 0);
     // (anchorPrice[0] * depositAmount(rch))
-    res.forCcyAmountWhenSuccessfulExecuted =
+    res.linkedCcyAmountWhenSuccessfulExecuted =
       Number(product.anchorPrices[0]) * res.depositAmount;
     // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
-    res.forCcyExtraRewardWhenSuccessfulExecuted =
-      Number(data.amounts.maxRedeemableOfLinkedCcy) -
-      res.forCcyAmountWhenSuccessfulExecuted;
+    res.linkedCcyExtraRewardWhenSuccessfulExecuted =
+      Number(
+        executionStatus == DualPositionExecutionStatus.NotExpired
+          ? data.amounts.maxRedeemableOfLinkedCcy
+          : data.amounts.redeemableOfLinkedCcy,
+      ) - res.linkedCcyAmountWhenSuccessfulExecuted;
 
     res.depositCcy = product.vault.forCcy;
 

@@ -27,7 +27,7 @@ export const DualProfitScenarios = (
     [t, props.productType],
   );
   const rchConfig = CCYService.ccyConfigs['RCH'];
-  const forCcyConfig = CCYService.ccyConfigs[props.forCcy];
+  const forCcyConfig = CCYService.ccyConfigs[props.linkedCcy];
   const depositCcyConfig = CCYService.ccyConfigs[props.depositCcy];
   const priceIndex = useIndexPrices();
   const isMobileUI = useIsMobileUI();
@@ -59,12 +59,12 @@ export const DualProfitScenarios = (
               {
                 amount: amountFormatter(
                   simplePlus(
-                    props.forCcyAmountWhenSuccessfulExecuted,
-                    props.forCcyExtraRewardWhenSuccessfulExecuted,
+                    props.linkedCcyAmountWhenSuccessfulExecuted,
+                    props.linkedCcyExtraRewardWhenSuccessfulExecuted,
                   ),
                   forCcyConfig?.precision,
                 ),
-                crypto: forCcyConfig?.name || props.forCcy,
+                crypto: forCcyConfig?.name || props.linkedCcy,
                 rchAmount: amountFormatter(
                   props.rchReturnAmount,
                   rchConfig?.precision,
@@ -98,7 +98,7 @@ export const DualProfitScenarios = (
               <span className={styles['exchange-rate']}>
                 {amountFormatter(
                   props.depositAmount /
-                    props.forCcyAmountWhenSuccessfulExecuted,
+                    props.linkedCcyAmountWhenSuccessfulExecuted,
                   Math.max(
                     forCcyConfig?.precision || 6,
                     depositCcyConfig?.precision || 6,
@@ -116,12 +116,12 @@ export const DualProfitScenarios = (
               {(forCcyConfig && <img src={forCcyConfig.icon} />) || undefined}
               <span className={styles['amount']}>
                 {amountFormatter(
-                  props.forCcyAmountWhenSuccessfulExecuted,
+                  props.linkedCcyAmountWhenSuccessfulExecuted,
                   forCcyConfig?.precision,
                 )}
               </span>
               <span className={styles['unit']}>
-                {forCcyConfig?.name || props.forCcy}
+                {forCcyConfig?.name || props.linkedCcy}
               </span>
             </div>
           </div>
@@ -146,12 +146,12 @@ export const DualProfitScenarios = (
                 <span className={styles['value']}>
                   <span className={styles['amount']}>
                     {amountFormatter(
-                      props.forCcyExtraRewardWhenSuccessfulExecuted,
+                      props.linkedCcyExtraRewardWhenSuccessfulExecuted,
                       forCcyConfig?.precision,
                     )}
                   </span>
                   <span className={styles['unit']}>
-                    {forCcyConfig?.name || props.forCcy}
+                    {forCcyConfig?.name || props.linkedCcy}
                   </span>
                 </span>
               </div>
@@ -174,19 +174,19 @@ export const DualProfitScenarios = (
                   <span className={styles['unit']}>
                     {rchConfig?.name || 'RCH'}
                   </span>
-                  {(priceIndex.prices[props.forCcy] &&
+                  {(priceIndex.prices[props.linkedCcy] &&
                     priceIndex.prices['RCH'] && (
                       <span className={styles['est']}>
                         ≈
                         <span className={styles['amount']}>
                           {amountFormatter(
                             (props.rchReturnAmount * priceIndex.prices['RCH']) /
-                              priceIndex.prices[props.forCcy]!,
+                              priceIndex.prices[props.linkedCcy]!,
                             rchConfig?.precision,
                           )}
                         </span>
                         <span className={styles['unit']}>
-                          {forCcyConfig?.name || props.forCcy}
+                          {forCcyConfig?.name || props.linkedCcy}
                         </span>
                       </span>
                     )) ||
@@ -288,7 +288,7 @@ export const DualProfitScenarios = (
                     )}
                   </span>
                   <span className={styles['unit']}>
-                    {forCcyConfig?.name || props.forCcy}
+                    {forCcyConfig?.name || props.linkedCcy}
                   </span>
                 </span>
               </div>

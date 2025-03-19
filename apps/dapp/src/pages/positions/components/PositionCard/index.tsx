@@ -1,17 +1,14 @@
 import { useMemo, useRef } from 'react';
-import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import {
-  PositionInfo,
   PositionsService,
   TransactionProgress,
 } from '@sofa/services/positions';
-import { ProductType, RiskType, VaultInfo } from '@sofa/services/products';
+import { ProductType, RiskType } from '@sofa/services/products';
 import { PositionStatus } from '@sofa/services/the-graph';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, MsIntervals, next8h } from '@sofa/utils/expiry';
-import { currQuery } from '@sofa/utils/history';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
@@ -31,39 +28,13 @@ import {
   PositionClaimProgressRef,
 } from '../ClaimProgress';
 
+import DualPositionCard from './Dual/DualPositionCard';
+import { PositionCardProps, usePositionSettled } from './common';
 import locale from './locale';
 
 import styles from './index.module.scss';
 
 addI18nResources(locale, 'PositionCard');
-
-export interface PositionCardProps {
-  isAutomator?: boolean;
-  position: PositionInfo & { vault: VaultInfo };
-  onStatusChange?(status: PositionStatus): void;
-  onClick?(): void;
-  showBaseCcyEst: boolean;
-}
-
-export const BUFFER_TIME_FOR_SETTLEMENT = MsIntervals.min * 5;
-export function judgeSettled(position: PositionInfo) {
-  const product = position.product;
-
-  if (currQuery().settled) return Date.now() - product.expiry * 1000 > 0;
-
-  const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
-    product.vault.productType,
-  );
-  if (isTrend) return !!position.triggerPrice;
-  return (
-    Date.now() - product.expiry * 1000 > BUFFER_TIME_FOR_SETTLEMENT ||
-    !!(position.claimParams.maker && position.triggerTime)
-  );
-}
-
-export function usePositionSettled(position: PositionInfo) {
-  return useMemo(() => judgeSettled(position), [position]);
-}
 
 const ProtectedAmounts = (
   props: PositionCardProps & { onClaim(): Promise<unknown> },
@@ -291,14 +262,16 @@ const PositionCard = (props: PositionCardProps) => {
   const product = position.product;
   const riskTypeRef = RiskTypeRefs[product.vault.riskType];
   const productTypeRef = ProductTypeRefs[product.vault.productType];
-  const icon = useMemo(
-    () =>
-      productTypeRef.icon(
-        product.vault.riskType,
-        !product.vault.depositCcy.startsWith('USD'),
-      ),
-    [product.vault.depositCcy, product.vault.riskType, productTypeRef],
-  );
+  const icon = useMemo(() => {
+    if (product.vault.riskType == RiskType.DUAL) {
+      // 特殊样式，没有 icon 定义
+      return undefined;
+    }
+    return productTypeRef.icon(
+      product.vault.riskType,
+      !product.vault.depositCcy.startsWith('USD'),
+    );
+  }, [product.vault.depositCcy, product.vault.riskType, productTypeRef]);
   // const leverageInfo = useAsyncMemo(
   //   () => ProductsService.vaultLeverageInfo(product.vault, position.createdAt),
   //   [product.vault, position.createdAt],
@@ -372,7 +345,18 @@ const PositionCard = (props: PositionCardProps) => {
     };
     return PositionsService.claim(cb, params);
   });
-
+  if (product.vault.riskType == RiskType.DUAL) {
+    return (
+      <DualPositionCard
+        {...props}
+        claimProgressRef={claimProgressRef}
+        handleClaim={handleClaim}
+      />
+    );
+  }
+  if (!icon) {
+    throw new Error(`icon must be non-empty`);
+  }
   return (
     <>
       <div

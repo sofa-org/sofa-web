@@ -6,6 +6,7 @@ import './points';
 import './auth';
 import './automator';
 import './market';
+import './positions';
 
 export function isMockEnabled(): false | 'always' | 'whenError' {
   if (!Env.isDaily) return false;

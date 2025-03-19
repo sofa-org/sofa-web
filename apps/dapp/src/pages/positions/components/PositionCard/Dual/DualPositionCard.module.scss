@@ -1,0 +1,327 @@
+.count-down {
+  white-space: nowrap;
+}
+
+.infos {
+  @include flex-center;
+
+  justify-content: flex-start;
+  gap: 12px;
+  line-height: min(22px, 4.4vw);
+  font-size: min(14px, 2.4vw);
+
+  .expiry,
+  .prices {
+    padding: min(4px, 0.8vw);
+    color: #000;
+    background: #f2f2f2;
+    white-space: nowrap;
+    border-radius: 4px;
+  }
+}
+
+.rch-content {
+  @include flex-center;
+
+  .rch-amount {
+    @include flex-center;
+
+    height: min(32px, 5vw);
+    margin: 0;
+    font-size: min(12px, 2.4vw);
+    color: var(--color-rch);
+
+    &::after {
+      content: "";
+      display: inline-block;
+      margin-bottom: 5px;
+      width: 18px;
+      height: 18px;
+      background: url("./assets/icon-income.svg") no-repeat center / 100%;
+    }
+  }
+}
+
+.card {
+  @include pointer;
+
+  position: relative;
+  width: min(344px, calc((100vw - 24px - 3vw) / 2));
+  padding: 16px;
+  min-width: min(calc((100vw - 24px - 3vw) / 2), 200px);
+  min-height: min(55vw, 300px);
+  margin: 0;
+  background: #fff;
+  border-radius: min(25px, 2.5vw);
+  overflow: hidden;
+
+  .header {
+    @include flex-center;
+
+    justify-content: start;
+    margin-bottom: 12px;
+    gap: 24px;
+
+    .icon {
+      position: relative;
+
+      img {
+        width: 48px;
+        height: 48px;
+      }
+
+      &::after {
+        content: "";
+        display: inline-block;
+        position: absolute;
+        bottom: 0;
+        right: -10px;
+        width: 26px;
+        height: 26px;
+        background: url("./assets/icon-buy-low.svg") no-repeat center / 100%;
+      }
+    }
+
+    .name {
+      @include bold;
+
+      line-height: 20px;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+  }
+
+  &.sell {
+    .header {
+      .icon {
+        &::after {
+          background-image: url("./assets/icon-sell-high.svg");
+        }
+      }
+    }
+  }
+}
+
+.btns {
+  :global(.semi-button-content) {
+    text-transform: capitalize;
+  }
+}
+
+.claim-status-claimable {
+  .rch-content {
+    justify-content: space-between;
+
+    :global {
+      .semi-button {
+        height: 40px;
+        border-radius: 30px;
+        padding: 10px 19px;
+      }
+
+      .semi-button-content {
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.dual-status {
+  @include bold;
+
+  padding: 0;
+  font-size: 12px;
+  display: flex;
+
+  .op {
+    border-radius: 4px 0 0 4px;
+    padding: 4px 6px;
+    color: white;
+    background-color: #000;
+  }
+
+  .status {
+    border-radius: 0 4px 4px 0;
+    border: 1px solid black;
+    padding: 4px 6px;
+    color: #000;
+  }
+}
+
+.scenario {
+  @include flex-center;
+
+  padding: 16px;
+  justify-content: start;
+  gap: 12px;
+  background: #f6fbfe;
+  border-radius: 16px;
+  margin: 8px 0;
+
+  .left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    border-radius: 32px;
+    background: #fff;
+    padding: 8px;
+
+    .up,
+    .down {
+      img {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  .right {
+    @include bold;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .unit,
+    .side {
+      margin-left: 5px;
+    }
+
+    .price,
+    .profits {
+      font-size: 12px;
+      font-weight: 400;
+      color: #000;
+      opacity: 0.65;
+    }
+
+    .up {
+      @include flex-center;
+
+      flex-direction: column;
+      align-items: start;
+      height: 45px;
+    }
+
+    .down {
+      @include flex-center;
+
+      flex-direction: column;
+      align-items: start;
+      height: 45px;
+    }
+  }
+}
+
+.execution-status-notexpired {
+  // 未到期
+  .dual-status {
+    > .op {
+      background-color: #51acf1;
+    }
+
+    > .status {
+      color: #51acf1;
+      border-color: #51acf1;
+    }
+  }
+
+  .scenario {
+    background: #f6fbfe;
+    border: 2px dotted #51acf1;
+
+    .left {
+      .arrow {
+        width: 1.5px;
+        height: 14.5px;
+        background: url("./assets/icon-arrow-notexpired.svg") no-repeat center /
+          100%;
+      }
+    }
+  }
+}
+
+.execution-status-executed,
+.execution-status-partialexecuted {
+  // 到期执行成功
+  .dual-status {
+    > .op {
+      background-color: #23ba5e;
+    }
+
+    > .status {
+      color: #23ba5e;
+      border-color: #23ba5e;
+    }
+  }
+
+  .scenario {
+    background: #f8f8f8;
+
+    .left {
+      .arrow {
+        width: 16px;
+        height: 16px;
+        background: url("./assets/icon-arrow-executed.svg") no-repeat center /
+          100%;
+      }
+    }
+  }
+}
+
+.execution-status-notexecuted {
+  // 到期未执行
+  .dual-status {
+    > .op {
+      background-color: #f37600;
+    }
+
+    > .status {
+      color: #f37600;
+      border-color: #f37600;
+    }
+  }
+
+  .scenario {
+    background: #f8f8f8;
+
+    .left {
+      .arrow {
+        width: 16px;
+        height: 16px;
+        background: url("./assets/icon-arrow-notexecuted.svg") no-repeat
+          center / 100%;
+      }
+    }
+  }
+}
+
+.execution-status-partialexecuted {
+  // 到期部分执行
+  .is-dual-ccy {
+    img:last-child {
+      margin-left: -12px;
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  :global(.is-mobile) {
+    .card {
+      flex-grow: 1;
+      max-width: calc((100vw - 24px - 3vw) / 2);
+    }
+  }
+}
+
+@media screen and (width <= 500px) {
+  :global(.is-pc) {
+    .card {
+      flex-grow: 1;
+      max-width: calc((100vw - 24px - 3vw) / 2);
+    }
+  }
+}

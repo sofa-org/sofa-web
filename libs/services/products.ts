@@ -86,12 +86,17 @@ export interface CalculatedInfo {
     rchAirdrop: string | number; // rch 空投数量
     totalInterest: string | number; // totalCollateral 产生的总利息，非 Earn 合约为 0
     minRedeemable: string | number; // 对赌输了的情况能赎回的钱，包含本金
+    minRedeemableOfLinkedCcy: string | number; // 如果没换币，能赎回的挂钩货币的金额，只有 Dual 产品有，其它产品为 0
     maxRedeemable: string | number; // 对赌全赢的情况能赎回的钱，包含本金
     maxRedeemableOfLinkedCcy: string | number; // 如果换币，能赎回的挂钩货币的金额，只有 Dual 产品有，其它产品为 0
     redeemable?: string | number; // 能赎回的钱，包含本金，如果未到期表示为根据当前的价格情况预估能赎回的钱，pending 状态下不存在这个值
+    redeemableOfLinkedCcy?: string | number; // 能赎回的挂钩货币的金额，只有 Dual 产品有，其它产品为 0
     tradingFee: string | number; // 付出给合约的交易手续费，做市商为不付交易手续费
+    tradingFeeOfLinkedCcy: string | number; // 挂钩货币的金额的交易手续费，只有 Dual 产品有，其它产品为 0
     settlementFee: string | number; // 赎回时付出给合约的结算手续费，做市商为不付结算手续费
+    settlementFeeOfLinkedCcy: string | number; // 赎回时挂钩货币的金额的结算手续费，只有 Dual 产品有，其它产品为 0
     maxSettlementFee: string | number; // 全赢赎回时付出给合约的结算手续费，做市商为不付结算手续费
+    maxSettlementFeeOfLinkedCcy: string | number; // 全换币时挂钩货币的金额的结算手续费，只有 Dual 产品有，其它产品为 0
     borrow: string | number; // 借款金额，只有杠杆合约有：(depositAmount - borrowCost) * (vault.leverage - 1)，其它合约为 0
     borrowCost: string | number; // 借款成本，只有杠杆合约有，其它合约为 0
     spreadCost: string | number; // 借款成本中合约扣留的部分，只有杠杆合约有，其它合约为 0
@@ -377,6 +382,9 @@ export class ProductsService {
           continue;
         }
         if (k === 'riskType' && !strictRiskType) {
+          if (filters.riskType === RiskType.DUAL) {
+            if (it.riskType !== RiskType.DUAL) return false;
+          } else if (it.riskType === RiskType.DUAL) return false;
           if (filters.riskType === RiskType.RISKY) {
             if (it.riskType !== RiskType.RISKY) return false;
           } else if (it.riskType === RiskType.RISKY) return false;
@@ -614,6 +622,7 @@ export class ProductsService {
   ): CalculatedInfo {
     const total = +data.amounts.counterparty + +data.amounts.own;
     const amounts = {
+      ...data.amounts,
       counterparty: +data.amounts.counterparty * pps.atTrade,
       own: +data.amounts.own * pps.atTrade,
       premium: +data.amounts.premium * pps.atTrade,
@@ -624,8 +633,6 @@ export class ProductsService {
         total * pps.atTrade,
       minRedeemable: +data.amounts.minRedeemable * pps.afterExpire,
       maxRedeemable: +data.amounts.maxRedeemable * pps.afterExpire,
-      // TODO: dual 和 depositBaseCcy 暂时不能共存
-      maxRedeemableOfLinkedCcy: data.amounts.maxRedeemableOfLinkedCcy,
       redeemable: Number(data.amounts.redeemable) * pps.afterExpire,
       tradingFee: +data.amounts.tradingFee * pps.afterExpire,
       settlementFee: +data.amounts.settlementFee * pps.afterExpire,
