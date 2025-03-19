@@ -269,7 +269,9 @@ export class ProductsService {
           }).then((prices) => [c, prices] as const),
         ),
       ).then((res) => Object.fromEntries(res)),
-      MarketService.interestRate(quotes[0].chainId),
+      quotes.length
+        ? MarketService.interestRate(quotes[0].chainId)
+        : Promise.resolve({} as ReturnType<typeof MarketService.interestRate>),
     ]);
     const ppsMap = list.reduce((pre, it) => {
       const expiry = it.quote.expiry * 1000;
@@ -472,6 +474,8 @@ export class ProductsService {
     let url: string;
     if (product.riskType == RiskType.DUAL) {
       url = '/rfq/dual/quote';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (params as any).strike = params.lowerStrike || params.upperStrike;
     } else {
       url = {
         [ProductType.DNT]: '/rfq/dnt/quote',

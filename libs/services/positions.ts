@@ -246,17 +246,49 @@ export class PositionsService {
 
   @applyMock('positionList')
   static async $positionList(params: PositionParams) {
-    if (
-      params.vaults?.find(
-        (r) => r.startsWith('0xaaaaaaa') || r.startsWith('0xbbbbbb'),
-      )
-    ) {
-      throw new Error('Dual position API not working, use mock');
+    if (!params.vaults) {
+      return await http.post<unknown, HttpResponse<PositionInfo[]>>(
+        '/rfq/position-list',
+        params,
+      );
     }
-    return await http.post<unknown, HttpResponse<PositionInfo[]>>(
-      '/rfq/position-list',
-      params,
+    const dualVaults = params.vaults
+      .map((v) =>
+        ContractsService.vaults.find(
+          (vault) => vault.vault.toLowerCase() == v.toLowerCase(),
+        ),
+      )
+      .filter(Boolean) as VaultInfo[];
+    let dualRes: HttpResponse<PositionInfo[]> | undefined = undefined;
+    if (dualVaults.length) {
+      dualRes = await http.post<unknown, HttpResponse<PositionInfo[]>>(
+        '/rfq/dual/position-list',
+        params,
+      );
+    }
+    if (dualRes) {
+      if (dualVaults.length == params.vaults.length || dualRes.code) {
+        return dualRes;
+      }
+    }
+    const nonDualVaults = params.vaults.filter(
+      (v) =>
+        !dualVaults.find(
+          (vault) => vault.vault.toLowerCase() == v.toLowerCase(),
+        ),
     );
+
+    const nonDualRes = await http.post<unknown, HttpResponse<PositionInfo[]>>(
+      '/rfq/position-list',
+      {
+        ...params,
+        vaults: nonDualVaults,
+      },
+    );
+    return {
+      code: nonDualRes.code,
+      value: [...(dualRes?.value || []), ...nonDualRes.value],
+    };
   }
 
   static async history(

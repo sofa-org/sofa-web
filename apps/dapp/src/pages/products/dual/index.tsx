@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Toast } from '@douyinfe/semi-ui';
 import { ProductType, ProjectType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
 import { dualVaults } from '@sofa/services/vaults/dual';
 import { displayPercentage } from '@sofa/utils/amount';
+import { isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { uniq } from 'lodash-es';
+import { max, min, uniq } from 'lodash-es';
 
 import { useForCcySelect } from '@/components/CCYSelector';
 import { C_Select, CSelect } from '@/components/CSelect';
@@ -57,18 +59,23 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
   );
   const forCcys = useMemo(() => {
     const _forCcys = uniq(vaults.map((v) => v.forCcy));
+    const recommendedList = useProductsState.getState().recommendedList;
     return _forCcys.map((forCcy) => {
-      // TODO: 接入api
-      const rand = Math.random();
       const vault = vaults.find((v) => v.forCcy == forCcy)!;
+      const allProducts =
+        recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
+      const allApys = allProducts
+        ?.map((p) => p.apyInfo?.max)
+        .filter((v) => !isNullLike(v))
+        ?.map(Number);
       return {
         forCcy,
         vault,
-        minApy: rand,
-        maxApy: rand * 2 + 0.2,
+        minApy: allApys?.length ? min(allApys) : undefined,
+        maxApy: allApys?.length ? max(allApys) : undefined,
       };
     });
-  }, [vaults]);
+  }, [vaults, new Date().getSeconds() % 20]);
   const [forCcy, setForCcy] = useForCcySelect({
     defaultValue: forCcys?.[0]?.forCcy || 'RCH',
     acceptance: (ccy) => !!forCcys?.find((a) => a.forCcy == ccy),
@@ -334,7 +341,29 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                   price={customPrice}
                   expiry={customExpiry}
                   onClickDeposit={async () => {
-                    // TODO: quote
+                    if (!customPrice) {
+                      Toast.error(
+                        t({
+                          enUS: 'Please input Target Price',
+                        }),
+                      );
+                      return;
+                    }
+                    if (!customExpiry) {
+                      Toast.error(
+                        t({
+                          enUS: 'Please select Settlement Date',
+                        }),
+                      );
+                      return;
+                    }
+                    const res = await useProductsState.quote({
+                      vault,
+                      anchorPrices: [customPrice],
+                      expiry: customExpiry,
+                      depositAmount: 100,
+                    });
+                    setQuote(res);
                   }}
                 />
               )}
