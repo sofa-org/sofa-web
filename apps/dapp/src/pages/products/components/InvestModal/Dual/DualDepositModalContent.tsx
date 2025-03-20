@@ -239,7 +239,7 @@ export const DualDepositModalContent = (
                   <AmountInput
                     className={styles['amount-input']}
                     // min={}
-                    tick={CCYService.getPriceInputTick(vault.depositCcy)}
+                    tick={CCYService.getPriceInputTick(vault.domCcy)}
                     value={dualGetPrice(product as ProductQuoteParams)}
                     suffix={
                       <span className={styles['unit-2']}>

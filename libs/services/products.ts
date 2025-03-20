@@ -228,7 +228,8 @@ export class ProductsService {
     if (!product) return '';
     if (isDualQuoteParams(product)) {
       const depositAmount = product.depositAmount || product.amounts?.own;
-      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${(product as ProductQuoteParams)?.anchorPrices?.[0]}-${depositAmount}`;
+      const price = dualGetPrice(product as ProductQuoteParams);
+      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${price}-${depositAmount}`;
     }
     const vault = product.vault?.vault?.toLowerCase();
     const prices = product.anchorPrices?.map(Number).join('-');
@@ -469,6 +470,7 @@ export class ProductsService {
     product: {
       productType: ProductType;
       riskType: RiskType;
+      domCcy: VaultInfo['domCcy'];
     },
     params: OriginProductQuoteParams,
   ) {
@@ -507,7 +509,7 @@ export class ProductsService {
     }
 
     return ProductsService.$quote(
-      pick(data.vault, ['productType', 'riskType']),
+      pick(data.vault, ['productType', 'riskType', 'domCcy']),
       {
         ...pick(data, [
           'expiry',

@@ -1,6 +1,8 @@
+import { roundWith } from '@sofa/utils/amount';
 import { isNullLike } from '@sofa/utils/fns';
 
 import { ProductType, VaultInfo } from './base-type';
+import { CCYService } from './ccy';
 import { PositionInfo } from './positions';
 import { ProductInfo, ProductQuoteResult } from './products';
 
@@ -85,19 +87,26 @@ export function getDualPositionClaimStatus(
 }
 
 export function dualShouldRevertAnchorPrice(productType: ProductType) {
-  return productType == ProductType.BullSpread;
+  return productType == ProductType.BearSpread;
 }
 
 export function dualGetPrice(params: {
-  vault: { productType: ProductType };
+  vault: { productType: ProductType; domCcy: VaultInfo['domCcy'] };
   anchorPrices: (number | string)[];
 }) {
   const p = params.anchorPrices?.[0];
   if (!dualShouldRevertAnchorPrice(params.vault.productType)) {
-    return isNullLike(p) ? undefined : Number(p);
+    return isNullLike(p)
+      ? undefined
+      : roundWith(Number(p), CCYService.getPriceInputTick(params.vault.domCcy));
   }
 
-  return isNullLike(p) ? undefined : p === 0 || p === '0' ? 0 : 1.0 / Number(p);
+  return isNullLike(p)
+    ? undefined
+    : roundWith(
+        p === 0 || p === '0' ? 0 : 1.0 / Number(p),
+        CCYService.getPriceInputTick(params.vault.domCcy),
+      );
 }
 
 export function dualUpdatePrice(
