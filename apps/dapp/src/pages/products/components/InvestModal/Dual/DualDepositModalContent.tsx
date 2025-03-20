@@ -93,21 +93,22 @@ export const DualDepositModalContent = (
       ]?.[0] as PartialRequired<ProductQuoteParams, 'id' | 'vault'>),
   );
 
-  const dateRange = useAsyncMemo(
+  const expiries = useAsyncMemo(
     async () =>
-      vault
-        ? ProductsService.genExpiries(vault).then((res) =>
-            res.reduce(
-              (acc, value) => ({
-                min: acc.min ? Math.min(value * 1000, acc.min) : value,
-                max: acc.max ? Math.max(value * 1000, acc.max) : value,
-              }),
-              { min: 0, max: 0 },
-            ),
-          )
-        : undefined,
+      (vault &&
+        ProductsService.genExpiries(vault).then((res) =>
+          res.reduce(
+            (acc, value) => ({
+              ...acc,
+              [value]: true,
+            }),
+            {} as Record<number, boolean>,
+          ),
+        )) ||
+      undefined,
     [vault],
   );
+
   const preDataRef = useRef<ProductQuoteResult>();
   const data = useProductsState((state) => {
     const val =
@@ -281,9 +282,9 @@ export const DualDepositModalContent = (
                     dropdownClassName={styles['date-picker-dropdown']}
                     type="date"
                     disabledDate={(d) => {
-                      if (!d || !dateRange) return true;
+                      if (!d || !expiries) return true;
                       const curr8h = next8h(d.getTime());
-                      return curr8h < dateRange.min || curr8h > dateRange.max;
+                      return !expiries[curr8h];
                     }}
                     presetPosition="top"
                     value={
@@ -292,12 +293,13 @@ export const DualDepositModalContent = (
                         : product.expiry * 1000
                     }
                     onChange={(v) => {
+                      const t = v instanceof Date ? v.getTime() : Number(v);
+                      const curr8h = next8h(t);
                       return (
                         product &&
                         useProductsState.updateCart({
                           ...product,
-                          expiry:
-                            v === undefined ? undefined : Number(v) / 1000,
+                          expiry: v === undefined ? undefined : curr8h / 1000,
                         })
                       );
                     }}

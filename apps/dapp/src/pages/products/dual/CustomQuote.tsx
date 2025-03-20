@@ -31,15 +31,15 @@ export const CustomQuote = (props: {
 }) => {
   const [t] = useTranslation('ProductDual');
 
-  const dateRange = useAsyncMemo(
+  const expiries = useAsyncMemo(
     async () =>
       ProductsService.genExpiries(props.vault).then((res) =>
         res.reduce(
           (acc, value) => ({
-            min: acc.min ? Math.min(value * 1000, acc.min) : value,
-            max: acc.max ? Math.max(value * 1000, acc.max) : value,
+            ...acc,
+            [value]: true,
           }),
-          { min: 0, max: 0 },
+          {} as Record<number, boolean>,
         ),
       ),
     [props.vault],
@@ -65,17 +65,19 @@ export const CustomQuote = (props: {
             dropdownClassName={styles['date-picker-dropdown']}
             type="date"
             disabledDate={(d) => {
-              if (!d || !dateRange) return true;
+              if (!d || !expiries) return true;
               const curr8h = next8h(d.getTime());
-              return curr8h < dateRange.min || curr8h > dateRange.max;
+              return !expiries[curr8h];
             }}
             presetPosition="top"
             value={props.expiry === undefined ? undefined : props.expiry * 1000}
-            onChange={(v) =>
+            onChange={(v) => {
+              const t = v instanceof Date ? v.getTime() : Number(v);
+              const curr8h = next8h(t);
               props.onChangedExpiry(
-                v === undefined ? undefined : Number(v) / 1000,
-              )
-            }
+                v === undefined ? undefined : curr8h / 1000,
+              );
+            }}
           />
           {!!props.expiry && (
             <span className={styles['term']}>
