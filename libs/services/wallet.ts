@@ -36,6 +36,15 @@ export interface MintProductParams {
   makerSignature: string;
 }
 
+export interface DualMintProductParams {
+  expiry: number;
+  anchorPrice: string | number;
+  makerCollateral: string | number;
+  deadline: number;
+  maker: string;
+  makerSignature: string;
+}
+
 export class WalletService {
   static async readonlyConnect(chainId: number) {
     return WalletConnect.getProvider(chainId);
@@ -234,11 +243,53 @@ export class WalletService {
     );
   }
 
+  static async $dualMint(
+    ctx: Awaited<ReturnType<typeof WalletService.connect>>,
+    data: ProductQuoteResult & { depositCcy?: CCY | USDS },
+  ): Promise<string> {
+    const contract = await ContractsService.rfqContract(
+      data.vault.vault,
+      ctx.signer,
+    );
+    const amount = Big(data.quote.totalCollateral)
+      .minus(data.quote.makerCollateral)
+      .toFixed();
+    const params: DualMintProductParams = {
+      expiry: data.expiry,
+      anchorPrice: data.quote.anchorPrices[0],
+      makerCollateral: data.quote.makerCollateral,
+      deadline: data.quote.deadline,
+      maker: data.quote.makerWallet!,
+      makerSignature: data.quote.signature!,
+    };
+
+    const collateral = await WalletService.getCollateralFromVault(
+      data.vault.vault,
+      ctx.provider,
+    );
+
+    await WalletService.$approve(
+      collateral.address!,
+      amount,
+      ctx.signer,
+      data.vault.vault,
+    );
+    const args = (gasLimit?: number) => [
+      data.quote.totalCollateral,
+      params,
+      '0x837f487ec9e1C65bf960e7c3652b409EAD9fAb24',
+      ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
+    ];
+    return ContractsService.dirtyCall(contract, 'mint', args);
+  }
   static async mint(
     data: ProductQuoteResult & { depositCcy?: CCY | USDS },
   ): Promise<string> {
     const ctx = await WalletService.connect(+data.vault.chainId);
     if (!ctx.signer) throw new Error('Please connect you wallet first');
+    if (data.vault.riskType === RiskType.DUAL) {
+      return this.$dualMint(ctx, data);
+    }
     const contract = await ContractsService.rfqContract(
       data.vault.vault,
       ctx.signer,

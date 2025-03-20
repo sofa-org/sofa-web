@@ -272,7 +272,7 @@ const StepForm = () => {
   });
   return (
     <div className={styles['step-3-form']}>
-      <Form
+      <Form<Record<string, unknown>>
         labelPosition="top"
         initValues={payload}
         getFormApi={(formApi) => (api.current = formApi)}

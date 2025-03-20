@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { Modal, Spin, Table } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
+import { ProjectType } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -32,6 +33,7 @@ export interface ProgressRef {
 
 interface ProgressProps {
   chainId: number;
+  projectType?: ProjectType;
 }
 
 export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
@@ -250,10 +252,12 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
               __html: t(
                 'Deposit successful. <a href="{{url}}">Go to position page</a> to see your successful records',
                 {
-                  url: `/positions${window.location.search.replace(
-                    /([?&])tab=[^&]+/,
-                    '$1',
-                  )}`,
+                  url:
+                    `/positions${window.location.search.replace(
+                      /([?&])tab=[^&]+/,
+                      '$1',
+                    )}` +
+                    (props.projectType ? `&project=${props.projectType}` : ''),
                 },
               ),
             }}

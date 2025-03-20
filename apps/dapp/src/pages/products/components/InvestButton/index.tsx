@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Button, Toast } from '@douyinfe/semi-ui';
 import { wait, waitUntil } from '@livelybone/promise-wait';
+import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService, VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -302,7 +303,17 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
           ? t('Purchase All Tickets')
           : t('Deposit')}
       </BaseInvestButton>
-      <InvestProgress chainId={wallet.chainId} ref={progressRef} />
+      <InvestProgress
+        projectType={
+          vault.riskType === RiskType.DUAL
+            ? ProjectType.Dual
+            : vault.riskType === RiskType.RISKY
+              ? ProjectType.Surge
+              : undefined
+        }
+        chainId={wallet.chainId}
+        ref={progressRef}
+      />
     </>
   );
 };
