@@ -411,11 +411,11 @@ export const DualProfitScenarios = (
                         <span className={styles['amount']}>
                           {amountFormatter(
                             props.depositCcyExtraRewardWhenNoExecuted,
-                            forCcyConfig?.precision,
+                            depositCcyConfig?.precision,
                           )}
                         </span>
                         <span className={styles['unit']}>
-                          {forCcyConfig?.name || props.linkedCcy}
+                          {depositCcyConfig?.name || props.depositCcy}
                         </span>
                       </span>
                     </div>

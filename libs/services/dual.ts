@@ -34,6 +34,12 @@ export function getDualPositionExecutionStatus(
   position: PositionInfo & { vault: VaultInfo },
 ) {
   if (
+    getDualPositionClaimStatus(position, new Date()).status ==
+    DualPositionClaimStatus.NotExpired
+  ) {
+    return DualPositionExecutionStatus.NotExpired;
+  }
+  if (
     Number(position.amounts.redeemable) > 0 &&
     !Number(position.amounts.redeemableOfLinkedCcy)
   ) {
@@ -68,6 +74,13 @@ export function getDualPositionClaimStatus(
   position: PositionInfo & { vault: VaultInfo },
   now: Date,
 ) {
+  if (position.product?.expiry === undefined) {
+    // is a quote?
+    return {
+      status: DualPositionClaimStatus.NotExpired,
+      leftTime: -1,
+    };
+  }
   if (position.claimed) {
     return { status: DualPositionClaimStatus.Claimed, leftTime: 0 };
   }
@@ -98,14 +111,21 @@ export function dualGetPrice(params: {
   if (!dualShouldRevertAnchorPrice(params.vault.productType)) {
     return isNullLike(p)
       ? undefined
-      : roundWith(Number(p), CCYService.getPriceInputTick(params.vault.domCcy));
+      : Number(
+          roundWith(
+            Number(p),
+            CCYService.getPriceInputTick(params.vault.domCcy),
+          ),
+        );
   }
 
   return isNullLike(p)
     ? undefined
-    : roundWith(
-        p === 0 || p === '0' ? 0 : 1.0 / Number(p),
-        CCYService.getPriceInputTick(params.vault.domCcy),
+    : Number(
+        roundWith(
+          p === 0 || p === '0' ? 0 : 1.0 / Number(p),
+          CCYService.getPriceInputTick(params.vault.domCcy),
+        ),
       );
 }
 
@@ -145,13 +165,16 @@ export function getDualProfitRenderProps(
       ? executionStatus
       : undefined,
   } as DualProfitRenderProps;
+  const price = dualGetPrice(product);
+  if (price === undefined) {
+    return undefined;
+  }
   if (data.vault.productType == ProductType.BearSpread) {
     res.linkedCcy = data.vault.forCcy;
     // 低买： anchorPrice[0] = RCH/USDT
     res.depositAmount = Number(data.amounts.own || 0);
     // anchorPrice[0] * depositAmount(usdt)
-    res.linkedCcyAmountWhenSuccessfulExecuted =
-      Number(product.anchorPrices[0]) * res.depositAmount;
+    res.linkedCcyAmountWhenSuccessfulExecuted = res.depositAmount / price;
     // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
     res.linkedCcyExtraRewardWhenSuccessfulExecuted =
       Number(
@@ -170,8 +193,7 @@ export function getDualProfitRenderProps(
     // 高卖： anchorPrice[0] = USDT/RCH
     res.depositAmount = Number(data.amounts.own || 0);
     // (anchorPrice[0] * depositAmount(rch))
-    res.linkedCcyAmountWhenSuccessfulExecuted =
-      Number(product.anchorPrices[0]) * res.depositAmount;
+    res.linkedCcyAmountWhenSuccessfulExecuted = price * res.depositAmount;
     // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
     res.linkedCcyExtraRewardWhenSuccessfulExecuted =
       Number(
@@ -186,6 +208,22 @@ export function getDualProfitRenderProps(
     res.depositCcyExtraRewardWhenNoExecuted =
       Number(data.amounts.maxRedeemable) - res.depositAmount;
     res.rchReturnAmount = Number(data.amounts.rchAirdrop || 0);
+  }
+  if (
+    res.linkedCcyExtraRewardWhenSuccessfulExecuted < 0 &&
+    res.linkedCcyExtraRewardWhenSuccessfulExecuted >
+      -Math.pow(0.1, CCYService.ccyConfigs[res.linkedCcy]?.precision || 4)
+  ) {
+    // 精度问题，且负数不会被后面 amountFormatter 排除
+    res.linkedCcyExtraRewardWhenSuccessfulExecuted = 0;
+  }
+  if (
+    res.depositCcyExtraRewardWhenNoExecuted < 0 &&
+    res.depositCcyExtraRewardWhenNoExecuted >
+      -Math.pow(0.1, CCYService.ccyConfigs[res.depositCcy]?.precision || 4)
+  ) {
+    // 精度问题，且负数不会被后面 amountFormatter 排除
+    res.depositCcyExtraRewardWhenNoExecuted = 0;
   }
   return res;
 }
