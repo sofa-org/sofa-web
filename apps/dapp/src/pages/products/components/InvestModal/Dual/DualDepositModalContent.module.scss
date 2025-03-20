@@ -58,33 +58,6 @@
         background: #d7d7d7;
         padding: 0 15px;
         position: relative;
-
-        .max {
-          @include pointer;
-
-          position: absolute;
-          height: 48px;
-          left: -60px;
-          font-size: 14px;
-          font-weight: 510;
-          background: linear-gradient(
-            93deg,
-            #d665a3 0.25%,
-            #e05e2b 20.67%,
-            #f8d748 43.58%,
-            #36af73 67.49%,
-            #2d6fb9 95.88%
-          );
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          border: none;
-          outline: 0;
-
-          &:hover,
-          &:active {
-            opacity: 0.5;
-          }
-        }
       }
     }
 

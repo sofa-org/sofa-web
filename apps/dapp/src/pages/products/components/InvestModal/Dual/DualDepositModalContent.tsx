@@ -13,7 +13,7 @@ import {
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
-import { useLazyCallback } from '@sofa/utils/hooks';
+import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import { formatHighlightedText } from '@sofa/utils/string';
 import classNames from 'classnames';
@@ -93,13 +93,21 @@ export const DualDepositModalContent = (
       ]?.[0] as PartialRequired<ProductQuoteParams, 'id' | 'vault'>),
   );
 
-  const dateRange = useMemo(() => {
-    // TODO: 接入api
-    return {
-      min: Date.now() + 86400 * 1000,
-      max: Date.now() + 20 * 86400 * 1000,
-    };
-  }, []);
+  const dateRange = useAsyncMemo(
+    async () =>
+      vault
+        ? ProductsService.genExpiries(vault).then((res) =>
+            res.reduce(
+              (acc, value) => ({
+                min: acc.min ? Math.min(value * 1000, acc.min) : value,
+                max: acc.max ? Math.max(value * 1000, acc.max) : value,
+              }),
+              { min: 0, max: 0 },
+            ),
+          )
+        : undefined,
+    [vault],
+  );
   const preDataRef = useRef<ProductQuoteResult>();
   const data = useProductsState((state) => {
     const val =
@@ -169,33 +177,6 @@ export const DualDepositModalContent = (
                     value={product?.depositAmount}
                     suffix={
                       <span className={styles['unit-1']}>
-                        {(wallet.balance?.[data.vault.depositCcy] && (
-                          <button
-                            className={styles['max']}
-                            onClick={() => {
-                              if (
-                                Number(
-                                  wallet.balance?.[data.vault.depositCcy],
-                                ) > Number(vault?.depositMinAmount) &&
-                                product
-                              ) {
-                                useProductsState.updateCart({
-                                  ...product,
-                                  depositAmount:
-                                    wallet.balance?.[data.vault.depositCcy],
-                                });
-                                setTimeout(() => {
-                                  if (product) {
-                                    useProductsState.quote(product);
-                                  }
-                                }, 0);
-                              }
-                            }}
-                          >
-                            {t({ enUS: 'Max', zhCN: '最大' })}
-                          </button>
-                        )) ||
-                          undefined}
                         {vault?.depositCcy}
                       </span>
                     }
@@ -300,7 +281,7 @@ export const DualDepositModalContent = (
                     dropdownClassName={styles['date-picker-dropdown']}
                     type="date"
                     disabledDate={(d) => {
-                      if (!d) return true;
+                      if (!d || !dateRange) return true;
                       const curr8h = next8h(d.getTime());
                       return curr8h < dateRange.min || curr8h > dateRange.max;
                     }}
