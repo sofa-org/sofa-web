@@ -353,7 +353,7 @@ export const ProjectedReturns = (
     position: position,
   });
   if (position.vault.riskType == RiskType.DUAL) {
-    return <DualProjectedReturns {...props} />;
+    return <DualProjectedReturns {...props} scenario="position" />;
   }
   if (!position.amounts || !position.pricesForCalculation || !product)
     return <div className={styles['profit-scenarios']} />;

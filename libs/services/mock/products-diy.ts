@@ -137,7 +137,11 @@ function mockProductQuote(
       maxSettlementFee: Math.random() * 10, // 全赢赎回时付出给合约的结算手续费，做市商为不付结算手续费
       borrow: Math.random() * 10, // 借款金额，只有杠杆合约有：(depositAmount - borrowCost) * (vault.leverage - 1)，其它合约为 0
       borrowCost: Math.random() * 10, // 借款成本，只有杠杆合约有，其它合约为 0
-      spreadCost: Math.random() * 10, // 借款成本中合约扣留的部分，只有杠杆合约有，其它合约为 0
+      spreadCost: Math.random() * 10,
+      minRedeemableOfLinkedCcy: 0,
+      tradingFeeOfLinkedCcy: 0,
+      settlementFeeOfLinkedCcy: 0,
+      maxSettlementFeeOfLinkedCcy: 0,
     },
     feeRate: { trading: Math.random() * 10, settlement: Math.random() * 10 },
     leverageInfo: {

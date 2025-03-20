@@ -35,10 +35,12 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
   const productTypeRef = ProductTypeRefs[product.vault.productType];
   const productIcon = useMemo(
     () =>
-      productTypeRef.icon(
-        product.vault.riskType,
-        !product.vault.depositCcy.startsWith('USD'),
-      ),
+      product.vault.riskType == RiskType.DUAL
+        ? undefined
+        : productTypeRef.icon(
+            product.vault.riskType,
+            !product.vault.depositCcy.startsWith('USD'),
+          ),
     [product.vault.depositCcy, product.vault.riskType, productTypeRef],
   );
 
@@ -68,7 +70,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
     () => (product.vault.depositCcy.startsWith('USD') ? 2 : 5),
     [product.vault.depositCcy],
   );
-  if (!levelRef) return <></>;
+  if (!levelRef || !productIcon) return <></>;
   return (
     <div className={styles['card']}>
       <div className={styles['profits']} style={{ background: levelRef.color }}>

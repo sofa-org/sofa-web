@@ -55,13 +55,15 @@ const KLine = (props: KLineProps) => {
 
   const { data, loading } = useRequest(
     () =>
-      MarketService.dailyCandles(
-        props.forCcy,
-        pre8h(undefined, 30),
-        Date.now(),
-      ).then((res) =>
-        res.map((it) => [it.timestamp * 1000, it.close]).reverse(),
-      ),
+      ['WETH', 'WBTC', 'BTC', 'ETH'].includes(props.forCcy)
+        ? MarketService.dailyCandles(
+            props.forCcy as 'ETH' | 'BTC' | 'WETH' | 'WBTC',
+            pre8h(undefined, 30),
+            Date.now(),
+          ).then((res) =>
+            res.map((it) => [it.timestamp * 1000, it.close]).reverse(),
+          )
+        : Promise.resolve([]),
     {
       refreshDeps: [props.forCcy],
       pollingInterval: MsIntervals.min * 10,

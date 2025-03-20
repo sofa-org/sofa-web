@@ -4,6 +4,7 @@ import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { CCYService } from '@sofa/services/ccy';
 import { ProductType, RiskType, VaultInfo } from '@sofa/services/contracts';
 import {
+  dualGetPrice,
   DualPositionClaimStatus,
   getDualPositionClaimStatus,
   getDualSettlementTime,
@@ -121,7 +122,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                 zhCN: '目标价格',
               }),
               value: amountFormatter(
-                productTypeRef.dualGetPrice(product),
+                dualGetPrice(product),
                 CCYService.ccyConfigs[product.vault.depositCcy]?.precision,
               ),
             },
