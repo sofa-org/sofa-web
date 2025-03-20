@@ -3,9 +3,11 @@ import { DatePicker } from '@douyinfe/semi-ui';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
+import { ProductsService } from '@sofa/services/products';
 import { displayPercentage } from '@sofa/utils/amount';
 import { next8h } from '@sofa/utils/expiry';
 import { currQuery } from '@sofa/utils/history';
+import { useAsyncMemo } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
@@ -28,13 +30,20 @@ export const CustomQuote = (props: {
   apy?: number;
 }) => {
   const [t] = useTranslation('ProductDual');
-  const dateRange = useMemo(() => {
-    // TODO: 接入api
-    return {
-      min: Date.now() + 86400 * 1000,
-      max: Date.now() + 20 * 86400 * 1000,
-    };
-  }, []);
+
+  const dateRange = useAsyncMemo(
+    async () =>
+      ProductsService.genExpiries(props.vault).then((res) =>
+        res.reduce(
+          (acc, value) => ({
+            min: acc.min ? Math.min(value * 1000, acc.min) : value,
+            max: acc.max ? Math.max(value * 1000, acc.max) : value,
+          }),
+          { min: 0, max: 0 },
+        ),
+      ),
+    [props.vault],
+  );
 
   return (
     <>
@@ -56,7 +65,7 @@ export const CustomQuote = (props: {
             dropdownClassName={styles['date-picker-dropdown']}
             type="date"
             disabledDate={(d) => {
-              if (!d) return true;
+              if (!d || !dateRange) return true;
               const curr8h = next8h(d.getTime());
               return curr8h < dateRange.min || curr8h > dateRange.max;
             }}
