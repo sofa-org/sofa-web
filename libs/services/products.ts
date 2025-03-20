@@ -14,6 +14,7 @@ import {
   RiskType,
   VaultInfo,
 } from './contracts';
+import { dualGetPrice } from './dual';
 import { MarketService } from './market';
 import { WalletService } from './wallet';
 
@@ -475,7 +476,14 @@ export class ProductsService {
     if (product.riskType == RiskType.DUAL) {
       url = '/rfq/dual/quote';
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (params as any).strike = params.lowerStrike || params.upperStrike;
+      (params as any).strike = dualGetPrice({
+        vault: product,
+        anchorPrices: [params.lowerStrike],
+      });
+      params.lowerStrike = undefined!;
+      params.upperStrike = undefined!;
+      params.lowerBarrier = undefined!;
+      params.upperBarrier = undefined!;
     } else {
       url = {
         [ProductType.DNT]: '/rfq/dnt/quote',

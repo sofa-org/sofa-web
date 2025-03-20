@@ -1,7 +1,9 @@
 import { ethers } from 'ethers';
 
-// TODO: change ABIs to actual dual
-import DNTVaultAbis from '../../abis/DNTVault.json';
+import AAVEDualVault from '../../abis/AAVEDualVault.json';
+import CrvUSDDualVault from '../../abis/CrvUSDDualVault.json';
+import DualVault from '../../abis/DualVault.json';
+import RCHDualVault from '../../abis/RCHDualVault.json';
 import { ProductType, ProjectType, VaultInfo } from '../../base-type';
 import {
   getCollateralDecimal,
@@ -19,7 +21,21 @@ const vaults = [...vaults_1, ...vaults_421614, ...vaults_11155111];
 function getDualAbis(
   vault: Pick<VaultInfo, 'forCcy' | 'domCcy' | 'depositCcy'>,
 ) {
-  return DNTVaultAbis as ethers.InterfaceAbi;
+  const RFQVaultAbis: PartialRecord<
+    `${VaultInfo['forCcy']}-${VaultInfo['domCcy']}-${VaultInfo['depositCcy']}`,
+    ethers.InterfaceAbi
+  > = {
+    // 高卖 RCH
+    [`${'RCH'}-${'USDT'}-${'RCH'}`]: RCHDualVault,
+    // 低买 RCH
+    [`${'RCH'}-${'USDT'}-${'USDT'}`]: AAVEDualVault,
+
+    // 高卖 CRV
+    [`${'CRV'}-${'crvUSD'}-${'CRV'}`]: DualVault,
+    // 低买 CRV
+    [`${'CRV'}-${'crvUSD'}-${'crvUSD'}`]: CrvUSDDualVault,
+  };
+  return RFQVaultAbis[`${vault.forCcy}-${vault.domCcy}-${vault.depositCcy}`];
 }
 
 export function getDualDepositCcy(

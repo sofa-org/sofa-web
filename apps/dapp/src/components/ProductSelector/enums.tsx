@@ -13,6 +13,7 @@ import {
   WinningProbabilities,
 } from '@sofa/services/products';
 import { displayPercentage } from '@sofa/utils/amount';
+import { isNullLike } from '@sofa/utils/fns';
 
 import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';
@@ -195,7 +196,6 @@ export const ProductTypeRefs = {
       }),
     }),
     dualIsBuy: false,
-    dualGetPrice: (product: ProductInfo | QuoteInfo) => Number(product.anchorPrices[0]),
     dualDesc: (t: TFunction) => ({
       executed: t({ enUS: 'Sell High Executed' }),
       limited: t({ enUS: 'Limit Sell' }),
@@ -315,7 +315,6 @@ export const ProductTypeRefs = {
       throw new Error('Not suported scenario');
     },
     dualIsBuy: false,
-    dualGetPrice: (product: ProductInfo | QuoteInfo) => Number(product.anchorPrices[0]),
     dualDesc: (t: TFunction) => {
       throw new Error('Not suported scenario');
     },
@@ -443,7 +442,6 @@ export const ProductTypeRefs = {
       }),
     }),
     dualIsBuy: true,
-    dualGetPrice: (product: ProductInfo | QuoteInfo) => Number(product.anchorPrices[0]),
     dualDesc: (t: TFunction) => ({
       executed: t({ enUS: 'Buy Low Executed' }),
       limited: t({ enUS: 'Limit Buy' }),

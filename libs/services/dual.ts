@@ -1,3 +1,5 @@
+import { isNullLike } from '@sofa/utils/fns';
+
 import { ProductType, VaultInfo } from './base-type';
 import { PositionInfo } from './positions';
 import { ProductInfo, ProductQuoteResult } from './products';
@@ -80,6 +82,33 @@ export function getDualPositionClaimStatus(
     };
   }
   return { status: DualPositionClaimStatus.Claimable, leftTime: 0 };
+}
+
+export function dualShouldRevertAnchorPrice(productType: ProductType) {
+  return productType == ProductType.BullSpread;
+}
+
+export function dualGetPrice(params: {
+  vault: { productType: ProductType };
+  anchorPrices: (number | string)[];
+}) {
+  const p = params.anchorPrices?.[0];
+  if (!dualShouldRevertAnchorPrice(params.vault.productType)) {
+    return isNullLike(p) ? undefined : Number(p);
+  }
+
+  return isNullLike(p) ? undefined : p === 0 || p === '0' ? 0 : 1.0 / Number(p);
+}
+
+export function dualUpdatePrice(
+  params: { vault: { productType: ProductType } },
+  p?: string | number,
+) {
+  if (!dualShouldRevertAnchorPrice(params.vault.productType)) {
+    return isNullLike(p) ? 0 : Number(p);
+  }
+
+  return isNullLike(p) ? 0 : p === 0 || p === '0' ? 0 : 1.0 / Number(p);
 }
 
 export function getDualProfitRenderProps(

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DatePicker, Spin } from '@douyinfe/semi-ui';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService, ProductType } from '@sofa/services/contracts';
+import { dualGetPrice, dualUpdatePrice } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteParams,
@@ -115,8 +116,9 @@ export const DualDepositModalContent = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ProductsService.productKey(product), wallet.address]);
 
+  const productTypeRef = vault ? ProductTypeRefs[vault.productType] : undefined;
   const diffPrice = useMemo(() => {
-    const currentPrice = product?.anchorPrices?.[0];
+    const currentPrice = dualGetPrice(product as ProductQuoteParams);
     if (
       currentPrice === undefined ||
       !product?.vault.forCcy ||
@@ -129,9 +131,10 @@ export const DualDepositModalContent = (
     product?.anchorPrices?.[0],
     product?.vault.forCcy,
     prices[product?.vault.forCcy || ''],
+    productTypeRef,
   ]);
   const isMobileUI = useIsMobileUI();
-  if (!vault) {
+  if (!vault || !productTypeRef) {
     return undefined;
   }
   return (
@@ -237,7 +240,7 @@ export const DualDepositModalContent = (
                     className={styles['amount-input']}
                     // min={}
                     tick={CCYService.getPriceInputTick(vault.depositCcy)}
-                    value={product?.anchorPrices?.[0]}
+                    value={dualGetPrice(product as ProductQuoteParams)}
                     suffix={
                       <span className={styles['unit-2']}>
                         {formatHighlightedText(
@@ -274,7 +277,7 @@ export const DualDepositModalContent = (
                         !isNullLike(v) &&
                         useProductsState.updateCart({
                           ...product,
-                          anchorPrices: [Number(v)],
+                          anchorPrices: [dualUpdatePrice(product, v)],
                         })
                       );
                     }}

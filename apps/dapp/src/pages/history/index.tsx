@@ -4,6 +4,7 @@ import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import {
+  dualGetPrice,
   DualPositionClaimStatus,
   getDualLinkedCcy,
   getDualPositionClaimStatus,
@@ -138,9 +139,7 @@ const OrderHistory = () => {
         }),
         render: (_, record) =>
           amountFormatter(
-            ProductTypeRefs[record.product.vault.productType].dualGetPrice(
-              record.product,
-            ),
+            dualGetPrice(record.product),
             CCYService.ccyConfigs[record.product.vault.depositCcy]?.precision,
           ),
       },

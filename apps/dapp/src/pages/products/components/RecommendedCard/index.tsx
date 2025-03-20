@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
+import { dualGetPrice } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   isDualQuoteParams,
@@ -28,6 +29,7 @@ import {
   useProductSelect,
   useProjectChange,
 } from '@/components/ProductSelector';
+import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
@@ -264,7 +266,7 @@ export async function handleRecommendCardClick(
         ...(vault.riskType === RiskType.DUAL
           ? {
               expiry: it.expiry,
-              strike: (it as ProductQuoteResult).anchorPrices?.[0],
+              strike: dualGetPrice(it),
             }
           : undefined),
         expanded: 1,
