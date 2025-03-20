@@ -2,6 +2,13 @@ import { useMemo, useState } from 'react';
 import { Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
+import {
+  DualPositionClaimStatus,
+  getDualLinkedCcy,
+  getDualPositionClaimStatus,
+  getDualSettlementTime,
+} from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
@@ -10,6 +17,7 @@ import { getErrorMsg } from '@sofa/utils/fns';
 import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
 import { displayTenor } from '@sofa/utils/time';
 import { useInfiniteScroll } from 'ahooks';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { uniqBy } from 'lodash-es';
 
@@ -35,9 +43,6 @@ import { AutomatorHistory } from './automator';
 import locale from './locale';
 
 import styles from './index.module.scss';
-import { CCYService } from '@sofa/services/ccy';
-import { DualPositionClaimStatus, getDualLinkedCcy, getDualPositionClaimStatus, getDualSettlementTime } from '@sofa/services/dual';
-import classNames from 'classnames';
 
 addI18nResources(locale, 'History');
 
@@ -92,16 +97,24 @@ const OrderHistory = () => {
     return [
       {
         title: t({
-          enUS: 'Assets'
+          enUS: 'Assets',
         }),
-        render: (_, record) => <>
-          <img src={CCYService.ccyConfigs[record.product.vault.forCcy]?.icon} />
-          <span>{record.product.vault.forCcy}</span>
-        </>,
+        render: (_, record) => (
+          <span className={styles['ccy']}>
+            <img
+              src={CCYService.ccyConfigs[record.product.vault.forCcy]?.icon}
+            />
+            <span>{record.product.vault.forCcy}</span>
+          </span>
+        ),
       },
       {
         title: t('Product'),
-        render: (_, record) => ProductTypeRefs[record.product.vault.productType].dualOp(t, record.product.vault).op,
+        render: (_, record) =>
+          ProductTypeRefs[record.product.vault.productType].dualOp(
+            t,
+            record.product.vault,
+          ).op,
       },
       {
         title: t('Expiration'),
@@ -125,10 +138,12 @@ const OrderHistory = () => {
         }),
         render: (_, record) =>
           amountFormatter(
-            ProductTypeRefs[record.product.vault.productType].dualGetPrice(record.product),
-            CCYService.ccyConfigs[record.product.vault.depositCcy]?.precision
+            ProductTypeRefs[record.product.vault.productType].dualGetPrice(
+              record.product,
+            ),
+            CCYService.ccyConfigs[record.product.vault.depositCcy]?.precision,
           ),
-      } ,
+      },
       {
         title: t('Deposit'),
         render: (_, record) =>
@@ -144,35 +159,56 @@ const OrderHistory = () => {
           if (!judgeSettled(record)) {
             return '-';
           }
-          if (!record.amounts.redeemable && !record.amounts.redeemableOfLinkedCcy) {
+          if (
+            !record.amounts.redeemable &&
+            !record.amounts.redeemableOfLinkedCcy
+          ) {
             return '-';
           }
-          return <>
-            {record.amounts.redeemable &&
-              <span
-                className={classNames(styles['amount'], styles['deposit-ccy'])}
-              >
-                <AmountDisplay
-                  amount={record.amounts.redeemable}
-                  ccy={record.product.vault.depositCcy}
-                />{' '}
-                {record.product.vault.depositCcy}
-              </span> || undefined}
-            {record.amounts.redeemableOfLinkedCcy &&
-              <span
-                className={classNames(styles['amount'], styles['linked-ccy'])}
-              >
-                <AmountDisplay
-                  amount={record.amounts.redeemableOfLinkedCcy}
-                  ccy={getDualLinkedCcy(record.product.vault)}
-                />{' '}
-                {getDualLinkedCcy(record.product.vault)}
-              </span> || undefined}
-          </>;
+          return (
+            <>
+              {(record.amounts.redeemable && (
+                <span
+                  className={classNames(
+                    styles['amount'],
+                    styles['deposit-ccy'],
+                  )}
+                >
+                  <AmountDisplay
+                    amount={record.amounts.redeemable}
+                    ccy={record.product.vault.depositCcy}
+                  />{' '}
+                  {record.product.vault.depositCcy}
+                </span>
+              )) ||
+                undefined}
+              {(record.amounts.redeemableOfLinkedCcy && (
+                <>
+                  <br />
+                  <span
+                    className={classNames(
+                      styles['amount'],
+                      styles['linked-ccy'],
+                    )}
+                  >
+                    <AmountDisplay
+                      amount={record.amounts.redeemableOfLinkedCcy}
+                      ccy={getDualLinkedCcy(record.product.vault)}
+                    />{' '}
+                    {getDualLinkedCcy(record.product.vault)}
+                  </span>
+                </>
+              )) ||
+                undefined}
+            </>
+          );
         },
       },
       {
-        title: t('RCH PnL'),
+        title: t({
+          enUS: 'RCH Reward',
+          zhCN: 'RCH 奖励',
+        }),
         render: (_, record) =>
           record.claimParams.maker ||
           Date.now() - next8h() > MsIntervals.min * 10 ? (
@@ -200,149 +236,173 @@ const OrderHistory = () => {
       },
       {
         title: t({
-          enUS: 'State'
+          enUS: 'State',
         }),
         render: (_, record) => {
-          const {status} = getDualPositionClaimStatus({...record, vault: record.product.vault}, new Date());
-          return <span className={styles['dual-state']}>
-            {status == DualPositionClaimStatus.NotExpired ? t({
-              enUS: 'Active',
-            }) : status == DualPositionClaimStatus.ExpiredButNotClaimable ? t({
-              enUS: 'Settling',
-            }) : status == DualPositionClaimStatus.Claimable ? t({
-              enUS: 'Unclaimed',
-            }) : status == DualPositionClaimStatus.Claimed ? t({
-              enUS: 'Claimed',
-            }) : ''}
-          </span>
+          const { status } = getDualPositionClaimStatus(
+            { ...record, vault: record.product.vault },
+            new Date(),
+          );
+          return (
+            <span className={styles['dual-state']}>
+              {status == DualPositionClaimStatus.NotExpired
+                ? t({
+                    enUS: 'Active',
+                  })
+                : status == DualPositionClaimStatus.ExpiredButNotClaimable
+                  ? t({
+                      enUS: 'Settling',
+                    })
+                  : status == DualPositionClaimStatus.Claimable
+                    ? t({
+                        enUS: 'Unclaimed',
+                      })
+                    : status == DualPositionClaimStatus.Claimed
+                      ? t({
+                          enUS: 'Claimed',
+                        })
+                      : ''}
+            </span>
+          );
         },
       },
-    ] as ColumnProps<PositionInfo>[]
+    ] as ColumnProps<PositionInfo>[];
   });
 
   const columns = useMemo(
-    () => riskType == RiskType.DUAL ? getDualColumns() :
-      [
-        {
-          title: t('Product'),
-          render: (_, record) =>
-            ProductTypeRefs[record.product.vault.productType].alias,
-        },
-        {
-          title: t('Type'),
-          render: (_, record) => (
-            <span className={styles['product-type']}>
-              {RiskTypeRefs[record.product.vault.riskType].icon}
-              {record.product.vault.riskType === RiskType.LEVERAGE && (
-                <span className={styles['badge-leverage']}>Lev.</span>
-              )}
-            </span>
-          ),
-        },
-        {
-          title: t('Expiration'),
-          render: (_, record) => displayExpiry(record.product.expiry * 1000),
-        },
-        {
-          title: t('Term'),
-          render: (_, record) =>
-            displayTenor(
-              dayjs(record.product.expiry * 1000).diff(
-                next8h(record.createdAt * 1000),
-                'day',
+    () =>
+      riskType == RiskType.DUAL
+        ? getDualColumns()
+        : ([
+            {
+              title: t('Product'),
+              render: (_, record) =>
+                ProductTypeRefs[record.product.vault.productType].alias,
+            },
+            {
+              title: t('Type'),
+              render: (_, record) => (
+                <span className={styles['product-type']}>
+                  {RiskTypeRefs[record.product.vault.riskType].icon}
+                  {record.product.vault.riskType === RiskType.LEVERAGE && (
+                    <span className={styles['badge-leverage']}>Lev.</span>
+                  )}
+                </span>
               ),
-              t,
-            ),
-        },
-        {
-          title: t('Strikes'),
-          render: (_, record) =>
-            record.product.anchorPrices
-              .map((it) => amountFormatter(it, 0))
-              .join('-'),
-        },
-        {
-          title: t('Deposit'),
-          render: (_, record) =>
-            `${amountFormatter(record.amounts.own, 2)} ${
-              record.product.vault.depositCcy
-            }`,
-        },
-        {
-          title: t('Basic PnL'),
-          render: (_, record) => {
-            if (!record.amounts.redeemable || !judgeSettled(record)) {
-              return '-';
-            }
-            const pnl = Number(record.amounts.redeemable) - +record.amounts.own;
-            if (!pnl) return '-';
-            return (
-              <span
-                className={styles['amount']}
-                style={{
-                  color: pnl >= 0 ? 'var(--color-rise)' : 'var(--color-fall)',
-                }}
-              >
-                <AmountDisplay
-                  amount={pnl}
-                  ccy={record.product.vault.depositCcy}
-                  signed
-                />{' '}
-                {record.product.vault.depositCcy}
-              </span>
-            );
-          },
-        },
-        {
-          title: t('RCH PnL'),
-          render: (_, record) =>
-            record.claimParams.maker ||
-            Date.now() - next8h() > MsIntervals.min * 10 ? (
-              '-'
-            ) : (
-              <span className={styles['amount-rch']}>
-                {amountFormatter(record.amounts.rchAirdrop, 4)} RCH
-              </span>
-            ),
-        },
-        {
-          title: t('Created Time'),
-          render: (_, record) => (
-            <Time time={record.createdAt * 1000} format="YYYY-MM-DD HH:mm" />
-          ),
-        },
-        {
-          title: t('Settlement Time'),
-          render: (_, record) => (
-            <Time
-              time={record.product.expiry * 1000}
-              format="YYYY-MM-DD HH:mm"
-            />
-          ),
-        },
-        {
-          title: t('Details'),
-          fixed: 'right',
-          render: (_, record) => (
-            <IconDetails
-              className={styles['icon-details']}
-              onClick={() =>
-                setExpandedRowKeys((pre) => {
-                  const id = `${record?.product.vault.productType}-${record?.id}`;
-                  if (id === pre[0]) return [];
-                  return [id];
-                })
-              }
-            />
-          ),
-        },
-      ] as ColumnProps<PositionInfo>[],
+            },
+            {
+              title: t('Expiration'),
+              render: (_, record) =>
+                displayExpiry(record.product.expiry * 1000),
+            },
+            {
+              title: t('Term'),
+              render: (_, record) =>
+                displayTenor(
+                  dayjs(record.product.expiry * 1000).diff(
+                    next8h(record.createdAt * 1000),
+                    'day',
+                  ),
+                  t,
+                ),
+            },
+            {
+              title: t('Strikes'),
+              render: (_, record) =>
+                record.product.anchorPrices
+                  .map((it) => amountFormatter(it, 0))
+                  .join('-'),
+            },
+            {
+              title: t('Deposit'),
+              render: (_, record) =>
+                `${amountFormatter(record.amounts.own, 2)} ${
+                  record.product.vault.depositCcy
+                }`,
+            },
+            {
+              title: t('Basic PnL'),
+              render: (_, record) => {
+                if (!record.amounts.redeemable || !judgeSettled(record)) {
+                  return '-';
+                }
+                const pnl =
+                  Number(record.amounts.redeemable) - +record.amounts.own;
+                if (!pnl) return '-';
+                return (
+                  <span
+                    className={styles['amount']}
+                    style={{
+                      color:
+                        pnl >= 0 ? 'var(--color-rise)' : 'var(--color-fall)',
+                    }}
+                  >
+                    <AmountDisplay
+                      amount={pnl}
+                      ccy={record.product.vault.depositCcy}
+                      signed
+                    />{' '}
+                    {record.product.vault.depositCcy}
+                  </span>
+                );
+              },
+            },
+            {
+              title: t('RCH PnL'),
+              render: (_, record) =>
+                record.claimParams.maker ||
+                Date.now() - next8h() > MsIntervals.min * 10 ? (
+                  '-'
+                ) : (
+                  <span className={styles['amount-rch']}>
+                    {amountFormatter(record.amounts.rchAirdrop, 4)} RCH
+                  </span>
+                ),
+            },
+            {
+              title: t('Created Time'),
+              render: (_, record) => (
+                <Time
+                  time={record.createdAt * 1000}
+                  format="YYYY-MM-DD HH:mm"
+                />
+              ),
+            },
+            {
+              title: t('Settlement Time'),
+              render: (_, record) => (
+                <Time
+                  time={record.product.expiry * 1000}
+                  format="YYYY-MM-DD HH:mm"
+                />
+              ),
+            },
+            {
+              title: t('Details'),
+              fixed: 'right',
+              render: (_, record) => (
+                <IconDetails
+                  className={styles['icon-details']}
+                  onClick={() =>
+                    setExpandedRowKeys((pre) => {
+                      const id = `${record?.product.vault.productType}-${record?.id}`;
+                      if (id === pre[0]) return [];
+                      return [id];
+                    })
+                  }
+                />
+              ),
+            },
+          ] as ColumnProps<PositionInfo>[]),
     [t],
   );
 
   return (
     <Table
-      className={styles['table']}
+      className={classNames(
+        styles['table'],
+        styles['table-' + riskType.toLowerCase()],
+      )}
       columns={columns}
       dataSource={data?.list}
       loading={loading}

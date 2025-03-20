@@ -91,6 +91,9 @@
   margin: 0 auto;
   border-radius: min(24px, 3vw);
   overflow: hidden;
+  &.table-dual {
+    width: 1340px;
+  }
 
   th,
   td {
@@ -127,6 +130,13 @@
 
     .semi-table-placeholder {
       background: #fff;
+    }
+  }
+  .ccy {
+    @include flex-center;
+
+    img {
+      max-width: 20px;
     }
   }
 }
