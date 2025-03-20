@@ -267,7 +267,7 @@ export class PositionsService {
         '/rfq/dual/position-list',
         {
           ...params,
-          vaults: dualVaults,
+          vaults: dualVaults.map((v) => v.vault),
         },
       );
     }
