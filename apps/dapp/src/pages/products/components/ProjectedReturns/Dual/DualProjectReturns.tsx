@@ -48,7 +48,8 @@ export const DualProfitScenarios = (
         },
       )}
     >
-      {props.executionResult == DualPositionExecutionStatus.PartialExecuted ? (
+      {props.scenario === 'position' &&
+      props.executionResult == DualPositionExecutionStatus.PartialExecuted ? (
         // 如果是部分执行，顶部显示特殊UI
         <div
           className={classNames(
@@ -469,6 +470,7 @@ export const DualProfitScenarios = (
       ]
         .sort((a, b) => {
           if (
+            props.scenario === 'quote' ||
             !props.executionResult ||
             ![
               DualPositionExecutionStatus.Executed,

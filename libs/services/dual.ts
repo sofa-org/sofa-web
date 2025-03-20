@@ -29,13 +29,22 @@ export function getDualLinkedCcy(vault: VaultInfo) {
 export function getDualPositionExecutionStatus(
   position: PositionInfo & { vault: VaultInfo },
 ) {
-  if (position.amounts.redeemable && !position.amounts.redeemableOfLinkedCcy) {
+  if (
+    Number(position.amounts.redeemable) > 0 &&
+    !Number(position.amounts.redeemableOfLinkedCcy)
+  ) {
     return DualPositionExecutionStatus.NotExecuted;
   }
-  if (!position.amounts.redeemable && position.amounts.redeemableOfLinkedCcy) {
+  if (
+    !Number(position.amounts.redeemable) &&
+    Number(position.amounts.redeemableOfLinkedCcy) > 0
+  ) {
     return DualPositionExecutionStatus.Executed;
   }
-  if (position.amounts.redeemable && position.amounts.redeemableOfLinkedCcy) {
+  if (
+    Number(position.amounts.redeemable) > 0 &&
+    Number(position.amounts.redeemableOfLinkedCcy) > 0
+  ) {
     return DualPositionExecutionStatus.PartialExecuted;
   }
   return DualPositionExecutionStatus.NotExpired;
@@ -88,7 +97,6 @@ export function getDualProfitRenderProps(
   const executionStatus = getDualPositionExecutionStatus(
     data as PositionInfo & { vault: VaultInfo },
   );
-
   const res = {
     productType: data.vault.productType,
     executionResult: [

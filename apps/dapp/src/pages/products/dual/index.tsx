@@ -363,7 +363,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                       expiry: customExpiry,
                       depositAmount: 100,
                     });
-                    setQuote(res);
+                    if (res) setQuote(res);
                   }}
                 />
               )}
