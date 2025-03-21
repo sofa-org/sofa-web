@@ -107,26 +107,22 @@ export class DualService {
     vault: { productType: ProductType; domCcy: VaultInfo['domCcy'] };
     anchorPrices: (number | string)[];
   }) {
-    const p = params.anchorPrices?.[0];
+    if (isNullLike(params?.anchorPrices?.[0])) {
+      return undefined;
+    }
+    const p = params.anchorPrices[0];
     if (!DualService.shouldRevertAnchorPrice(params.vault.productType)) {
-      return isNullLike(p)
-        ? undefined
-        : Number(
-            roundWith(
-              Number(p),
-              CCYService.getPriceInputTick(params.vault.domCcy),
-            ),
-          );
+      return Number(
+        roundWith(Number(p), CCYService.getPriceInputTick(params.vault.domCcy)),
+      );
     }
 
-    return isNullLike(p)
-      ? undefined
-      : Number(
-          roundWith(
-            p === 0 || p === '0' ? 0 : 1.0 / Number(p),
-            CCYService.getPriceInputTick(params.vault.domCcy),
-          ),
-        );
+    return Number(
+      roundWith(
+        p === 0 || p === '0' ? 0 : 1.0 / Number(p),
+        CCYService.getPriceInputTick(params.vault.domCcy),
+      ),
+    );
   }
   static shouldRevertAnchorPrice(productType: ProductType) {
     return productType == ProductType.BearSpread;

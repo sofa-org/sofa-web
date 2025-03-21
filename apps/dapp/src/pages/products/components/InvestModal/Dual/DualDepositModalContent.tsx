@@ -127,6 +127,9 @@ export const DualDepositModalContent = (
 
   const productTypeRef = vault ? ProductTypeRefs[vault.productType] : undefined;
   const diffPrice = useMemo(() => {
+    if (!product) {
+      return undefined;
+    }
     const currentPrice = DualService.getPrice(product as ProductQuoteParams);
     if (
       currentPrice === undefined ||
