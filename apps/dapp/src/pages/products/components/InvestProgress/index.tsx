@@ -253,10 +253,9 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
                 'Deposit successful. <a href="{{url}}">Go to position page</a> to see your successful records',
                 {
                   url:
-                    `/positions${window.location.search.replace(
-                      /([?&])tab=[^&]+/,
-                      '$1',
-                    )}` +
+                    `/positions${window.location.search
+                      .replace(/([?&])tab=[^&]+/, '$1')
+                      .replace(/([?&])project=[^&]+/, '$1')}` +
                     (props.projectType ? `&project=${props.projectType}` : ''),
                 },
               ),
