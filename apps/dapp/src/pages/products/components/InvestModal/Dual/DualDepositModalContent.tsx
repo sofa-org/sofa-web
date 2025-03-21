@@ -96,15 +96,22 @@ export const DualDepositModalContent = (
   const expiries = useAsyncMemo(
     async () =>
       (vault &&
-        ProductsService.genExpiries(vault).then((res) =>
-          res.reduce(
+        ProductsService.genExpiries(vault).then((res) => {
+          if (!res.length) {
+            return undefined;
+          }
+          return res.reduce(
             (acc, value) => ({
               ...acc,
-              [value]: true,
+              min: acc.min ? Math.min(acc.min, value) : value,
+              max: acc.min ? Math.max(acc.max, value) : value,
             }),
-            {} as Record<number, boolean>,
-          ),
-        )) ||
+            {
+              max: 0,
+              min: 0,
+            },
+          );
+        })) ||
       undefined,
     [vault],
   );
@@ -287,7 +294,7 @@ export const DualDepositModalContent = (
                     disabledDate={(d) => {
                       if (!d || !expiries) return true;
                       const curr8h = next8h(d.getTime());
-                      return !expiries[curr8h];
+                      return curr8h < expiries.min || curr8h > expiries.max;
                     }}
                     presetPosition="top"
                     value={

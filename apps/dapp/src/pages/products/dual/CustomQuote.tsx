@@ -33,15 +33,22 @@ export const CustomQuote = (props: {
 
   const expiries = useAsyncMemo(
     async () =>
-      ProductsService.genExpiries(props.vault).then((res) =>
-        res.reduce(
+      ProductsService.genExpiries(props.vault).then((res) => {
+        if (!res.length) {
+          return undefined;
+        }
+        return res.reduce(
           (acc, value) => ({
             ...acc,
-            [value]: true,
+            min: acc.min ? Math.min(acc.min, value) : value,
+            max: acc.min ? Math.max(acc.max, value) : value,
           }),
-          {} as Record<number, boolean>,
-        ),
-      ),
+          {
+            max: 0,
+            min: 0,
+          },
+        );
+      }),
     [props.vault],
   );
 
@@ -67,7 +74,7 @@ export const CustomQuote = (props: {
             disabledDate={(d) => {
               if (!d || !expiries) return true;
               const curr8h = next8h(d.getTime());
-              return !expiries[curr8h];
+              return curr8h < expiries.min || curr8h > expiries.max;
             }}
             presetPosition="top"
             value={props.expiry === undefined ? undefined : props.expiry * 1000}
