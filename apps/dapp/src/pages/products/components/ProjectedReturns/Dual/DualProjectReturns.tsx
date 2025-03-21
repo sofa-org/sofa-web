@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { Tooltip } from '@douyinfe/semi-ui';
 import { ProductType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import {
@@ -17,6 +18,8 @@ import classNames from 'classnames';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
+
+import { PartialExecutedTooltip } from './PartialExecutedTooltip';
 
 import styles from './DualProjectReturns.module.scss';
 
@@ -401,7 +404,9 @@ export const DualProfitScenarios = (
                   <div className={styles['rewards']}>
                     <div className={styles['item']}>
                       <span className={styles['label']}>
-                        {(forCcyConfig && <img src={forCcyConfig.icon} />) ||
+                        {(depositCcyConfig && (
+                          <img src={depositCcyConfig.icon} />
+                        )) ||
                           undefined}
                         {t({
                           enUS: 'Deposit Reward',
@@ -498,15 +503,23 @@ export const DualProfitScenarios = (
             },
           )}
         >
-          <div>
-            <div className={styles['title']}>{desc.partialExecuted}</div>
-            <div className={styles['subtitle']}>
-              {t({
-                enUS: 'Still Get Deposit Rewards and RCH Airdrops',
-              })}
+          <Tooltip
+            className={styles['partial-buy-tooltip']}
+            content={<PartialExecutedTooltip {...props} />}
+            style={{
+              maxWidth: 500,
+            }}
+          >
+            <div>
+              <div className={styles['title']}>{desc.partialExecuted}</div>
+              <div className={styles['subtitle']}>
+                {t({
+                  enUS: 'Still Get Deposit Rewards and RCH Airdrops',
+                })}
+              </div>
+              <div className={styles['line']} />
             </div>
-            <div className={styles['line']} />
-          </div>
+          </Tooltip>
         </div>
       )}
     </div>

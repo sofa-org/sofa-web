@@ -72,7 +72,7 @@ export class DualService {
     return DualPositionExecutionStatus.NotExpired;
   }
   static getSettlementTime(product: ProductInfo) {
-    return new Date((product.expiry + 2 * 3600) * 1000);
+    return new Date((Number(product.expiry) + 2 * 3600) * 1000);
   }
 
   static getClaimStatus(
