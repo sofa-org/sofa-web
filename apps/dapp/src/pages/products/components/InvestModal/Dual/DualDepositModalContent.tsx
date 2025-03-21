@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DatePicker, Spin } from '@douyinfe/semi-ui';
 import { CCYService } from '@sofa/services/ccy';
 import { ContractsService, ProductType } from '@sofa/services/contracts';
-import { dualGetPrice, dualUpdatePrice } from '@sofa/services/dual';
+import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   ProductQuoteParams,
@@ -127,7 +127,7 @@ export const DualDepositModalContent = (
 
   const productTypeRef = vault ? ProductTypeRefs[vault.productType] : undefined;
   const diffPrice = useMemo(() => {
-    const currentPrice = dualGetPrice(product as ProductQuoteParams);
+    const currentPrice = DualService.getPrice(product as ProductQuoteParams);
     if (
       currentPrice === undefined ||
       !product?.vault.forCcy ||
@@ -222,7 +222,7 @@ export const DualDepositModalContent = (
                     className={styles['amount-input']}
                     // min={}
                     tick={CCYService.getPriceInputTick(vault.domCcy)}
-                    value={dualGetPrice(product as ProductQuoteParams)}
+                    value={DualService.getPrice(product as ProductQuoteParams)}
                     suffix={
                       <span className={styles['unit-2']}>
                         {formatHighlightedText(
@@ -259,7 +259,7 @@ export const DualDepositModalContent = (
                         !isNullLike(v) &&
                         useProductsState.updateCart({
                           ...product,
-                          anchorPrices: [dualUpdatePrice(product, v)],
+                          anchorPrices: [DualService.updatePrice(product, v)],
                         })
                       );
                     }}

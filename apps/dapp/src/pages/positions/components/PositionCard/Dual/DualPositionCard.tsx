@@ -3,14 +3,12 @@ import { CCYService } from '@sofa/services/ccy';
 import {
   DualPositionClaimStatus,
   DualPositionExecutionStatus,
-  getDualLinkedCcy,
-  getDualPositionClaimStatus,
-  getDualPositionExecutionStatus,
-  getDualProfitRenderProps,
+  DualService,
 } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, next8h } from '@sofa/utils/expiry';
+import { useAsyncMemo } from '@sofa/utils/hooks';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -52,14 +50,17 @@ const DualPositionCard = (
     product.vault.forCcy == product.vault.depositCcy
       ? domCcyConfig
       : forCcyConfig;
-  const linkedCcy = getDualLinkedCcy(product.vault);
+  const linkedCcy = DualService.getLinkedCcy(product.vault);
 
-  const executionStatus = getDualPositionExecutionStatus(position);
-  const { status: claimStatus, leftTime } = getDualPositionClaimStatus(
+  const executionStatus = DualService.getExecutionStatus(position);
+  const { status: claimStatus, leftTime } = DualService.getClaimStatus(
     position,
     new Date(),
   );
-  const renderProps = getDualProfitRenderProps(position);
+  const renderProps = useAsyncMemo(
+    () => DualService.getProfitRenderProps(position),
+    [position],
+  );
   return (
     <>
       <div

@@ -3,13 +3,7 @@ import { Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
-import {
-  dualGetPrice,
-  DualPositionClaimStatus,
-  getDualLinkedCcy,
-  getDualPositionClaimStatus,
-  getDualSettlementTime,
-} from '@sofa/services/dual';
+import { DualPositionClaimStatus, DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import { amountFormatter, cvtAmountsInCcy } from '@sofa/utils/amount';
@@ -139,7 +133,7 @@ const OrderHistory = () => {
         }),
         render: (_, record) =>
           amountFormatter(
-            dualGetPrice(record.product),
+            DualService.getPrice(record.product),
             CCYService.ccyConfigs[record.product.vault.depositCcy]?.precision,
           ),
       },
@@ -192,9 +186,9 @@ const OrderHistory = () => {
                   >
                     <AmountDisplay
                       amount={record.amounts.redeemableOfLinkedCcy}
-                      ccy={getDualLinkedCcy(record.product.vault)}
+                      ccy={DualService.getLinkedCcy(record.product.vault)}
                     />{' '}
-                    {getDualLinkedCcy(record.product.vault)}
+                    {DualService.getLinkedCcy(record.product.vault)}
                   </span>
                 </>
               )) ||
@@ -228,7 +222,7 @@ const OrderHistory = () => {
         title: t('Settlement Time'),
         render: (_, record) => (
           <Time
-            time={getDualSettlementTime(record.product).getTime()}
+            time={DualService.getSettlementTime(record.product).getTime()}
             format="YYYY-MM-DD HH:mm"
           />
         ),
@@ -238,7 +232,7 @@ const OrderHistory = () => {
           enUS: 'State',
         }),
         render: (_, record) => {
-          const { status } = getDualPositionClaimStatus(
+          const { status } = DualService.getClaimStatus(
             { ...record, vault: record.product.vault },
             new Date(),
           );

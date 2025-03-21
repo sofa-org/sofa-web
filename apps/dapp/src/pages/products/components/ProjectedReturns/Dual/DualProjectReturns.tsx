@@ -4,12 +4,13 @@ import { CCYService } from '@sofa/services/ccy';
 import {
   DualPositionExecutionStatus,
   DualProfitRenderProps,
-  getDualProfitRenderProps,
+  DualService,
 } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';
 import { ProductQuoteResult } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
+import { useAsyncMemo } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
@@ -521,8 +522,8 @@ export const DualProjectedReturns = (
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
   const product = position.product;
-  const profitsProps = useMemo(
-    () => getDualProfitRenderProps(position),
+  const profitsProps = useAsyncMemo(
+    () => DualService.getProfitRenderProps(position),
     [product, position],
   );
   const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);

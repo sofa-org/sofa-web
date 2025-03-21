@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { getDualProfitRenderProps } from '@sofa/services/dual';
+import { DualService } from '@sofa/services/dual';
 import { PositionInfo } from '@sofa/services/positions';
 import { ProductQuoteResult, VaultInfo } from '@sofa/services/products';
+import { useAsyncMemo } from '@sofa/utils/hooks';
 
 import { addI18nResources } from '@/locales';
 
@@ -22,7 +23,10 @@ export const DualProfitsRender = (
 ) => {
   const data = props.data;
 
-  const profitsProps = useMemo(() => getDualProfitRenderProps(data), [data]);
+  const profitsProps = useAsyncMemo(
+    () => DualService.getProfitRenderProps(data),
+    [data],
+  );
   if (!profitsProps) {
     return <></>;
   }

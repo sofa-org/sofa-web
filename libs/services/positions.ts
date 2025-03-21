@@ -5,6 +5,7 @@ import { http, pollingUntil } from '@sofa/utils/http';
 import { simplePlus } from '@sofa/utils/object';
 import { UserStorage } from '@sofa/utils/storage';
 
+import { getDualProductType } from './vaults/dual';
 import {
   ContractsService,
   ProductType,
@@ -84,6 +85,42 @@ export interface OriginPositionInfo extends CalculatedInfo, SettlementInfo {
   createdAt: number; // 创建时间，秒
   claimParams: ClaimParams;
   size?: number;
+
+  /*
+  上面的方案是从the graph角度想的，前端查后端，后端查thegraph似乎有点曲折；后端查thegraph需要api-key的开销；keccak256，abi.encodePacked等函数后端实现似乎也有点复杂。
+下面是从查智能合约角度的方案，似乎简洁些，可以作为另一种选择：
+  1.查 totalPositions[productId]: maker可换的总金额(不会减少)
+    productId = uint256(keccak256(abi.encodePacked(expiry, anchorPrice, uint256(0))))
+  2.查 quotePositions[makerProductId]: maker已经换的总金额
+    makerProductId = uint256(keccak256(abi.encodePacked(expiry, anchorPrice, uint256(1))))
+  3.通过前两者的比例，算出minter被换币的金额
+  */
+
+  /*
+  1. 从position的expiry/anchorPrice拿到所有maker存的金额 totalPositions（同期，同价格share一个池子）
+  2. 从 totalPositions 拿总金额
+  3. 相同的办法获得做市商对这个池子换了多少币
+  4. quotePositions
+  5. 对于maker
+     算出换币比例
+     redeemableOfLinkedCcy = quotePositions * anchorPrice
+     redeemable = quotePositions
+     
+     对于taker
+     taker换币数量 = quotePositions / totalPositions * (own + counterParty)
+     redeemableOfLinkedCcy = taker换币数量 * anchorPrice
+     redeemable = (own + counterParty) - taker换币数量
+     --
+
+     
+  */
+
+  // productId => id
+  isMaker: boolean;
+
+  // amounts
+  redeemable: string | number; // 对赌全赢的情况能赎回的钱，包含本金
+  redeemableOfLinkedCcy: string | number; // 如果换币，能赎回的挂钩货币的金额，只有 Dual 产品有，其它产品为 0
 }
 
 export interface PositionInfo extends OriginPositionInfo {
@@ -270,6 +307,15 @@ export class PositionsService {
           vaults: dualVaults.map((v) => v.vault),
         },
       );
+      if (dualRes.value.length) {
+        for (const p of dualRes.value) {
+          // 手动修复返回值
+          if ((p.product.vault.productType as string) === 'Dual') {
+            p.product.vault.riskType = RiskType.DUAL;
+            p.product.vault.productType = getDualProductType(p.product.vault);
+          }
+        }
+      }
     }
     if (dualRes) {
       if (dualVaults.length == params.vaults.length || dualRes.code) {
@@ -332,7 +378,6 @@ export class PositionsService {
       limit,
       orderBy: extra?.orderBy,
     } as PositionParams);
-
     const list = res.value.map((it) => ({
       position: it,
       vault: ContractsService.getVaultInfo(

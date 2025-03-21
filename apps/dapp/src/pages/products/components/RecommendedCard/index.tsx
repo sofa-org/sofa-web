@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@douyinfe/semi-ui';
 import { ProjectType } from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts';
-import { dualGetPrice } from '@sofa/services/dual';
+import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   isDualQuoteParams,
@@ -266,7 +266,7 @@ export async function handleRecommendCardClick(
         ...(vault.riskType === RiskType.DUAL
           ? {
               expiry: it.expiry,
-              strike: dualGetPrice(it),
+              strike: DualService.getPrice(it),
             }
           : undefined),
         expanded: 1,

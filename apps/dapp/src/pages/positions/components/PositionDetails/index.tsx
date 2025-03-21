@@ -3,12 +3,7 @@ import { Modal, Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { CCYService } from '@sofa/services/ccy';
 import { ProductType, RiskType, VaultInfo } from '@sofa/services/contracts';
-import {
-  dualGetPrice,
-  DualPositionClaimStatus,
-  getDualPositionClaimStatus,
-  getDualSettlementTime,
-} from '@sofa/services/dual';
+import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   PositionInfo,
@@ -122,7 +117,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                 zhCN: '目标价格',
               }),
               value: amountFormatter(
-                dualGetPrice(product),
+                DualService.getPrice(product),
                 CCYService.ccyConfigs[product.vault.depositCcy]?.precision,
               ),
             },
@@ -155,7 +150,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                 <Time
                   time={
                     product.vault.riskType == RiskType.DUAL
-                      ? getDualSettlementTime(product).getTime()
+                      ? DualService.getSettlementTime(product).getTime()
                       : product.expiry * 1000
                   }
                   format="YYYY-MM-DD HH:mm"
@@ -454,12 +449,11 @@ const PositionDetails = (props: PositionDetailsProps) => {
           </div>
         </>
       )) ||
-        undefined}
-      {!position.claimParams.maker && (
-        <div className={styles['returns']}>
-          <ProjectedReturns data={position} />
-        </div>
-      )}
+        (!position.claimParams.maker && (
+          <div className={styles['returns']}>
+            <ProjectedReturns data={position} />
+          </div>
+        ))}
       <PositionClaimProgress
         ref={claimProgressRef}
         chainId={product.vault.chainId}

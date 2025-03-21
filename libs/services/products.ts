@@ -14,7 +14,7 @@ import {
   RiskType,
   VaultInfo,
 } from './contracts';
-import { dualGetPrice } from './dual';
+import { DualService } from './dual';
 import { MarketService } from './market';
 import { WalletService } from './wallet';
 
@@ -228,7 +228,7 @@ export class ProductsService {
     if (!product) return '';
     if (isDualQuoteParams(product)) {
       const depositAmount = product.depositAmount || product.amounts?.own;
-      const price = dualGetPrice(product as ProductQuoteParams);
+      const price = DualService.getPrice(product as ProductQuoteParams);
       return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${price}-${depositAmount}`;
     }
     const vault = product.vault?.vault?.toLowerCase();
@@ -478,7 +478,7 @@ export class ProductsService {
     if (product.riskType == RiskType.DUAL) {
       url = '/rfq/dual/quote';
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (params as any).strike = dualGetPrice({
+      (params as any).strike = DualService.getPrice({
         vault: product,
         anchorPrices: [params.lowerStrike],
       });
