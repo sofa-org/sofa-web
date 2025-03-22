@@ -211,6 +211,7 @@ export const CustomQuote = (props: {
       <AsyncButton
         className={styles['deposit-btn']}
         onClick={() => props.onClickDeposit(matchingQuote)}
+        disabled={!props.price || !props.expiry}
       >
         {t({ enUS: 'Deposit' })}
       </AsyncButton>
