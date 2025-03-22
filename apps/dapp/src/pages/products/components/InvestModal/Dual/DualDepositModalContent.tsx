@@ -56,7 +56,6 @@ export const DualDepositModalContent = (
   props: InvestModalProps & { setVisible: Dispatch<boolean> },
 ) => {
   const wallet = useWalletStore();
-  const navigate = useNavigate();
 
   const [t] = useTranslation('InvestModal');
 

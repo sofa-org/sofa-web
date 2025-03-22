@@ -1,18 +1,22 @@
-import { useMemo, useState } from 'react';
-import { DatePicker } from '@douyinfe/semi-ui';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { DatePicker, Toast } from '@douyinfe/semi-ui';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
-import { ProductsService } from '@sofa/services/products';
-import { displayPercentage } from '@sofa/utils/amount';
+import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
+import { displayPercentage, roundWith } from '@sofa/utils/amount';
 import { next8h } from '@sofa/utils/expiry';
+import { getErrorMsg, isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
-import { useAsyncMemo } from '@sofa/utils/hooks';
+import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
 import AmountInput from '@/components/AmountInput';
 import AsyncButton from '@/components/AsyncButton';
+import { useIndexPrices } from '@/components/IndexPrices/store';
+import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
 import locale from './locale';
@@ -24,13 +28,47 @@ export const CustomQuote = (props: {
   vault: VaultInfo;
   expiry?: number;
   price?: number;
+  otherQuotes: ProductQuoteResult[];
   onChangedExpiry: (v?: number) => void;
   onChangedPrice: (v?: number) => void;
-  onClickDeposit: () => Promise<void>;
-  apy?: number;
+  onClickDeposit: (matchingQuote?: ProductQuoteResult) => Promise<void>;
+  onQuote: (params: {
+    expiry: number;
+    price: number;
+  }) => Promise<ProductQuoteResult | undefined>;
 }) => {
   const [t] = useTranslation('ProductDual');
+  const [quote, setQuote] = useState<ProductQuoteResult | undefined>(undefined);
+  const [lazyPrice, setLazyPrice] = useState<number | undefined>(undefined);
+  const lazyTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const quoteNew = useLazyCallback(async () => {
+    if (lazyPrice != props.price || !props.price || !props.expiry) {
+      return;
+    }
 
+    const res = await props.onQuote({
+      price: props.price,
+      expiry: props.expiry,
+    });
+    setQuote(res);
+  });
+  const matchingQuote = useMemo(() => {
+    if (!props.expiry || !props.price) {
+      return undefined;
+    }
+    if (
+      quote?.expiry == props.expiry &&
+      props.price == DualService.getPrice(quote)
+    ) {
+      return quote;
+    }
+    return props.otherQuotes.find(
+      (q) =>
+        q?.expiry == props.expiry && props.price == DualService.getPrice(q),
+    );
+  }, [props.expiry, props.price, quote, props.otherQuotes]);
   const expiries = useAsyncMemo(
     async () =>
       ProductsService.genExpiries(props.vault).then((res) => {
@@ -51,6 +89,36 @@ export const CustomQuote = (props: {
       }),
     [props.vault],
   );
+  const prices = useIndexPrices((state) => state.prices);
+  const productTypeRef = ProductTypeRefs[props.vault.productType];
+  const maxPrice = useMemo(() => {
+    // 买的时候，不能超过目前价格
+    const res =
+      productTypeRef.dualIsBuy && prices[props.vault.forCcy] !== undefined
+        ? roundWith(
+            Number(prices[props.vault.forCcy]),
+            CCYService.getPriceInputTick(props.vault.forCcy),
+            undefined,
+            undefined,
+            'upper',
+          )
+        : undefined;
+    return res;
+  }, [productTypeRef, props.vault, prices[props.vault?.forCcy || '']]);
+  const minPrice = useMemo(() => {
+    // 卖的时候，不能低于目前价格
+    const res =
+      !productTypeRef.dualIsBuy && prices[props.vault.forCcy] !== undefined
+        ? roundWith(
+            Number(prices[props.vault.forCcy]),
+            CCYService.getPriceInputTick(props.vault.forCcy),
+            undefined,
+            undefined,
+            'lower',
+          )
+        : undefined;
+    return res;
+  }, [productTypeRef, props.vault, prices[props.vault?.forCcy || '']]);
 
   return (
     <>
@@ -103,11 +171,20 @@ export const CustomQuote = (props: {
           <AmountInput
             className={styles['amount-input']}
             value={props.price}
-            onChange={(v) =>
+            // max={maxPrice}
+            // min={minPrice}
+            onChange={(v) => {
               props.onChangedPrice(
                 v === undefined || v === '' ? undefined : Number(v),
-              )
-            }
+              );
+              setLazyPrice(isNullLike(v) ? undefined : Number(v));
+              if (lazyTimeoutRef.current) {
+                clearTimeout(lazyTimeoutRef.current);
+              }
+              lazyTimeoutRef.current = setTimeout(() => {
+                quoteNew().catch((e) => Toast.error(getErrorMsg(e)));
+              }, 800);
+            }}
             onBlur={(e) => {
               const val = (e.target as HTMLInputElement)?.value;
               if (!val) props.onChangedPrice(undefined);
@@ -127,11 +204,13 @@ export const CustomQuote = (props: {
             enUS: 'extra reward',
           })}
         </span>
-        <span className={styles['value']}>{displayPercentage(props.apy)}</span>
+        <span className={styles['value']}>
+          {displayPercentage(matchingQuote?.apyInfo?.max)}
+        </span>
       </div>
       <AsyncButton
         className={styles['deposit-btn']}
-        onClick={() => props.onClickDeposit()}
+        onClick={() => props.onClickDeposit(matchingQuote)}
       >
         {t({ enUS: 'Deposit' })}
       </AsyncButton>

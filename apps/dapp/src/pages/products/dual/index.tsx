@@ -99,12 +99,6 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
   const [customExpiry, setCustomExpiry] = useState(defaultInput.expiry);
   const investModalRef = useRef<InvestModalPropsRef>(null);
   const [quote, setQuote] = useState<ProductQuoteResult | undefined>(undefined);
-  useEffect(() => {
-    if (quote) {
-      // TODO: mobile ui
-      investModalRef.current?.show();
-    }
-  }, [quote]);
 
   const data = useMemo(() => {
     if (!vault) return [];
@@ -336,6 +330,9 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                   }
 
                   setQuote(q);
+                  setTimeout(() => {
+                    investModalRef.current?.show();
+                  }, 100);
                 }}
               />
             )}
@@ -347,7 +344,18 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                   onChangedPrice={setCustomPrice}
                   price={customPrice}
                   expiry={customExpiry}
-                  onClickDeposit={async () => {
+                  otherQuotes={data}
+                  onQuote={(params) =>
+                    useProductsState.quote({
+                      vault,
+                      anchorPrices: [
+                        DualService.updatePrice({ vault }, params.price),
+                      ],
+                      expiry: params.expiry,
+                      depositAmount: 100,
+                    })
+                  }
+                  onClickDeposit={async (matchingQuote) => {
                     if (!customPrice) {
                       Toast.error(
                         t({
@@ -364,15 +372,22 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                       );
                       return;
                     }
-                    const res = await useProductsState.quote({
-                      vault,
-                      anchorPrices: [
-                        DualService.updatePrice({ vault }, customPrice),
-                      ],
-                      expiry: customExpiry,
-                      depositAmount: 100,
-                    });
-                    if (res) setQuote(res);
+                    if (!matchingQuote) {
+                      matchingQuote = await useProductsState.quote({
+                        vault,
+                        anchorPrices: [
+                          DualService.updatePrice({ vault }, customPrice),
+                        ],
+                        expiry: customExpiry,
+                        depositAmount: 100,
+                      });
+                    }
+                    if (matchingQuote) {
+                      setQuote(matchingQuote);
+                      setTimeout(() => {
+                        investModalRef.current?.show();
+                      }, 100);
+                    }
                   }}
                 />
               )}

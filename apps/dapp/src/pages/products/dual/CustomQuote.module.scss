@@ -15,21 +15,26 @@
     line-height: 32px;
     display: inline-block;
   }
+
   .value {
     position: relative;
+
     .date-picker {
       width: 200px;
       height: 32px;
     }
+
     :global {
       .semi-input-wrapper {
         border-radius: 40px;
       }
+
       .semi-input-wrapper:hover {
         background-color: #f0f0f0;
         border-color: transparent;
       }
     }
+
     .term {
       color: #000;
       font-size: 12px;
@@ -44,6 +49,7 @@
 
 .target-price {
   margin-right: 50px;
+
   .label {
     opacity: 0.65;
     margin-right: 12px;
@@ -57,10 +63,16 @@
         height: 32px;
         width: 200px;
       }
+
+      .quick-widget {
+        display: none;
+      }
     }
+
     .amount-input {
       font-size: 20px;
     }
+
     .unit-in-input {
       color: #000;
       font-size: 14px;

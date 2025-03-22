@@ -190,7 +190,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
         )}
       </div>
       {!!props.max && props.type !== 'internal' && (
-        <div className={styles['quick-widget']}>
+        <div className={classNames('quick-widget', styles['quick-widget'])}>
           <Button
             className={styles['btn-minus']}
             onMouseDown={() => handleSliderBtnClick(-1)}
