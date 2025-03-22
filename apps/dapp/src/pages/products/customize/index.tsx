@@ -545,7 +545,11 @@ const Comp = (props: BaseProps & { onlyForm?: boolean }) => {
       ProductsService.filterVaults(ContractsService.vaults, {
         chainId,
         riskType:
-          project === ProjectType.Surge ? RiskType.RISKY : RiskType.PROTECTED,
+          project === ProjectType.Surge
+            ? RiskType.RISKY
+            : project === ProjectType.Dual
+              ? RiskType.DUAL
+              : RiskType.PROTECTED,
       }),
     [chainId, project],
   );
