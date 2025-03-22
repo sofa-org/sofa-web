@@ -182,12 +182,13 @@ export const ProductTypeRefs = {
         ),
       } as { situation: string; description: string } | undefined,
     }),
-    dualOp: (t: TFunction, vault: { forCcy: string }) => ({
-      helpMeOp: t({ enUS: 'Help Me Sell' }),
-      op: t({ enUS: 'Sell High', zhCN: '高卖' }),
+    dualOp: (t: TFunction, vault: { forCcy: string; domCcy: string }) => ({
       opCrypto: t(
-        { enUS: 'Sell {{crypto}}', zhCN: '卖出 {{crypto}}' },
-        { crypto: vault.forCcy },
+        {
+          enUS: 'Sell {{forCcy}} Get {{domCcy}}',
+          zhCN: '卖出 {{forCcy}} 买入 {{domCcy}}',
+        },
+        vault,
       ),
       opValue: 'buy_crypto',
       title: t({
@@ -197,9 +198,11 @@ export const ProductTypeRefs = {
     }),
     dualIsBuy: false,
     dualDesc: (t: TFunction) => ({
+      helpMeOp: t({ enUS: 'Help Me Sell' }),
       executed: t({ enUS: 'Sell High Executed' }),
       limited: t({ enUS: 'Limit Sell' }),
       op: t({ enUS: 'Sell' }),
+      op2: t({ enUS: 'Sell High', zhCN: '高卖' }),
       partialExecuted: t({ enUS: 'Partial Sell' }),
     }),
     extraDesc: (t: TFunction) =>
@@ -311,7 +314,7 @@ export const ProductTypeRefs = {
         | { situation: string; description: string }
         | undefined,
     }),
-    dualOp: (t: TFunction, params: { forCcy: string }) => {
+    dualOp: (t: TFunction, params: { forCcy: string; domCcy: string }) => {
       throw new Error('Not suported scenario');
     },
     dualIsBuy: false,
@@ -428,13 +431,8 @@ export const ProductTypeRefs = {
         ),
       } as { situation: string; description: string } | undefined,
     }),
-    dualOp: (t: TFunction, vault: { forCcy: string }) => ({
-      helpMeOp: t({ enUS: 'Help Me Buy' }),
-      op: t({ enUS: 'Buy Low', zhCN: '低买' }),
-      opCrypto: t(
-        { enUS: 'Buy {{crypto}}', zhCN: '买入 {{crypto}}' },
-        { crypto: vault.forCcy },
-      ),
+    dualOp: (t: TFunction, vault: { forCcy: string; domCcy: string }) => ({
+      opCrypto: t({ enUS: 'Buy {{forCcy}}', zhCN: '买入 {{forCcy}}' }, vault),
       opValue: 'buy_crypto',
       title: t({
         enUS: 'Buy crypto at a discount and get bonus rewards',
@@ -443,9 +441,11 @@ export const ProductTypeRefs = {
     }),
     dualIsBuy: true,
     dualDesc: (t: TFunction) => ({
+      helpMeOp: t({ enUS: 'Help Me Buy' }),
       executed: t({ enUS: 'Buy Low Executed' }),
       limited: t({ enUS: 'Limit Buy' }),
       op: t({ enUS: 'Buy' }),
+      op2: t({ enUS: 'Buy Low', zhCN: '低买' }),
       partialExecuted: t({ enUS: 'Partial Buy' }),
     }),
     extraDesc: (t: TFunction) =>

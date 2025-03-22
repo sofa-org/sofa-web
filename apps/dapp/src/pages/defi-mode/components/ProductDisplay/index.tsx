@@ -95,7 +95,7 @@ export const DIYProductDisplay = () => {
         <>
           <div className={styles['risk-type']}>
             {ProjectTypeRefs.Dual.label(t)}{' '}
-            {ProductTypeRefs[quote.vault.productType].dualOp(t, quote.vault).op}
+            {ProductTypeRefs[quote.vault.productType].dualDesc(t).op2}
             {' - '}
             {quote?.vault.forCcy}/{quote?.vault.domCcy}
           </div>

@@ -233,6 +233,7 @@ const DualOptions = () => {
   }
   const ref = ProductTypeRefs[formData.productType].dualOp(t, {
     forCcy: formData.forCcy!,
+    domCcy: formData.domCcy!,
   });
   const options = [
     {

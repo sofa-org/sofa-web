@@ -3,6 +3,7 @@ import { Table } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
 import {
@@ -70,7 +71,7 @@ export const RecommendedList = (props: {
 
   const quotes = useMemo(() => {
     return data.filter((it) => it.expiry == date?.expiry);
-  }, [date]);
+  }, [date, data]);
   const loading = useMemo(() => !quotes.length, [quotes]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const timerRef = useRef<any>();
@@ -174,17 +175,15 @@ export const RecommendedList = (props: {
                 ),
                 render: (_, row) => {
                   const current = prices[props.vault.forCcy];
+                  const p = DualService.getPrice(row);
                   const diff =
-                    current === undefined || row.anchorPrices?.[0] === undefined
+                    current === undefined || p === undefined
                       ? undefined
                       : Number(row.anchorPrices[0]) - current;
                   return (
                     <>
                       <span className={styles['target-price']}>
-                        {amountFormatter(
-                          row.anchorPrices?.[0],
-                          domCcyConfig?.precision,
-                        )}
+                        {amountFormatter(p, domCcyConfig?.precision)}
                       </span>
                       <span className={styles['change-to-current-price']}>
                         {formatHighlightedText(

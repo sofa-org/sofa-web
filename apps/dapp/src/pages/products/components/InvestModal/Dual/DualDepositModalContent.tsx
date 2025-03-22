@@ -210,7 +210,7 @@ export const DualDepositModalContent = (
               {/* depositCcy 数量 */}
               <div className={classNames(styles['field'], styles['amount'])}>
                 <span className={styles['label']}>
-                  {ProductTypeRefs[vault.productType].dualOp(t, vault).helpMeOp}
+                  {ProductTypeRefs[vault.productType].dualDesc(t).helpMeOp}
                 </span>
                 <span className={styles['value']}>
                   <AmountInput

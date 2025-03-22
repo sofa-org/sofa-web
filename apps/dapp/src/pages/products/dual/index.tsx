@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Toast } from '@douyinfe/semi-ui';
 import { ProductType, ProjectType, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
 import { dualVaults } from '@sofa/services/vaults/dual';
@@ -55,27 +56,37 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         chainId,
         productType: product,
       }),
-    [chainId],
+    [chainId, product],
   );
+  const { recommendedList, quoteInfos } = useProductsState((state) => state);
   const forCcys = useMemo(() => {
     const _forCcys = uniq(vaults.map((v) => v.forCcy));
-    const recommendedList = useProductsState.getState().recommendedList;
-    return _forCcys.map((forCcy) => {
-      const vault = vaults.find((v) => v.forCcy == forCcy)!;
-      const allProducts =
-        recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
-      const allApys = allProducts
-        ?.map((p) => p.apyInfo?.max)
-        .filter((v) => !isNullLike(v))
-        ?.map(Number);
-      return {
-        forCcy,
-        vault,
-        minApy: allApys?.length ? min(allApys) : undefined,
-        maxApy: allApys?.length ? max(allApys) : undefined,
-      };
-    });
-  }, [vaults, new Date().getSeconds() % 20]);
+    return _forCcys
+      .map((forCcy) => {
+        const vault = vaults.find((v) => v.forCcy == forCcy)!;
+        if (!vault) {
+          return undefined;
+        }
+        const allProducts =
+          recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
+        const allApys = allProducts
+          ?.map((p) => p.apyInfo?.max)
+          .filter((v) => !isNullLike(v))
+          ?.map(Number);
+        return {
+          forCcy,
+          vault,
+          minApy: allApys?.length ? min(allApys) : undefined,
+          maxApy: allApys?.length ? max(allApys) : undefined,
+        };
+      })
+      .filter(Boolean) as {
+      forCcy: VaultInfo['forCcy'];
+      vault: VaultInfo;
+      minApy?: number;
+      maxApy?: number;
+    }[];
+  }, [vaults, product, recommendedList]);
   const [forCcy, setForCcy] = useForCcySelect({
     defaultValue: forCcys?.[0]?.forCcy || 'RCH',
     acceptance: (ccy) => !!forCcys?.find((a) => a.forCcy == ccy),
@@ -95,10 +106,10 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
     }
   }, [quote]);
 
-  const data = useProductsState((state) => {
+  const data = useMemo(() => {
     if (!vault) return [];
     const list =
-      state.recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
+      recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
     if (!list) return [];
     return list
       .filter((it) => Date.now() < it.expiry * 1000)
@@ -109,10 +120,10 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
       })
       .map(
         (it) =>
-          (state.quoteInfos[ProductsService.productKey(it)] ||
+          (quoteInfos[ProductsService.productKey(it)] ||
             it) as ProductQuoteResult,
       );
-  });
+  }, [vault, recommendedList, quoteInfos]);
   const dates = useMemo(() => {
     const expiries = data.reduce(
       (prev, v) => {
@@ -143,15 +154,17 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
     return Object.values(expiries);
   }, [data]);
   const [date, setDate] = useState<(typeof dates)[0] | undefined>(undefined);
-  useEffect(
-    useLazyCallback(() => {
-      if (!date && dates.length) {
+  useEffect(() => {
+    if (dates.length) {
+      if (!date || !dates.includes(date)) {
+        if (date && dates.find((d) => d.expiry == date.expiry)) {
+          setDate(dates.find((d) => d.expiry == date.expiry));
+          return;
+        }
         setDate(dates[0]);
-        return;
       }
-    }),
-    [dates, date],
-  );
+    }
+  }, [dates, date]);
   useEffect(
     useLazyCallback(() => {
       if (!date) {
@@ -183,10 +196,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
             label: (
               <>
                 <span className={styles['icon']} />
-                {
-                  ProductTypeRefs[ProductType.BearSpread].dualOp(t, { forCcy })
-                    .op
-                }
+                {ProductTypeRefs[ProductType.BearSpread].dualDesc(t).op2}
               </>
             ),
             value: ProductType.BearSpread,
@@ -196,10 +206,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
             label: (
               <>
                 <span className={styles['icon']} />
-                {
-                  ProductTypeRefs[ProductType.BullSpread].dualOp(t, { forCcy })
-                    .op
-                }
+                {ProductTypeRefs[ProductType.BullSpread].dualDesc(t).op2}
               </>
             ),
             value: ProductType.BullSpread,
@@ -359,7 +366,9 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                     }
                     const res = await useProductsState.quote({
                       vault,
-                      anchorPrices: [customPrice],
+                      anchorPrices: [
+                        DualService.updatePrice({ vault }, customPrice),
+                      ],
                       expiry: customExpiry,
                       depositAmount: 100,
                     });

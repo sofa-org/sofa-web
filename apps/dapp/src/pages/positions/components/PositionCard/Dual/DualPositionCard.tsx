@@ -86,7 +86,7 @@ const DualPositionCard = (
             <div className={styles['dual-status']}>
               <span className={styles['op']}>
                 {/* 操作 Buy Low / Sell High */}
-                {productTypeRef.dualOp(t, product.vault).op}
+                {productTypeRef.dualDesc(t).op2}
               </span>
               <span className={styles['status']}>
                 {/* 当前状态 */}

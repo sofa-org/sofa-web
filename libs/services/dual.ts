@@ -375,17 +375,15 @@ export class DualService {
       res.rchReturnAmount = Number(data.amounts.rchAirdrop || 0);
     }
     if (
-      res.linkedCcyExtraRewardWhenSuccessfulExecuted < 0 &&
-      res.linkedCcyExtraRewardWhenSuccessfulExecuted >
-        -Math.pow(0.1, CCYService.ccyConfigs[res.linkedCcy]?.precision || 4)
+      Math.abs(res.linkedCcyExtraRewardWhenSuccessfulExecuted) <
+      Math.pow(0.1, CCYService.ccyConfigs[res.linkedCcy]?.precision || 4)
     ) {
       // 精度问题，且负数不会被后面 amountFormatter 排除
       res.linkedCcyExtraRewardWhenSuccessfulExecuted = 0;
     }
     if (
-      res.depositCcyExtraRewardWhenNoExecuted < 0 &&
-      res.depositCcyExtraRewardWhenNoExecuted >
-        -Math.pow(0.1, CCYService.ccyConfigs[res.depositCcy]?.precision || 4)
+      Math.abs(res.depositCcyExtraRewardWhenNoExecuted) >
+      Math.pow(0.1, CCYService.ccyConfigs[res.depositCcy]?.precision || 4)
     ) {
       // 精度问题，且负数不会被后面 amountFormatter 排除
       res.depositCcyExtraRewardWhenNoExecuted = 0;

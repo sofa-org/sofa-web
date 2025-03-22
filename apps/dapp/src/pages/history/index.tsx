@@ -106,10 +106,7 @@ const OrderHistory = () => {
       {
         title: t('Product'),
         render: (_, record) =>
-          ProductTypeRefs[record.product.vault.productType].dualOp(
-            t,
-            record.product.vault,
-          ).op,
+          ProductTypeRefs[record.product.vault.productType].dualDesc(t).op2,
       },
       {
         title: t('Expiration'),
