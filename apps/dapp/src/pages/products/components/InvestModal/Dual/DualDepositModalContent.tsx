@@ -10,7 +10,11 @@ import {
   ProductQuoteResult,
   ProductsService,
 } from '@sofa/services/products';
-import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
+import {
+  amountFormatter,
+  displayPercentage,
+  roundWith,
+} from '@sofa/utils/amount';
 import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
@@ -152,6 +156,40 @@ export const DualDepositModalContent = (
     prices[product?.vault.forCcy || ''],
     productTypeRef,
   ]);
+  const maxPrice = useMemo(() => {
+    // 买的时候，不能超过目前价格
+    if (!vault || !productTypeRef) {
+      return undefined;
+    }
+    const res =
+      productTypeRef.dualIsBuy && prices[vault.forCcy] !== undefined
+        ? roundWith(
+            Number(prices[vault.forCcy]),
+            CCYService.getPriceInputTick(vault.forCcy),
+            undefined,
+            undefined,
+            'upper',
+          )
+        : undefined;
+    return res;
+  }, [productTypeRef, vault, prices[vault?.forCcy || '']]);
+  const minPrice = useMemo(() => {
+    // 卖的时候，不能低于目前价格
+    if (!vault || !productTypeRef) {
+      return undefined;
+    }
+    const res =
+      !productTypeRef.dualIsBuy && prices[vault.forCcy] !== undefined
+        ? roundWith(
+            Number(prices[vault.forCcy]),
+            CCYService.getPriceInputTick(vault.forCcy),
+            undefined,
+            undefined,
+            'lower',
+          )
+        : undefined;
+    return res;
+  }, [productTypeRef, vault, prices[vault?.forCcy || '']]);
   const isMobileUI = useIsMobileUI();
   if (!vault || !productTypeRef) {
     return undefined;
@@ -230,7 +268,8 @@ export const DualDepositModalContent = (
                 <span className={styles['value']}>
                   <AmountInput
                     className={styles['amount-input']}
-                    // min={}
+                    max={maxPrice}
+                    min={minPrice}
                     tick={CCYService.getPriceInputTick(vault.domCcy)}
                     value={DualService.getPrice(product as ProductQuoteParams)}
                     suffix={
