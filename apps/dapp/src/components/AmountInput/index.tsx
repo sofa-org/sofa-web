@@ -140,7 +140,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
         document.querySelector<HTMLInputElement>(`#${id}`)?.blur()
       }
     >
-      <div className={styles['input-wrapper']}>
+      <div className={classNames(styles['input-wrapper'], 'input-wrapper')}>
         {props.prefix}
         <input
           id={id}

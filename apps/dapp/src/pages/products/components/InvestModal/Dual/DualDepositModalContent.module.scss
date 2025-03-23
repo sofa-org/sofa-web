@@ -59,6 +59,10 @@
         padding: 0 15px;
         position: relative;
       }
+
+      :global(.input-wrapper) {
+        height: 48px;
+      }
     }
 
     .price {
