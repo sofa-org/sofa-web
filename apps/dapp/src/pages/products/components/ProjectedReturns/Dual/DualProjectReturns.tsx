@@ -510,6 +510,7 @@ export const DualProfitScenarios = (
             style={{
               maxWidth: 500,
             }}
+            trigger={isMobileUI ? 'click' : 'hover'}
             position="bottom"
           >
             <div>

@@ -43,6 +43,10 @@
     margin: -24px 0 0;
     padding: 0;
   }
+  .expand-widget {
+    background-image: none;
+    padding-bottom: 0;
+  }
 }
 
 @media (orientation: portrait) {
@@ -54,11 +58,5 @@
 @media (width <= 1000px) {
   :global(.is-pc) {
     @include rewrite;
-  }
-}
-
-.mobile-ui {
-  .expand-widget {
-    background: none;
   }
 }
