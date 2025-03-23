@@ -7,6 +7,7 @@ import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
 import { PayoffProps } from '..';
@@ -26,7 +27,7 @@ const DualPayoff = (
     [props.enhancedYield, props.protectedYield, props.rchYield],
   );
   const atm = useIndexPrices((state) => state.prices[props.forCcy]);
-
+  const mobileUI = useIsMobileUI();
   return (
     <div
       className={classNames(
@@ -35,6 +36,9 @@ const DualPayoff = (
         props.productType == ProductType.BullSpread
           ? styles['buy-low']
           : styles['sell-high'],
+        {
+          [styles['mobile-ui']]: mobileUI,
+        },
       )}
     >
       <div className={styles['payoff-infos']}>

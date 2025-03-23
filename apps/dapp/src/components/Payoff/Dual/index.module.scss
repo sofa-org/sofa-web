@@ -69,3 +69,11 @@
     }
   }
 }
+
+.mobile-ui {
+  &.payoff {
+    .payoff-infos {
+      min-width: auto;
+    }
+  }
+}
