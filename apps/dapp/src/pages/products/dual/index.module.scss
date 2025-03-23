@@ -143,10 +143,40 @@
   display: flex;
   flex-direction: column;
 
+  .form {
+    width: 100vw;
+    .sub-title {
+      font-size: 12px;
+    }
+    .content {
+      padding-left: 16px;
+      padding-right: 16px;
+      :global {
+        .semi-table-wrapper {
+          .semi-table-thead .semi-table-row-head {
+            padding: 0;
+
+            &:last-child {
+              text-align: right;
+            }
+          }
+          .semi-table-tbody .semi-table-row-cell {
+            padding: 0;
+            &:last-child {
+              text-align: right;
+            }
+          }
+        }
+      }
+    }
+  }
   .custom-quote {
     flex-direction: column;
     align-items: start;
     padding: 0;
+    margin-top: 40px;
+    margin-left: -16px;
+    margin-right: -16px;
   }
 
   .buy-low,

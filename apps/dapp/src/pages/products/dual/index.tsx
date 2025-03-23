@@ -266,9 +266,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                 ),
                 value: it.expiry,
               }))}
-              onChange={(v) =>
-                setDate(dates.find((d) => d.expiry === Number(v)))
-              }
+              onChange={(v) => setDate(dates.find((d) => d.expiry == v))}
             />
           </>
         ) : undefined}
