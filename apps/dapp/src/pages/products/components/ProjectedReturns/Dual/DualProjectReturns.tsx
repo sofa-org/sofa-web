@@ -510,6 +510,7 @@ export const DualProfitScenarios = (
             style={{
               maxWidth: 500,
             }}
+            position="bottom"
           >
             <div>
               <div className={styles['title']}>{desc.partialExecuted}</div>

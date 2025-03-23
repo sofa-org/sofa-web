@@ -449,6 +449,10 @@
 .partial-buy-tooltip {
   background: #fff;
   max-width: 500px;
+
+  > svg {
+    color: #fff !important;
+  }
 }
 
 @mixin mobile-rewrite {

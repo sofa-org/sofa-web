@@ -37,6 +37,10 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
               )}
             </span>
             <span className={styles['unit']}>
+              {CCYService.ccyConfigs[props.depositCcy]?.name ||
+                props.depositCcy}
+            </span>
+            <span className={styles['ccys']}>
               {'['}
               {CCYService.ccyConfigs[props.linkedCcy]?.name || props.linkedCcy}+
               {CCYService.ccyConfigs[props.depositCcy]?.name ||
