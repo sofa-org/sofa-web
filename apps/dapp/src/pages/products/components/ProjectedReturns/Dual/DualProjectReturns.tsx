@@ -46,7 +46,6 @@ export const DualProfitScenarios = (
         styles['profit-scenarios-wrapper'],
         styles['for-' + props.scenario],
         props.className,
-        isMobileUI ? styles['mobile-ui'] : undefined,
         {
           [styles['settled']]: !!props.executionResult,
         },
@@ -65,11 +64,13 @@ export const DualProfitScenarios = (
           )}
         >
           <div className={classNames(styles['profit-scenario-wrapper'])}>
-            <div className={styles['title']}>{desc.partialExecuted}</div>
-            <div className={styles['subtitle']}>
-              {t({
-                enUS: 'Still Get Deposit Rewards and RCH Airdrops',
-              })}
+            <div>
+              <div className={styles['title']}>{desc.partialExecuted}</div>
+              <div className={styles['subtitle']}>
+                {t({
+                  enUS: 'Still Get Deposit Rewards and RCH Airdrops',
+                })}
+              </div>
             </div>
             <div className={classNames(styles['profit-scenario'])}>
               <div className={styles['left']}>
@@ -118,24 +119,24 @@ export const DualProfitScenarios = (
                     )}
                   </span>
                   <span className={styles['unit']}>RCH</span>
+                  {(priceIndex.prices[props.depositCcy] &&
+                    priceIndex.prices['RCH'] && (
+                      <span className={styles['est']}>
+                        ≈
+                        <span className={styles['amount']}>
+                          {amountFormatter(
+                            (props.rchReturnAmount * priceIndex.prices['RCH']) /
+                              priceIndex.prices[props.depositCcy]!,
+                            rchConfig?.precision,
+                          )}
+                        </span>
+                        <span className={styles['unit']}>
+                          {depositCcyConfig?.name || props.depositCcy}
+                        </span>
+                      </span>
+                    )) ||
+                    undefined}
                 </div>
-                {(priceIndex.prices[props.depositCcy] &&
-                  priceIndex.prices['RCH'] && (
-                    <span className={styles['est']}>
-                      ≈
-                      <span className={styles['amount']}>
-                        {amountFormatter(
-                          (props.rchReturnAmount * priceIndex.prices['RCH']) /
-                            priceIndex.prices[props.depositCcy]!,
-                          rchConfig?.precision,
-                        )}
-                      </span>
-                      <span className={styles['unit']}>
-                        {depositCcyConfig?.name || props.depositCcy}
-                      </span>
-                    </span>
-                  )) ||
-                  undefined}
               </div>
             </div>
           </div>

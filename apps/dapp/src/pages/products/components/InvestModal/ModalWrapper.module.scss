@@ -56,3 +56,9 @@
     @include rewrite;
   }
 }
+
+.mobile-ui {
+  .expand-widget {
+    background: none;
+  }
+}

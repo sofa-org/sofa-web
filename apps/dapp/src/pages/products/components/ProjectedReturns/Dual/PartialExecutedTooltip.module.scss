@@ -1,3 +1,69 @@
 .content {
   color: #000;
+  padding: 16px 25px;
+
+  .title {
+    font-size: 12px;
+    opacity: 0.35;
+    margin-bottom: 8px;
+  }
+
+  .body {
+    @include flex-center;
+
+    justify-content: space-between;
+
+    .left,
+    .right {
+      border: 1px solid #dbffa4;
+      padding: 12px 25px;
+      text-align: center;
+    }
+
+    .left {
+      .value {
+        font-size: 20px;
+
+        .amount {
+          margin: 0 5px;
+        }
+      }
+
+      .unit {
+        font-size: 16px;
+        display: block;
+      }
+    }
+
+    .right {
+      .unit {
+        font-size: 12px;
+        margin-left: 5px;
+      }
+
+      .value {
+        font-size: 20px;
+
+        .unit {
+          font-size: 14px;
+        }
+      }
+
+      .estimated-value {
+        opacity: 0.35;
+      }
+    }
+
+    .label {
+      font-size: 12px;
+      opacity: 0.35;
+      margin-bottom: 15px;
+    }
+
+    .plus {
+      &::after {
+        content: "+";
+      }
+    }
+  }
 }

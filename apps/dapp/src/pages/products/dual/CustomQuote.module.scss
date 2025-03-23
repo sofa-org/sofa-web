@@ -1,21 +1,23 @@
+.content {
+  @include flex-center;
+}
+
 .caption {
-  margin-top: -1px;
   margin-right: 9px;
-  line-height: 32px;
 }
 
 .field {
   margin-right: 20px;
 }
 
-.settlement-date {
-  .label {
-    opacity: 0.65;
-    margin-right: 9px;
-    line-height: 32px;
-    display: inline-block;
-  }
+.label {
+  opacity: 0.65;
+  margin-right: 9px;
+  line-height: 32px;
+  display: inline-block;
+}
 
+.settlement-date {
   .value {
     position: relative;
 
@@ -49,13 +51,6 @@
 
 .target-price {
   margin-right: 50px;
-
-  .label {
-    opacity: 0.65;
-    margin-right: 12px;
-    line-height: 32px;
-    display: inline-block;
-  }
 
   .value {
     :global {
@@ -102,5 +97,95 @@
     color: #2c2f34;
     background: linear-gradient(95deg, #67d629 -6.67%, #eaff48 109.97%);
     opacity: 1;
+  }
+}
+
+.mobile-ui {
+  &.content {
+    width: 100%;
+    flex-direction: column;
+    align-items: start;
+    padding: 16px;
+    margin: 0;
+
+    .field {
+      margin: 0;
+    }
+
+    .settlement-date {
+      width: 100%;
+
+      .label {
+        margin-bottom: 8px;
+      }
+
+      .value {
+        position: relative;
+
+        .date-picker {
+          width: 100%;
+        }
+      }
+    }
+
+    .target-price {
+      width: 100%;
+      margin-top: 24px;
+
+      .label {
+        margin-bottom: 10px;
+      }
+
+      .value {
+        :global {
+          .amount-input-wrapper {
+            height: 32px;
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .extra-reward {
+      @include flex-center;
+
+      width: 100%;
+      justify-content: space-between;
+      flex-direction: row;
+      margin: 48px 0 24px;
+      position: relative;
+
+      &::before {
+        content: "";
+        width: 100%;
+        border-top: #7d7d7d 2px solid;
+        position: absolute;
+        top: -24px;
+      }
+
+      .label {
+        font-size: 14px;
+        color: #fff;
+        opacity: 1;
+      }
+
+      .value {
+        @include bold;
+
+        color: #50d113;
+        font-size: 24px;
+      }
+    }
+
+    .deposit-btn {
+      width: 100%;
+      height: 37px;
+
+      &:hover {
+        color: #2c2f34;
+        background: linear-gradient(95deg, #67d629 -6.67%, #eaff48 109.97%);
+        opacity: 1;
+      }
+    }
   }
 }

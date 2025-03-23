@@ -83,6 +83,8 @@
 }
 
 .profit-scenario-wrapper {
+  margin-bottom: 32px;
+
   .title-info {
     display: flex;
     justify-content: space-between;
@@ -110,7 +112,6 @@
   .profit-scenario {
     @include flex-center;
 
-    margin-bottom: 48px;
     justify-content: space-between;
   }
 
@@ -119,6 +120,7 @@
     height: 132px;
     background-color: #fff;
     padding: 12px;
+    border-radius: 0 0 8px 8px;
 
     .action,
     .target {
@@ -135,6 +137,8 @@
     }
 
     .result {
+      white-space: nowrap;
+
       img {
         width: 16px;
         height: 16px;
@@ -149,12 +153,11 @@
         color: #000;
         vertical-align: middle;
       }
-    }
-  }
 
-  .plus-sign {
-    display: block;
-    margin: 0 12px;
+      .unit {
+        margin-left: 5px;
+      }
+    }
   }
 
   .right {
@@ -199,62 +202,6 @@
         color: rgb(0 0 0 / 45%);
         font-size: 12px;
         font-weight: 500;
-      }
-    }
-  }
-}
-
-.profit-scenario-wrapper:nth-child(2) {
-  .profit-scenario {
-    margin-bottom: 32px;
-  }
-}
-
-.profit-scenarios-wrapper {
-  &.for-position {
-    border-radius: 8px;
-    margin-top: 24px;
-    overflow: hidden;
-
-    .profit-scenario-bg {
-      padding: 32px 24px;
-      background: linear-gradient(
-        to right,
-        rgba(#50d113, 0.12) 0%,
-        rgba(#ffe500, 0.12) 100%
-      );
-    }
-  }
-
-  &.settled.for-position {
-    padding: 0;
-    background: #f5f5f5;
-
-    .profit-scenario-bg {
-      background: transparent;
-
-      &.scenario-selected {
-        position: relative;
-        background: linear-gradient(
-          to right,
-          rgba(#50d113, 0.12) 0%,
-          rgba(#ffe500, 0.12) 100%
-        );
-        padding-left: 50px;
-
-        &::before {
-          content: "";
-          background: url("./assets/icon-scenario-selected.svg") no-repeat center;
-          width: 30px;
-          height: 30px;
-          position: absolute;
-          top: 70px;
-          left: 0;
-        }
-      }
-
-      &.scenario-invalid {
-        opacity: 0.5;
       }
     }
   }
@@ -309,6 +256,193 @@
     );
     background-size: 5px 1px;
     background-repeat: repeat-x;
+  }
+}
+
+.profit-scenarios-wrapper {
+  &.for-position {
+    border-radius: 8px;
+    margin-top: 24px;
+    overflow: hidden;
+
+    .profit-scenario-bg {
+      padding: 32px 24px 0;
+      background: linear-gradient(
+        to right,
+        rgba(#50d113, 0.12) 0%,
+        rgba(#ffe500, 0.12) 100%
+      );
+
+      &:last-child {
+        padding-bottom: 32px;
+      }
+
+      .profit-scenario-wrapper {
+        margin: 0;
+      }
+
+      .left {
+        padding: 12px 40px;
+        width: 48%;
+      }
+
+      .right {
+        width: 48%;
+      }
+    }
+  }
+
+  &.settled.for-position {
+    padding: 0;
+    background: #f5f5f5;
+
+    .profit-scenario-bg {
+      padding: 32px 24px;
+      background: transparent;
+
+      &.scenario-invalid {
+        padding: 32px 24px;
+        opacity: 0.45;
+
+        &:last-child {
+          padding-top: 0;
+        }
+
+        .title-info {
+          background: #eee;
+        }
+
+        .subtitle {
+          color: #000;
+        }
+      }
+
+      &.scenario-selected {
+        position: relative;
+        background: linear-gradient(
+          to right,
+          rgba(#50d113, 0.12) 0%,
+          rgba(#ffe500, 0.12) 100%
+        );
+        padding-left: 50px;
+
+        .profit-scenario-wrapper {
+          margin: 0 0 0 15px;
+        }
+
+        &::before {
+          content: "";
+          background: url("./assets/icon-scenario-selected.svg") no-repeat
+            center;
+          width: 30px;
+          height: 30px;
+          position: absolute;
+          top: calc(50% - 15px);
+          left: 24px;
+        }
+
+        &::after {
+          background: none;
+        }
+
+        &.partial-executed {
+          .profit-scenario-wrapper {
+            border-radius: 8px;
+            padding: 16px 26px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            border: 0;
+
+            .title {
+              @include bold;
+
+              display: inline;
+
+              &::after {
+                color: #eee;
+              }
+            }
+
+            .subtitle {
+              @include bold;
+
+              display: inline;
+            }
+
+            &::after {
+              background: none;
+            }
+
+            .profit-scenario {
+              margin-top: 10px;
+              width: 100%;
+
+              .left,
+              .right {
+                width: 45%;
+                height: 100px;
+                padding: 0;
+                border-radius: 8px;
+                background: #dbffa4;
+
+                .profit-title {
+                  color: #3a8200;
+                  padding: 5px 9px 3px;
+                }
+
+                .result {
+                  @include bold;
+
+                  padding: 12px 0;
+                  border-radius: 8px;
+                  border: 1px solid #e2e2e2;
+                  background: #fff;
+                }
+
+                .amount,
+                .unit {
+                  margin-left: 5px;
+                }
+              }
+
+              .left {
+                .result {
+                  padding: 17px 0;
+                  text-align: center;
+                }
+
+                .partial-ccys {
+                  @include flex-center;
+
+                  font-size: 12px;
+                  color: #666;
+                  margin-bottom: 10px;
+                }
+              }
+
+              .right {
+                .result {
+                  padding: 12px 24px;
+
+                  img {
+                    width: 16px;
+                    height: 16px;
+                  }
+
+                  .est {
+                    display: block;
+                    font-size: 12px;
+                    opacity: 0.65;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -458,9 +592,96 @@
         }
       }
     }
+
+    &.for-position {
+      width: calc(100% + 24px);
+      gap: 0;
+      margin-left: -12px;
+
+      .profit-scenario-bg {
+        .title-info {
+          .title {
+            width: calc(100% - 40px);
+          }
+
+          .subtitle {
+            width: calc(100% - 40px);
+          }
+        }
+      }
+    }
+
+    &.settled.for-position {
+      .profit-scenario-bg {
+        .title-info {
+          .title {
+            width: calc(100% - 80px);
+          }
+
+          .subtitle {
+            width: calc(100% - 80px);
+          }
+        }
+
+        &.partial-executed {
+          padding: 24px 16px;
+
+          &::before {
+            background: none;
+            width: 0;
+          }
+
+          .profit-scenario-wrapper.profit-scenario-wrapper {
+            padding: 8px;
+            margin-left: 0;
+
+            .title {
+              display: block;
+            }
+
+            .subtitle {
+              display: block;
+              margin: 16px auto;
+
+              &::after {
+                background: none;
+              }
+            }
+
+            .profit-scenario {
+              margin-top: 0;
+
+              .left,
+              .right {
+                width: 100%;
+                height: auto;
+                padding: 8px;
+                background: #f7f7f7;
+
+                .profit-title {
+                  color: #000;
+                  padding: 0;
+                  font-size: 12px;
+                }
+
+                .result {
+                  @include bold;
+
+                  text-align: center;
+                  width: 100%;
+                  padding: 0;
+                  border: 0;
+                  background: none;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
-.mobile-ui {
+:global(.is-mobile) {
   @include mobile-rewrite;
 }

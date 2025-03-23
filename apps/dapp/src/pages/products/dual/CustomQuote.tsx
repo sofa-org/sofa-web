@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 import AmountInput from '@/components/AmountInput';
 import AsyncButton from '@/components/AsyncButton';
 import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
@@ -120,8 +121,13 @@ export const CustomQuote = (props: {
     return res;
   }, [productTypeRef, props.vault, prices[props.vault?.forCcy || '']]);
 
+  const isMobileUI = useIsMobileUI();
   return (
-    <>
+    <div
+      className={classNames(styles['content'], {
+        [styles['mobile-ui']]: isMobileUI,
+      })}
+    >
       <span className={styles['caption']}>
         {t({
           enUS: 'Customize',
@@ -215,6 +221,6 @@ export const CustomQuote = (props: {
       >
         {t({ enUS: 'Deposit' })}
       </AsyncButton>
-    </>
+    </div>
   );
 };

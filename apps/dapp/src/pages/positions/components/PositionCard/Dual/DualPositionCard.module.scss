@@ -312,7 +312,7 @@
   :global(.is-mobile) {
     .card {
       flex-grow: 1;
-      max-width: calc((100vw - 24px - 3vw) / 2);
+      width: 100%;
     }
   }
 }
@@ -321,7 +321,7 @@
   :global(.is-pc) {
     .card {
       flex-grow: 1;
-      max-width: calc((100vw - 24px - 3vw) / 2);
+      width: 100%;
     }
   }
 }
