@@ -13,16 +13,19 @@
 .label {
   opacity: 0.65;
   margin-right: 9px;
-  line-height: 32px;
   display: inline-block;
 }
 
 .settlement-date {
+  @include flex-center;
+
+  height: 48px;
+
   .value {
     position: relative;
 
     .date-picker {
-      width: 200px;
+      width: 180px;
       height: 32px;
     }
 
@@ -39,24 +42,25 @@
 
     .term {
       color: #000;
-      font-size: 12px;
-      opacity: 0.5;
       position: absolute;
       right: 34px;
-      top: 11px;
+      top: 16px;
       transform: translate(0, -50%);
     }
   }
 }
 
 .target-price {
+  @include flex-center;
+
   margin-right: 50px;
+  height: 48px;
 
   .value {
     :global {
       .amount-input-wrapper {
         height: 32px;
-        width: 200px;
+        width: 180px;
       }
 
       .quick-widget {
@@ -78,25 +82,77 @@
 .extra-reward {
   flex-direction: column;
   margin-right: 29px;
+  position: relative;
+  height: 48px;
+
+  &::before {
+    content: "";
+    height: 48px;
+    width: 1px;
+    position: absolute;
+    left: -29px;
+    background: linear-gradient(
+      to top,
+      transparent 0%,
+      transparent 50%,
+      #d8d8d8 50%,
+      #d8d8d8 100%
+    );
+    background-size: 1px 5px;
+    background-repeat: repeat-y;
+    opacity: 0.35;
+  }
+
+  .value {
+    &.has-reward {
+      @include bold;
+
+      color: #50d113;
+      font-size: 24px;
+    }
+
+    &.no-reward {
+      opacity: 0.45;
+    }
+  }
 
   span {
+    opacity: 1;
     display: block;
   }
 }
 
 .deposit-btn {
+  height: 37px;
   padding: 8px 32px;
   font-size: 16px;
   border-radius: 30px;
   border: 1px solid rgb(255 255 255 / 30%);
   color: #fff;
-  opacity: 0.35;
-  background: #2c2f34;
+  background: #2c2f34 !important;
+
+  > span {
+    color: #fff;
+    opacity: 0.35;
+  }
 
   &:hover {
+    opacity: 0.35;
+  }
+
+  &.click {
     color: #2c2f34;
-    background: linear-gradient(95deg, #67d629 -6.67%, #eaff48 109.97%);
+    background: linear-gradient(
+      95deg,
+      #67d629 -6.67%,
+      #eaff48 109.97%
+    ) !important;
     opacity: 1;
+
+    > span {
+      color: #000;
+      opacity: 1;
+    }
   }
 }
 
@@ -113,6 +169,8 @@
     }
 
     .settlement-date {
+      height: auto;
+      display: block;
       width: 100%;
 
       .label {
@@ -125,10 +183,16 @@
         .date-picker {
           width: 100%;
         }
+
+        .term {
+          top: 11px;
+        }
       }
     }
 
     .target-price {
+      height: auto;
+      display: block;
       width: 100%;
       margin-top: 24px;
 
@@ -149,6 +213,7 @@
     .extra-reward {
       @include flex-center;
 
+      height: auto;
       width: 100%;
       justify-content: space-between;
       flex-direction: row;
@@ -161,6 +226,9 @@
         border-top: #7d7d7d 2px solid;
         position: absolute;
         top: -24px;
+        left: 0;
+        margin: 0;
+        background: none;
       }
 
       .label {
@@ -174,6 +242,10 @@
 
         color: #50d113;
         font-size: 24px;
+
+        &.no-reward {
+          display: none;
+        }
       }
     }
 

@@ -210,12 +210,24 @@ export const CustomQuote = (props: {
             enUS: 'extra reward',
           })}
         </span>
-        <span className={styles['value']}>
-          {displayPercentage(matchingQuote?.apyInfo?.max)}
+        <span
+          className={classNames(
+            styles['value'],
+            matchingQuote?.apyInfo?.max
+              ? styles['has-reward']
+              : styles['no-reward'],
+          )}
+        >
+          {matchingQuote?.apyInfo?.max
+            ? displayPercentage(matchingQuote?.apyInfo?.max)
+            : '-'}
         </span>
       </div>
       <AsyncButton
-        className={styles['deposit-btn']}
+        className={classNames(
+          styles['deposit-btn'],
+          !props.price || !props.expiry ? styles['no-click'] : styles['click'],
+        )}
         onClick={() => props.onClickDeposit(matchingQuote)}
         disabled={!props.price || !props.expiry}
       >

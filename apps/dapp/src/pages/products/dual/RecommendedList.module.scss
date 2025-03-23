@@ -67,6 +67,11 @@
   :global {
     .semi-table-row {
       position: relative;
+
+      &:hover > td {
+        // 去掉覆盖变色
+        background: transparent !important;
+      }
     }
 
     .semi-table-row-head {

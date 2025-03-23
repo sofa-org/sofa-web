@@ -323,7 +323,12 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
           props.product.amounts.own,
           props.product.vault.depositTickAmount,
           props.product.vault.depositMinAmount,
-          Math.max(balance || 0, props.product.vault.depositMinAmount),
+          // TODO: 确认这个修改
+          Math.max(
+            balance || 0,
+            (props.product.amounts.own && Number(props.product.amounts.own)) ||
+              props.product.vault.depositMinAmount,
+          ),
         ),
         protectedApy: props.product.apyInfo?.min,
         fundingApy,
