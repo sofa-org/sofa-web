@@ -313,6 +313,7 @@ export class WalletConnect {
       const validConnectors = await WalletConnect.getValidConnectors();
       if (validConnectors.length === 1) {
         const originProvider = validConnectors[0].originProvider;
+        await new BrowserProvider(originProvider).getSigner();
         const provider = await (async () => {
           let p = new BrowserProvider(originProvider);
           if (switchNetwork) await WalletConnect.switchNetwork(p, chainId);
