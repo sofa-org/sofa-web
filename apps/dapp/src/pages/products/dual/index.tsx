@@ -27,6 +27,7 @@ import TopTabs from '@/components/TopTabs';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
+import { FlowDual } from '../components/FlowDual';
 import InvestModal, { InvestModalPropsRef } from '../components/InvestModal';
 import { useProductsState } from '../store';
 
@@ -177,6 +178,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         })}
         banner={
           <>
+            <FlowDual />
             <h1 className={styles['head-title']}>
               {ProjectTypeRefs[ProjectType.Dual].icon}
               {t({

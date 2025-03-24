@@ -50,6 +50,8 @@ const List = (props: {
   riskType?: RiskType;
   productType?: ProductType;
   automator?: AutomatorVaultInfo;
+  expired?: boolean;
+  filter?: (it: PositionInfo) => boolean;
 }) => {
   const [t] = useTranslation('PositionList');
   const navigate = useNavigate();
@@ -69,6 +71,7 @@ const List = (props: {
           chainId: wallet.chainId,
           owner: address,
           claimed: false,
+          expired: props.expired,
           concealed: props.automator ? undefined : false,
           riskType: props.automator ? undefined : props.riskType,
           productType: props.automator ? undefined : props.productType,
@@ -78,6 +81,7 @@ const List = (props: {
         // debugger;
         return {
           ...res,
+          list: props.filter ? res.list.filter(props.filter) : res.list,
           chainId: wallet.chainId,
           owner: address,
         };
@@ -318,49 +322,51 @@ const List = (props: {
         />
       </Spin>
       <div className={styles['btn-bottom-wrapper']}>
-        {!!loseList.length && !props.automator && (
-          <AsyncButton
-            size="large"
-            theme="solid"
-            type="primary"
-            className={classNames(styles['btn-bottom'], styles['btn-txt'])}
-            onClick={() =>
-              new Promise((res, rej) =>
-                Modal.confirm({
-                  icon: null,
-                  centered: true,
-                  title: t({
-                    enUS: 'Hide Lose Positions',
-                    zhCN: '隐藏输了的头寸',
-                  }),
-                  content: t({
-                    enUS: 'To hide such positions, please click confirm. You can still view them in the history.',
-                    zhCN: '隐藏此类头寸，请点击确定。您仍可以从历史记录查看',
-                  }),
-                  okText: t({ enUS: 'Confirm', zhCN: '确定' }),
-                  cancelText: t({ enUS: 'Cancel', zhCN: '取消' }),
-                  onOk: res,
-                  onCancel: rej,
-                }),
-              )
-                .then(() =>
-                  PositionsService.conceal({
-                    chainId: wallet.chainId,
-                    positionIds: loseList.map((it) => it.positionId),
+        {!!loseList.length &&
+          !props.automator &&
+          props.riskType != RiskType.DUAL && (
+            <AsyncButton
+              size="large"
+              theme="solid"
+              type="primary"
+              className={classNames(styles['btn-bottom'], styles['btn-txt'])}
+              onClick={() =>
+                new Promise((res, rej) =>
+                  Modal.confirm({
+                    icon: null,
+                    centered: true,
+                    title: t({
+                      enUS: 'Hide Lose Positions',
+                      zhCN: '隐藏输了的头寸',
+                    }),
+                    content: t({
+                      enUS: 'To hide such positions, please click confirm. You can still view them in the history.',
+                      zhCN: '隐藏此类头寸，请点击确定。您仍可以从历史记录查看',
+                    }),
+                    okText: t({ enUS: 'Confirm', zhCN: '确定' }),
+                    cancelText: t({ enUS: 'Cancel', zhCN: '取消' }),
+                    onOk: res,
+                    onCancel: rej,
                   }),
                 )
-                .then(() => {
-                  refresh();
-                  Toast.info(
-                    t({ enUS: 'Hidden successfully', zhCN: '隐藏成功' }),
-                  );
-                })
-            }
-          >
-            {t({ enUS: 'Hide Lose', zhCN: '隐藏输了的头寸' })} (
-            {loseList?.length})
-          </AsyncButton>
-        )}
+                  .then(() =>
+                    PositionsService.conceal({
+                      chainId: wallet.chainId,
+                      positionIds: loseList.map((it) => it.positionId),
+                    }),
+                  )
+                  .then(() => {
+                    refresh();
+                    Toast.info(
+                      t({ enUS: 'Hidden successfully', zhCN: '隐藏成功' }),
+                    );
+                  })
+              }
+            >
+              {t({ enUS: 'Hide Lose', zhCN: '隐藏输了的头寸' })} (
+              {loseList?.length})
+            </AsyncButton>
+          )}
         <Button
           size="large"
           theme="solid"
@@ -399,7 +405,11 @@ const List = (props: {
   );
 };
 
-const PositionList = (props: { automator?: AutomatorVaultInfo }) => {
+const PositionList = (props: {
+  automator?: AutomatorVaultInfo;
+  expired?: boolean;
+  filter?: (it: PositionInfo) => boolean;
+}) => {
   const [project] = useProjectChange();
   const [riskType] = useRiskSelect(project);
   return (

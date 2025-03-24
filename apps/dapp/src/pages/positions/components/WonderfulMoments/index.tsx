@@ -13,6 +13,7 @@ import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
+import PositionList from '../PositionList';
 import WonderfulMomentCard from '../WonderfulMomentCard';
 import { RuleDescriptions } from '../WonderfulMomentCard/level';
 
@@ -91,7 +92,11 @@ const WonderfulMoment = (props: { automator?: AutomatorVaultInfo }) => {
   const [riskType] = useRiskSelect(project);
   return (
     <div className={styles['list-wrapper']}>
-      <List riskType={riskType} {...props} />
+      {riskType == RiskType.DUAL ? (
+        <PositionList expired />
+      ) : (
+        <List riskType={riskType} {...props} />
+      )}
     </div>
   );
 };

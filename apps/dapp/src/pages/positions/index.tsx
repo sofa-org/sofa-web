@@ -50,15 +50,13 @@ export const PositionsEl = (props: { automator?: AutomatorVaultInfo }) => {
 
   return (
     <div className={styles['content']}>
-      {project == ProjectType.Dual ? undefined : (
-        <RadioBtnGroup
-          className={styles['btn-group']}
-          options={tabs}
-          value={tab}
-          onChange={(v) => updateQuery({ tab: v })}
-        />
-      )}
-      {tab === '1' || project == ProjectType.Dual ? (
+      <RadioBtnGroup
+        className={styles['btn-group']}
+        options={tabs}
+        value={tab}
+        onChange={(v) => updateQuery({ tab: v })}
+      />
+      {tab === '1' ? (
         <PositionList {...props} />
       ) : (
         <WonderfulMoments {...props} />
