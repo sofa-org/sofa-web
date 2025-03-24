@@ -70,7 +70,16 @@ export class ProductsDIYService {
     });
   }
 
-  static getSupportMatrix(v: Partial<VaultInfo>): {
+  static getSupportMatrix(
+    v: Partial<VaultInfo> & {
+      item?: {
+        disabled: boolean;
+        key: string;
+        data: Partial<VaultInfo>;
+        isDual: 'all' | 'partial' | false;
+      };
+    },
+  ): {
     skipCurrentOptionValue?: boolean;
     skipOption?: ('riskType' | 'dualOptions')[];
   } {
@@ -85,7 +94,7 @@ export class ProductsDIYService {
       };
     }
     if (vaults.length && vaults.every((v) => v.riskType == RiskType.DUAL)) {
-      // 选双币时，depositCcy 只显示双币的
+      // 选双币时，depositCcy 只显示双币的，且不展示disable项目
       const allPossibleDepositCcys = vaults.reduce(
         (ccys, v) => ({
           ...ccys,
@@ -98,6 +107,7 @@ export class ProductsDIYService {
         skipCurrentOptionValue:
           v.productType === ProductType.DNT ||
           (v.depositCcy && !allPossibleDepositCcys[v.depositCcy]) ||
+          v.item?.disabled ||
           false,
         skipOption: ['riskType'],
       };

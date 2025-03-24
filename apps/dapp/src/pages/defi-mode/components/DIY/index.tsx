@@ -193,6 +193,7 @@ const DepositToken = () => {
               ...formData,
               chainId,
               depositCcy: it.data.depositCcy,
+              item: it,
             }).skipCurrentOptionValue,
         )
         .map((it) => ({
@@ -277,6 +278,7 @@ const RiskTolerance = () => {
               ...formData,
               chainId,
               riskType: it.data.riskType,
+              item: it,
             }).skipCurrentOptionValue,
         )
         .map((it) => ({
