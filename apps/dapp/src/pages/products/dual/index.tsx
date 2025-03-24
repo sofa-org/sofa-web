@@ -213,7 +213,6 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         value={product}
         type={'banner-expandable'}
         onChange={(v) => setProduct(v as ProductType)}
-        extraTopContent={<div className={styles['title']}>{t('My RCH')}</div>}
       >
         {isMobileUI ? (
           <>
