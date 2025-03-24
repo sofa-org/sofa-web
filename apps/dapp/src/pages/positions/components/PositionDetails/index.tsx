@@ -157,7 +157,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                 />
               ),
             },
-            ...(position.triggerPrice
+            ...(position.triggerPrice && product.vault.riskType != RiskType.DUAL
               ? [
                   {
                     label: t('Settlement Price'),
@@ -234,6 +234,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
       collateralAtRiskPercentage:
         position.claimParams.collateralAtRiskPercentage,
       isMaker: position.claimParams.maker,
+      riskType: position.vault.riskType,
     }),
     [
       position.claimParams.anchorPrices,

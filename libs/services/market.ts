@@ -197,7 +197,10 @@ export class MarketService {
       MarketService.getPPSOfScrv().catch(() => 1),
       MarketService.getPPSOfZRCH().catch(() => 1),
       MarketService.$fetchIndexPx(),
-      MarketService.getRchPriceInUsd().then((price) => ({ RCH: price })),
+      MarketService.fetchPxFromCoinGecko('RCH')
+        .catch(() => 1)
+        .then((price) => ({ RCH: price })),
+      // MarketService.getRchPriceInUsd().then((price) => ({ RCH: price })),
       MarketService.fetchPxFromCoinGecko('crvUSD')
         .catch(() => 1)
         .then((price) => ({ crvUSD: price })),

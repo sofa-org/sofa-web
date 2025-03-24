@@ -51,6 +51,7 @@ const List = (props: {
   productType?: ProductType;
   automator?: AutomatorVaultInfo;
   expired?: boolean;
+  claimed?: boolean;
   filter?: (it: PositionInfo) => boolean;
 }) => {
   const [t] = useTranslation('PositionList');
@@ -70,7 +71,7 @@ const List = (props: {
         {
           chainId: wallet.chainId,
           owner: address,
-          claimed: false,
+          claimed: props.claimed || false,
           expired: props.expired,
           concealed: props.automator ? undefined : false,
           riskType: props.automator ? undefined : props.riskType,
@@ -146,6 +147,7 @@ const List = (props: {
       collateralAtRiskPercentage: it.claimParams.collateralAtRiskPercentage,
       isMaker: it.claimParams.maker,
       redeemableAmount: it.amounts.redeemable || 0,
+      riskType: it.product.vault.riskType,
     }));
     const cb = (it: TransactionProgress) => {
       claimProgressRef.current?.update(it);
@@ -408,6 +410,7 @@ const List = (props: {
 const PositionList = (props: {
   automator?: AutomatorVaultInfo;
   expired?: boolean;
+  claimed?: boolean;
   filter?: (it: PositionInfo) => boolean;
 }) => {
   const [project] = useProjectChange();

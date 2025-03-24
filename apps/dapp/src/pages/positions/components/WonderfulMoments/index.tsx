@@ -93,7 +93,7 @@ const WonderfulMoment = (props: { automator?: AutomatorVaultInfo }) => {
   return (
     <div className={styles['list-wrapper']}>
       {riskType == RiskType.DUAL ? (
-        <PositionList expired />
+        <PositionList claimed />
       ) : (
         <List riskType={riskType} {...props} />
       )}

@@ -320,6 +320,7 @@ const PositionCard = (props: PositionCardProps) => {
       collateralAtRiskPercentage:
         position.claimParams.collateralAtRiskPercentage,
       isMaker: position.claimParams.maker,
+      riskType: position.vault.riskType,
     }),
     [
       position.claimParams.anchorPrices,

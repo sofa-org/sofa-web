@@ -415,6 +415,7 @@ export class AutomatorUserService {
         collateralAtRiskPercentage: it.claimParams.collateralAtRiskPercentage,
         isMaker: it.claimParams.maker,
         redeemableAmount: it.amounts.redeemable || 0,
+        riskType: it.product.vault.riskType,
       }));
       await AutomatorCreatorService.claimPositions(() => {}, vault, data)
         .then(() =>

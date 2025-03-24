@@ -539,6 +539,7 @@ export class WalletService {
       chainId: number;
       claimCcy?: CCY | USDS;
       redeemableAmount?: string | number;
+      riskType: RiskType;
     },
   ): Promise<string> {
     const ctx = await WalletService.connect(+data.chainId);
@@ -546,11 +547,28 @@ export class WalletService {
     const args = (gasLimit?: number) => [
       ...(data.productType === ProductType.DNT ? [data.term] : []),
       data.expiry,
-      data.anchorPrices,
-      ...(data.collateralAtRiskPercentage
-        ? [data.collateralAtRiskPercentage]
-        : []),
-      data.isMaker,
+      ...(data.riskType === RiskType.DUAL
+        ? [
+            // 双币只有一个价格
+            data.anchorPrices[0],
+          ]
+        : [
+            // 其他是价格数组
+            data.anchorPrices,
+          ]),
+
+      ...(data.riskType === RiskType.DUAL
+        ? [
+            // 双币 TODO
+            0,
+          ]
+        : [
+            // 其他
+            ...(data.collateralAtRiskPercentage
+              ? [data.collateralAtRiskPercentage]
+              : []),
+            data.isMaker,
+          ]),
       ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
     ];
     return ContractsService.dirtyCall(
