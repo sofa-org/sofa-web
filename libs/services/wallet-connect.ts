@@ -21,6 +21,8 @@ import { nanoid } from 'nanoid';
 import iconWalletConnect from './assets/icon-walletconnect.svg?url';
 import { ChainMap } from './chains';
 
+declare const ethereum: Global['ethereum'];
+
 export type Connector = {
   id: string;
   type: string;
@@ -261,7 +263,7 @@ export class WalletConnect {
     if (Env.isMobile) {
       const validConnectors = await WalletConnect.getValidConnectors();
       if (validConnectors.length === 1) {
-        const originProvider = validConnectors[0].originProvider;
+        const originProvider = ethereum || validConnectors[0].originProvider;
         console.info('Get Modal Provider on mobile', {
           provider: originProvider,
           validConnectors,
@@ -311,8 +313,10 @@ export class WalletConnect {
 
     if (Env.isMobile && !Env.isTelegram) {
       const validConnectors = await WalletConnect.getValidConnectors();
+      console.log(1111, validConnectors);
       if (validConnectors.length === 1) {
-        const originProvider = validConnectors[0].originProvider;
+        const originProvider = ethereum || validConnectors[0].originProvider;
+        await new BrowserProvider(originProvider).getSigner();
         const provider = await (async () => {
           let p = new BrowserProvider(originProvider);
           if (switchNetwork) await WalletConnect.switchNetwork(p, chainId);
