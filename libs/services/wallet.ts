@@ -556,17 +556,13 @@ export class WalletService {
             // 其他是价格数组
             data.anchorPrices,
           ]),
-
+      ...(data.collateralAtRiskPercentage
+        ? [data.collateralAtRiskPercentage]
+        : []),
       ...(data.riskType === RiskType.DUAL
-        ? [
-            // 双币 TODO
-            0,
-          ]
+        ? []
         : [
             // 其他
-            ...(data.collateralAtRiskPercentage
-              ? [data.collateralAtRiskPercentage]
-              : []),
             data.isMaker,
           ]),
       ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
