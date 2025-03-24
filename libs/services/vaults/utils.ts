@@ -154,23 +154,3 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
         sUSDa: 0.05,
       }[depositCcy];
 }
-
-export function getTickPrice(domCcy: string, project: ProjectType) {
-  return (
-    {
-      RCH: 0.05,
-      stRCH: 0.05,
-      zRCH: 0.05,
-      USDT: 0.05,
-      aUSDT: 0.05,
-      USDC: 0.05,
-      aArbSepUSDC: 0.05,
-      aUSDC: 0.05,
-      crvUSD: 0.05,
-      scrvUSD: 0.05,
-      WETH: 0.000001,
-      stETH: 0.000001,
-      WBTC: 0.000001,
-    }[domCcy] || 1
-  );
-}

@@ -103,8 +103,17 @@ export class DualService {
     }
     return { status: DualPositionClaimStatus.Claimable, leftTime: 0 };
   }
+  static getPricePrecision(params: {
+    minStepSize?: string | number;
+    vault: { productType: ProductType; domCcy: VaultInfo['domCcy'] };
+  }) {
+    return !params.minStepSize
+      ? CCYService.ccyConfigs[params.vault.domCcy]?.precision || 4
+      : (String(params.minStepSize).split('.', 2)[1] || '').length;
+  }
   static getPrice(params: {
     vault: { productType: ProductType; domCcy: VaultInfo['domCcy'] };
+    minStepSize?: string | number;
     anchorPrices: (number | string)[];
   }) {
     if (isNullLike(params?.anchorPrices?.[0])) {
@@ -112,17 +121,17 @@ export class DualService {
     }
     const p = params.anchorPrices[0];
     if (!DualService.shouldRevertAnchorPrice(params.vault.productType)) {
-      return Number(
-        roundWith(Number(p), CCYService.getPriceInputTick(params.vault.domCcy)),
-      );
+      const res = Number(p);
+      if (params.minStepSize) {
+        return Number(roundWith(res, params.minStepSize));
+      }
+      return res;
     }
-
-    return Number(
-      roundWith(
-        p === 0 || p === '0' ? 0 : 1.0 / Number(p),
-        CCYService.getPriceInputTick(params.vault.domCcy),
-      ),
-    );
+    const res = p === 0 || p === '0' ? 0 : 1.0 / Number(p);
+    if (params.minStepSize) {
+      return Number(roundWith(res, params.minStepSize));
+    }
+    return res;
   }
   static shouldRevertAnchorPrice(productType: ProductType) {
     return productType == ProductType.BearSpread;

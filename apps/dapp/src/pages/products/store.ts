@@ -36,6 +36,13 @@ export const useProductsState = Object.assign(
           `${VaultInfo['vault']}-${VaultInfo['chainId']}`,
           string | undefined
         >,
+        // 双币需要的配置
+        dualConfig: {} as Record<
+          `${VaultInfo['vault']}-${VaultInfo['chainId']}`,
+          {
+            minStepSize: number | string;
+          }
+        >,
       }),
       {
         name: 'products-state-new',
@@ -49,11 +56,26 @@ export const useProductsState = Object.assign(
       vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType' | 'riskType'>,
     ) => {
       const list = await ProductsService.listRecommended(vault);
+      const dualList = list.filter((it) => it.vault.riskType === RiskType.DUAL);
       useProductsState.setState((pre) => ({
         recommendedList: {
           ...pre.recommendedList,
           [`${vault.vault.toLowerCase()}-${vault.chainId}`]: list,
         },
+        dualConfig: dualList.length
+          ? {
+              ...pre.dualConfig,
+              ...dualList.reduce(
+                (acc, it) => ({
+                  ...acc,
+                  [`${it.vault.vault.toLowerCase()}-${it.vault.chainId}`]: {
+                    minStepSize: it.minStepSize,
+                  },
+                }),
+                {} as (typeof pre)['dualConfig'],
+              ),
+            }
+          : pre.dualConfig,
       }));
     },
     clearCart: (vault: Pick<VaultInfo, 'vault' | 'chainId'>) => {
@@ -131,6 +153,9 @@ export const useProductsState = Object.assign(
       quote: ProductQuoteResult | ProductQuoteResult[],
       replaceAll?: boolean,
     ) => {
+      const dualQuotes = toArray(quote).filter(
+        (it) => it.vault.riskType === RiskType.DUAL,
+      );
       useProductsState.setState((pre) => ({
         quoteInfos: {
           ...(replaceAll
@@ -147,6 +172,20 @@ export const useProductsState = Object.assign(
             toArray(quote).map((it) => [ProductsService.productKey(it), it]),
           ),
         },
+        dualConfig: dualQuotes.length
+          ? {
+              ...pre.dualConfig,
+              ...dualQuotes.reduce(
+                (acc, it) => ({
+                  ...acc,
+                  [`${it.vault.vault.toLowerCase()}-${it.vault.chainId}`]: {
+                    minStepSize: it.minStepSize,
+                  },
+                }),
+                {} as (typeof pre)['dualConfig'],
+              ),
+            }
+          : pre.dualConfig,
       }));
     },
     quote: async (params: PartialRequired<ProductQuoteParams, 'vault'>) => {

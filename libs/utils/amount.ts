@@ -77,10 +77,13 @@ export function amountFormatter(
     : Math.max($precision, exponent);
   const [int, $decimal] = Big(amount).toFixed(18).split('.');
   const intStr = int.replace(/\B(?=(\d{3})+(\.|$))/g, ',');
-  const decimal = $decimal?.replace(/0+$/, '');
+  const decimal = !forcePrecision ? $decimal?.replace(/0+$/, '') : $decimal;
   if (!decimal || !precision) return intStr;
-  const $$decimal = decimal.slice(0, precision).replace(/0+$/, '');
-  if (!$$decimal) return intStr;
+  let $$decimal = decimal.slice(0, precision);
+  if (!forcePrecision) {
+    $$decimal = $$decimal.replace(/0+$/, '');
+    if (!$$decimal) return intStr;
+  }
   return `${intStr}.${$$decimal}`;
 }
 

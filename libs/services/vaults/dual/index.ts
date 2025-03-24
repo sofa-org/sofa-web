@@ -9,7 +9,6 @@ import {
   getCollateralDecimal,
   getDepositMinAmount,
   getDepositTickAmount,
-  getTickPrice,
 } from '../utils';
 
 import vaults_1 from './1';
@@ -76,6 +75,5 @@ export const dualVaults = vaults.map((it) => {
     abis: getDualAbis(
       it as Pick<VaultInfo, 'forCcy' | 'domCcy' | 'depositCcy'>,
     ),
-    tickPrice: getTickPrice(it.domCcy, ProjectType.Dual),
   } as VaultInfo;
 });

@@ -79,7 +79,6 @@ export interface VaultInfo {
   interestType: InterestType | undefined; // 生息方式，只有 PROTECTED 产品有
   abis: ethers.InterfaceAbi;
   earlyClaimable: boolean | undefined;
-  tickPrice: number; // Dual: 价格的布增
 }
 
 export interface AutomatorVaultInfo {

@@ -20,6 +20,8 @@ import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
 
+import { useProductsState } from '../store';
+
 import locale from './locale';
 
 import styles from './CustomQuote.module.scss';
@@ -41,6 +43,10 @@ export const CustomQuote = (props: {
   const [t] = useTranslation('ProductDual');
   const [quote, setQuote] = useState<ProductQuoteResult | undefined>(undefined);
   const [lazyPrice, setLazyPrice] = useState<number | undefined>(undefined);
+  const dualConfig = useProductsState(
+    (s) =>
+      s.dualConfig[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`],
+  );
   const lazyTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -95,31 +101,45 @@ export const CustomQuote = (props: {
   const maxPrice = useMemo(() => {
     // 买的时候，不能超过目前价格
     const res =
-      productTypeRef.dualIsBuy && prices[props.vault.forCcy] !== undefined
+      productTypeRef.dualIsBuy &&
+      prices[props.vault.forCcy] !== undefined &&
+      dualConfig
         ? roundWith(
             Number(prices[props.vault.forCcy]),
-            CCYService.getPriceInputTick(props.vault.forCcy),
+            dualConfig.minStepSize,
             undefined,
             undefined,
             'upper',
           )
         : undefined;
     return res;
-  }, [productTypeRef, props.vault, prices[props.vault?.forCcy || '']]);
+  }, [
+    productTypeRef,
+    props.vault,
+    prices[props.vault?.forCcy || ''],
+    dualConfig,
+  ]);
   const minPrice = useMemo(() => {
     // 卖的时候，不能低于目前价格
     const res =
-      !productTypeRef.dualIsBuy && prices[props.vault.forCcy] !== undefined
+      !productTypeRef.dualIsBuy &&
+      prices[props.vault.forCcy] !== undefined &&
+      dualConfig
         ? roundWith(
             Number(prices[props.vault.forCcy]),
-            CCYService.getPriceInputTick(props.vault.forCcy),
+            dualConfig.minStepSize,
             undefined,
             undefined,
             'lower',
           )
         : undefined;
     return res;
-  }, [productTypeRef, props.vault, prices[props.vault?.forCcy || '']]);
+  }, [
+    productTypeRef,
+    props.vault,
+    prices[props.vault?.forCcy || ''],
+    dualConfig,
+  ]);
 
   const isMobileUI = useIsMobileUI();
   return (

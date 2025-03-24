@@ -1,5 +1,9 @@
 import { calc_apy, calc_yield } from '@sofa/alg';
-import { cvtAmountsInUsd, getPrecision } from '@sofa/utils/amount';
+import {
+  amountFormatter,
+  cvtAmountsInUsd,
+  getPrecision,
+} from '@sofa/utils/amount';
 import { applyMock, asyncCache } from '@sofa/utils/decorators';
 import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
@@ -131,6 +135,7 @@ export interface OriginProductQuoteResult extends CalculatedInfo {
   chainId: number;
   expiry: number; // 到期日对应的秒级时间戳，例如 1672387200
   depositAmount: string | number; // rfq申购金额
+  minStepSize: string | number; // 用户输入报价时的最小一格的大小 （只有dual有）
   timestamp: number; // 目前定价对应的触发时间；下一个观察开始时间基于此逻辑计算
   observationStart: number; // 目前产品根据 timestamp 预估的开始观察敲入敲出时间，需要持续观测的产品有这个
   quote: QuoteInfo & { quoteId: string | number };
@@ -168,7 +173,10 @@ export interface DealtQuoteInfo {
 export interface ProductQuoteResult
   extends ProductInfo,
     CalculatedInfo,
-    Pick<OriginProductQuoteResult, 'rfqId' | 'quote' | 'timestamp'> {
+    Pick<
+      OriginProductQuoteResult,
+      'rfqId' | 'quote' | 'timestamp' | 'minStepSize'
+    > {
   pricesForCalculation: Record<string, number | undefined>;
 
   // 对于存入之后没有利息的 earn 的 vault（比如 sUSDa 的几个 Earn 合约）来讲，需要计算以底层价值币种来转换数据
@@ -228,8 +236,7 @@ export class ProductsService {
     if (!product) return '';
     if (isDualQuoteParams(product)) {
       const depositAmount = product.depositAmount || product.amounts?.own;
-      const price = DualService.getPrice(product as ProductQuoteParams);
-      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${price}-${depositAmount}`;
+      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${amountFormatter(product.anchorPrices?.[0], 8, true)}-${depositAmount}`;
     }
     const vault = product.vault?.vault?.toLowerCase();
     const prices = product.anchorPrices?.map(Number).join('-');

@@ -61,6 +61,12 @@ export const DualDepositModalContent = (
 
   const prices = useIndexPrices((state) => state.prices);
 
+  const dualConfig = useProductsState(
+    (s) =>
+      s.dualConfig[
+        `${props.product.vault.vault.toLowerCase()}-${props.product.vault.chainId}`
+      ],
+  );
   const $vault = useMemo(
     () =>
       ProductsService.findVault(ContractsService.vaults, {
@@ -140,7 +146,10 @@ export const DualDepositModalContent = (
     if (!product) {
       return undefined;
     }
-    const currentPrice = DualService.getPrice(product as ProductQuoteParams);
+    const currentPrice = DualService.getPrice({
+      ...(product as ProductQuoteParams),
+      minStepSize: dualConfig?.minStepSize,
+    });
     if (
       currentPrice === undefined ||
       !product?.vault.forCcy ||
@@ -161,34 +170,52 @@ export const DualDepositModalContent = (
       return undefined;
     }
     const res =
-      productTypeRef.dualIsBuy && prices[vault.forCcy] !== undefined
+      productTypeRef.dualIsBuy &&
+      prices[vault.forCcy] !== undefined &&
+      dualConfig
         ? roundWith(
             Number(prices[vault.forCcy]),
-            CCYService.getPriceInputTick(vault.forCcy),
+            dualConfig.minStepSize,
             undefined,
             undefined,
             'upper',
           )
         : undefined;
     return res;
-  }, [productTypeRef, vault, prices[vault?.forCcy || '']]);
+  }, [productTypeRef, vault, prices[vault?.forCcy || ''], dualConfig]);
   const minPrice = useMemo(() => {
     // 卖的时候，不能低于目前价格
     if (!vault || !productTypeRef) {
       return undefined;
     }
     const res =
-      !productTypeRef.dualIsBuy && prices[vault.forCcy] !== undefined
+      !productTypeRef.dualIsBuy &&
+      prices[vault.forCcy] !== undefined &&
+      dualConfig
         ? roundWith(
             Number(prices[vault.forCcy]),
-            CCYService.getPriceInputTick(vault.forCcy),
+            dualConfig.minStepSize,
             undefined,
             undefined,
             'lower',
           )
         : undefined;
     return res;
-  }, [productTypeRef, vault, prices[vault?.forCcy || '']]);
+  }, [productTypeRef, vault, prices[vault?.forCcy || ''], dualConfig]);
+  const diffPercentage = useMemo(() => {
+    const current = prices[props.product.vault.forCcy];
+    const p = DualService.getPrice({
+      ...(product as ProductQuoteParams),
+      minStepSize: dualConfig?.minStepSize,
+    });
+    return current === undefined || p === undefined
+      ? undefined
+      : (p - current) / current;
+  }, [
+    prices[props.product.vault.forCcy],
+    product?.anchorPrices?.[0],
+    dualConfig?.minStepSize,
+  ]);
   const isMobileUI = useIsMobileUI();
   if (!vault || !productTypeRef) {
     return undefined;
@@ -269,22 +296,23 @@ export const DualDepositModalContent = (
                     className={styles['amount-input']}
                     max={maxPrice}
                     min={minPrice}
-                    tick={CCYService.getPriceInputTick(vault.domCcy)}
-                    value={DualService.getPrice(product as ProductQuoteParams)}
+                    tick={dualConfig?.minStepSize}
+                    value={DualService.getPrice({
+                      ...(product as ProductQuoteParams),
+                      minStepSize: dualConfig?.minStepSize,
+                    })}
                     suffix={
                       <span className={styles['unit-2']}>
                         {formatHighlightedText(
                           t(
                             {
-                              enUS: '(Current price: [[{{currentPrice}}]])',
+                              enUS: '(Current price: [[{{changePercentage}}]])',
                             },
                             {
-                              currentPrice: amountFormatter(
-                                vault?.forCcy === undefined
+                              changePercentage: displayPercentage(
+                                diffPercentage === undefined
                                   ? undefined
-                                  : prices[vault?.forCcy],
-                                CCYService.ccyConfigs[vault?.domCcy || '']
-                                  ?.precision,
+                                  : Math.abs(diffPercentage),
                               ),
                             },
                           ),

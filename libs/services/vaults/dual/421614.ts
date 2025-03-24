@@ -4,7 +4,7 @@ const CRVVaults = [
   // buy low
   {
     chainId: 421614,
-    vault: '0xe462f318FE07427132865e1765A4121b4164086C',
+    vault: '0x623080585CBf12dd7600cCf6AA2fDe6C35A8684A',
     riskType: RiskType.DUAL,
     forCcy: 'CRV',
     domCcy: 'crvUSD',
@@ -15,7 +15,7 @@ const CRVVaults = [
   // sell high
   {
     chainId: 421614,
-    vault: '0x5c2CEBbEc0E378d06A16Ab05d0d32DF990E28666',
+    vault: '0x1C5144d4d0027c69FA84C143e325FB3559197557',
     riskType: RiskType.DUAL,
     forCcy: 'CRV',
     domCcy: 'crvUSD',

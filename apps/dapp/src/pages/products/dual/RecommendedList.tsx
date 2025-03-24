@@ -43,6 +43,10 @@ export const RecommendedList = (props: {
   const [t] = useTranslation('ProductDual');
   const { data, dates, date, setDate } = props;
   const isMobileUI = useIsMobileUI();
+  const dualConfig = useProductsState(
+    (s) =>
+      s.dualConfig[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`],
+  );
   const domCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.vault.domCcy],
     [props.vault],
@@ -138,6 +142,7 @@ export const RecommendedList = (props: {
                 price: amountFormatter(
                   prices[props.vault.forCcy],
                   domCcyConfig?.precision,
+                  true,
                 ),
               },
             ),
@@ -176,14 +181,21 @@ export const RecommendedList = (props: {
                 render: (_, row) => {
                   const current = prices[props.vault.forCcy];
                   const p = DualService.getPrice(row);
-                  const diff =
+                  const diffPercentage =
                     current === undefined || p === undefined
                       ? undefined
-                      : Number(row.anchorPrices[0]) - current;
+                      : (p - current) / current;
                   return (
                     <>
                       <span className={styles['target-price']}>
-                        {amountFormatter(p, domCcyConfig?.precision)}
+                        {amountFormatter(
+                          p,
+                          DualService.getPricePrecision({
+                            vault: props.vault,
+                            minStepSize: dualConfig?.minStepSize,
+                          }),
+                          true,
+                        )}
                       </span>
                       <span className={styles['change-to-current-price']}>
                         {formatHighlightedText(
@@ -193,16 +205,19 @@ export const RecommendedList = (props: {
                             },
                             {
                               changePercentage: displayPercentage(
-                                diff === undefined ? undefined : Math.abs(diff),
+                                diffPercentage === undefined
+                                  ? undefined
+                                  : Math.abs(diffPercentage),
                               ),
                             },
                           ),
                           {
                             hightlightedClassName: classNames(
                               styles['amount'],
-                              diff === undefined || diff === 0
+                              diffPercentage === undefined ||
+                                diffPercentage === 0
                                 ? 'unchanged'
-                                : diff > 0
+                                : diffPercentage > 0
                                   ? styles['increased']
                                   : styles['decreased'],
                             ),
