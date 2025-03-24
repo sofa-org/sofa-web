@@ -95,6 +95,7 @@ const RecommendedTickets = (props: TicketsProps) => {
       leverageInfo: {} as never,
       relevantDollarPrices: [] as never,
       pricesForCalculation: {} as never,
+      minStepSize: 0.0001,
     };
     const index = (v: (typeof data)[0]) =>
       +v.amounts.maxRedeemable /

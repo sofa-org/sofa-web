@@ -50,7 +50,8 @@ const InvestButton = (
     <ProductInvestButton
       products={products}
       quoteInfos={quoteInfos}
-      useProductsState={useProductsState}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      useProductsState={useProductsState as any}
       vaultInfo={{
         depositCcy: props.depositCcy,
         riskType: RiskType.RISKY,
