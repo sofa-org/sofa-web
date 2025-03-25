@@ -293,7 +293,7 @@ const List = (props: {
               className={styles['deposit-ccy-group']}
             >
               {e[1]?.map((it) =>
-                it.claimed ? (
+                it.claimed && !props.claimed ? (
                   <Fragment key={it.id} />
                 ) : (
                   <PositionCard

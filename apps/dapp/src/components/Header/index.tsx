@@ -116,7 +116,7 @@ const allMenuItems = (
                 enUS: 'Your Earn & Surge Positions.',
                 zhCN: '你交易的 Earn 和 Surge 的头寸',
               }),
-            path: '/positions?project=Earn',
+            path: '/positions',
           },
         ],
       },

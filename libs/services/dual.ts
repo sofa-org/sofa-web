@@ -66,13 +66,7 @@ export class DualService {
     ) {
       return DualPositionExecutionStatus.Executed;
     }
-    if (
-      Number(position.amounts.redeemable) > 0 &&
-      Number(position.amounts.redeemableOfLinkedCcy) > 0
-    ) {
-      return DualPositionExecutionStatus.PartialExecuted;
-    }
-    return DualPositionExecutionStatus.NotExpired;
+    return DualPositionExecutionStatus.PartialExecuted;
   }
   static getSettlementTime(product: ProductInfo) {
     return new Date((Number(product.expiry) + 2 * 3600) * 1000);
