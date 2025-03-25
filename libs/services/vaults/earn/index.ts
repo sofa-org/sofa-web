@@ -6,7 +6,13 @@ import PrincipalDNTVaultAbis from '../../abis/PrincipalDNTVault.json';
 import PrincipalDNTVaultAbis1 from '../../abis/PrincipalDNTVault-No-Permit2.json';
 import PrincipalSTVaultAbis from '../../abis/PrincipalSmartTrendVault.json';
 import PrincipalSTVaultAbis1 from '../../abis/PrincipalSmartTrendVault-No-Permit2.json';
-import { ProductType, ProjectType, RiskType, VaultInfo } from '../../base-type';
+import {
+  InterestType,
+  ProductType,
+  ProjectType,
+  RiskType,
+  VaultInfo,
+} from '../../base-type';
 import {
   getCollateralDecimal,
   getDepositMinAmount,
@@ -76,5 +82,13 @@ export const earnVaults = vaults.map((it) => {
     balanceDecimal:
       collateralDecimal * (it.riskType === RiskType.PROTECTED ? 1e18 : 1),
     abis: getEarnAbis(it),
+    interestType: {
+      USDT: InterestType.AAVE,
+      USDC: InterestType.AAVE,
+      RCH: InterestType.SOFA,
+      stETH: InterestType.LIDO,
+      crvUSD: InterestType.CURVE,
+      sUSDa: InterestType.AriesMarkets,
+    }[it.depositCcy],
   } as VaultInfo;
 });

@@ -4,7 +4,12 @@ import AAVEDualVault from '../../abis/AAVEDualVault.json';
 import CrvUSDDualVault from '../../abis/CrvUSDDualVault.json';
 import DualVault from '../../abis/DualVault.json';
 import RCHDualVault from '../../abis/RCHDualVault.json';
-import { ProductType, ProjectType, VaultInfo } from '../../base-type';
+import {
+  InterestType,
+  ProductType,
+  ProjectType,
+  VaultInfo,
+} from '../../base-type';
 import {
   getCollateralDecimal,
   getDepositMinAmount,
@@ -75,5 +80,13 @@ export const dualVaults = vaults.map((it) => {
     abis: getDualAbis(
       it as Pick<VaultInfo, 'forCcy' | 'domCcy' | 'depositCcy'>,
     ),
+    interestType: {
+      USDT: InterestType.AAVE,
+      USDC: InterestType.AAVE,
+      RCH: InterestType.SOFA,
+      stETH: InterestType.LIDO,
+      crvUSD: InterestType.CURVE,
+      sUSDa: InterestType.AriesMarkets,
+    }[it.depositCcy],
   } as VaultInfo;
 });

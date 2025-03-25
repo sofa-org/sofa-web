@@ -314,10 +314,9 @@ export class MarketService {
   > {
     const ccyList = ContractsService.vaults.reduce((pre, it) => {
       if (it.riskType === RiskType.RISKY || it.chainId !== chainId) return pre;
-      if (it.depositBaseCcy && !pre.includes(it.depositBaseCcy))
-        pre.push(it.depositBaseCcy);
-      if (it.depositCcy && !pre.includes(it.depositCcy))
+      if (it.interestType && !pre.includes(it.depositCcy)) {
         pre.push(it.depositCcy);
+      }
       return pre;
     }, [] as string[]);
     const defaultApy = {
