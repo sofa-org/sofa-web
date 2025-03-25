@@ -245,6 +245,20 @@
   }
 }
 
+.execution-status-loading {
+  // 载入中状态
+  .dual-status {
+    > .op {
+      background-color: #ccc;
+    }
+
+    > .status {
+      color: #ccc;
+      border-color: #ccc;
+    }
+  }
+}
+
 .execution-status-executed,
 .execution-status-partialexecuted {
   // 到期执行成功
