@@ -149,15 +149,19 @@ const OrderHistory = () => {
           if (!judgeSettled(record)) {
             return '-';
           }
-          if (
-            !record.amounts.redeemable &&
-            !record.amounts.redeemableOfLinkedCcy
-          ) {
+          const redeemable =
+            (record.amounts.redeemable && Number(record.amounts.redeemable)) ||
+            0;
+          const redeemableOfLinkedCcy =
+            (record.amounts.redeemableOfLinkedCcy &&
+              Number(record.amounts.redeemableOfLinkedCcy)) ||
+            0;
+          if (!redeemable && !redeemableOfLinkedCcy) {
             return '-';
           }
           return (
             <>
-              {(record.amounts.redeemable && (
+              {(redeemable && (
                 <span
                   className={classNames(
                     styles['amount'],
@@ -165,16 +169,15 @@ const OrderHistory = () => {
                   )}
                 >
                   <AmountDisplay
-                    amount={record.amounts.redeemable}
+                    amount={redeemable}
                     ccy={record.product.vault.depositCcy}
                   />{' '}
                   {record.product.vault.depositCcy}
                 </span>
               )) ||
                 undefined}
-              {(record.amounts.redeemableOfLinkedCcy && (
+              {(redeemableOfLinkedCcy && (
                 <>
-                  <br />
                   <span
                     className={classNames(
                       styles['amount'],
@@ -182,7 +185,7 @@ const OrderHistory = () => {
                     )}
                   >
                     <AmountDisplay
-                      amount={record.amounts.redeemableOfLinkedCcy}
+                      amount={redeemableOfLinkedCcy}
                       ccy={DualService.getLinkedCcy(record.product.vault)}
                     />{' '}
                     {DualService.getLinkedCcy(record.product.vault)}

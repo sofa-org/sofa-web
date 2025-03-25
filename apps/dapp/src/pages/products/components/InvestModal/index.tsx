@@ -382,7 +382,7 @@ const InvestModal = forwardRef<InvestModalPropsRef, InvestModalProps>(
             )}
           </>
         }
-        width={1080}
+        width={props.product.vault.riskType === RiskType.DUAL ? 1100 : 1080}
         visible={visible}
         onCancel={() => setVisible(false)}
         footer={null}

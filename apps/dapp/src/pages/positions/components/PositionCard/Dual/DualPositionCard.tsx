@@ -9,6 +9,7 @@ import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, next8h } from '@sofa/utils/expiry';
 import { useAsyncMemo } from '@sofa/utils/hooks';
+import { formatHighlightedText } from '@sofa/utils/string';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -249,17 +250,22 @@ const DualPositionCard = (
                     </span>
                   </div>
                   <div className={styles['profits']}>
-                    (
-                    <span className={styles['amount']}>
-                      {amountFormatter(
-                        renderProps?.linkedCcyExtraRewardWhenSuccessfulExecuted,
-                        linkedCcyOpsiteConfig?.precision,
-                      )}
-                    </span>
-                    {t({
-                      enUS: 'Profits',
-                    })}
-                    )
+                    {formatHighlightedText(
+                      t(
+                        {
+                          enUS: '([[{{amount}}]] Profits)',
+                        },
+                        {
+                          amount: amountFormatter(
+                            renderProps?.linkedCcyExtraRewardWhenSuccessfulExecuted,
+                            linkedCcyOpsiteConfig?.precision,
+                          ),
+                        },
+                      ),
+                      {
+                        hightlightedClassName: styles['amount'],
+                      },
+                    )}
                   </div>
                 </>
               ) : executionStatus == DualPositionExecutionStatus.NotExecuted ? (

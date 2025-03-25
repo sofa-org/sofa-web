@@ -29,23 +29,21 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
                 })}
           </div>
           <div className={styles['value']}>
-            ≈
+            <span className={styles['ccys']}>
+              <img src={CCYService.ccyConfigs[props.linkedCcy || '']?.icon} />
+              {CCYService.ccyConfigs[props.linkedCcy]?.name || props.linkedCcy}
+              <img src={CCYService.ccyConfigs[props.depositCcy || '']?.icon} />
+              {CCYService.ccyConfigs[props.depositCcy]?.name ||
+                props.depositCcy}
+            </span>
             <span className={styles['amount']}>
+              ≈
               {amountFormatter(
                 props.depositAmount + props.depositCcyExtraRewardWhenNoExecuted,
                 CCYService.ccyConfigs[props.depositCcy]?.precision,
-              )}
-            </span>
-            <span className={styles['unit']}>
+              )}{' '}
               {CCYService.ccyConfigs[props.depositCcy]?.name ||
                 props.depositCcy}
-            </span>
-            <span className={styles['ccys']}>
-              {'['}
-              {CCYService.ccyConfigs[props.linkedCcy]?.name || props.linkedCcy}+
-              {CCYService.ccyConfigs[props.depositCcy]?.name ||
-                props.depositCcy}
-              {']'}
             </span>
           </div>
         </div>
@@ -57,26 +55,29 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
             })}
           </div>
           <div className={styles['value']}>
+            <span className={styles['ccys']}>
+              <img src={CCYService.ccyConfigs['RCH']?.icon} />
+            </span>
             <span className={styles['amount']}>
               {amountFormatter(
                 props.rchReturnAmount,
                 CCYService.ccyConfigs['RCH']?.precision,
               )}
-            </span>
-            <span className={styles['unit']}>RCH</span>
+            </span>{' '}
+            RCH
+            {rchPrice !== undefined ? (
+              <div className={styles['estimated-value']}>
+                ≈
+                <span className={styles['amount']}>
+                  {amountFormatter(
+                    props.rchReturnAmount * rchPrice,
+                    CCYService.ccyConfigs['USDT']?.precision,
+                  )}
+                </span>
+                <span className={styles['unit']}>USDT</span>
+              </div>
+            ) : undefined}
           </div>
-          {rchPrice !== undefined ? (
-            <div className={styles['estimated-value']}>
-              ≈
-              <span className={styles['amount']}>
-                {amountFormatter(
-                  props.rchReturnAmount * rchPrice,
-                  CCYService.ccyConfigs['USDT']?.precision,
-                )}
-              </span>
-              <span className={styles['unit']}>USDT</span>
-            </div>
-          ) : undefined}
         </div>
       </div>
     </div>
