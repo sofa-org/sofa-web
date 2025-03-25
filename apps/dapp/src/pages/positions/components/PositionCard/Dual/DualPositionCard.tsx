@@ -73,7 +73,9 @@ const DualPositionCard = (
                 'execution-status-' +
                   renderProps.executionResult.toString().toLowerCase()
               ]
-            : styles['execution-status-loading'],
+            : [DualPositionClaimStatus.NotExpired].includes(claimStatus)
+              ? undefined
+              : styles['execution-status-loading'],
         )}
         onClick={() => props.onClick?.()}
       >
