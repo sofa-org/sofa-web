@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import AsyncButton from '@/components/AsyncButton';
 import { useIndexPrices } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
+import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
 import { useProductsState } from '../store';
 
@@ -74,8 +75,15 @@ export const RecommendedList = (props: {
   // );
 
   const quotes = useMemo(() => {
-    return data.filter((it) => it.expiry == date?.expiry);
-  }, [date, data]);
+    const dualIsBuy = ProductTypeRefs[props.vault.productType].dualIsBuy;
+    return data
+      .filter((it) => it.expiry == date?.expiry)
+      .sort((a, b) => {
+        const pa = DualService.getPrice(a) || 0;
+        const pb = DualService.getPrice(b) || 0;
+        return dualIsBuy ? pa - pb : pb - pa;
+      });
+  }, [date, data, props.vault.productType]);
   const loading = useMemo(() => !quotes.length, [quotes]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const timerRef = useRef<any>();
