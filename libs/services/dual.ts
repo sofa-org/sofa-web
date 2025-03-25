@@ -89,13 +89,17 @@ export class DualService {
     if (now.getTime() < position.product.expiry * 1000) {
       return {
         status: DualPositionClaimStatus.NotExpired,
-        leftTime: position.product.expiry * 1000 - now.getTime(),
+        leftTime:
+          DualService.getSettlementTime(position.product).getTime() -
+          now.getTime(),
       };
     }
     if (now < DualService.getSettlementTime(position.product)) {
       return {
         status: DualPositionClaimStatus.ExpiredButNotClaimable,
-        leftTime: 0,
+        leftTime:
+          DualService.getSettlementTime(position.product).getTime() -
+          now.getTime(),
       };
     }
     return { status: DualPositionClaimStatus.Claimable, leftTime: 0 };

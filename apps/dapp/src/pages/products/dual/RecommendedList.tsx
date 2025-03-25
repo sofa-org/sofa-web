@@ -240,7 +240,7 @@ export const RecommendedList = (props: {
                 title: (
                   <span className={styles['reward-column']}>
                     {t({
-                      enUS: 'Extra Reward (APY)',
+                      enUS: 'Extra Reward (APR)',
                     })}
                   </span>
                 ),

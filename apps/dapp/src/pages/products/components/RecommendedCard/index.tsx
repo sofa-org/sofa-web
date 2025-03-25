@@ -156,7 +156,12 @@ export const RecommendedCardItem = (props: {
           refMs={next8h(it.timestamp * 1000)}
           expMs={it.expiry * 1000}
           rchYield={Number(it.apyInfo?.rch)}
-          anchorPrices={it.anchorPrices}
+          anchorPrices={[
+            amountFormatter(
+              DualService.getPrice(it),
+              DualService.getPricePrecision(it),
+            ),
+          ]}
           protectedYield={Number(it.apyInfo?.min)}
           enhancedYield={simplePlus(it.apyInfo?.max, -(it.apyInfo?.min || 0))}
           {...props.extraPayoffProps}

@@ -47,7 +47,9 @@ const DualPayoff = (
           <span>{t({ enUS: 'APY', zhCN: '年华' })}</span>
         </div>
         <div className={styles['payoff-chart']}>
-          {ProductTypeRefs[props.productType].dualDesc(t).op2}
+          {ProductTypeRefs[props.productType]
+            .dualDesc(t)
+            .op3.replace('{price}', String(props.anchorPrices[0]))}
         </div>
         <div className={styles['ccys']}>
           <img src={CCYService.ccyConfigs[props.depositCcy]?.icon} />

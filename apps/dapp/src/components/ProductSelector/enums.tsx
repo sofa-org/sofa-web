@@ -203,6 +203,7 @@ export const ProductTypeRefs = {
       limited: t({ enUS: 'Limit Sell' }),
       op: t({ enUS: 'Sell' }),
       op2: t({ enUS: 'Sell High', zhCN: '高卖' }),
+      op3: t({ enUS: 'Sell High @ {price}', zhCN: '高卖 @ {price}' }),
       partialExecuted: t({ enUS: 'Partial Sell' }),
     }),
     extraDesc: (t: TFunction) =>
@@ -446,6 +447,7 @@ export const ProductTypeRefs = {
       limited: t({ enUS: 'Limit Buy' }),
       op: t({ enUS: 'Buy' }),
       op2: t({ enUS: 'Buy Low', zhCN: '低买' }),
+      op3: t({ enUS: 'Buy Low @ {price}', zhCN: '低买 @ {price}' }),
       partialExecuted: t({ enUS: 'Partial Buy' }),
     }),
     extraDesc: (t: TFunction) =>

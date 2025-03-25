@@ -55,10 +55,14 @@ const PositionDetails = (props: PositionDetailsProps) => {
   const [t] = useTranslation('PositionDetails');
   const position = props.position;
   const product = position.product;
-  const leftTime = useMemo(
-    () => product.expiry * 1000 - Date.now(),
-    [product.expiry],
+  const expiry = useMemo(
+    () =>
+      product.vault.riskType == RiskType.DUAL
+        ? DualService.getSettlementTime(product).getTime()
+        : product.expiry * 1000,
+    [product.vault.riskType, product],
   );
+  const leftTime = useMemo(() => expiry - Date.now(), [expiry]);
   const hasExpired = leftTime < 0;
 
   const hasSettled = usePositionSettled(position);
@@ -79,9 +83,9 @@ const PositionDetails = (props: PositionDetailsProps) => {
   );
 
   const goTimePercentage = useMemo(() => {
-    const totalTime = (product.expiry - observationStart) * 1000;
+    const totalTime = expiry - observationStart * 1000;
     return Math.min(1 - leftTime / totalTime, 0.8);
-  }, [leftTime, observationStart, product.expiry]);
+  }, [leftTime, observationStart, expiry]);
   const infos = useMemo(
     () => [
       ...(product.vault.riskType == RiskType.DUAL
@@ -97,12 +101,12 @@ const PositionDetails = (props: PositionDetailsProps) => {
         : []),
       {
         label: t('Expiration'),
-        value: displayExpiry(product.expiry * 1000),
+        value: displayExpiry(expiry),
       },
       {
         label: t('Term'),
         value: displayTenor(
-          dayjs(product.expiry * 1000).diff(observationStart * 1000, 'day'),
+          dayjs(expiry).diff(observationStart * 1000, 'day'),
           t,
         ),
       },
@@ -147,16 +151,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
         ? [
             {
               label: t('Settlement Time'),
-              value: (
-                <Time
-                  time={
-                    product.vault.riskType == RiskType.DUAL
-                      ? DualService.getSettlementTime(product).getTime()
-                      : product.expiry * 1000
-                  }
-                  format="YYYY-MM-DD HH:mm"
-                />
-              ),
+              value: <Time time={expiry} format="YYYY-MM-DD HH:mm" />,
             },
             ...(position.triggerPrice && product.vault.riskType != RiskType.DUAL
               ? [
@@ -170,9 +165,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
         : [
             {
               label: t('Before'),
-              value: (
-                <Time time={product.expiry * 1000} format="YYYY-MM-DD HH:mm" />
-              ),
+              value: <Time time={expiry} format="YYYY-MM-DD HH:mm" />,
             },
             ...(position.triggerPrice
               ? [
@@ -213,7 +206,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
       position.triggerPrice,
       position.triggerTime,
       product.anchorPrices,
-      product.expiry,
+      expiry,
       product.vault.forCcy,
       observationStart,
       product.vault.productType,
@@ -310,7 +303,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
             product.vault.riskType === RiskType.RISKY ? t('Win') : t('PnL'),
           key: 'win',
           render: (_, it) =>
-            Date.now() < product.expiry * 1000
+            Date.now() < expiry
               ? '-'
               : `${amountFormatter(
                   product.vault.riskType === RiskType.RISKY
@@ -320,7 +313,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                 )} ${it.product.vault.depositCcy}`,
         },
       ] as ColumnProps<TransactionInfo>[],
-    [precision, product.expiry, product.vault.riskType, t, ticketMeta],
+    [precision, expiry, product.vault.riskType, t, ticketMeta],
   );
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);

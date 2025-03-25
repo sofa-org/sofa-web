@@ -93,7 +93,10 @@ const DualPositionCard = (
               </span>
               <span className={styles['status']}>
                 {/* 当前状态 */}
-                {claimStatus == DualPositionClaimStatus.NotExpired ? (
+                {[
+                  DualPositionClaimStatus.NotExpired,
+                  DualPositionClaimStatus.ExpiredButNotClaimable,
+                ].includes(claimStatus) ? (
                   // 剩余到期时间
                   <span className={styles['count-down']}>
                     {formatDuration(leftTime).replace(/\d+s/, '') || '0m'}
@@ -112,7 +115,7 @@ const DualPositionCard = (
                               enUS: 'Premium Earned',
                             })
                           : productTypeRef.dualDesc(t).partialExecuted
-                      : undefined}
+                      : '...'}
                   </span>
                 )}
               </span>
