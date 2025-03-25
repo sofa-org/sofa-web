@@ -41,7 +41,10 @@ addI18nResources(locale, 'ProductDual');
 
 const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
   const [t] = useTranslation('ProductDual');
-  const [product, setProduct] = useProductSelect();
+  const [product, setProduct] = useProductSelect({
+    default: ProductType.BearSpread,
+    acceptance: [ProductType.BearSpread, ProductType.BullSpread],
+  });
   const { chainId } = useWalletStore();
   const isMobileUI = useIsMobileUI();
   const defaultInput = useMemo(() => {
@@ -166,6 +169,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         setDate(undefined);
         return;
       }
+      // 切的时候全清空，因为价格上下限和expiry可能不一样
       setCustomExpiry(undefined);
       setCustomPrice(undefined);
     }),

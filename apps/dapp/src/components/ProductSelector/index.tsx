@@ -1,7 +1,12 @@
 import { SetStateAction, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Radio, RadioGroup } from '@douyinfe/semi-ui';
-import { ProductType, ProjectType, RiskType } from '@sofa/services/base-type';
+import {
+  ProductType,
+  ProjectType,
+  RiskType,
+  VaultInfo,
+} from '@sofa/services/base-type';
 import { ContractsService } from '@sofa/services/contracts.ts';
 import { useTranslation } from '@sofa/services/i18n';
 import { Env } from '@sofa/utils/env';
@@ -72,11 +77,23 @@ export function useProjectChange(defaultVal = ProjectType.Earn) {
   return [project, setProject] as const;
 }
 
-export function useProductSelect() {
+export function useProductSelect(params?: {
+  acceptance?: ProductType[] | ((productType: ProductType) => boolean);
+  default?: ProductType;
+}) {
   const val = useQuery()['product-type'];
+  const accept = useLazyCallback((productType: ProductType) => {
+    if (!params?.acceptance) {
+      return ProductType[val as ProductType];
+    }
+    if (typeof params.acceptance == 'function') {
+      return params.acceptance(productType);
+    }
+    return params.acceptance.includes(productType);
+  });
   const productType = useMemo(() => {
-    if (ProductType[val as ProductType]) return val as ProductType;
-    return ProductType.BullSpread;
+    if (accept(val as ProductType)) return val as ProductType;
+    return params?.default || ProductType.BullSpread;
   }, [val]);
   const setProductType = useLazyCallback(
     (action: SetStateAction<ProductType>) => {
