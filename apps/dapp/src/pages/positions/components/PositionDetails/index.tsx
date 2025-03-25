@@ -82,9 +82,6 @@ const PositionDetails = (props: PositionDetailsProps) => {
     const totalTime = (product.expiry - observationStart) * 1000;
     return Math.min(1 - leftTime / totalTime, 0.8);
   }, [leftTime, observationStart, product.expiry]);
-
-  const productTypeRef = ProductTypeRefs[product.vault.productType];
-
   const infos = useMemo(
     () => [
       ...(product.vault.riskType == RiskType.DUAL
@@ -118,7 +115,11 @@ const PositionDetails = (props: PositionDetailsProps) => {
               }),
               value: amountFormatter(
                 DualService.getPrice(product),
-                CCYService.ccyConfigs[product.vault.depositCcy]?.precision,
+                DualService.getPricePrecision({
+                  minStepSize: position.product.vault.tickPrice,
+                  vault: product.vault,
+                }),
+                true,
               ),
             },
           ]
