@@ -258,7 +258,7 @@ export const RecommendedList = (props: {
                     title: (
                       <div className={styles['operate']}>
                         {t({
-                          enUS: 'Operate',
+                          enUS: 'Action',
                         })}
                       </div>
                     ),
@@ -267,7 +267,7 @@ export const RecommendedList = (props: {
                         className={styles['deposit-btn']}
                         onClick={() => props.onSelectQuote(row)}
                       >
-                        {t({ enUS: 'Deposit' })}
+                        {t({ enUS: 'Subscribe' })}
                       </AsyncButton>
                     ),
                   },
