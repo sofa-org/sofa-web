@@ -133,7 +133,9 @@ const DualPositionCard = (
                 t,
               )}
             </span>
-            <span className={styles['prices']}>{product.anchorPrices[0]}</span>
+            <span className={styles['prices']}>
+              {DualService.getPrice(product)}
+            </span>
           </div>
         </div>
         <div className={styles['scenario']}>
@@ -195,7 +197,7 @@ const DualPositionCard = (
                 <div className={styles['price']}>
                   <span className={styles['amount']}>
                     {amountFormatter(
-                      position.product.anchorPrices[0],
+                      DualService.getPrice(position.product),
                       domCcyConfig?.precision,
                     )}
                   </span>
@@ -230,7 +232,7 @@ const DualPositionCard = (
                     <div className={styles['price']}>
                       <span className={styles['amount']}>
                         {amountFormatter(
-                          position.product.anchorPrices[0],
+                          DualService.getPrice(position.product),
                           domCcyConfig?.precision,
                         )}
                       </span>

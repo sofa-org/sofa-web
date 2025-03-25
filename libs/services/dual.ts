@@ -109,24 +109,29 @@ export class DualService {
       : (String(params.minStepSize).split('.', 2)[1] || '').length;
   }
   static getPrice(params: {
-    vault: { productType: ProductType; domCcy: VaultInfo['domCcy'] };
+    vault: {
+      productType: ProductType;
+      domCcy: VaultInfo['domCcy'];
+      tickPrice?: number | string;
+    };
     minStepSize?: string | number;
     anchorPrices: (number | string)[];
   }) {
     if (isNullLike(params?.anchorPrices?.[0])) {
       return undefined;
     }
+    const tickPrice = params?.vault.tickPrice || params.minStepSize;
     const p = params.anchorPrices[0];
     if (!DualService.shouldRevertAnchorPrice(params.vault.productType)) {
       const res = Number(p);
-      if (params.minStepSize) {
-        return Number(roundWith(res, params.minStepSize));
+      if (tickPrice) {
+        return Number(roundWith(res, tickPrice));
       }
       return res;
     }
     const res = p === 0 || p === '0' ? 0 : 1.0 / Number(p);
-    if (params.minStepSize) {
-      return Number(roundWith(res, params.minStepSize));
+    if (tickPrice) {
+      return Number(roundWith(res, tickPrice));
     }
     return res;
   }
