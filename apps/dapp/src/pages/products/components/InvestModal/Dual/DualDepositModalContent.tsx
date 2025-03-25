@@ -178,7 +178,7 @@ export const DualDepositModalContent = (
             dualConfig.minStepSize,
             undefined,
             undefined,
-            'upper',
+            'lower',
           )
         : undefined;
     return res;
@@ -197,7 +197,7 @@ export const DualDepositModalContent = (
             dualConfig.minStepSize,
             undefined,
             undefined,
-            'lower',
+            'upper',
           )
         : undefined;
     return res;

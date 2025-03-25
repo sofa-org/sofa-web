@@ -109,7 +109,7 @@ export const CustomQuote = (props: {
             dualConfig.minStepSize,
             undefined,
             undefined,
-            'upper',
+            'lower',
           )
         : undefined;
     return res;
@@ -130,7 +130,7 @@ export const CustomQuote = (props: {
             dualConfig.minStepSize,
             undefined,
             undefined,
-            'lower',
+            'upper',
           )
         : undefined;
     return res;
@@ -197,8 +197,8 @@ export const CustomQuote = (props: {
           <AmountInput
             className={styles['amount-input']}
             value={props.price}
-            // max={maxPrice}
-            // min={minPrice}
+            max={maxPrice}
+            min={minPrice}
             onChange={(v) => {
               props.onChangedPrice(
                 v === undefined || v === '' ? undefined : Number(v),

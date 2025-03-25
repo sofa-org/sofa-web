@@ -166,6 +166,8 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         setDate(undefined);
         return;
       }
+      setCustomExpiry(undefined);
+      setCustomPrice(undefined);
     }),
     [vault],
   );
