@@ -50,6 +50,25 @@
 
   .subtitle {
     color: #e36e00;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(
+        to left,
+        transparent 0%,
+        transparent 50%,
+        #e36e00 50%,
+        #e36e00 100%
+      );
+      background-size: 5px 1px;
+      background-repeat: repeat-x;
+    }
   }
 
   .result {
@@ -71,7 +90,6 @@
     .label {
       @include flex-center;
 
-      align-items: start;
       gap: 4px;
 
       img {
@@ -80,10 +98,22 @@
       }
     }
   }
+
+  .plus-sign {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: url("./assets/icon-plus-sign.svg") no-repeat center / 100%;
+  }
 }
 
 .profit-scenario-wrapper {
   margin-bottom: 32px;
+
+  .unit,
+  .amount {
+    margin-left: 5px;
+  }
 
   .title-info {
     display: flex;
@@ -100,6 +130,7 @@
 
     .emoji {
       font-size: 19px;
+      margin-right: 7px;
     }
   }
 
@@ -131,8 +162,7 @@
 
     .line {
       width: 100%;
-      height: 1px;
-      border: #d9d9d9 solid 1px;
+      border: #d9d9d9 solid 0.5px;
       margin: 8px 0;
     }
 

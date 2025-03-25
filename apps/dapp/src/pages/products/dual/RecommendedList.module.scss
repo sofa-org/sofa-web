@@ -81,6 +81,10 @@
       font-weight: 400 !important;
     }
 
+    .semi-table-thead > .semi-table-row > .semi-table-row-head {
+      border-bottom: 1px solid #eee;
+    }
+
     .semi-table-row-cell {
       height: min(60px, 9.9vw);
     }
@@ -95,6 +99,7 @@
   .change-to-current-price {
     color: #bbb;
     font-size: 10px;
+    margin-left: 4px;
 
     > .amount {
       color: #999;

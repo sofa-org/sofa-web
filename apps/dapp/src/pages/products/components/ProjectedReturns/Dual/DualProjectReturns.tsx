@@ -184,8 +184,8 @@ export const DualProfitScenarios = (
                         rchConfig?.precision,
                       ),
                     },
-                  )}
-                  |
+                  )}{' '}
+                  |{' '}
                   {t({
                     enUS: 'Est.',
                     zhCN: '预估',
@@ -268,7 +268,7 @@ export const DualProfitScenarios = (
                         </span>
                       </span>
                     </div>
-                    <span className="plus-sign">+</span>
+                    <span className={styles['plus-sign']} />
                     <div className={styles['item']}>
                       <span className={styles['label']}>
                         {(rchConfig && <img src={rchConfig.icon} />) ||
@@ -362,8 +362,8 @@ export const DualProfitScenarios = (
                         rchConfig?.precision,
                       ),
                     },
-                  )}
-                  |
+                  )}{' '}
+                  |{' '}
                   {t({
                     enUS: 'Est.',
                     zhCN: '预估',
@@ -426,7 +426,7 @@ export const DualProfitScenarios = (
                         </span>
                       </span>
                     </div>
-                    <span className="plus-sign">+</span>
+                    <span className={styles['plus-sign']} />
                     <div className={styles['item']}>
                       <span className={styles['label']}>
                         {(rchConfig && <img src={rchConfig.icon} />) ||

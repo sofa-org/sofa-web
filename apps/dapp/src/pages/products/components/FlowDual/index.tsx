@@ -29,15 +29,9 @@ export const FlowDual = () => {
       <div className={styles['content']}>
         <Step1 width={127 / window.winScale} />
         <div className={styles['arrow']} />
-        <Step2 width={55 / window.winScale} />
-        <div className={styles['arrow']}>
-          <span>Expiry</span>
-        </div>
-        <Step3 width={159 / window.winScale} />
-        <div className={styles['arrow-1']}>
-          <span className={styles['txt-highlight']}>If you win</span>
-        </div>
-        <Step4 width={177 / window.winScale} />
+        <Step2 width={128 / window.winScale} />
+        <Step3 width={524 / window.winScale} />
+        <Step4 width={128 / window.winScale} />
       </div>
       <IconExpand className={styles['icon-expand']} />
     </div>

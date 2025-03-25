@@ -2,7 +2,7 @@
   @include flex-center;
 
   margin: 0;
-  padding: 75px 0 30px;
+  padding: 45px 0 30px;
   font-size: min(24px, 5vw);
   text-align: center;
   color: #fff;
@@ -10,7 +10,7 @@
 
 .form {
   width: $width-content;
-  margin: 24px auto 40px;
+  margin: -24px auto 40px;
   background: #2c2f34;
   border-radius: 40px 40px 24px 24px;
 
@@ -105,8 +105,8 @@
       }
 
       img {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         margin-right: 6px;
         z-index: 4;
 
@@ -122,6 +122,9 @@
       }
 
       .apy {
+        @include bold;
+
+        margin-top: 5px;
         color: #50d113;
       }
     }
@@ -145,12 +148,15 @@
 
   .form {
     width: 100vw;
+
     .sub-title {
       font-size: 12px;
     }
+
     .content {
       padding-left: 16px;
       padding-right: 16px;
+
       :global {
         .semi-table-wrapper {
           .semi-table-thead .semi-table-row-head {
@@ -160,8 +166,10 @@
               text-align: right;
             }
           }
+
           .semi-table-tbody .semi-table-row-cell {
             padding: 0;
+
             &:last-child {
               text-align: right;
             }
@@ -170,6 +178,7 @@
       }
     }
   }
+
   .custom-quote {
     flex-direction: column;
     align-items: start;

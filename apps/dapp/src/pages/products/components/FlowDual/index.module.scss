@@ -11,8 +11,7 @@
   margin: 0 40px;
 }
 
-.arrow,
-.arrow-1 {
+.arrow {
   @include flex-column-center;
 
   align-items: flex-start;
@@ -27,14 +26,6 @@
 
   > span {
     white-space: nowrap;
-  }
-}
-
-.arrow-1 {
-  color: #ffe601;
-
-  &::before {
-    content: url("./assets/arrow-1.svg");
   }
 }
 
@@ -82,8 +73,7 @@
     margin: 0;
   }
 
-  .arrow,
-  .arrow-1 {
+  .arrow {
     position: relative;
 
     &::before {

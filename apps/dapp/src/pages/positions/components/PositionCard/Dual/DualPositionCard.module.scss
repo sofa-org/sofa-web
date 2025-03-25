@@ -189,7 +189,9 @@
 
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     gap: 12px;
+    height: 95px;
 
     .unit,
     .side {
@@ -211,7 +213,6 @@
       gap: 4px;
       flex-direction: column;
       align-items: start;
-      height: 45px;
     }
   }
 }
