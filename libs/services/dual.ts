@@ -23,6 +23,9 @@ export interface DualProfitRenderProps {
     | DualPositionExecutionStatus.Executed
     | DualPositionExecutionStatus.NotExecuted
     | DualPositionExecutionStatus.PartialExecuted;
+
+  redeemableOfLinkedCcy: number;
+  redeemable: number;
 }
 export enum DualPositionExecutionStatus {
   NotExpired = 'NotExpired',
@@ -42,7 +45,7 @@ export class DualService {
   static getLinkedCcy(vault: VaultInfo) {
     return vault.forCcy == vault.depositCcy ? vault.domCcy : vault.forCcy;
   }
-  static getExecutionStatus(
+  private static $getExecutionStatus(
     position: positions.PositionInfo & { vault: VaultInfo },
   ) {
     if (
@@ -326,7 +329,7 @@ export class DualService {
         };
       }
     }
-    const executionStatus = DualService.getExecutionStatus(
+    const executionStatus = DualService.$getExecutionStatus(
       data as positions.PositionInfo & { vault: VaultInfo },
     );
     const res = {
@@ -338,6 +341,8 @@ export class DualService {
       ].includes(executionStatus)
         ? executionStatus
         : undefined,
+      redeemable: data.amounts.redeemable,
+      redeemableOfLinkedCcy: data.amounts.redeemableOfLinkedCcy,
     } as DualProfitRenderProps;
     const price = DualService.getPrice(product);
     if (price === undefined) {
@@ -391,7 +396,7 @@ export class DualService {
       res.linkedCcyExtraRewardWhenSuccessfulExecuted = 0;
     }
     if (
-      Math.abs(res.depositCcyExtraRewardWhenNoExecuted) >
+      Math.abs(res.depositCcyExtraRewardWhenNoExecuted) <
       Math.pow(0.1, CCYService.ccyConfigs[res.depositCcy]?.precision || 4)
     ) {
       // 精度问题，且负数不会被后面 amountFormatter 排除

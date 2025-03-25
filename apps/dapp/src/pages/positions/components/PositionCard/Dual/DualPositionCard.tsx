@@ -53,7 +53,6 @@ const DualPositionCard = (
       : forCcyConfig;
   const linkedCcy = DualService.getLinkedCcy(product.vault);
 
-  const executionStatus = DualService.getExecutionStatus(position);
   const { status: claimStatus, leftTime } = DualService.getClaimStatus(
     position,
     new Date(),
@@ -68,10 +67,13 @@ const DualPositionCard = (
         className={classNames(
           styles['card'],
           styles['claim-status-' + claimStatus.toString().toLowerCase()],
-          styles[
-            'execution-status-' + executionStatus.toString().toLowerCase()
-          ],
           productTypeRef.dualIsBuy ? styles['buy'] : styles['sell'],
+          renderProps?.executionResult
+            ? styles[
+                'execution-status-' +
+                  renderProps.executionResult.toString().toLowerCase()
+              ]
+            : undefined,
         )}
         onClick={() => props.onClick?.()}
       >
@@ -91,23 +93,26 @@ const DualPositionCard = (
               </span>
               <span className={styles['status']}>
                 {/* 当前状态 */}
-                {executionStatus == DualPositionExecutionStatus.NotExpired ? (
+                {claimStatus == DualPositionClaimStatus.NotExpired ? (
                   // 剩余到期时间
                   <span className={styles['count-down']}>
                     {formatDuration(leftTime).replace(/\d+s/, '') || '0m'}
                   </span>
                 ) : (
                   <span className={styles['execution-status']}>
-                    {executionStatus == DualPositionExecutionStatus.Executed
-                      ? t({
-                          enUS: 'Successful',
-                        })
-                      : executionStatus ==
-                          DualPositionExecutionStatus.NotExecuted
+                    {renderProps?.executionResult
+                      ? renderProps.executionResult ==
+                        DualPositionExecutionStatus.Executed
                         ? t({
-                            enUS: 'Premium Earned',
+                            enUS: 'Successful',
                           })
-                        : productTypeRef.dualDesc(t).partialExecuted}
+                        : renderProps.executionResult ==
+                            DualPositionExecutionStatus.NotExecuted
+                          ? t({
+                              enUS: 'Premium Earned',
+                            })
+                          : productTypeRef.dualDesc(t).partialExecuted
+                      : undefined}
                   </span>
                 )}
               </span>
@@ -147,12 +152,18 @@ const DualPositionCard = (
             <div
               className={classNames(styles['down'], {
                 [styles['is-dual-ccy']]:
-                  executionStatus ==
+                  renderProps?.executionResult ==
                   DualPositionExecutionStatus.PartialExecuted,
               })}
             >
-              <img src={linkedCcyOpsiteConfig?.icon} />
-              {executionStatus ==
+              {renderProps?.executionResult ==
+              DualPositionExecutionStatus.NotExecuted ? (
+                <img src={depositCcyConfig?.icon} />
+              ) : (
+                <img src={linkedCcyOpsiteConfig?.icon} />
+              )}
+
+              {renderProps?.executionResult ==
               DualPositionExecutionStatus.PartialExecuted ? (
                 // 如果是部分执行，下方需要显示两个图标
                 <img
@@ -180,7 +191,7 @@ const DualPositionCard = (
               </div>
               {/* 如果是未到期的卖，价格显示在上面 */}
               {!productTypeRef.dualIsBuy &&
-              executionStatus == DualPositionExecutionStatus.NotExpired ? (
+              claimStatus == DualPositionClaimStatus.NotExpired ? (
                 <div className={styles['price']}>
                   <span className={styles['amount']}>
                     {amountFormatter(
@@ -198,7 +209,7 @@ const DualPositionCard = (
               ) : undefined}
             </div>
             <div className={styles['down']}>
-              {executionStatus == DualPositionExecutionStatus.NotExpired ? (
+              {claimStatus == DualPositionClaimStatus.NotExpired ? (
                 <>
                   {/* 下方情况1：如果未到期，显示预估买到的币，和价格 */}
                   <div
@@ -232,7 +243,8 @@ const DualPositionCard = (
                     </div>
                   )}
                 </>
-              ) : executionStatus == DualPositionExecutionStatus.Executed ? (
+              ) : renderProps?.executionResult ==
+                DualPositionExecutionStatus.Executed ? (
                 <>
                   {/* 下方情况2：如果已执行，显示对手币的数额+Profits(linked ccy) */}
 
@@ -241,7 +253,7 @@ const DualPositionCard = (
                   >
                     <span className={styles['amount']}>
                       {amountFormatter(
-                        position.amounts.redeemableOfLinkedCcy,
+                        renderProps.redeemableOfLinkedCcy,
                         linkedCcyOpsiteConfig?.precision,
                       )}
                     </span>
@@ -268,7 +280,8 @@ const DualPositionCard = (
                     )}
                   </div>
                 </>
-              ) : executionStatus == DualPositionExecutionStatus.NotExecuted ? (
+              ) : renderProps?.executionResult ==
+                DualPositionExecutionStatus.NotExecuted ? (
                 <>
                   {/* 下方情况3：如果未执行，显示depositCcy的数额+Profits(deposit ccy) */}
                   <div
@@ -276,7 +289,7 @@ const DualPositionCard = (
                   >
                     <span className={styles['amount']}>
                       {amountFormatter(
-                        position.amounts.redeemable,
+                        renderProps.redeemable,
                         depositCcyConfig?.precision,
                       )}
                     </span>
@@ -285,20 +298,26 @@ const DualPositionCard = (
                     </span>
                   </div>
                   <div className={styles['profits']}>
-                    (
-                    <span className={styles['amount']}>
-                      {amountFormatter(
-                        renderProps?.depositCcyExtraRewardWhenNoExecuted,
-                        depositCcyConfig?.precision,
-                      )}
-                    </span>
-                    {t({
-                      enUS: 'Profits',
-                    })}
-                    )
+                    {formatHighlightedText(
+                      t(
+                        {
+                          enUS: '([[{{amount}}]] Profits)',
+                        },
+                        {
+                          amount: amountFormatter(
+                            renderProps?.depositCcyExtraRewardWhenNoExecuted,
+                            depositCcyConfig?.precision,
+                          ),
+                        },
+                      ),
+                      {
+                        hightlightedClassName: styles['amount'],
+                      },
+                    )}
                   </div>
                 </>
-              ) : (
+              ) : renderProps?.executionResult ==
+                DualPositionExecutionStatus.PartialExecuted ? (
                 <>
                   {/* 下方情况4：如果部分执行，显示两个币的具体数值 */}
                   <div
@@ -306,7 +325,7 @@ const DualPositionCard = (
                   >
                     <span className={styles['amount']}>
                       {amountFormatter(
-                        position.amounts.redeemableOfLinkedCcy,
+                        renderProps.redeemableOfLinkedCcy,
                         linkedCcyOpsiteConfig?.precision,
                       )}
                     </span>
@@ -316,7 +335,7 @@ const DualPositionCard = (
                     <br />+
                     <span className={styles['amount']}>
                       {amountFormatter(
-                        position.amounts.redeemable,
+                        renderProps.redeemable,
                         depositCcyConfig?.precision,
                       )}
                     </span>
@@ -325,7 +344,7 @@ const DualPositionCard = (
                     </span>
                   </div>
                 </>
-              )}
+              ) : undefined}
             </div>
           </div>
         </div>
