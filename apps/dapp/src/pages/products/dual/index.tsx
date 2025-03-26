@@ -279,9 +279,15 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
         ) : undefined}
         <div className={styles['form']}>
           <div className={styles['sub-title']}>
-            {t({
-              enUS: '👏 Buy crypto at a discount and get bonus rewards!',
-            })}
+            {!vault
+              ? '...'
+              : ProductTypeRefs[vault.productType].dualIsBuy
+                ? t({
+                    enUS: '👏 Buy crypto at a discount and get bonus rewards!',
+                  })
+                : t({
+                    enUS: '👏 Sell crypto at Peak and get bonus rewards!',
+                  })}
           </div>
           <div className={styles['content']}>
             {isMobileUI ? undefined : (

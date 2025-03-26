@@ -1,4 +1,4 @@
-import { roundWith } from '@sofa/utils/amount';
+import { amountFormatter, roundWith } from '@sofa/utils/amount';
 import { asyncCache } from '@sofa/utils/decorators';
 import { isNullLike } from '@sofa/utils/fns';
 import { ethers } from 'ethers';
@@ -26,6 +26,8 @@ export interface DualProfitRenderProps {
 
   redeemableOfLinkedCcy: number;
   redeemable: number;
+
+  priceFormatted: string;
 }
 export enum DualPositionExecutionStatus {
   NotExpired = 'NotExpired',
@@ -335,6 +337,10 @@ export class DualService {
     const executionStatus = DualService.$getExecutionStatus(
       data as positions.PositionInfo & { vault: VaultInfo },
     );
+    const price = DualService.getPrice(product);
+    if (price === undefined) {
+      return undefined;
+    }
     const res = {
       productType: data.vault.productType,
       executionResult: [
@@ -346,11 +352,11 @@ export class DualService {
         : undefined,
       redeemable: data.amounts.redeemable,
       redeemableOfLinkedCcy: data.amounts.redeemableOfLinkedCcy,
+      priceFormatted: amountFormatter(
+        price,
+        DualService.getPricePrecision(product),
+      ),
     } as DualProfitRenderProps;
-    const price = DualService.getPrice(product);
-    if (price === undefined) {
-      return undefined;
-    }
     if (data.vault.productType == ProductType.BearSpread) {
       res.linkedCcy = data.vault.forCcy;
       // 低买： anchorPrice[0] = RCH/USDT

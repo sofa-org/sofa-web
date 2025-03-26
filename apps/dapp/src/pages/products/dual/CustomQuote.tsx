@@ -251,7 +251,7 @@ export const CustomQuote = (props: {
         onClick={() => props.onClickDeposit(matchingQuote)}
         disabled={!props.price || !props.expiry}
       >
-        {t({ enUS: 'Deposit' })}
+        {t({ enUS: 'Subscribe' })}
       </AsyncButton>
     </div>
   );

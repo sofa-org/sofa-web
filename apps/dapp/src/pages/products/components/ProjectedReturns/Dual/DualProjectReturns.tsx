@@ -208,14 +208,7 @@ export const DualProfitScenarios = (
                   </div>
                   <div className={styles['exchange-rate-info']}>
                     <span className={styles['exchange-rate']}>
-                      {amountFormatter(
-                        props.depositAmount /
-                          props.linkedCcyAmountWhenSuccessfulExecuted,
-                        Math.max(
-                          forCcyConfig?.precision || 6,
-                          depositCcyConfig?.precision || 6,
-                        ),
-                      )}
+                      {props.priceFormatted}
                     </span>
                   </div>
                   <div
@@ -339,7 +332,7 @@ export const DualProfitScenarios = (
                 <div className={styles['title']}>
                   <span className={styles['emoji']}>️️✌️</span>
                   {t({
-                    enUS: 'No Executed, Premium Earned',
+                    enUS: 'Not Executed, Premium Earned',
                     zhCN: '未成交，获得额外奖励',
                   })}
                 </div>

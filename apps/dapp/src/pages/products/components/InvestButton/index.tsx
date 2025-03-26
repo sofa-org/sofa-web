@@ -301,7 +301,11 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       >
         {vault.riskType === RiskType.RISKY
           ? t('Purchase All Tickets')
-          : t('Deposit')}
+          : vault.riskType === RiskType.DUAL
+            ? t({
+                enUS: 'Subscribe',
+              })
+            : t('Deposit')}
       </BaseInvestButton>
       <InvestProgress
         projectType={
