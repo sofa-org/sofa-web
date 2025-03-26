@@ -92,8 +92,7 @@
 .profit-scenario-wrapper {
   margin-bottom: 32px;
 
-  .unit,
-  .amount {
+  .unit {
     margin-left: 5px;
   }
 
@@ -155,6 +154,7 @@
         width: 16px;
         height: 16px;
         vertical-align: middle;
+        margin-right: 5px;
       }
 
       .amount,

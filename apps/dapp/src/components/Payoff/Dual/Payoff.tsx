@@ -34,8 +34,8 @@ const DualPayoff = (
         styles['payoff'],
         'payoff',
         props.productType == ProductType.BullSpread
-          ? styles['buy-low']
-          : styles['sell-high'],
+          ? styles['sell-high']
+          : styles['buy-low'],
         {
           [styles['mobile-ui']]: mobileUI,
         },

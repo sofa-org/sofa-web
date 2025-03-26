@@ -74,6 +74,19 @@
       }
     }
 
+    .semi-table-tbody {
+      tr:nth-child(odd) {
+        background: #fafafa;
+      }
+
+      > .semi-table-row {
+        > .semi-table-row-cell {
+          border-bottom: none;
+          height: min(72px, 12vw);
+        }
+      }
+    }
+
     .semi-table-row-head {
       color: rgb(0 0 0 / 85%) !important;
       font-size: 14px;
@@ -83,10 +96,6 @@
 
     .semi-table-thead > .semi-table-row > .semi-table-row-head {
       border-bottom: 1px solid #eee;
-    }
-
-    .semi-table-row-cell {
-      height: min(60px, 9.9vw);
     }
   }
 

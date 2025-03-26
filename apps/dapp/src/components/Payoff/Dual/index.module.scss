@@ -10,20 +10,32 @@
 
   &.buy-low {
     .payoff-chart {
-      margin: 16px 0 32px;
-      height: 61px;
-      background: url("./assets/payoff-chart-buy-low.svg") no-repeat center
-        center / contain;
+      &::after {
+        content: "";
+        display: block;
+        margin: 8px 0 24px;
+        height: 61px;
+        background: url("./assets/payoff-chart-buy-low.svg") no-repeat center
+          center / contain;
+      }
     }
   }
 
   &.sell-high {
+    .apy {
+      margin-top: 4px;
+    }
+
     .payoff-chart {
-      margin: 8px 0 32px;
-      height: 69px;
-      background: url("./assets/payoff-chart-sell-high.svg") no-repeat center
-        bottom / contain;
-      background-size: auto 45px;
+      &::after {
+        content: "";
+        display: block;
+        margin: 8px 0 24px;
+        height: 48px;
+        background: url("./assets/payoff-chart-sell-high.svg") no-repeat center
+          bottom / contain;
+        background-size: auto 45px;
+      }
     }
   }
 
@@ -38,8 +50,9 @@
 
     .apy {
       color: #50d113;
-      font-size: 32px;
+      font-size: 28px;
       display: inline-block;
+      margin-bottom: 8px;
 
       span {
         margin-left: 5px;

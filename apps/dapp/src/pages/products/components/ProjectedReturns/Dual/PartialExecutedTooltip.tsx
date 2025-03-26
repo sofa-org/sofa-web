@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { CCYService } from '@sofa/services/ccy';
 import { DualProfitRenderProps } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
@@ -10,11 +11,16 @@ import styles from './PartialExecutedTooltip.module.scss';
 export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
   const [t] = useTranslation('ProjectedReturns');
   const rchPrice = useIndexPrices((r) => r.prices['RCH']);
+  const desc = useMemo(
+    () => ProductTypeRefs[props.productType].dualDesc(t),
+    [t, props.productType],
+  );
   return (
     <div className={styles['content']}>
-      <div className={styles['title']}>
+      <div className={styles['title']}>{desc.partialExecuted}</div>
+      <div className={styles['subtitle']}>
         {t({
-          enUS: 'In extreme cases, partial execution may occur, and you can still get Deposit Rewards and RCH Airdrops',
+          enUS: 'Still Get Deposit Rewards and RCH Airdrops',
         })}
       </div>
       <div className={styles['body']}>
@@ -32,6 +38,7 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
             <span className={styles['ccys']}>
               <img src={CCYService.ccyConfigs[props.linkedCcy || '']?.icon} />
               {CCYService.ccyConfigs[props.linkedCcy]?.name || props.linkedCcy}
+              <span className={styles['plus-sign']} />
               <img src={CCYService.ccyConfigs[props.depositCcy || '']?.icon} />
               {CCYService.ccyConfigs[props.depositCcy]?.name ||
                 props.depositCcy}
@@ -62,9 +69,9 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
               {amountFormatter(
                 props.rchReturnAmount,
                 CCYService.ccyConfigs['RCH']?.precision,
-              )}
-            </span>{' '}
-            RCH
+              )}{' '}
+              RCH
+            </span>
             {rchPrice !== undefined ? (
               <div className={styles['estimated-value']}>
                 ≈

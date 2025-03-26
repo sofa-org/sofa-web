@@ -135,7 +135,7 @@
   display: flex;
   align-items: center;
   background-color: #2c2f34;
-  margin: 0 -40px;
+  margin: 32px -40px 0;
   border-radius: 0 0 12px 12px;
   color: #fff;
   padding: 20px 40px;
@@ -148,6 +148,7 @@
 
   .form {
     width: 100vw;
+    margin-top: 5px;
 
     .sub-title {
       font-size: 12px;

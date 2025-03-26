@@ -1,37 +1,88 @@
 .content {
   color: #000;
-  padding: 16px 25px;
+  padding: 16px 26px;
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
 
   .title {
-    font-size: 12px;
-    opacity: 0.35;
-    margin-bottom: 8px;
+    display: inline;
+    color: rgb(0 0 0 / 85%);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .subtitle {
+    @include bold;
+
+    display: inline;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(0 0 0 / 65%);
+
+    &::before {
+      content: "|";
+      color: rgb(0 0 0 / 45%);
+      margin: 0 10px;
+    }
   }
 
   .body {
     @include flex-center;
 
     justify-content: space-between;
+    margin-top: 10px;
 
     .left,
     .right {
-      border: 1px solid #dbffa4;
-      padding: 12px 25px;
+      border-radius: 8px;
+      background: rgb(0 0 0 / 35%);
       text-align: center;
+      height: 100px;
+
+      .label {
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        margin: 4px 12px;
+      }
+
+      .value {
+        border-radius: 8px;
+        border: 1px solid #e2e2e2;
+        background: #fff;
+        height: 83px;
+        padding: 12px 16px;
+      }
     }
 
     .left {
       .value {
-        font-size: 20px;
+        .ccys {
+          @include flex-center;
+
+          color: rgb(0 0 0 / 41%);
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .plus-sign {
+          width: 20px;
+          height: 20px;
+          display: inline-block;
+          background: url("./assets/icon-plus-sign.svg") no-repeat center / 100%;
+        }
 
         .amount {
-          margin: 0 5px;
-        }
-      }
+          @include bold;
 
-      .ccys {
-        font-size: 16px;
-        display: block;
+          color: rgb(0 0 0 / 85%);
+          font-size: 14px;
+          display: inline-block;
+          margin-top: 10px;
+        }
       }
     }
 
@@ -42,27 +93,27 @@
       }
 
       .value {
-        font-size: 20px;
+        @include bold;
 
-        .unit {
-          font-size: 14px;
-        }
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        font-size: 14px;
       }
 
       .estimated-value {
-        opacity: 0.35;
+        color: rgb(0 0 0 / 85%);
+        font-size: 12px;
+        font-weight: 500;
       }
-    }
-
-    .label {
-      font-size: 12px;
-      opacity: 0.35;
-      margin-bottom: 15px;
     }
 
     .plus {
       &::after {
         content: "+";
+        color: rgb(0 0 0 / 10%);
+        font-weight: 500;
+        font-size: 20px;
       }
     }
   }
