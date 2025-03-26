@@ -36,6 +36,7 @@ export interface AmountInputProps extends BaseInputProps<string | number> {
   type?: 'normal' | 'internal';
   onBlur?(e: FocusEvent): void;
   disabledUnlessWalletConnected?: boolean;
+  roundingMethodForTick?: 'upper' | 'lower';
 }
 
 const AmountInput = memo<AmountInputProps>((props) => {
@@ -47,7 +48,13 @@ const AmountInput = memo<AmountInputProps>((props) => {
   }, [props.value]);
 
   const round = useLazyCallback((v?: string | number) =>
-    roundWith(v, props.tick || 0.0001, props.min || 0, props.max, 'lower'),
+    roundWith(
+      v,
+      props.tick || 0.0001,
+      props.min || 0,
+      props.max,
+      props.roundingMethodForTick || 'lower',
+    ),
   );
   const { address } = useWalletStore();
   const { bringUpConnect } = useWalletUIState();

@@ -297,6 +297,9 @@ export const DualDepositModalContent = (
                     max={maxPrice}
                     min={minPrice}
                     tick={dualConfig?.minStepSize}
+                    roundingMethodForTick={
+                      productTypeRef.dualIsBuy ? 'lower' : 'upper'
+                    }
                     value={DualService.getPrice({
                       ...(product as ProductQuoteParams),
                       minStepSize: dualConfig?.minStepSize,
