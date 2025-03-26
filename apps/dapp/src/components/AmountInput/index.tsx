@@ -170,6 +170,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
               e.target.blur();
             }
           }}
+          autoComplete="off"
         />
         {props.suffix}
         {props.type === 'internal' && (
