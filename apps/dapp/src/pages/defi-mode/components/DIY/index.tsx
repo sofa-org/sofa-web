@@ -8,6 +8,7 @@ import { displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
+import { useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import { pick } from 'lodash-es';
 
@@ -304,7 +305,13 @@ const RiskTolerance = () => {
     </div>
   );
 };
-
+const safeLog = (n: number) => {
+  if (n <= 0) {
+    // 保证不会生成一个 -Inf
+    n = 0.000001;
+  }
+  return Math.log(n);
+};
 const ApyTarget = () => {
   const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
@@ -313,14 +320,15 @@ const ApyTarget = () => {
     useDIYState.getApyList(chainId, state),
   );
   const max = rest[rest.length - 1];
+
   const [logMin, logMax] = useMemo(
-    () => [Math.log(min), Math.log(max)],
+    () => [safeLog(min), safeLog(max)],
     [max, min],
   );
 
   const percentage = useMemo(() => {
     if (isNullLike(formData?.apyTarget)) return 0;
-    const log = Math.log(formData.apyTarget);
+    const log = safeLog(formData.apyTarget);
     return (log - logMin) / (logMax - logMin);
   }, [formData?.apyTarget, logMax, logMin]);
 
@@ -402,13 +410,13 @@ const OddsTarget = () => {
   );
   const max = rest[rest.length - 1];
   const [logMin, logMax] = useMemo(
-    () => [Math.log(min), Math.log(max)],
+    () => [safeLog(min), safeLog(max)],
     [max, min],
   );
 
   const percentage = useMemo(() => {
     if (isNullLike(formData?.oddsTarget)) return 0;
-    const log = Math.log(formData.oddsTarget);
+    const log = safeLog(formData.oddsTarget);
     return (log - logMin) / (logMax - logMin);
   }, [formData?.oddsTarget, logMax, logMin]);
 
