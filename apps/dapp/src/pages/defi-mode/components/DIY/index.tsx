@@ -312,6 +312,12 @@ const safeLog = (n: number) => {
   }
   return Math.log(n);
 };
+const safeExp = (n: number) => {
+  return Math.exp(n);
+};
+const linear = (n: number) => {
+  return n;
+};
 const ApyTarget = () => {
   const [t] = useTranslation('DIY');
   const chainId = useWalletStore((state) => state.chainId);
@@ -320,17 +326,24 @@ const ApyTarget = () => {
     useDIYState.getApyList(chainId, state),
   );
   const max = rest[rest.length - 1];
+  const [decimalMappingFn, decimalReverseMappingFn] = useMemo(
+    () =>
+      formData?.riskType == RiskType.DUAL
+        ? [linear, linear]
+        : [safeLog, safeExp],
+    [formData?.riskType],
+  );
 
   const [logMin, logMax] = useMemo(
-    () => [safeLog(min), safeLog(max)],
-    [max, min],
+    () => [decimalMappingFn(min), decimalMappingFn(max)],
+    [max, min, decimalMappingFn],
   );
 
   const percentage = useMemo(() => {
     if (isNullLike(formData?.apyTarget)) return 0;
-    const log = safeLog(formData.apyTarget);
+    const log = decimalMappingFn(formData.apyTarget);
     return (log - logMin) / (logMax - logMin);
-  }, [formData?.apyTarget, logMax, logMin]);
+  }, [formData?.apyTarget, logMax, logMin, decimalMappingFn]);
 
   const selectedQuote = useDIYState((state) => state.selectedQuote[0]);
   const probabilityDesc = useMemo(() => {
@@ -380,7 +393,9 @@ const ApyTarget = () => {
           onPercentChange={(p) =>
             useDIYState.updateApyTarget(
               chainId,
-              +Math.exp(p * (logMax - logMin) + logMin).toFixed(2),
+              +decimalReverseMappingFn(p * (logMax - logMin) + logMin).toFixed(
+                2,
+              ),
             )
           }
         />
@@ -455,7 +470,7 @@ const OddsTarget = () => {
           onPercentChange={(p) =>
             useDIYState.updateMultipleTarget(
               chainId,
-              +Math.exp(p * (logMax - logMin) + logMin).toFixed(2),
+              +safeExp(p * (logMax - logMin) + logMin).toFixed(2),
             )
           }
         />
