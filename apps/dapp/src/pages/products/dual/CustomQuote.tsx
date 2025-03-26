@@ -43,6 +43,7 @@ export const CustomQuote = (props: {
   const [t] = useTranslation('ProductDual');
   const [quote, setQuote] = useState<ProductQuoteResult | undefined>(undefined);
   const [lazyPrice, setLazyPrice] = useState<number | undefined>(undefined);
+  const [lazyExpiry, setLazyExpiry] = useState<number | undefined>(undefined);
   const dualConfig = useProductsState(
     (s) =>
       s.dualConfig[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`],
@@ -51,7 +52,12 @@ export const CustomQuote = (props: {
     undefined,
   );
   const quoteNew = useLazyCallback(async () => {
-    if (lazyPrice != props.price || !props.price || !props.expiry) {
+    if (
+      lazyPrice != props.price ||
+      !props.price ||
+      !props.expiry ||
+      lazyExpiry != props.expiry
+    ) {
       return;
     }
 
@@ -175,9 +181,15 @@ export const CustomQuote = (props: {
             onChange={(v) => {
               const t = v instanceof Date ? v.getTime() : Number(v);
               const curr8h = next8h(t);
-              props.onChangedExpiry(
-                v === undefined ? undefined : curr8h / 1000,
-              );
+              const expiry = v === undefined ? undefined : curr8h / 1000;
+              setLazyExpiry(expiry);
+              props.onChangedExpiry(expiry);
+              if (lazyTimeoutRef.current) {
+                clearTimeout(lazyTimeoutRef.current);
+              }
+              lazyTimeoutRef.current = setTimeout(() => {
+                quoteNew().catch((e) => Toast.error(getErrorMsg(e)));
+              }, 800);
             }}
           />
           {!!props.expiry && (
