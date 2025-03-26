@@ -118,3 +118,12 @@
     }
   }
 }
+
+:global(.is-mobile) {
+  .content {
+    padding: 0;
+    .body {
+      padding-bottom: 30px;
+    }
+  }
+}
