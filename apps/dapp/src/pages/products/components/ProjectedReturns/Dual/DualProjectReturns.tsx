@@ -508,7 +508,7 @@ export const DualProfitScenarios = (
             className={styles['partial-buy-tooltip']}
             content={<PartialExecutedTooltip {...props} />}
             style={{
-              maxWidth: 500,
+              maxWidth: 600,
             }}
             trigger={isMobileUI ? 'click' : 'hover'}
             position="bottom"
