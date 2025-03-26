@@ -81,7 +81,7 @@ export const RecommendedList = (props: {
       .sort((a, b) => {
         const pa = DualService.getPrice(a) || 0;
         const pb = DualService.getPrice(b) || 0;
-        return dualIsBuy ? pa - pb : pb - pa;
+        return !dualIsBuy ? pa - pb : pb - pa;
       });
   }, [date, data, props.vault.productType]);
   const loading = useMemo(() => !quotes.length, [quotes]);
