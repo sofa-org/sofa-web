@@ -30,6 +30,17 @@
     border: 0.871px solid #e0e0e0;
     margin-bottom: 24px;
 
+    .for-ccy {
+      @include flex-center;
+
+      justify-content: flex-start;
+
+      img {
+        max-width: 24px;
+        max-height: 24px;
+      }
+    }
+
     .balance {
       display: flex;
       align-items: center;
@@ -76,6 +87,7 @@
           color: #000;
         }
       }
+
       .value {
         :global(.quick-widget) {
           display: none;
