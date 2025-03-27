@@ -138,9 +138,8 @@ export const DualDepositModalContent = (
   const data = useProductsState((state) => {
     const val =
       product && state.quoteInfos[ProductsService.productKey(product)];
-    const value = val || preDataRef.current || props.product;
-    preDataRef.current = val;
-    return value;
+    preDataRef.current = val || preDataRef.current;
+    return preDataRef.current || props.product;
   });
   const loading = product && useProductsState.isQuoting(product);
   useEffect(() => {

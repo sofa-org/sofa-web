@@ -76,6 +76,11 @@
           color: #000;
         }
       }
+      .value {
+        :global(.quick-widget) {
+          display: none;
+        }
+      }
     }
 
     .expiry {

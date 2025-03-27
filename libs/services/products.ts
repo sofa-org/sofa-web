@@ -507,7 +507,7 @@ export class ProductsService {
   }
 
   @asyncCache({
-    until: (_, createdAt) => !createdAt || Date.now() - createdAt >= 30000,
+    until: (_, createdAt) => !createdAt || Date.now() - createdAt >= 15000,
   })
   static async quote(data: ProductQuoteParams) {
     if (data.vault.riskType === RiskType.LEVERAGE) {
