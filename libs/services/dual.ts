@@ -70,7 +70,7 @@ export class DualService {
     }
     return DualPositionExecutionStatus.PartialExecuted;
   }
-  static getSettlementTime(product: ProductInfo) {
+  static getSettlementTime(product: PartialRequired<ProductInfo, 'expiry'>) {
     return new Date((Number(product.expiry) + 2 * 3600) * 1000);
   }
 

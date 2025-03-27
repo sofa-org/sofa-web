@@ -33,7 +33,7 @@ export interface AmountInputProps extends BaseInputProps<string | number> {
   prefix?: ReactNode;
   suffix?: ReactNode;
   // @default normal; 选择 internal 之后加减按钮会出现在输入框内部
-  type?: 'normal' | 'internal';
+  type?: 'normal' | 'internal' | 'internal_max';
   onBlur?(e: FocusEvent): void;
   disabledUnlessWalletConnected?: boolean;
   roundingMethodForTick?: 'upper' | 'lower';
@@ -179,6 +179,21 @@ const AmountInput = memo<AmountInputProps>((props) => {
           }}
           autoComplete="off"
         />
+        {!!props.max && props.type === 'internal_max' && (
+          <div className={styles['controls']}>
+            <Button
+              className={styles['btn-max']}
+              theme={'borderless'}
+              onClick={() => {
+                const max = round(props.max);
+                setTempValue(max || '');
+                props.onChange?.(max);
+              }}
+            >
+              Max
+            </Button>
+          </div>
+        )}
         {props.suffix}
         {props.type === 'internal' && (
           <div className={styles['controls']}>
@@ -197,7 +212,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
           </div>
         )}
       </div>
-      {!!props.max && props.type !== 'internal' && (
+      {!!props.max && props.type === 'normal' && (
         <div className={classNames('quick-widget', styles['quick-widget'])}>
           <Button
             className={styles['btn-minus']}

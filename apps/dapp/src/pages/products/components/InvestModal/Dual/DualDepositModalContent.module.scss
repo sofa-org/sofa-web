@@ -54,7 +54,7 @@
         line-height: 48px;
         font-size: 14px;
         height: 48px;
-        margin: 0 -16px 0 0;
+        margin: 0 -16px 0 10px;
         background: #d7d7d7;
         padding: 0 15px;
         position: relative;
@@ -73,19 +73,7 @@
         .amount {
           @include bold;
 
-          color: #999;
-        }
-
-        .increased {
-          &::before {
-            content: "▲";
-          }
-        }
-
-        .decreased {
-          &::before {
-            content: "▼";
-          }
+          color: #000;
         }
       }
     }

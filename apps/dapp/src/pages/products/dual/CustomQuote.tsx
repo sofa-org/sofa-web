@@ -103,15 +103,23 @@ export const CustomQuote = (props: {
     [props.vault],
   );
   const prices = useIndexPrices((state) => state.prices);
+  const currentForCcyPriceInDomCcy = useMemo(
+    () =>
+      (prices[props.vault.forCcy] &&
+        prices[props.vault.domCcy] &&
+        prices[props.vault.forCcy]! / prices[props.vault.domCcy]!) ||
+      undefined,
+    [prices[props.vault.forCcy], prices[props.vault.domCcy]],
+  );
   const productTypeRef = ProductTypeRefs[props.vault.productType];
   const maxPrice = useMemo(() => {
     // 买的时候，不能超过目前价格
     const res =
       productTypeRef.dualIsBuy &&
-      prices[props.vault.forCcy] !== undefined &&
+      currentForCcyPriceInDomCcy !== undefined &&
       dualConfig
         ? roundWith(
-            Number(prices[props.vault.forCcy]),
+            currentForCcyPriceInDomCcy,
             dualConfig.minStepSize,
             undefined,
             undefined,
@@ -119,20 +127,15 @@ export const CustomQuote = (props: {
           )
         : undefined;
     return res;
-  }, [
-    productTypeRef,
-    props.vault,
-    prices[props.vault?.forCcy || ''],
-    dualConfig,
-  ]);
+  }, [productTypeRef, props.vault, currentForCcyPriceInDomCcy, dualConfig]);
   const minPrice = useMemo(() => {
     // 卖的时候，不能低于目前价格
     const res =
       !productTypeRef.dualIsBuy &&
-      prices[props.vault.forCcy] !== undefined &&
+      currentForCcyPriceInDomCcy !== undefined &&
       dualConfig
         ? roundWith(
-            Number(prices[props.vault.forCcy]),
+            currentForCcyPriceInDomCcy,
             dualConfig.minStepSize,
             undefined,
             undefined,
@@ -140,12 +143,7 @@ export const CustomQuote = (props: {
           )
         : undefined;
     return res;
-  }, [
-    productTypeRef,
-    props.vault,
-    prices[props.vault?.forCcy || ''],
-    dualConfig,
-  ]);
+  }, [productTypeRef, props.vault, currentForCcyPriceInDomCcy, dualConfig]);
 
   const isMobileUI = useIsMobileUI();
   return (

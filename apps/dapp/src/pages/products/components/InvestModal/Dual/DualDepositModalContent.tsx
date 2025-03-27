@@ -60,6 +60,15 @@ export const DualDepositModalContent = (
   const [t] = useTranslation('InvestModal');
 
   const prices = useIndexPrices((state) => state.prices);
+  const currentForCcyPriceInDomCcy = useMemo(
+    () =>
+      (prices[props.product.vault.forCcy] &&
+        prices[props.product.vault.domCcy] &&
+        prices[props.product.vault.forCcy]! /
+          prices[props.product.vault.domCcy]!) ||
+      undefined,
+    [prices[props.product.vault.forCcy], prices[props.product.vault.domCcy]],
+  );
 
   const dualConfig = useProductsState(
     (s) =>
@@ -153,15 +162,15 @@ export const DualDepositModalContent = (
     if (
       currentPrice === undefined ||
       !product?.vault.forCcy ||
-      prices[product.vault.forCcy] === undefined
+      currentForCcyPriceInDomCcy === undefined
     ) {
       return undefined;
     }
-    return Number(currentPrice) - Number(prices[product.vault.forCcy]);
+    return Number(currentPrice) - currentForCcyPriceInDomCcy;
   }, [
     product?.anchorPrices?.[0],
     product?.vault.forCcy,
-    prices[product?.vault.forCcy || ''],
+    currentForCcyPriceInDomCcy,
     productTypeRef,
   ]);
   const maxPrice = useMemo(() => {
@@ -171,10 +180,10 @@ export const DualDepositModalContent = (
     }
     const res =
       productTypeRef.dualIsBuy &&
-      prices[vault.forCcy] !== undefined &&
+      currentForCcyPriceInDomCcy !== undefined &&
       dualConfig
         ? roundWith(
-            Number(prices[vault.forCcy]),
+            currentForCcyPriceInDomCcy,
             dualConfig.minStepSize,
             undefined,
             undefined,
@@ -182,7 +191,7 @@ export const DualDepositModalContent = (
           )
         : undefined;
     return res;
-  }, [productTypeRef, vault, prices[vault?.forCcy || ''], dualConfig]);
+  }, [productTypeRef, vault, currentForCcyPriceInDomCcy, dualConfig]);
   const minPrice = useMemo(() => {
     // 卖的时候，不能低于目前价格
     if (!vault || !productTypeRef) {
@@ -190,10 +199,10 @@ export const DualDepositModalContent = (
     }
     const res =
       !productTypeRef.dualIsBuy &&
-      prices[vault.forCcy] !== undefined &&
+      currentForCcyPriceInDomCcy !== undefined &&
       dualConfig
         ? roundWith(
-            Number(prices[vault.forCcy]),
+            currentForCcyPriceInDomCcy,
             dualConfig.minStepSize,
             undefined,
             undefined,
@@ -201,18 +210,17 @@ export const DualDepositModalContent = (
           )
         : undefined;
     return res;
-  }, [productTypeRef, vault, prices[vault?.forCcy || ''], dualConfig]);
+  }, [productTypeRef, vault, currentForCcyPriceInDomCcy, dualConfig]);
   const diffPercentage = useMemo(() => {
-    const current = prices[props.product.vault.forCcy];
     const p = DualService.getPrice({
       ...(product as ProductQuoteParams),
       minStepSize: dualConfig?.minStepSize,
     });
-    return current === undefined || p === undefined
+    return currentForCcyPriceInDomCcy === undefined || p === undefined
       ? undefined
-      : (p - current) / current;
+      : (p - currentForCcyPriceInDomCcy) / currentForCcyPriceInDomCcy;
   }, [
-    prices[props.product.vault.forCcy],
+    currentForCcyPriceInDomCcy,
     product?.anchorPrices?.[0],
     dualConfig?.minStepSize,
   ]);
@@ -233,6 +241,11 @@ export const DualDepositModalContent = (
         <div className={styles['content']}>
           <div className={styles['left']}>
             <div className={styles['left-form']}>
+              {/* forCcy 图标 */}
+              <div className={styles['for-ccy']}>
+                <img src={CCYService.ccyConfigs[vault.forCcy]?.icon} />
+                {CCYService.ccyConfigs[vault.forCcy]?.name || vault.forCcy}
+              </div>
               {/* depositCcy 数量 */}
               <div className={classNames(styles['field'], styles['amount'])}>
                 <span className={styles['label']}>
@@ -248,6 +261,7 @@ export const DualDepositModalContent = (
                         ? wallet.balance![data.vault.depositCcy]
                         : undefined
                     }
+                    type="internal_max"
                     tick={vault?.depositTickAmount}
                     value={product?.depositAmount}
                     suffix={
@@ -309,25 +323,34 @@ export const DualDepositModalContent = (
                         {formatHighlightedText(
                           t(
                             {
-                              enUS: '(Current price: [[{{changePercentage}}]])',
+                              enUS: '(Current price: [[{{currentPrice}}]] {{change}}{{changePercentage}})',
                             },
                             {
                               changePercentage: displayPercentage(
                                 diffPercentage === undefined
                                   ? undefined
                                   : Math.abs(diffPercentage),
+                                0,
                               ),
+                              change: !diffPrice
+                                ? ''
+                                : diffPrice > 0
+                                  ? '▲'
+                                  : '▼',
+                              currentPrice:
+                                product && currentForCcyPriceInDomCcy
+                                  ? amountFormatter(
+                                      currentForCcyPriceInDomCcy,
+                                      DualService.getPricePrecision({
+                                        ...product,
+                                        minStepSize: dualConfig?.minStepSize,
+                                      }),
+                                    )
+                                  : '-',
                             },
                           ),
                           {
-                            hightlightedClassName: classNames(
-                              styles['amount'],
-                              diffPrice === undefined || diffPrice === 0
-                                ? 'unchanged'
-                                : diffPrice > 0
-                                  ? styles['increased']
-                                  : styles['decreased'],
-                            ),
+                            hightlightedClassName: classNames(styles['amount']),
                           },
                         )}
                       </span>
@@ -390,6 +413,19 @@ export const DualDepositModalContent = (
                     </span>
                   )}
                 </span>
+
+                {product?.expiry ? (
+                  <div className={styles['expire-date']}>
+                    {dayjs(
+                      DualService.getSettlementTime({
+                        expiry: product?.expiry,
+                      }),
+                    )
+                      .utc()
+                      .format('YYYY-MM-DD HH:mm')}{' '}
+                    [UTC]
+                  </div>
+                ) : undefined}
               </div>
               <div className={styles['line']} />
               <div className={styles['reward']}>
