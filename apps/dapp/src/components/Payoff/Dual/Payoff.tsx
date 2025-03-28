@@ -44,7 +44,7 @@ const DualPayoff = (
       <div className={styles['payoff-infos']}>
         <div className={styles['apy']}>
           {displayPercentage(maxApy)}
-          <span>{t({ enUS: 'APY', zhCN: '年华' })}</span>
+          <span>{t({ enUS: 'APY', zhCN: '年化' })}</span>
         </div>
         <div className={styles['payoff-chart']}>
           {ProductTypeRefs[props.productType]
