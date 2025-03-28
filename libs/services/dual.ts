@@ -284,6 +284,7 @@ export class DualService {
         makerProductIdKeccak256,
         quotePositions,
         takerExchangedAmount,
+        feeRate,
         res,
       });
       return res;
@@ -300,6 +301,7 @@ export class DualService {
           makerProductIdKeccak256,
           quotePositions,
           takerExchangedAmount,
+          feeRate,
           res,
         },
         e,
