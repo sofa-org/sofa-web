@@ -60,6 +60,10 @@
 
     .left {
       .value {
+        @include flex-center;
+
+        flex-direction: column;
+
         .ccys {
           @include flex-center;
 
@@ -81,7 +85,6 @@
           color: rgb(0 0 0 / 85%);
           font-size: 14px;
           display: inline-block;
-          margin-top: 10px;
         }
       }
     }
@@ -99,12 +102,24 @@
         flex-direction: column;
         align-items: start;
         font-size: 14px;
+        justify-content: center;
+        gap: 8px;
+
+        .amount {
+          @include flex-center;
+        }
       }
 
       .estimated-value {
+        @include flex-center;
+
         color: rgb(0 0 0 / 85%);
         font-size: 12px;
         font-weight: 500;
+
+        .unit {
+          margin: 0;
+        }
       }
     }
 
@@ -122,6 +137,7 @@
 :global(.is-mobile) {
   .content {
     padding: 0;
+
     .body {
       padding-bottom: 30px;
     }

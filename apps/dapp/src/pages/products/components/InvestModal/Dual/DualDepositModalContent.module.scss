@@ -144,6 +144,14 @@
           transform: translate(0, -50%);
         }
       }
+
+      .expire-date {
+        color: rgb(0 0 0 / 45%);
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 8px;
+        text-align: end;
+      }
     }
 
     .line {

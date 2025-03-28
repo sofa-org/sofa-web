@@ -62,10 +62,8 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
             })}
           </div>
           <div className={styles['value']}>
-            <span className={styles['ccys']}>
-              <img src={CCYService.ccyConfigs['RCH']?.icon} />
-            </span>
             <span className={styles['amount']}>
+              <img src={CCYService.ccyConfigs['RCH']?.icon} />
               {amountFormatter(
                 props.rchReturnAmount,
                 CCYService.ccyConfigs['RCH']?.precision,

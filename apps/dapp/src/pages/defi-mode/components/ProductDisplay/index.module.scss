@@ -51,6 +51,7 @@
 }
 
 .risk-type {
+  @include bold;
   @include flex-center;
 
   position: relative;

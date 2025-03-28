@@ -27,15 +27,12 @@
 
     &::before {
       content: "@";
-      width: 14px;
-      height: 14px;
-      font-size: 10px;
+      font-size: 12px;
       line-height: 14px;
       display: inline-block;
       border-radius: 7px;
       text-align: center;
-      background-color: #6d6d6d;
-      color: #fff;
+      color: #6d6d6d;
     }
 
     &::after {
@@ -48,25 +45,24 @@
   }
 }
 
-.no-executed {
-  .title-info {
-    background: #ffe0c4;
-  }
-
-  .subtitle {
-    color: #e36e00;
-    position: relative;
-  }
-
-  .result {
-    img {
-      display: block;
-      margin: 10px 0 4px;
-    }
-  }
-}
-
 .rewards {
+  img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .value {
+    @include flex-center;
+
+    gap: 0;
+  }
+
+  .amount {
+    @include flex-center;
+
+    margin-left: 5px;
+  }
+
   .item {
     height: 61px;
     display: flex;
@@ -78,11 +74,12 @@
       @include flex-center;
 
       gap: 4px;
+    }
 
-      img {
-        width: 16px;
-        height: 16px;
-      }
+    .est {
+      @include flex-center;
+
+      gap: 0;
     }
   }
 
@@ -91,6 +88,34 @@
     height: 20px;
     display: inline-block;
     background: url("./assets/icon-plus-sign.svg") no-repeat center / 100%;
+  }
+}
+
+.no-executed {
+  .left {
+    @include flex-center;
+
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .title-info {
+    background: #ffe0c4;
+  }
+
+  .subtitle {
+    color: #e36e00;
+    position: relative;
+  }
+
+  .result {
+    @include flex-center;
+
+    gap: 0;
+
+    img {
+      display: inline;
+    }
   }
 }
 
@@ -106,24 +131,29 @@
     justify-content: space-between;
     border-radius: 8px 8px 0 0;
     padding: 8px;
-    align-items: end;
+    align-items: center;
   }
 
   .title {
     @include bold;
+    @include flex-center;
 
     color: #000;
+    font-size: 12px;
 
     .emoji {
       font-size: 19px;
-      margin-right: 7px;
     }
   }
 
   .subtitle {
     @include bold;
 
-    // color: #3a8200;
+    font-size: 12px;
+
+    .est {
+      font-weight: 400;
+    }
   }
 
   .profit-scenario {
@@ -207,7 +237,6 @@
       .unit {
         font-size: 12px;
         font-weight: 500;
-        margin-left: 5px;
       }
 
       .item:last-child {
@@ -215,7 +244,6 @@
       }
 
       .est {
-        display: block;
         color: rgb(0 0 0 / 45%);
         font-size: 12px;
         font-weight: 500;
@@ -398,7 +426,7 @@
 
               .left,
               .right {
-                width: 45%;
+                width: 48%;
                 height: 100px;
                 padding: 0;
                 border-radius: 8px;
@@ -413,6 +441,7 @@
                   @include bold;
 
                   padding: 12px 0;
+                  height: 83px;
                   border-radius: 8px;
                   border: 1px solid #e2e2e2;
                   background: #fff;
@@ -424,10 +453,24 @@
                 }
               }
 
+              .plus-sign {
+                color: rgb(0 0 0 / 10%);
+                font-size: 20px;
+                font-weight: 500;
+              }
+
               .left {
                 .result {
                   padding: 17px 0;
                   text-align: center;
+                }
+
+                .plus-sign {
+                  width: 20px;
+                  height: 20px;
+                  display: inline-block;
+                  background: url("./assets/icon-plus-sign.svg") no-repeat
+                    center / 100%;
                 }
 
                 .partial-ccys {
@@ -435,21 +478,36 @@
 
                   font-size: 12px;
                   color: #666;
-                  margin-bottom: 10px;
+                  margin-bottom: 4px;
+                  gap: 4px;
+
+                  img {
+                    margin: 0;
+                  }
                 }
               }
 
               .right {
                 .result {
+                  @include flex-center;
+
+                  flex-direction: column;
+                  align-items: start;
                   padding: 12px 24px;
 
                   img {
                     width: 16px;
                     height: 16px;
+                    margin-left: -5px;
+                    margin-right: 5px;
+                  }
+
+                  .amount {
+                    display: flex;
                   }
 
                   .est {
-                    display: block;
+                    display: flex;
                     font-size: 12px;
                     opacity: 0.65;
                   }
@@ -467,6 +525,9 @@
   background: #fff;
   max-width: 800px !important;
   min-width: 500px !important;
+  border-radius: 8px;
+  border: 1px solid rgb(0 0 0 / 10%);
+  box-shadow: 0 4px 16px 0 rgb(0 0 0 / 10%);
 
   > svg {
     color: #fff !important;
