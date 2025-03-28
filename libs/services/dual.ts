@@ -197,6 +197,7 @@ export class DualService {
     let totalPositions: bigint = undefined!,
       quotePositions: bigint = undefined!;
     let takerExchangedAmount: number = undefined!;
+    let feeRate: number = undefined!;
     let res:
       | {
           redeemableOfLinkedCcy: number;
@@ -261,6 +262,17 @@ export class DualService {
             Number(data.amounts.counterparty) -
             takerExchangedAmount,
         };
+      }
+      // 计算 fee rate
+      feeRate = Number(data.feeRate.trading);
+      if (feeRate) {
+        const counterparty = Number(data.amounts.counterparty);
+        const own = Number(data.amounts.own);
+        res.redeemable =
+          ((res.redeemable * counterparty) / (own + counterparty)) * feeRate;
+        res.redeemableOfLinkedCcy =
+          ((res.redeemableOfLinkedCcy * counterparty) / (own + counterparty)) *
+          feeRate;
       }
       console.info('calculated $readRedeemable for dual', {
         provider,
