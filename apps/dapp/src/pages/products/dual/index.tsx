@@ -347,62 +347,63 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                 }}
               />
             )}
-            <div className={styles['custom-quote']}>
-              {vault && (
-                <CustomQuote
-                  vault={vault}
-                  onChangedExpiry={setCustomExpiry}
-                  onChangedPrice={setCustomPrice}
-                  price={customPrice}
-                  expiry={customExpiry}
-                  otherQuotes={data}
-                  onQuote={(params) =>
-                    useProductsState.quote({
+          </div>
+          <div className={styles['custom-quote-bg']} />
+          <div className={styles['custom-quote']}>
+            {vault && (
+              <CustomQuote
+                vault={vault}
+                onChangedExpiry={setCustomExpiry}
+                onChangedPrice={setCustomPrice}
+                price={customPrice}
+                expiry={customExpiry}
+                otherQuotes={data}
+                onQuote={(params) =>
+                  useProductsState.quote({
+                    vault,
+                    anchorPrices: [
+                      DualService.updatePrice({ vault }, params.price),
+                    ],
+                    expiry: params.expiry,
+                    depositAmount: 100,
+                  })
+                }
+                onClickDeposit={async (matchingQuote) => {
+                  if (!customPrice) {
+                    Toast.error(
+                      t({
+                        enUS: 'Please input Target Price',
+                      }),
+                    );
+                    return;
+                  }
+                  if (!customExpiry) {
+                    Toast.error(
+                      t({
+                        enUS: 'Please select Settlement Date',
+                      }),
+                    );
+                    return;
+                  }
+                  if (!matchingQuote) {
+                    matchingQuote = await useProductsState.quote({
                       vault,
                       anchorPrices: [
-                        DualService.updatePrice({ vault }, params.price),
+                        DualService.updatePrice({ vault }, customPrice),
                       ],
-                      expiry: params.expiry,
+                      expiry: customExpiry,
                       depositAmount: 100,
-                    })
+                    });
                   }
-                  onClickDeposit={async (matchingQuote) => {
-                    if (!customPrice) {
-                      Toast.error(
-                        t({
-                          enUS: 'Please input Target Price',
-                        }),
-                      );
-                      return;
-                    }
-                    if (!customExpiry) {
-                      Toast.error(
-                        t({
-                          enUS: 'Please select Settlement Date',
-                        }),
-                      );
-                      return;
-                    }
-                    if (!matchingQuote) {
-                      matchingQuote = await useProductsState.quote({
-                        vault,
-                        anchorPrices: [
-                          DualService.updatePrice({ vault }, customPrice),
-                        ],
-                        expiry: customExpiry,
-                        depositAmount: 100,
-                      });
-                    }
-                    if (matchingQuote) {
-                      setQuote(matchingQuote);
-                      setTimeout(() => {
-                        investModalRef.current?.show();
-                      }, 100);
-                    }
-                  }}
-                />
-              )}
-            </div>
+                  if (matchingQuote) {
+                    setQuote(matchingQuote);
+                    setTimeout(() => {
+                      investModalRef.current?.show();
+                    }, 100);
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </TopTabs>

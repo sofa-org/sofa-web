@@ -239,7 +239,7 @@ export const CustomQuote = (props: {
       <div className={classNames(styles['field'], styles['extra-reward'])}>
         <span className={styles['label']}>
           {t({
-            enUS: 'extra reward',
+            enUS: 'Extra reward',
           })}
         </span>
         <span

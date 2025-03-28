@@ -1,9 +1,13 @@
 .content {
   @include flex-center;
+
+  font-size: 14px;
+  gap: 0;
 }
 
 .caption {
-  margin-right: 9px;
+  margin-right: 12px;
+  font-weight: 700;
 }
 
 .field {
@@ -12,8 +16,9 @@
 
 .label {
   opacity: 0.65;
-  margin-right: 9px;
+  margin-right: 6px;
   display: inline-block;
+  font-weight: 400;
 }
 
 .settlement-date {
@@ -55,6 +60,7 @@
 
   margin-right: 50px;
   height: 48px;
+  flex: 1;
 
   .value {
     :global {
@@ -84,6 +90,10 @@
   margin-right: 29px;
   position: relative;
   height: 48px;
+
+  .label {
+    font-weight: 700;
+  }
 
   &::before {
     content: "";
