@@ -268,9 +268,9 @@ export class DualService {
       if (feeRate) {
         const counterparty = Number(data.amounts.counterparty);
         const own = Number(data.amounts.own);
-        res.redeemable =
+        res.redeemable -=
           ((res.redeemable * counterparty) / (own + counterparty)) * feeRate;
-        res.redeemableOfLinkedCcy =
+        res.redeemableOfLinkedCcy -=
           ((res.redeemableOfLinkedCcy * counterparty) / (own + counterparty)) *
           feeRate;
       }
