@@ -160,6 +160,7 @@ export const RecommendedCardItem = (props: {
             amountFormatter(
               DualService.getPrice(it),
               DualService.getPricePrecision(it),
+              true,
             ),
           ]}
           protectedYield={Number(it.apyInfo?.min)}

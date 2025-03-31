@@ -372,6 +372,7 @@ export class DualService {
       priceFormatted: amountFormatter(
         price,
         DualService.getPricePrecision(product),
+        true,
       ),
     } as DualProfitRenderProps;
     if (data.vault.productType == ProductType.BearSpread) {
