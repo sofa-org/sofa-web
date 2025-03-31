@@ -238,13 +238,12 @@ export class DualService {
         // 3. 对于maker
         // redeemableOfLinkedCcy = quotePositions * anchorPrice
         // redeemable = quotePositions
-        const ratio =
-          quotePositions == BigInt(vault.collateralDecimal)
-            ? 1
-            : Number(quotePositions) / Number(BigInt(vault.collateralDecimal));
+        const redeemable =
+          Number(quotePositions) / Number(BigInt(vault.collateralDecimal));
         res = {
-          redeemableOfLinkedCcy: ratio * Number(data.product.anchorPrices[0]),
-          redeemable: ratio * Number(data.product.anchorPrices[0]),
+          redeemable,
+          redeemableOfLinkedCcy:
+            redeemable * Number(data.product.anchorPrices[0]),
         };
       } else {
         //  对于taker
