@@ -169,7 +169,7 @@
 
   .left {
     width: 160px;
-    height: 132px;
+    height: 136px;
     background-color: #fff;
     padding: 12px;
     border-radius: 0 0 8px 8px;
@@ -218,10 +218,13 @@
 
   .right {
     width: 365px;
-    height: 132px;
+    height: 136px;
     padding: 10px 12px 12px;
     border-radius: 0 0 8px 8px;
     background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     > .label {
       color: rgb(0 0 0 / 65%);
@@ -717,6 +720,7 @@
             width: calc(100% - 80px);
           }
         }
+
         .profit-scenario {
           > .plus-sign {
             width: 20px;
