@@ -234,6 +234,7 @@ export class DualService {
         [makerProductIdKeccak256],
       );
       if (claimParams.maker) {
+        // 双币暂时没有maker，下面代码不重要
         // 3. 对于maker
         // redeemableOfLinkedCcy = quotePositions * anchorPrice
         // redeemable = quotePositions

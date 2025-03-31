@@ -1,6 +1,7 @@
 .content {
   color: #000;
   padding: 16px 26px;
+  width: 588px;
 
   img {
     width: 16px;
@@ -39,7 +40,7 @@
     .right {
       border-radius: 8px;
       background: rgb(0 0 0 / 35%);
-      text-align: center;
+      text-align: start;
       height: 100px;
 
       .label {
@@ -59,6 +60,8 @@
     }
 
     .left {
+      width: 321px;
+
       .value {
         @include flex-center;
 
@@ -90,6 +93,8 @@
     }
 
     .right {
+      width: 180px;
+
       .unit {
         font-size: 12px;
         margin-left: 5px;

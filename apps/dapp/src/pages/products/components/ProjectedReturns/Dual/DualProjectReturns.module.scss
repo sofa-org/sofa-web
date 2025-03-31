@@ -26,13 +26,11 @@
     }
 
     &::before {
+      @include bold;
+
       content: "@";
       font-size: 12px;
-      line-height: 14px;
-      display: inline-block;
-      border-radius: 7px;
-      text-align: center;
-      color: #6d6d6d;
+      color: #595959;
     }
 
     &::after {
@@ -64,7 +62,7 @@
   }
 
   .item {
-    height: 61px;
+    height: auto;
     display: flex;
     flex-direction: column;
     align-items: end;
@@ -88,6 +86,12 @@
     height: 20px;
     display: inline-block;
     background: url("./assets/icon-plus-sign.svg") no-repeat center / 100%;
+  }
+}
+
+.rewards:has(.est) {
+  .item {
+    height: 61px;
   }
 }
 
@@ -183,7 +187,11 @@
     }
 
     .result {
+      @include flex-center;
+
+      justify-content: start;
       white-space: nowrap;
+      gap: 0;
 
       img {
         width: 16px;
@@ -192,16 +200,16 @@
         margin-right: 5px;
       }
 
-      .amount,
-      .unit {
+      .amount {
         @include bold;
 
-        line-height: 16px;
         color: #000;
         vertical-align: middle;
       }
 
       .unit {
+        font-weight: 500;
+        font-size: 12px;
         margin-left: 5px;
       }
     }
@@ -461,8 +469,10 @@
 
               .left {
                 .result {
-                  padding: 17px 0;
+                  padding: 17px 0 0 24px;
                   text-align: center;
+                  flex-direction: column;
+                  align-items: flex-start;
                 }
 
                 .plus-sign {
@@ -524,7 +534,7 @@
 .partial-buy-tooltip {
   background: #fff;
   max-width: 800px !important;
-  min-width: 500px !important;
+  min-width: 588px !important;
   border-radius: 8px;
   border: 1px solid rgb(0 0 0 / 10%);
   box-shadow: 0 4px 16px 0 rgb(0 0 0 / 10%);

@@ -85,19 +85,21 @@ export const DualProfitScenarios = (
                     <span className={styles['plus-sign']} />
                     <img src={depositCcyConfig?.icon} /> {props.depositCcy}
                   </div>
-                  ≈
-                  <span className={styles['amount']}>
-                    {amountFormatter(
-                      simplePlus(
-                        props.depositAmount,
-                        props.depositCcyExtraRewardWhenNoExecuted,
-                      ),
-                      depositCcyConfig?.precision,
-                    )}
-                  </span>
-                  <span className={styles['unit']}>
-                    {depositCcyConfig?.name || props.depositCcy}
-                  </span>
+                  <div>
+                    ≈
+                    <span className={styles['amount']}>
+                      {amountFormatter(
+                        simplePlus(
+                          props.depositAmount,
+                          props.depositCcyExtraRewardWhenNoExecuted,
+                        ),
+                        depositCcyConfig?.precision,
+                      )}
+                    </span>
+                    <span className={styles['unit']}>
+                      {depositCcyConfig?.name || props.depositCcy}
+                    </span>
+                  </div>
                 </div>
               </div>
               <span className={styles['plus-sign']}>+</span>
