@@ -491,7 +491,7 @@ const PositionDetailsModal = (
           {product?.vault.riskType === RiskType.DUAL ? (
             <>
               {t({
-                enUS: 'DualFlex',
+                enUS: 'Dual',
                 zhCN: '双币交易',
               })}
             </>

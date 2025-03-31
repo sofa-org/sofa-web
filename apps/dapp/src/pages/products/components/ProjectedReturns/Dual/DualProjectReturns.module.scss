@@ -72,6 +72,7 @@
       @include flex-center;
 
       gap: 4px;
+      font-size: 12px;
     }
 
     .est {
@@ -217,8 +218,8 @@
 
   .right {
     width: 365px;
-    height: 138px;
-    padding: 10px 16px 16px;
+    height: 132px;
+    padding: 10px 12px 12px;
     border-radius: 0 0 8px 8px;
     background: #fff;
 
@@ -534,8 +535,8 @@
 
 .partial-buy-tooltip {
   background: #fff;
-  max-width: 800px !important;
-  min-width: 588px !important;
+  max-width: 800px;
+  min-width: 588px;
   border-radius: 8px;
   border: 1px solid rgb(0 0 0 / 10%);
   box-shadow: 0 4px 16px 0 rgb(0 0 0 / 10%);
@@ -716,6 +717,16 @@
             width: calc(100% - 80px);
           }
         }
+        .profit-scenario {
+          > .plus-sign {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            background: url("./assets/icon-plus-sign.svg") no-repeat center /
+              100%;
+            color: transparent;
+          }
+        }
 
         &.partial-executed {
           padding: 24px 16px;
@@ -778,6 +789,7 @@
   .partial-buy-tooltip {
     max-width: 100vw !important;
     width: 100vw !important;
+    min-width: 100vw !important;
   }
 }
 

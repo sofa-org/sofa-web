@@ -382,11 +382,8 @@ export class DualService {
       res.linkedCcyAmountWhenSuccessfulExecuted = res.depositAmount / price;
       // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
       res.linkedCcyExtraRewardWhenSuccessfulExecuted =
-        Number(
-          executionStatus == DualPositionExecutionStatus.NotExpired
-            ? data.amounts.maxRedeemableOfLinkedCcy
-            : data.amounts.redeemableOfLinkedCcy,
-        ) - res.linkedCcyAmountWhenSuccessfulExecuted;
+        Number(data.amounts.maxRedeemableOfLinkedCcy) -
+        res.linkedCcyAmountWhenSuccessfulExecuted;
       res.depositCcy = data.vault.depositCcy;
 
       // maxRedeemable - own
@@ -401,11 +398,8 @@ export class DualService {
       res.linkedCcyAmountWhenSuccessfulExecuted = price * res.depositAmount;
       // maxRedeemableOfLinkedCcy - (anchorPrice[0] * depositAmount)
       res.linkedCcyExtraRewardWhenSuccessfulExecuted =
-        Number(
-          executionStatus == DualPositionExecutionStatus.NotExpired
-            ? data.amounts.maxRedeemableOfLinkedCcy
-            : data.amounts.redeemableOfLinkedCcy,
-        ) - res.linkedCcyAmountWhenSuccessfulExecuted;
+        Number(data.amounts.maxRedeemableOfLinkedCcy) -
+        res.linkedCcyAmountWhenSuccessfulExecuted;
 
       res.depositCcy = product.vault.forCcy;
 

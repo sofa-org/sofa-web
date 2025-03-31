@@ -24,7 +24,7 @@ export const FlowDual = () => {
       onClick={() => setExpanded((pre) => (pre === '1' ? '0' : '1'))}
     >
       <div className={styles['title']}>
-        {t({ enUS: 'Getting Started with DualFlex' })}
+        {t({ enUS: 'Getting Started with Dual' })}
       </div>
       <div className={styles['content']}>
         <Step1 width={127 / window.winScale} />

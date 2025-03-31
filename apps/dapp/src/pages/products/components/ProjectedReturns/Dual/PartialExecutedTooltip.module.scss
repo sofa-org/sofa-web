@@ -142,9 +142,27 @@
 :global(.is-mobile) {
   .content {
     padding: 0;
+    width: auto;
+
+    .title,
+    .subtitle {
+      font-size: 12px;
+    }
 
     .body {
-      padding-bottom: 30px;
+      padding-bottom: 16px;
+
+      .left {
+        width: auto;
+      }
+
+      .right {
+        width: auto;
+      }
+
+      .label {
+        font-size: 10px;
+      }
     }
   }
 }

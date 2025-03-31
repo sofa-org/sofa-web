@@ -64,7 +64,7 @@ export const ProjectTypeRefs = {
       ),
     desc1: (t: TFunction) =>
       t({
-        enUS: 'High returns & high risk. Designed for risk-takers who can stomach potential losses.',
+        enUS: 'High risk, high returns.  Designed for ambitious risk takers.',
         zhCN: '高回报 & 高风险。为能够承受潜在亏损的冒险者量身打造。',
       }),
     icon: <img src={IconHighYield} width="24px" />,
@@ -88,15 +88,15 @@ export const ProjectTypeRefs = {
     link: EnvLinks.config.VITE_AUTOMATOR_LINK,
   },
   [ProjectType.Dual]: {
-    label: (t: TFunction) => t({ enUS: 'DualFlex', zhCN: '双币交易' }),
+    label: (t: TFunction) => t({ enUS: 'Dual', zhCN: '双币交易' }),
     desc: (t: TFunction) =>
       t({
-        enUS: 'DualFlex: Buy Low, Sell High',
+        enUS: 'Dual: Buy Low, Sell High',
       }),
     desc1: (t: TFunction) =>
       t({
-        enUS: `Buy Low & Sell High.
-Designed for users confident in market trends and seeking dynamic opportunities.`,
+        enUS: `Buy Low, Sell High
+Earn extra rewards while you are at it.`,
       }),
     icon: <img src={IconDual} width="24px" />,
     value: ProjectType.Dual,
@@ -192,14 +192,14 @@ export const ProductTypeRefs = {
       ),
       opValue: 'buy_crypto',
       title: t({
-        enUS: 'Sell crypto for high price and get bonus rewards',
+        enUS: 'Sell highs, earn higher',
         zhCN: '高价卖出加密货币并获得奖励',
       }),
     }),
     dualIsBuy: false,
     dualDesc: (t: TFunction) => ({
-      helpMeOp: t({ enUS: 'Help Me Sell' }),
-      executed: t({ enUS: 'Sell High Executed' }),
+      helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '存入金额' }),
+      executed: t({ enUS: 'Sell Target Triggered' }),
       limited: t({ enUS: 'Limit Sell' }),
       op: t({ enUS: 'Sell' }),
       op2: t({ enUS: 'Sell High', zhCN: '高卖' }),
@@ -436,14 +436,14 @@ export const ProductTypeRefs = {
       opCrypto: t({ enUS: 'Buy {{forCcy}}', zhCN: '买入 {{forCcy}}' }, vault),
       opValue: 'buy_crypto',
       title: t({
-        enUS: 'Buy crypto at a discount and get bonus rewards',
+        enUS: 'Buy dips, get a bonus',
         zhCN: '低价买入加密货币并获得奖励',
       }),
     }),
     dualIsBuy: true,
     dualDesc: (t: TFunction) => ({
-      helpMeOp: t({ enUS: 'Help Me Buy' }),
-      executed: t({ enUS: 'Buy Low Executed' }),
+      helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '存入金额' }),
+      executed: t({ enUS: 'Purchase Target Triggered' }),
       limited: t({ enUS: 'Limit Buy' }),
       op: t({ enUS: 'Buy' }),
       op2: t({ enUS: 'Buy Low', zhCN: '低买' }),

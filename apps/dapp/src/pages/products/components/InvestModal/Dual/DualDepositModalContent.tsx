@@ -296,7 +296,7 @@ export const DualDepositModalContent = (
                 <span className={styles['label']}>
                   {t(
                     {
-                      enUS: 'with price({{forCcy}} / {{domCcy}})',
+                      enUS: 'Target Price ({{forCcy}} / {{domCcy}})',
                     },
                     {
                       forCcy: product?.vault.forCcy,
@@ -430,7 +430,8 @@ export const DualDepositModalContent = (
               <div className={styles['reward']}>
                 <span className={styles['label']}>
                   {t({
-                    enUS: 'Yield (Deposit Reward + RCH Airdorp)',
+                    enUS: 'APR(Deposit Reward + RCH Airdorp)',
+                    zhCN: '年利率 (存入收益+RCH空投)',
                   })}
                 </span>
                 <span className={styles['value']}>

@@ -188,7 +188,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
             <h1 className={styles['head-title']}>
               {ProjectTypeRefs[ProjectType.Dual].icon}
               {t({
-                enUS: 'DualFlex: Buy Low, Sell High',
+                enUS: 'Dual: Buy Low, Sell High',
               })}
             </h1>
           </>
@@ -283,10 +283,10 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
               ? '...'
               : ProductTypeRefs[vault.productType].dualIsBuy
                 ? t({
-                    enUS: '👏 Buy crypto at a discount and get bonus rewards!',
+                    enUS: '👏 Buy dips, get a bonus.',
                   })
                 : t({
-                    enUS: '👏 Sell crypto at Peak and get bonus rewards!',
+                    enUS: '👏 Sell highs, earn higher.',
                   })}
           </div>
           <div className={styles['content']}>

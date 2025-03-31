@@ -180,6 +180,7 @@ export const RecommendedList = (props: {
                 title: t(
                   {
                     enUS: 'Target Price ({{forCcy}}/{{domCcy}})',
+                    zhCN: '目标价格 ({{forCcy}}/{{domCcy}})',
                   },
                   {
                     forCcy: props.vault?.forCcy,
@@ -240,7 +241,8 @@ export const RecommendedList = (props: {
                 title: (
                   <span className={styles['reward-column']}>
                     {t({
-                      enUS: 'Extra Reward (APR)',
+                      enUS: 'APR',
+                      zhCN: '年利率',
                     })}
                   </span>
                 ),
@@ -259,6 +261,7 @@ export const RecommendedList = (props: {
                       <div className={styles['operate']}>
                         {t({
                           enUS: 'Action',
+                          zhCN: '操作',
                         })}
                       </div>
                     ),

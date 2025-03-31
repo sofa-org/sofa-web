@@ -230,10 +230,14 @@
         .semi-modal-content.semi-modal-content {
           padding: 0;
         }
+
         .semi-modal-header.semi-modal-header {
+          margin: 0 -12px 24px;
           h5 {
             font-size: 14px;
-            margin-left: -10px;
+            text-align: center;
+            display: block;
+            // margin-left: -10px;
             img {
               display: none;
             }

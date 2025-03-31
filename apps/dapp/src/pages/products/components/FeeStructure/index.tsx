@@ -10,8 +10,6 @@ import { addI18nResources } from '@/locales';
 import locale from './locale';
 
 addI18nResources(locale, 'FeeStructure');
-import { ProductTypeRefs } from '@/components/ProductSelector/enums';
-import enUS from '@/locales/en-US';
 
 import styles from './index.module.scss';
 
@@ -19,13 +17,13 @@ export const FeeStructure = (product: Partial<ProductQuoteResult>) => {
   const [t] = useTranslation('FeeStructure');
   const dualDesc: Partial<Record<`${VaultInfo['forCcy']}`, string>> = {
     [`${'CRV'}`]: t({
-      enUS: `For CRV/crvUSD - Buy Low product, users deposit crvUSD, which is automatically placed into Curve protocol. The interest earned is collected by SOFA as the fee, so users <strong>do not need to pay any additional trading fees</strong>.<br/><br/>
-For CRV/crvUSD - Sell High product, users deposit CRV and must pay <strong>15% of the option premium</strong> (the Extra Reward) as a trading fee.`,
+      enUS: `For CRV/crvUSD:
+'Buy Low' Product:  No additional fees;
+'Sell High' Product:  15% of the option premium will be charged as fees.`,
     }),
     [`${'RCH'}`]: t({
-      enUS: `For RCH/USDT - Buy Low product, users deposit USDT, which is placed into the Aave protocol to earn yield.<br/><br/>
-For RCH/USDT - Sell High product, users deposit RCH, which is placed into the SOFA protocol to earn yield.<br/><br/>
-In both cases, the interest earned is collected by SOFA as the fee, so users <strong>do not need to pay any additional trading fees</strong>.`,
+      enUS: `For RCH/USDT:
+No additional trading fees will be charged on any RCH/USDT DualFlex products.`,
     }),
   };
   return (
@@ -38,7 +36,8 @@ In both cases, the interest earned is collected by SOFA as the fee, so users <st
         {product.vault?.riskType == RiskType.DUAL ? (
           <div
             dangerouslySetInnerHTML={{
-              __html: dualDesc[product.vault.forCcy] || '',
+              __html:
+                dualDesc[product.vault.forCcy]?.replace('\n', '<br />') || '',
             }}
           />
         ) : (

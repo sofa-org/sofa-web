@@ -238,8 +238,8 @@ export const DualProfitScenarios = (
                 <div className={styles['right']}>
                   <div className={styles['label']}>
                     {t({
-                      enUS: 'Extra rewards',
-                      zhCN: '额外收益',
+                      enUS: 'Rewards',
+                      zhCN: '收益',
                     })}
                   </div>
                   <div className={styles['rewards']}>
@@ -335,7 +335,7 @@ export const DualProfitScenarios = (
                 <div className={styles['title']}>
                   <span className={styles['emoji']}>️️✌️</span>
                   {t({
-                    enUS: 'Not Executed, Premium Earned',
+                    enUS: 'No Trigger. Premium Earned',
                     zhCN: '未成交，获得额外奖励',
                   })}
                 </div>
@@ -393,12 +393,12 @@ export const DualProfitScenarios = (
                     </span>
                   </span>
                 </div>
-                <span className="plus-sign">+</span>
+                <span className={styles['plus-sign']}>+</span>
                 <div className={styles['right']}>
                   <div className={styles['label']}>
                     {t({
-                      enUS: 'Extra rewards',
-                      zhCN: '额外收益',
+                      enUS: 'Rewards',
+                      zhCN: '收益',
                     })}
                   </div>
                   <div className={styles['rewards']}>

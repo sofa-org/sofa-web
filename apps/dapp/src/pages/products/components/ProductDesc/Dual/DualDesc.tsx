@@ -28,7 +28,7 @@ export const DualDesc = (
           <p
             dangerouslySetInnerHTML={{
               __html: t(
-                `At the start, the user's deposited funds and the reward amount promised by the market maker are both locked in SOFA contract.`,
+                `Inception: The full user deposit and market maker exposure amounts will be locked on the SOFA contract.`,
               ),
             }}
           />
@@ -37,7 +37,7 @@ export const DualDesc = (
           <p
             dangerouslySetInnerHTML={{
               __html: t(
-                `Before the expiry date, the market maker has the right to execute a swap within the liquidity pool at the user's specified target price.`,
+                `Pre-Expiry: Market maker has a right to execute the token swap within the liquidity pool at the user's Target Price.`,
               ),
             }}
           />
@@ -46,7 +46,7 @@ export const DualDesc = (
           <p
             dangerouslySetInnerHTML={{
               __html: t(
-                'Upon expiry, the total amount in the pool will be settled and returned to the user. At this point, the user may receive either USDT or the underlying asset.',
+                'Expiry: Total pool amount will be settled and returned to user, paid either in USDT or the underlying token depending on the market outcome.',
               ),
             }}
           />

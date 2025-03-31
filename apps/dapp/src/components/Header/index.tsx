@@ -113,8 +113,8 @@ const allMenuItems = (
             label: (t: TFunction) => t({ enUS: 'Position', zhCN: '持仓' }),
             desc: (t: TFunction) =>
               t({
-                enUS: 'Your Earn & Surge Positions.',
-                zhCN: '你交易的 Earn 和 Surge 的头寸',
+                enUS: 'Your Earn, Surge & Dual Positions.',
+                zhCN: '你交易的 Earn、Surge 和 Dual 的头寸',
               }),
             path: '/positions',
           },
