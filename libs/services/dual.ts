@@ -237,13 +237,13 @@ export class DualService {
         // 3. 对于maker
         // redeemableOfLinkedCcy = quotePositions * anchorPrice
         // redeemable = quotePositions
+        const ratio =
+          quotePositions == BigInt(vault.collateralDecimal)
+            ? 1
+            : Number(quotePositions) / Number(BigInt(vault.collateralDecimal));
         res = {
-          redeemableOfLinkedCcy:
-            Number(quotePositions / BigInt(vault.collateralDecimal)) *
-            Number(data.product.anchorPrices[0]),
-          redeemable:
-            Number(quotePositions / BigInt(vault.collateralDecimal)) *
-            Number(data.product.anchorPrices[0]),
+          redeemableOfLinkedCcy: ratio * Number(data.product.anchorPrices[0]),
+          redeemable: ratio * Number(data.product.anchorPrices[0]),
         };
       } else {
         //  对于taker
@@ -251,8 +251,10 @@ export class DualService {
         //  redeemableOfLinkedCcy = taker换币数量 * anchorPrice
         //  redeemable = (own + counterParty) - taker换币数量
         takerExchangedAmount =
-          Number(quotePositions / totalPositions) *
-          (Number(data.amounts.own) + Number(data.amounts.counterparty));
+          quotePositions == totalPositions
+            ? 1
+            : (Number(quotePositions) / Number(totalPositions)) *
+              (Number(data.amounts.own) + Number(data.amounts.counterparty));
 
         res = {
           redeemableOfLinkedCcy:
