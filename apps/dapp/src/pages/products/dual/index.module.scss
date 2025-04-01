@@ -131,6 +131,7 @@
     }
   }
 }
+
 .custom-quote-bg {
   background-color: #000;
   height: 13px;
@@ -140,6 +141,7 @@
   width: calc(1px + $width-content);
   z-index: 2;
 }
+
 .custom-quote {
   display: flex;
   align-items: center;
@@ -149,7 +151,6 @@
   padding: 20px 40px;
   font-size: 14px;
   margin-top: -13px;
-
   position: sticky;
   left: 0;
   bottom: 0;
@@ -194,9 +195,11 @@
       }
     }
   }
+
   .custom-quote-bg {
     display: none;
   }
+
   .custom-quote {
     flex-direction: column;
     align-items: start;
@@ -220,15 +223,38 @@
   .for-ccy-select {
     display: flex;
     justify-content: end;
-    height: auto;
+    height: 48px;
 
     .ccy-item {
-      text-align: end;
+      font-size: 16px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+
+      .flex-center {
+        @include flex-center;
+      }
+
+      .apy {
+        color: #50d113;
+        font-size: 14px;
+      }
 
       img {
         width: 17px;
         height: 18px;
       }
+    }
+  }
+
+  .settlement-dates-select {
+    height: 48px;
+
+    .date-item {
+      font-size: 16px;
+      width: 100%;
+      text-align: end;
     }
   }
 }

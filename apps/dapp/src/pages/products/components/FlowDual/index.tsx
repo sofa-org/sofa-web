@@ -27,11 +27,13 @@ export const FlowDual = () => {
         {t({ enUS: 'Getting Started with Dual' })}
       </div>
       <div className={styles['content']}>
-        <Step1 width={127 / window.winScale} />
+        <Step1 width={163 / window.winScale} />
         <div className={styles['arrow']} />
-        <Step2 width={128 / window.winScale} />
-        <Step3 width={524 / window.winScale} />
-        <Step4 width={128 / window.winScale} />
+        <Step2 width={108 / window.winScale} />
+        <div className={styles['arrow2']} />
+        <Step3 width={394 / window.winScale} />
+        <div className={styles['arrow3']} />
+        <Step4 width={138 / window.winScale} />
       </div>
       <IconExpand className={styles['icon-expand']} />
     </div>

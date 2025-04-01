@@ -11,7 +11,9 @@
   margin: 0 40px;
 }
 
-.arrow {
+.arrow,
+.arrow2,
+.arrow3 {
   @include flex-column-center;
 
   align-items: flex-start;
@@ -27,6 +29,14 @@
   > span {
     white-space: nowrap;
   }
+}
+
+.arrow2 {
+  margin-right: -32px;
+}
+
+.arrow3 {
+  margin-left: -32px;
 }
 
 .txt-gradient {
@@ -73,8 +83,11 @@
     margin: 0;
   }
 
-  .arrow {
+  .arrow,
+  .arrow2,
+  .arrow3 {
     position: relative;
+    margin: 0;
 
     &::before {
       display: inline-block;

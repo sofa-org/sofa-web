@@ -232,12 +232,13 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                 label: (
                   <>
                     <span className={styles['ccy-item']}>
-                      <img
-                        src={CCYService.ccyConfigs[it.forCcy]?.icon}
-                        alt=""
-                      />
-                      {CCYService.ccyConfigs[it.forCcy]?.name || it.forCcy}
-
+                      <div className={styles['flex-center']}>
+                        <img
+                          src={CCYService.ccyConfigs[it.forCcy]?.icon}
+                          alt=""
+                        />
+                        {CCYService.ccyConfigs[it.forCcy]?.name || it.forCcy}
+                      </div>
                       <div className={styles['apy']}>
                         {it.minApy == it.maxApy ? (
                           <>{displayPercentage(it.maxApy)}</>
