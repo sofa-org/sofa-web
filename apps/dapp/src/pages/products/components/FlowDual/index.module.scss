@@ -74,6 +74,44 @@
     }
   }
 }
+.step1 {
+  width: 163px;
+  height: 42px;
+  background: url(./assets/1.svg) no-repeat center;
+  background-size: contain;
+}
+.step2 {
+  width: 108px;
+  height: 50px;
+  background: url(./assets/2.svg) no-repeat center;
+  background-size: contain;
+}
+.step3 {
+  width: 394px;
+  height: 106px;
+  background: url(./assets/3.svg) no-repeat center;
+  background-size: contain;
+}
+.step4 {
+  width: 138px;
+  height: 50px;
+  background: url(./assets/4.svg) no-repeat center;
+  background-size: contain;
+}
+.lang-zh {
+  .step1 {
+    background-image: url(./assets/1.zhCN.svg);
+  }
+  .step2 {
+    background-image: url(./assets/2.zhCN.svg);
+  }
+  .step3 {
+    background-image: url(./assets/3.zhCN.svg);
+  }
+  .step4 {
+    background-image: url(./assets/4.zhCN.svg);
+  }
+}
 
 @mixin rewrite() {
   .flow-wrapper.expanded .content {
