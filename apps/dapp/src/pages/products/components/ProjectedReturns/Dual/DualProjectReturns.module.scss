@@ -537,14 +537,16 @@
 
 .partial-buy-tooltip {
   background: #fff;
-  max-width: 800px;
-  min-width: 588px;
   border-radius: 8px;
   border: 1px solid rgb(0 0 0 / 10%);
   box-shadow: 0 4px 16px 0 rgb(0 0 0 / 10%);
 
   > svg {
     color: #fff !important;
+  }
+  &:global(.semi-tooltip-wrapper.semi-tooltip-wrapper) {
+    max-width: 800px;
+    min-width: 588px;
   }
 }
 

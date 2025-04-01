@@ -248,7 +248,10 @@ const DualOptions = () => {
     <div className={styles['form-item']}>
       <div className={styles['label']}>
         {t(
-          { enUS: 'If the market {{direction}}, would you prefer to?' },
+          {
+            enUS: 'If the market {{direction}}, would you prefer to?',
+            zhCN: '如果市场{{direction}}，你想要?',
+          },
           {
             direction: ProductTypeRefs[
               formData?.productType || ProductType.BearSpread

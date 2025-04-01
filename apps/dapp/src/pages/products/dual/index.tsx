@@ -187,9 +187,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
             <FlowDual />
             <h1 className={styles['head-title']}>
               {ProjectTypeRefs[ProjectType.Dual].icon}
-              {t({
-                enUS: 'Dual: Buy Low, Sell High',
-              })}
+              {t({ enUS: 'Dual: Buy Low, Sell High', zhCN: '双币：低买高卖' })}
             </h1>
           </>
         }
@@ -285,9 +283,11 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
               : ProductTypeRefs[vault.productType].dualIsBuy
                 ? t({
                     enUS: '👏 Buy dips, get a bonus.',
+                    zhCN: '👏 逢低买入，获得奖金。',
                   })
                 : t({
                     enUS: '👏 Sell highs, earn higher.',
+                    zhCN: '👏 高卖赚取更多。',
                   })}
           </div>
           <div className={styles['content']}>
@@ -374,6 +374,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                     Toast.error(
                       t({
                         enUS: 'Please input Target Price',
+                        zhCN: '请输入目标价格',
                       }),
                     );
                     return;
@@ -382,6 +383,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                     Toast.error(
                       t({
                         enUS: 'Please select Settlement Date',
+                        zhCN: '请选择结算日期',
                       }),
                     );
                     return;

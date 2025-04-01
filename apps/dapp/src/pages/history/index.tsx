@@ -91,9 +91,7 @@ const OrderHistory = () => {
   const getDualColumns = useLazyCallback(() => {
     return [
       {
-        title: t({
-          enUS: 'Assets',
-        }),
+        title: t({ enUS: 'Assets', zhCN: '资产' }),
         render: (_, record) => (
           <span className={styles['ccy']}>
             <img
@@ -142,9 +140,7 @@ const OrderHistory = () => {
           }`,
       },
       {
-        title: t({
-          enUS: 'Settlement Results',
-        }),
+        title: t({ enUS: 'Settlement Results', zhCN: '结算结果' }),
         render: (_, record) => {
           if (!judgeSettled(record)) {
             return '-';
@@ -228,9 +224,7 @@ const OrderHistory = () => {
         ),
       },
       {
-        title: t({
-          enUS: 'State',
-        }),
+        title: t({ enUS: 'State', zhCN: '状态' }),
         render: (_, record) => {
           const { status } = DualService.getClaimStatus(
             { ...record, vault: record.product.vault },
@@ -239,21 +233,13 @@ const OrderHistory = () => {
           return (
             <span className={styles['dual-state']}>
               {status == DualPositionClaimStatus.NotExpired
-                ? t({
-                    enUS: 'Active',
-                  })
+                ? t({ enUS: 'Active', zhCN: '未结算' })
                 : status == DualPositionClaimStatus.ExpiredButNotClaimable
-                  ? t({
-                      enUS: 'Settling',
-                    })
+                  ? t({ enUS: 'Settling', zhCN: '结算中' })
                   : status == DualPositionClaimStatus.Claimable
-                    ? t({
-                        enUS: 'Unclaimed',
-                      })
+                    ? t({ enUS: 'Unclaimed', zhCN: '未领取' })
                     : status == DualPositionClaimStatus.Claimed
-                      ? t({
-                          enUS: 'Claimed',
-                        })
+                      ? t({ enUS: 'Claimed', zhCN: '已领取' })
                       : ''}
             </span>
           );

@@ -144,6 +144,7 @@ export const RecommendedList = (props: {
             t(
               {
                 enUS: '{{currency}} Current Price: [[${{price}}]]',
+                zhCN: '当前{{currency}}价格: [[${{price}}]]',
               },
               {
                 currency: forCcyConfig?.name || props.vault.forCcy,
@@ -211,6 +212,7 @@ export const RecommendedList = (props: {
                           t(
                             {
                               enUS: '(Current price: [[{{changePercentage}}]])',
+                              zhCN: '（当前价格：[[{{changePercentage}}]]）',
                             },
                             {
                               changePercentage: displayPercentage(
@@ -270,7 +272,7 @@ export const RecommendedList = (props: {
                         className={styles['deposit-btn']}
                         onClick={() => props.onSelectQuote(row)}
                       >
-                        {t({ enUS: 'Subscribe' })}
+                        {t({ enUS: 'Subscribe', zhCN: '订阅' })}
                       </AsyncButton>
                     ),
                   },

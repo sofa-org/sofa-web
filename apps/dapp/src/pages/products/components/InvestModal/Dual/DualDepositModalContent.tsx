@@ -297,6 +297,7 @@ export const DualDepositModalContent = (
                   {t(
                     {
                       enUS: 'Target Price ({{forCcy}} / {{domCcy}})',
+                      zhCN: '目标价格 ({{forCcy}} / {{domCcy}})',
                     },
                     {
                       forCcy: product?.vault.forCcy,
@@ -323,6 +324,7 @@ export const DualDepositModalContent = (
                           t(
                             {
                               enUS: '(Current price: [[{{currentPrice}}]] {{change}}{{changePercentage}})',
+                              zhCN: '(当前价格: [[{{currentPrice}}]] {{change}}{{changePercentage}})',
                             },
                             {
                               changePercentage: displayPercentage(

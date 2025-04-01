@@ -21,7 +21,7 @@ export const FlowDual = () => {
       onClick={() => setExpanded((pre) => (pre === '1' ? '0' : '1'))}
     >
       <div className={styles['title']}>
-        {t({ enUS: 'Getting Started with Dual' })}
+        {t({ enUS: 'Getting Started with Dual', zhCN: '如何进行双币交易' })}
       </div>
       <div className={styles['content']}>
         <div className={styles['step1']} />

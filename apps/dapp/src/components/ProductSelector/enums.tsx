@@ -95,8 +95,8 @@ export const ProjectTypeRefs = {
       }),
     desc1: (t: TFunction) =>
       t({
-        enUS: `Buy Low, Sell High
-Earn extra rewards while you are at it.`,
+        enUS: 'Buy Low, Sell High\nEarn extra rewards while you are at it.',
+        zhCN: '低买高卖\n并赚取额外奖励。',
       }),
     icon: <img src={IconDual} width="24px" />,
     value: ProjectType.Dual,
@@ -199,12 +199,12 @@ export const ProductTypeRefs = {
     dualIsBuy: false,
     dualDesc: (t: TFunction) => ({
       helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '存入金额' }),
-      executed: t({ enUS: 'Sell Target Triggered' }),
-      limited: t({ enUS: 'Limit Sell' }),
-      op: t({ enUS: 'Sell' }),
+      executed: t({ enUS: 'Sell Target Triggered', zhCN: '成功卖出' }),
+      limited: t({ enUS: 'Limit Sell', zhCN: '限价卖出' }),
+      op: t({ enUS: 'Sell', zhCN: '卖出' }),
       op2: t({ enUS: 'Sell High', zhCN: '高卖' }),
       op3: t({ enUS: 'Sell High @ {price}', zhCN: '高卖 @ {price}' }),
-      partialExecuted: t({ enUS: 'Partial Sell' }),
+      partialExecuted: t({ enUS: 'Partial Sell', zhCN: '部分卖出' }),
     }),
     extraDesc: (t: TFunction) =>
       t(
@@ -443,12 +443,12 @@ export const ProductTypeRefs = {
     dualIsBuy: true,
     dualDesc: (t: TFunction) => ({
       helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '存入金额' }),
-      executed: t({ enUS: 'Purchase Target Triggered' }),
-      limited: t({ enUS: 'Limit Buy' }),
-      op: t({ enUS: 'Buy' }),
+      executed: t({ enUS: 'Purchase Target Triggered', zhCN: '成功购买' }),
+      limited: t({ enUS: 'Limit Buy', zhCN: '限价购买' }),
+      op: t({ enUS: 'Buy', zhCN: '购买' }),
       op2: t({ enUS: 'Buy Low', zhCN: '低买' }),
       op3: t({ enUS: 'Buy Low @ {price}', zhCN: '低买 @ {price}' }),
-      partialExecuted: t({ enUS: 'Partial Buy' }),
+      partialExecuted: t({ enUS: 'Partial Buy', zhCN: '部分购买' }),
     }),
     extraDesc: (t: TFunction) =>
       t(

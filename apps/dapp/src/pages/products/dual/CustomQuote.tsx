@@ -153,9 +153,7 @@ export const CustomQuote = (props: {
       })}
     >
       <span className={styles['caption']}>
-        {t({
-          enUS: 'Customize',
-        })}
+        {t({ enUS: 'Customize', zhCN: '自定义' })}
       </span>
       <div className={classNames(styles['field'], styles['settlement-date'])}>
         <span className={styles['label']}>
@@ -199,9 +197,7 @@ export const CustomQuote = (props: {
       </div>
       <div className={classNames(styles['field'], styles['target-price'])}>
         <span className={styles['label']}>
-          {t({
-            enUS: 'Target Price',
-          })}
+          {t({ enUS: 'Target Price', zhCN: '目标价格' })}
         </span>
         <span className={styles['value']}>
           <AmountInput
@@ -264,7 +260,7 @@ export const CustomQuote = (props: {
         onClick={() => props.onClickDeposit(matchingQuote)}
         disabled={!props.price || !props.expiry}
       >
-        {t({ enUS: 'Subscribe' })}
+        {t({ enUS: 'Subscribe', zhCN: '订阅' })}
       </AsyncButton>
     </div>
   );

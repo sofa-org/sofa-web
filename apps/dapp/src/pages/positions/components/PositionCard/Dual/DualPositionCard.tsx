@@ -108,14 +108,10 @@ const DualPositionCard = (
                     {renderProps?.executionResult
                       ? renderProps.executionResult ==
                         DualPositionExecutionStatus.Executed
-                        ? t({
-                            enUS: 'Successful',
-                          })
+                        ? t({ enUS: 'Successful', zhCN: '换币成功' })
                         : renderProps.executionResult ==
                             DualPositionExecutionStatus.NotExecuted
-                          ? t({
-                              enUS: 'Premium Earned',
-                            })
+                          ? t({ enUS: 'Premium Earned', zhCN: '已赚取奖励' })
                           : productTypeRef.dualDesc(t).partialExecuted
                       : '...'}
                   </span>
@@ -273,6 +269,7 @@ const DualPositionCard = (
                       t(
                         {
                           enUS: '([[{{amount}}]] Profits)',
+                          zhCN: '（[[{{amount}}]] 收益）',
                         },
                         {
                           amount: amountFormatter(
@@ -309,6 +306,7 @@ const DualPositionCard = (
                       t(
                         {
                           enUS: '([[{{amount}}]] Profits)',
+                          zhCN: '（[[{{amount}}]] 收益）',
                         },
                         {
                           amount: amountFormatter(
