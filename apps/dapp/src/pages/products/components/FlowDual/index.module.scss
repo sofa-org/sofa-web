@@ -114,11 +114,21 @@
 }
 
 @mixin rewrite() {
-  .flow-wrapper.expanded .content {
-    @include flex-column-center;
-
-    gap: 24px;
-    margin: 0;
+  .flow-wrapper.expanded {
+    gap: 0;
+    .content {
+      @include flex-column-center;
+      width: 80vw;
+      height: 120vw;
+      background: url(./assets/mobile.enUS.svg) no-repeat center;
+      background-size: contain;
+      > * {
+        display: none;
+      }
+    }
+  }
+  .lang-zh.flow-wrapper.expanded .content {
+    background-image: url(./assets/mobile.zhCN.svg);
   }
 
   .arrow,

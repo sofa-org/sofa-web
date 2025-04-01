@@ -283,11 +283,11 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
               : ProductTypeRefs[vault.productType].dualIsBuy
                 ? t({
                     enUS: '👏 Buy dips, get a bonus.',
-                    zhCN: '👏 逢低买入，获得奖金。',
+                    zhCN: '👏 逢低买入，并获得超额收益。',
                   })
                 : t({
                     enUS: '👏 Sell highs, earn higher.',
-                    zhCN: '👏 高卖赚取更多。',
+                    zhCN: '👏 高点卖出，并获得超额收益。',
                   })}
           </div>
           <div className={styles['content']}>

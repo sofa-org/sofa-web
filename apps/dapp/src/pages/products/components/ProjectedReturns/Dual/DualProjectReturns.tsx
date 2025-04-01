@@ -78,7 +78,7 @@ export const DualProfitScenarios = (
                 <div className={styles['profit-title']}>
                   {t({
                     enUS: 'Deposit Reward+Partial Buy-in',
-                    zhCN: '存款奖励 + 部分买入',
+                    zhCN: '双币奖励 + 部分买入',
                   })}
                 </div>
                 <div className={styles['result']}>
@@ -169,7 +169,7 @@ export const DualProfitScenarios = (
                   {t(
                     {
                       enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
-                      zhCN: '接收 {{amount}} {{crypto}} + {{rchAmount}} RCH',
+                      zhCN: '收到 {{amount}} {{crypto}} + {{rchAmount}} RCH',
                     },
                     {
                       amount: amountFormatter(
@@ -248,7 +248,7 @@ export const DualProfitScenarios = (
                       <span className={styles['label']}>
                         {t({
                           enUS: 'Deposit Reward',
-                          zhCN: '充值奖励',
+                          zhCN: '双币收益',
                         })}
                       </span>
                       <span className={styles['value']}>
@@ -335,16 +335,13 @@ export const DualProfitScenarios = (
               <div className={styles['title-info']}>
                 <div className={styles['title']}>
                   <span className={styles['emoji']}>️️✌️</span>
-                  {t({
-                    enUS: 'No Trigger. Premium Earned',
-                    zhCN: '未成交，获得额外奖励',
-                  })}
+                  {desc.notExecuted}
                 </div>
                 <div className={styles['subtitle']}>
                   {t(
                     {
                       enUS: 'Receive {{amount}} {{crypto}} + {{rchAmount}} RCH',
-                      zhCN: '接收 {{amount}} {{crypto}} + {{rchAmount}} RCH',
+                      zhCN: '收到 {{amount}} {{crypto}} + {{rchAmount}} RCH',
                     },
                     {
                       amount: amountFormatter(

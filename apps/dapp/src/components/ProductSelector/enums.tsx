@@ -193,13 +193,17 @@ export const ProductTypeRefs = {
       opValue: 'buy_crypto',
       title: t({
         enUS: 'Sell highs, earn higher',
-        zhCN: '高价卖出加密货币并获得奖励',
+        zhCN: '高点卖出，并获得超额收益',
       }),
     }),
     dualIsBuy: false,
     dualDesc: (t: TFunction) => ({
-      helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '存入金额' }),
-      executed: t({ enUS: 'Sell Target Triggered', zhCN: '成功卖出' }),
+      helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '申购金额' }),
+      executed: t({ enUS: 'Sell Target Triggered', zhCN: '触发高卖' }),
+      notExecuted: t({
+        enUS: 'No Trigger. Premium Earned',
+        zhCN: '未高卖，仍获得奖励',
+      }),
       limited: t({ enUS: 'Limit Sell', zhCN: '限价卖出' }),
       op: t({ enUS: 'Sell', zhCN: '卖出' }),
       op2: t({ enUS: 'Sell High', zhCN: '高卖' }),
@@ -437,13 +441,17 @@ export const ProductTypeRefs = {
       opValue: 'buy_crypto',
       title: t({
         enUS: 'Buy dips, get a bonus',
-        zhCN: '低价买入加密货币并获得奖励',
+        zhCN: '逢低买入，并获得超额收益',
       }),
     }),
     dualIsBuy: true,
     dualDesc: (t: TFunction) => ({
-      helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '存入金额' }),
-      executed: t({ enUS: 'Purchase Target Triggered', zhCN: '成功购买' }),
+      helpMeOp: t({ enUS: 'Deposit Amount', zhCN: '申购金额' }),
+      executed: t({ enUS: 'Purchase Target Triggered', zhCN: '触发低买' }),
+      notExecuted: t({
+        enUS: 'No Trigger. Premium Earned',
+        zhCN: '未低买，仍获得奖励',
+      }),
       limited: t({ enUS: 'Limit Buy', zhCN: '限价购买' }),
       op: t({ enUS: 'Buy', zhCN: '购买' }),
       op2: t({ enUS: 'Buy Low', zhCN: '低买' }),

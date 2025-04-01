@@ -165,6 +165,12 @@
   @include flex-center;
 }
 
+:global(.is-mobile) {
+  .head-title {
+    padding: 6px 0 20px !important;
+  }
+}
+
 .mobile-ui {
   display: flex;
   flex-direction: column;

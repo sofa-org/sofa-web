@@ -21,7 +21,7 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
       <div className={styles['subtitle']}>
         {t({
           enUS: 'Still Get Deposit Rewards and RCH Airdrops',
-          zhCN: '仍然获得存款奖励和RCH空投',
+          zhCN: '仍获得双币奖励和RCH空投',
         })}
       </div>
       <div className={styles['body']}>
@@ -30,11 +30,11 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
             {ProductTypeRefs[props.productType].dualIsBuy
               ? t({
                   enUS: 'Deposit Reward + Partial Buy Low',
-                  zhCN: '存款奖励 + 部分低买',
+                  zhCN: '双币奖励 + 部分低买',
                 })
               : t({
                   enUS: 'Deposit Reward + Partial Sell High',
-                  zhCN: '存款奖励 + 部分高卖',
+                  zhCN: '双币奖励 + 部分高卖',
                 })}
           </div>
           <div className={styles['value']}>

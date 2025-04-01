@@ -274,7 +274,7 @@ export const RecommendedList = (props: {
                         className={styles['deposit-btn']}
                         onClick={() => props.onSelectQuote(row)}
                       >
-                        {t({ enUS: 'Subscribe', zhCN: '订阅' })}
+                        {t({ enUS: 'Subscribe', zhCN: '申购' })}
                       </AsyncButton>
                     ),
                   },

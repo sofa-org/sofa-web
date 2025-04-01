@@ -420,7 +420,7 @@ export const DualDepositModalContent = (
                       }),
                     )
                       .utc()
-                      .format('YYYY-MM-DD　HH:mm')}{' '}
+                      .format('YYYY-MM-DD HH:mm')}{' '}
                     [UTC]
                   </div>
                 ) : undefined}
