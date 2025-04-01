@@ -432,7 +432,7 @@ export const DualDepositModalContent = (
               <div className={styles['reward']}>
                 <span className={styles['label']}>
                   {t({
-                    enUS: 'APR(Deposit Reward + RCH Airdorp)',
+                    enUS: 'APR(Deposit Reward + RCH Airdrop)',
                     zhCN: '年利率 (存入收益+RCH空投)',
                   })}
                 </span>
