@@ -69,7 +69,7 @@ export const DualProfitScenarios = (
               <div className={styles['subtitle']}>
                 {t({
                   enUS: 'Still Get Deposit Rewards and RCH Airdrops',
-                  zhCN: '仍然获得存款奖励和RCH空投',
+                  zhCN: '仍然获得双币收益和RCH空投',
                 })}
               </div>
             </div>
@@ -78,7 +78,7 @@ export const DualProfitScenarios = (
                 <div className={styles['profit-title']}>
                   {t({
                     enUS: 'Deposit Reward+Partial Buy-in',
-                    zhCN: '双币奖励 + 部分买入',
+                    zhCN: '双币收益 + 部分买入',
                   })}
                 </div>
                 <div className={styles['result']}>
@@ -107,7 +107,7 @@ export const DualProfitScenarios = (
               <span className={styles['plus-sign']}>+</span>
               <div className={styles['right']}>
                 <div className={styles['profit-title']}>
-                  {t({ enUS: 'RCH Airdrop | Est.', zhCN: 'RCH空投 | 估计值' })}
+                  {t({ enUS: 'RCH Airdrop | Est.', zhCN: 'RCH空投 | 估计' })}
                 </div>
 
                 <div className={styles['result']}>
@@ -405,7 +405,7 @@ export const DualProfitScenarios = (
                       <span className={styles['label']}>
                         {t({
                           enUS: 'Deposit Reward',
-                          zhCN: '存入奖励',
+                          zhCN: '双币收益',
                         })}
                       </span>
                       <span className={styles['value']}>
@@ -513,7 +513,7 @@ export const DualProfitScenarios = (
               <div className={styles['subtitle']}>
                 {t({
                   enUS: 'Still Get Deposit Rewards and RCH Airdrops',
-                  zhCN: '仍然获得存款奖励和RCH空投',
+                  zhCN: '仍然获得双币收益和RCH空投',
                 })}
               </div>
               <div className={styles['line']} />
