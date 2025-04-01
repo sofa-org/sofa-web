@@ -15,18 +15,18 @@ export default {
       'После выполнения депозита и транзакции с умным контрактом, активы не могут быть выведены до даты расчета. Опция "Заявка и вывод" будет доступна после расчета для перевода окончательного платежа обратно в кошелек пользователя.',
   },
   'zh-CN': {
-    'Claim & Withdraw': '领取与提取',
+    'Claim & Withdraw': '赎回与领取',
     'Once the deposit and smart contract transaction has been executed, assets cannot be withdrawn until the Settlement Date.A "Claim & Withdraw" option will be available post settlement, to transfer the final payout back to the user\'s wallet.':
-      '一旦存款和智能合约交互执行后，存入的资产要到结算日期才能提取。在结算后用戶可以選擇“领取与提取”，将最终的交易收益转回用户钱包。',
+      '一旦存款和智能合约交互执行后，存入的资产要到结算日期才能提取。在结算后用戶可以选择“赎回与领取”，将最终的交易收益转回用户钱包。',
   },
   'zh-HK': {
-    'Claim & Withdraw': '領取與提取',
+    'Claim & Withdraw': '贖回與領取',
     'Once the deposit and smart contract transaction has been executed, assets cannot be withdrawn until the Settlement Date.A "Claim & Withdraw" option will be available post settlement, to transfer the final payout back to the user\'s wallet.':
-      '一旦存款及智能合約交易執行後，資產需至結算日才能提取。結算後，用戶可選擇「領取與提取」將最終支付的款项轉回用戶的錢包。',
+      '一旦存款及智能合約交易執行後，資產需至結算日才能提取。結算後，用戶可選擇「贖回與領取」將最終支付的款项轉回用戶的錢包。',
   },
   'zh-TW': {
-    'Claim & Withdraw': '領取與提取',
+    'Claim & Withdraw': '贖回與領取',
     'Once the deposit and smart contract transaction has been executed, assets cannot be withdrawn until the Settlement Date.A "Claim & Withdraw" option will be available post settlement, to transfer the final payout back to the user\'s wallet.':
-      '一旦存款和智能合約交易被執行後，資產必須等到結算日期才能提取。結算後將會提供「領取與提取」選項，以將最終支付回轉到用戶的錢包。',
+      '一旦存款和智能合約交易被執行後，資產必須等到結算日期才能提取。結算後將會提供「贖回與領取」選項，以將最終支付回轉到用戶的錢包。',
   },
 };
