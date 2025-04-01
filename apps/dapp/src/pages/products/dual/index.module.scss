@@ -58,6 +58,9 @@
   }
 }
 
+.apy {
+  color: #50d113;
+}
 .content {
   align-items: stretch;
   justify-content: space-between;
@@ -158,6 +161,10 @@
   z-index: 3;
 }
 
+.flex-center {
+  @include flex-center;
+}
+
 .mobile-ui {
   display: flex;
   flex-direction: column;
@@ -232,10 +239,6 @@
       flex-direction: column;
       align-items: end;
 
-      .flex-center {
-        @include flex-center;
-      }
-
       .apy {
         color: #50d113;
         font-size: 14px;
@@ -255,6 +258,9 @@
       font-size: 16px;
       width: 100%;
       text-align: end;
+      > span {
+        margin-left: 8px;
+      }
     }
   }
 }
