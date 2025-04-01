@@ -219,6 +219,7 @@ export const RecommendedList = (props: {
                                 diffPercentage === undefined
                                   ? undefined
                                   : Math.abs(diffPercentage),
+                                2,
                               ),
                             },
                           ),
@@ -252,6 +253,7 @@ export const RecommendedList = (props: {
                   <div className={styles['reward']}>
                     {displayPercentage(
                       simplePlus(row.apyInfo?.max, row.apyInfo?.rch),
+                      2,
                     )}
                   </div>
                 ),

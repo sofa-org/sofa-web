@@ -1,8 +1,7 @@
 import { Dispatch, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { DatePicker, Spin } from '@douyinfe/semi-ui';
 import { CCYService } from '@sofa/services/ccy';
-import { ContractsService, ProductType } from '@sofa/services/contracts';
+import { ContractsService } from '@sofa/services/contracts';
 import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -17,13 +16,12 @@ import {
 } from '@sofa/utils/amount';
 import { next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
-import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
+import { useAsyncMemo } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import { formatHighlightedText } from '@sofa/utils/string';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { omit } from 'lodash-es';
-import { nanoid } from 'nanoid';
 
 import AmountInput from '@/components/AmountInput';
 import { useIndexPrices } from '@/components/IndexPrices/store';
@@ -31,7 +29,6 @@ import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
-import { useGlobalState } from '@/store';
 
 import { useProductsState } from '../../../store';
 import InvestButton from '../../InvestButton';
@@ -260,7 +257,7 @@ export const DualDepositModalContent = (
                         ? wallet.balance![data.vault.depositCcy]
                         : undefined
                     }
-                    type="internal_max"
+                    type="normal"
                     tick={vault?.depositTickAmount}
                     value={product?.depositAmount}
                     suffix={
@@ -331,7 +328,7 @@ export const DualDepositModalContent = (
                                 diffPercentage === undefined
                                   ? undefined
                                   : Math.abs(diffPercentage),
-                                0,
+                                2,
                               ),
                               change: !diffPrice
                                 ? ''
@@ -439,6 +436,7 @@ export const DualDepositModalContent = (
                 <span className={styles['value']}>
                   {displayPercentage(
                     simplePlus(data?.apyInfo?.max, data?.apyInfo?.rch),
+                    2,
                   )}
                 </span>
               </div>
