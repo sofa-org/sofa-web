@@ -60,7 +60,7 @@ export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
         <span className={styles['plus']} />
         <div className={styles['right']}>
           <div className={styles['label']}>
-            {t({ enUS: 'RCH Airdrop | Est.', zhCN: 'RCH空投 | 估计值' })}
+            {t({ enUS: 'RCH Airdrop | Est.', zhCN: 'RCH空投 | 估计' })}
           </div>
           <div className={styles['value']}>
             <span className={styles['amount']}>
