@@ -185,8 +185,8 @@ export const ProductTypeRefs = {
     dualOp: (t: TFunction, vault: { forCcy: string; domCcy: string }) => ({
       opCrypto: t(
         {
-          enUS: 'Sell {{forCcy}} Get {{domCcy}}',
-          zhCN: '卖出 {{forCcy}} 买入 {{domCcy}}',
+          enUS: 'Sell {{forCcy}} at a High Target Price',
+          zhCN: '高点卖出 {{forCcy}}',
         },
         vault,
       ),
@@ -437,7 +437,13 @@ export const ProductTypeRefs = {
       } as { situation: string; description: string } | undefined,
     }),
     dualOp: (t: TFunction, vault: { forCcy: string; domCcy: string }) => ({
-      opCrypto: t({ enUS: 'Buy {{forCcy}}', zhCN: '买入 {{forCcy}}' }, vault),
+      opCrypto: t(
+        {
+          enUS: 'Buy {{forCcy}} at a Low Target Price',
+          zhCN: '逢低买入 {{forCcy}}',
+        },
+        vault,
+      ),
       opValue: 'buy_crypto',
       title: t({
         enUS: 'Buy dips, get a bonus',
