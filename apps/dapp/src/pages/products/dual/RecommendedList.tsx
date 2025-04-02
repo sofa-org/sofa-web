@@ -150,7 +150,10 @@ export const RecommendedList = (props: {
                 currency: forCcyConfig?.name || props.vault.forCcy,
                 price: amountFormatter(
                   prices[props.vault.forCcy],
-                  domCcyConfig?.precision,
+                  DualService.getPricePrecision({
+                    vault: props.vault,
+                    minStepSize: dualConfig?.minStepSize,
+                  }),
                   true,
                 ),
               },

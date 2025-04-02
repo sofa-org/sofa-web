@@ -343,6 +343,7 @@ export const DualDepositModalContent = (
                                         ...product,
                                         minStepSize: dualConfig?.minStepSize,
                                       }),
+                                      true,
                                     )
                                   : '-',
                             },
