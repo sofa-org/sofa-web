@@ -42,12 +42,15 @@ export function useProjectChange(defaultVal = ProjectType.Earn) {
     : $val || defaultVal;
 
   useEffect(() => {
-    updateQuery({
-      project:
-        location.pathname.includes('automator') && val === ProjectType.Automator
-          ? undefined
-          : val,
-    });
+    if (/products|positions|transactions/.test(location.pathname)) {
+      updateQuery({
+        project:
+          location.pathname.includes('automator') &&
+          val === ProjectType.Automator
+            ? undefined
+            : val,
+      });
+    }
   }, [location.pathname, val]);
 
   const project = useMemo(() => {
