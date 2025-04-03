@@ -55,7 +55,7 @@ export const useLivePPS = (param: {
   const [requesting, setRequesting] = useState(false);
   useEffect(
     useLazyCallback(() => {
-      const interval = setInterval(() => {
+      const req = () => {
         if (document.hidden || requesting) {
           // 页面/tab隐蔽
           return;
@@ -84,7 +84,9 @@ export const useLivePPS = (param: {
               });
           })(param);
         }
-      }, 5 * 1000);
+      };
+      const interval = setInterval(req, 5 * 1000);
+      req();
       return () => clearInterval(interval);
     }),
     [param.forCcy, param.domCcy, document.hidden],
