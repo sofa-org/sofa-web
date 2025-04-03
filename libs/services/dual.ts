@@ -50,10 +50,14 @@ export class DualService {
   private static $getExecutionStatus(
     position: positions.PositionInfo & { vault: VaultInfo },
   ) {
+    const claimStatus = DualService.getClaimStatus(position, new Date());
     if (
-      DualService.getClaimStatus(position, new Date()).status ==
-      DualPositionClaimStatus.NotExpired
+      [
+        DualPositionClaimStatus.NotExpired,
+        DualPositionClaimStatus.ExpiredButNotClaimable,
+      ].includes(claimStatus.status)
     ) {
+      // 没到settlement time，一律认为未到期
       return DualPositionExecutionStatus.NotExpired;
     }
     if (
@@ -78,15 +82,15 @@ export class DualService {
     position: positions.PositionInfo & { vault: VaultInfo },
     now: Date,
   ) {
+    if (position.claimed) {
+      return { status: DualPositionClaimStatus.Claimed, leftTime: 0 };
+    }
     if (position.product?.expiry === undefined) {
       // is a quote?
       return {
         status: DualPositionClaimStatus.NotExpired,
         leftTime: -1,
       };
-    }
-    if (position.claimed) {
-      return { status: DualPositionClaimStatus.Claimed, leftTime: 0 };
     }
     if (now.getTime() < position.product.expiry * 1000) {
       return {
@@ -251,10 +255,8 @@ export class DualService {
         //  redeemableOfLinkedCcy = taker换币数量 * anchorPrice
         //  redeemable = (own + counterParty) - taker换币数量
         takerExchangedAmount =
-          quotePositions == totalPositions
-            ? 1
-            : (Number(quotePositions) / Number(totalPositions)) *
-              (Number(data.amounts.own) + Number(data.amounts.counterparty));
+          (Number(quotePositions) / Number(totalPositions)) *
+          (Number(data.amounts.own) + Number(data.amounts.counterparty));
 
         res = {
           redeemableOfLinkedCcy:
@@ -333,13 +335,10 @@ export class DualService {
       new Date(),
     ).status;
     if (
-      [
-        DualPositionClaimStatus.Claimable,
-        DualPositionClaimStatus.ExpiredButNotClaimable,
-      ].includes(claimStatus) &&
+      [DualPositionClaimStatus.Claimable].includes(claimStatus) &&
       data.amounts
     ) {
-      // 如果已过期，但未领取，需要从链上读状态
+      // 如果能领取了，需要从链上读状态
       const res = await DualService.$readRedeemableFromChain(
         data as positions.PositionInfo,
       );
