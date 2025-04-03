@@ -158,65 +158,6 @@ export class MarketService {
       .then((res) => res.value.prices[0][1]);
   }
 
-  @asyncRetry()
-  @asyncCache({
-    persist: true,
-    until: (v, t) => !v || !t || Date.now() - t > MsIntervals.min,
-    id: (_, args) => `index-price-${args[0]}_USDT`,
-  })
-  static async getPriceFromUniswap(token: 'RCH' | 'CRV') {
-    const address = {
-      RCH: defaultChain.rchAddress,
-      CRV: '0xd533a949740bb3306d119cc777fa900ba034cd52',
-    }[token];
-    const swapAddress = {
-      RCH: defaultChain.rchUniswapAddress,
-      CRV: '0x919Fa96e88d67499339577Fa202345436bcDaf79',
-    }[token];
-    const swapVersion = {
-      RCH: defaultChain.rchUniswapVersion,
-      CRV: 'v3' as const,
-    }[token];
-    if (!address || !swapAddress || !swapVersion) {
-      return MarketService.fetchPxFromCoinGecko(token);
-    }
-    return ContractsService.getUniswapPairPrice(
-      swapAddress,
-      address,
-      defaultChain.chainId,
-      swapVersion,
-    )
-      .then(async (info) => {
-        if (info.token0 == token && /usd/i.test(info.token1)) return info.price;
-        if (info.token1 == token && /usd/i.test(info.token0))
-          return 1.0 / info.price;
-        if (info.token0 != token && info.token1 != token) {
-          throw new Error(
-            `unexpected info from uniswap ${JSON.stringify(info)} for ${token}`,
-          );
-        }
-        let theOtherToken = info.token0 == token ? info.token1 : info.token0;
-        if (/btc/i.test(theOtherToken)) {
-          theOtherToken = 'BTC';
-        } else if (/eth/i.test(theOtherToken)) {
-          theOtherToken = 'ETH';
-        }
-        if (!['BTC', 'ETH'].includes(theOtherToken)) {
-          throw new Error(
-            `unexpected the op token from uniswap ${JSON.stringify(info)} for ${token}`,
-          );
-        }
-        const token1Price = await MarketService.$$fetchIndexPx(
-          theOtherToken as 'BTC' | 'ETH',
-        );
-        return info.price * token1Price;
-      })
-      .catch((err) => {
-        console.error(err);
-        return MarketService.fetchPxFromCoinGecko(token);
-      });
-  }
-
   static $fetchIndexPx() {
     return Promise.all(
       (['BTC', 'ETH'] as const).map(($ccy) =>
@@ -232,19 +173,31 @@ export class MarketService {
       MarketService.getPPSOfScrv().catch(() => 1),
       MarketService.getPPSOfZRCH().catch(() => 1),
       MarketService.$fetchIndexPx(),
-      Env.isPre || Env.isProd
-        ? MarketService.getPriceFromUniswap('RCH').then((price) => ({
-            RCH: price,
-          }))
-        : MarketService.fetchPxFromCoinGecko('RCH')
-            .catch(() => undefined)
-            .then((price) => ({ RCH: price })),
-      MarketService.fetchPxFromCoinGecko('USDT')
-        .catch(() => 1)
-        .then((price) => ({ USDT: price })),
-      MarketService.fetchPxFromCoinGecko('USDC')
-        .catch(() => 1)
-        .then((price) => ({ USDC: price })),
+      MarketService.getPPS({
+        fromCcy: 'RCH',
+        toCcy: 'USD',
+        includeNow: true,
+      }).then((res) => ({ RCH: res.now })),
+      MarketService.getPPS({
+        fromCcy: 'crvUSD',
+        toCcy: 'USD',
+        includeNow: true,
+      }).then((res) => ({ crvUSD: res.now })),
+      MarketService.getPPS({
+        fromCcy: 'USDT',
+        toCcy: 'USD',
+        includeNow: true,
+      }).then((res) => ({ USDT: res.now })),
+      MarketService.getPPS({
+        fromCcy: 'USDC',
+        toCcy: 'USD',
+        includeNow: true,
+      }).then((res) => ({ USDC: res.now })),
+      MarketService.getPPS({
+        fromCcy: 'CRV',
+        toCcy: 'USD',
+        includeNow: true,
+      }).then((res) => ({ CRV: res.now })),
     ]).then(([scrvPPS, zrchPPS, ...prices]) => {
       const obj = prices.reduce(
         (pre, it) => Object.assign(pre, it),
@@ -405,7 +358,7 @@ export class MarketService {
 
   @asyncCache({
     until: (it, createdAt) =>
-      !it || !createdAt || Date.now() - createdAt > MsIntervals.min,
+      !it || !createdAt || Date.now() - createdAt > MsIntervals.s * 10,
   })
   static async $getPPSNow(params: { fromCcy: string; toCcy: string }) {
     return http
