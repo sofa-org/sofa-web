@@ -1,5 +1,6 @@
 import { singleton } from '@livelybone/singleton';
 import { applyMock, asyncCache, asyncRetry } from '@sofa/utils/decorators';
+import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { jsonSafeParse } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
@@ -161,24 +162,58 @@ export class MarketService {
   @asyncCache({
     persist: true,
     until: (v, t) => !v || !t || Date.now() - t > MsIntervals.min,
-    id: () => 'index-price-RCH_USDT',
+    id: (_, args) => `index-price-${args[0]}_USDT`,
   })
-  static async getRchPriceInUsd() {
+  static async getPriceFromUniswap(token: 'RCH' | 'CRV') {
+    const address = {
+      RCH: defaultChain.rchAddress,
+      CRV: '0xd533a949740bb3306d119cc777fa900ba034cd52',
+    }[token];
+    const swapAddress = {
+      RCH: defaultChain.rchUniswapAddress,
+      CRV: '0x919Fa96e88d67499339577Fa202345436bcDaf79',
+    }[token];
+    const swapVersion = {
+      RCH: defaultChain.rchUniswapVersion,
+      CRV: 'v3' as const,
+    }[token];
+    if (!address || !swapAddress || !swapVersion) {
+      return MarketService.fetchPxFromCoinGecko(token);
+    }
     return ContractsService.getUniswapPairPrice(
-      ContractsService.rchUniswapAddress(),
-      ContractsService.rchAddress(),
+      swapAddress,
+      address,
       defaultChain.chainId,
-      defaultChain.rchUniswapVersion,
+      swapVersion,
     )
       .then(async (info) => {
-        if (/usd/i.test(info.token1)) return info.price;
-        const token1 = /btc/i.test(info.token1) ? 'BTC' : 'ETH';
-        const token1Price = await MarketService.$$fetchIndexPx(token1);
+        if (info.token0 == token && /usd/i.test(info.token1)) return info.price;
+        if (info.token1 == token && /usd/i.test(info.token0))
+          return 1.0 / info.price;
+        if (info.token0 != token && info.token1 != token) {
+          throw new Error(
+            `unexpected info from uniswap ${JSON.stringify(info)} for ${token}`,
+          );
+        }
+        let theOtherToken = info.token0 == token ? info.token1 : info.token0;
+        if (/btc/i.test(theOtherToken)) {
+          theOtherToken = 'BTC';
+        } else if (/eth/i.test(theOtherToken)) {
+          theOtherToken = 'ETH';
+        }
+        if (!['BTC', 'ETH'].includes(theOtherToken)) {
+          throw new Error(
+            `unexpected the op token from uniswap ${JSON.stringify(info)} for ${token}`,
+          );
+        }
+        const token1Price = await MarketService.$$fetchIndexPx(
+          theOtherToken as 'BTC' | 'ETH',
+        );
         return info.price * token1Price;
       })
       .catch((err) => {
         console.error(err);
-        return MarketService.fetchPxFromCoinGecko('RCH');
+        return MarketService.fetchPxFromCoinGecko(token);
       });
   }
 
@@ -197,10 +232,13 @@ export class MarketService {
       MarketService.getPPSOfScrv().catch(() => 1),
       MarketService.getPPSOfZRCH().catch(() => 1),
       MarketService.$fetchIndexPx(),
-      MarketService.fetchPxFromCoinGecko('RCH')
-        .catch(() => 1)
-        .then((price) => ({ RCH: price })),
-      // MarketService.getRchPriceInUsd().then((price) => ({ RCH: price })),
+      Env.isPre || Env.isProd
+        ? MarketService.getPriceFromUniswap('RCH').then((price) => ({
+            RCH: price,
+          }))
+        : MarketService.fetchPxFromCoinGecko('RCH')
+            .catch(() => undefined)
+            .then((price) => ({ RCH: price })),
       MarketService.fetchPxFromCoinGecko('crvUSD')
         .catch(() => 1)
         .then((price) => ({ crvUSD: price })),
@@ -210,9 +248,13 @@ export class MarketService {
       MarketService.fetchPxFromCoinGecko('USDC')
         .catch(() => 1)
         .then((price) => ({ USDC: price })),
-      MarketService.fetchPxFromCoinGecko('CRV')
-        .catch(() => 1)
-        .then((price) => ({ CRV: price })),
+      Env.isPre || Env.isProd
+        ? MarketService.getPriceFromUniswap('CRV').then((price) => ({
+            CRV: price,
+          }))
+        : MarketService.fetchPxFromCoinGecko('CRV')
+            .catch(() => undefined)
+            .then((price) => ({ CRV: price })),
     ]).then(([scrvPPS, zrchPPS, ...prices]) => {
       const obj = prices.reduce(
         (pre, it) => Object.assign(pre, it),
