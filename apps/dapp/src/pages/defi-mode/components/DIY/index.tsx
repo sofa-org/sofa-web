@@ -539,7 +539,7 @@ export const DIY = () => {
         {supportMatrix.skipOption?.includes('dualOptions') ? (
           <></>
         ) : (
-          <DualOptions />
+          <>{/* <DualOptions /> */}</>
         )}
         {riskType === RiskType.RISKY ? <OddsTarget /> : <ApyTarget />}
       </div>
