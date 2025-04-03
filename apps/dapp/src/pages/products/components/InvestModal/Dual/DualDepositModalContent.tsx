@@ -24,7 +24,7 @@ import dayjs from 'dayjs';
 import { omit } from 'lodash-es';
 
 import AmountInput from '@/components/AmountInput';
-import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useLivePPS } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { useWalletStore } from '@/components/WalletConnector/store';
@@ -56,16 +56,7 @@ export const DualDepositModalContent = (
 
   const [t] = useTranslation('InvestModal');
 
-  const prices = useIndexPrices((state) => state.prices);
-  const currentForCcyPriceInDomCcy = useMemo(
-    () =>
-      (prices[props.product.vault.forCcy] &&
-        prices[props.product.vault.domCcy] &&
-        prices[props.product.vault.forCcy]! /
-          prices[props.product.vault.domCcy]!) ||
-      undefined,
-    [prices[props.product.vault.forCcy], prices[props.product.vault.domCcy]],
-  );
+  const currentForCcyPriceInDomCcy = useLivePPS(props.product.vault);
 
   const dualConfig = useProductsState(
     (s) =>

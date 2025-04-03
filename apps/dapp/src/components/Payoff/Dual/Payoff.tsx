@@ -6,7 +6,7 @@ import { displayPercentage } from '@sofa/utils/amount';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
-import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useLivePPS } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
@@ -26,7 +26,6 @@ const DualPayoff = (
       simplePlus(props.rchYield, props.protectedYield, props.enhancedYield)!,
     [props.enhancedYield, props.protectedYield, props.rchYield],
   );
-  const atm = useIndexPrices((state) => state.prices[props.forCcy]);
   const mobileUI = useIsMobileUI();
   return (
     <div

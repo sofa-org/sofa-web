@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 
 import AmountInput from '@/components/AmountInput';
 import AsyncButton from '@/components/AsyncButton';
-import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useLivePPS } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { addI18nResources } from '@/locales';
@@ -102,15 +102,7 @@ export const CustomQuote = (props: {
       }),
     [props.vault],
   );
-  const prices = useIndexPrices((state) => state.prices);
-  const currentForCcyPriceInDomCcy = useMemo(
-    () =>
-      (prices[props.vault.forCcy] &&
-        prices[props.vault.domCcy] &&
-        prices[props.vault.forCcy]! / prices[props.vault.domCcy]!) ||
-      undefined,
-    [prices[props.vault.forCcy], prices[props.vault.domCcy]],
-  );
+  const currentForCcyPriceInDomCcy = useLivePPS(props.vault);
   const productTypeRef = ProductTypeRefs[props.vault.productType];
   const maxPrice = useMemo(() => {
     // 买的时候，不能超过目前价格

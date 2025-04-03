@@ -18,7 +18,7 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 
 import AsyncButton from '@/components/AsyncButton';
-import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useLivePPS } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
@@ -108,7 +108,7 @@ export const RecommendedList = (props: {
     () => CCYService.ccyConfigs[props.vault.forCcy],
     [props.vault.forCcy],
   );
-  const prices = useIndexPrices((state) => state.prices);
+  const currentForCcyPriceInDomCcy = useLivePPS(props.vault);
   return (
     <>
       <div className={styles['current-infos']}>
@@ -149,7 +149,7 @@ export const RecommendedList = (props: {
               {
                 currency: forCcyConfig?.name || props.vault.forCcy,
                 price: amountFormatter(
-                  prices[props.vault.forCcy],
+                  currentForCcyPriceInDomCcy,
                   DualService.getPricePrecision({
                     vault: props.vault,
                     minStepSize: dualConfig?.minStepSize,
@@ -192,7 +192,7 @@ export const RecommendedList = (props: {
                   },
                 ),
                 render: (_, row) => {
-                  const current = prices[props.vault.forCcy];
+                  const current = currentForCcyPriceInDomCcy;
                   const p = DualService.getPrice(row);
                   const diffPercentage =
                     current === undefined || p === undefined

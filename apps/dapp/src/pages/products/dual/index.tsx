@@ -7,6 +7,7 @@ import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
 import { dualVaults } from '@sofa/services/vaults/dual';
 import { displayPercentage } from '@sofa/utils/amount';
+import { MsIntervals } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
 import { currQuery } from '@sofa/utils/history';
 import { useLazyCallback } from '@sofa/utils/hooks';
@@ -62,6 +63,16 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
       }),
     [chainId, product],
   );
+  useEffect(() => {
+    const updateAllNumbers = () => {
+      for (const v of vaults) {
+        useProductsState.updateRecommendedList(v);
+      }
+    };
+    updateAllNumbers();
+    const i = setInterval(updateAllNumbers, 5 * MsIntervals.min);
+    return () => clearInterval(i);
+  }, [vaults]);
   const { recommendedList, quoteInfos } = useProductsState((state) => state);
   const forCcys = useMemo(() => {
     const _forCcys = uniq(vaults.map((v) => v.forCcy));

@@ -239,22 +239,12 @@ export class MarketService {
         : MarketService.fetchPxFromCoinGecko('RCH')
             .catch(() => undefined)
             .then((price) => ({ RCH: price })),
-      MarketService.fetchPxFromCoinGecko('crvUSD')
-        .catch(() => 1)
-        .then((price) => ({ crvUSD: price })),
       MarketService.fetchPxFromCoinGecko('USDT')
         .catch(() => 1)
         .then((price) => ({ USDT: price })),
       MarketService.fetchPxFromCoinGecko('USDC')
         .catch(() => 1)
         .then((price) => ({ USDC: price })),
-      Env.isPre || Env.isProd
-        ? MarketService.getPriceFromUniswap('CRV').then((price) => ({
-            CRV: price,
-          }))
-        : MarketService.fetchPxFromCoinGecko('CRV')
-            .catch(() => undefined)
-            .then((price) => ({ CRV: price })),
     ]).then(([scrvPPS, zrchPPS, ...prices]) => {
       const obj = prices.reduce(
         (pre, it) => Object.assign(pre, it),

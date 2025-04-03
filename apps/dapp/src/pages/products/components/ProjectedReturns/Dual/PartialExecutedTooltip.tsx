@@ -4,13 +4,16 @@ import { DualProfitRenderProps } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 
-import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useLivePPS } from '@/components/IndexPrices/store';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
 import styles from './PartialExecutedTooltip.module.scss';
 export const PartialExecutedTooltip = (props: DualProfitRenderProps) => {
   const [t] = useTranslation('ProjectedReturns');
-  const rchPrice = useIndexPrices((r) => r.prices['RCH']);
+  const rchPrice = useLivePPS({
+    forCcy: 'RCH',
+    domCcy: 'USDT',
+  });
   const desc = useMemo(
     () => ProductTypeRefs[props.productType].dualDesc(t),
     [t, props.productType],

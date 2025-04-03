@@ -15,7 +15,7 @@ import { useAsyncMemo } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
-import { useIndexPrices } from '@/components/IndexPrices/store';
+import { useLivePPS } from '@/components/IndexPrices/store';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 
@@ -35,9 +35,16 @@ export const DualProfitScenarios = (
     [t, props.productType],
   );
   const rchConfig = CCYService.ccyConfigs['RCH'];
-  const forCcyConfig = CCYService.ccyConfigs[props.linkedCcy];
+  const linkedCcyConfig = CCYService.ccyConfigs[props.linkedCcy];
   const depositCcyConfig = CCYService.ccyConfigs[props.depositCcy];
-  const priceIndex = useIndexPrices();
+  const depositCcyToRCH = useLivePPS({
+    forCcy: props.depositCcy as VaultInfo['forCcy'],
+    domCcy: 'RCH',
+  });
+  const linkedCcyToRCH = useLivePPS({
+    forCcy: props.linkedCcy as VaultInfo['forCcy'],
+    domCcy: 'RCH',
+  });
   const isMobileUI = useIsMobileUI();
 
   return (
@@ -83,7 +90,7 @@ export const DualProfitScenarios = (
                 </div>
                 <div className={styles['result']}>
                   <div className={styles['partial-ccys']}>
-                    <img src={forCcyConfig?.icon} /> {props.linkedCcy}
+                    <img src={linkedCcyConfig?.icon} /> {props.linkedCcy}
                     <span className={styles['plus-sign']} />
                     <img src={depositCcyConfig?.icon} /> {props.depositCcy}
                   </div>
@@ -119,22 +126,20 @@ export const DualProfitScenarios = (
                     )}
                     <span className={styles['unit']}>RCH</span>
                   </span>
-                  {(priceIndex.prices[props.depositCcy] &&
-                    priceIndex.prices['RCH'] && (
-                      <span className={styles['est']}>
-                        ≈
-                        <span className={styles['amount']}>
-                          {amountFormatter(
-                            (props.rchReturnAmount * priceIndex.prices['RCH']) /
-                              priceIndex.prices[props.depositCcy]!,
-                            rchConfig?.precision,
-                          )}
-                        </span>
-                        <span className={styles['unit']}>
-                          {depositCcyConfig?.name || props.depositCcy}
-                        </span>
+                  {(depositCcyToRCH && (
+                    <span className={styles['est']}>
+                      ≈
+                      <span className={styles['amount']}>
+                        {amountFormatter(
+                          props.rchReturnAmount / depositCcyToRCH,
+                          depositCcyConfig?.precision,
+                        )}
                       </span>
-                    )) ||
+                      <span className={styles['unit']}>
+                        {depositCcyConfig?.name || props.depositCcy}
+                      </span>
+                    </span>
+                  )) ||
                     undefined}
                 </div>
               </div>
@@ -177,9 +182,9 @@ export const DualProfitScenarios = (
                           props.linkedCcyAmountWhenSuccessfulExecuted,
                           props.linkedCcyExtraRewardWhenSuccessfulExecuted,
                         ),
-                        forCcyConfig?.precision,
+                        linkedCcyConfig?.precision,
                       ),
-                      crypto: forCcyConfig?.name || props.linkedCcy,
+                      crypto: linkedCcyConfig?.name || props.linkedCcy,
                       rchAmount: amountFormatter(
                         props.rchReturnAmount,
                         rchConfig?.precision,
@@ -222,16 +227,16 @@ export const DualProfitScenarios = (
                     }}
                   />
                   <div className={styles['result']}>
-                    {(forCcyConfig && <img src={forCcyConfig.icon} />) ||
+                    {(linkedCcyConfig && <img src={linkedCcyConfig.icon} />) ||
                       undefined}
                     <span className={styles['amount']}>
                       {amountFormatter(
                         props.linkedCcyAmountWhenSuccessfulExecuted,
-                        forCcyConfig?.precision,
+                        linkedCcyConfig?.precision,
                       )}
                     </span>
                     <span className={styles['unit']}>
-                      {forCcyConfig?.name || props.linkedCcy}
+                      {linkedCcyConfig?.name || props.linkedCcy}
                     </span>
                   </div>
                 </div>
@@ -252,16 +257,18 @@ export const DualProfitScenarios = (
                         })}
                       </span>
                       <span className={styles['value']}>
-                        {(forCcyConfig && <img src={forCcyConfig.icon} />) ||
+                        {(linkedCcyConfig && (
+                          <img src={linkedCcyConfig.icon} />
+                        )) ||
                           undefined}
                         <span className={styles['amount']}>
                           {amountFormatter(
                             props.linkedCcyExtraRewardWhenSuccessfulExecuted,
-                            forCcyConfig?.precision,
+                            linkedCcyConfig?.precision,
                           )}
                         </span>
                         <span className={styles['unit']}>
-                          {forCcyConfig?.name || props.linkedCcy}
+                          {linkedCcyConfig?.name || props.linkedCcy}
                         </span>
                       </span>
                     </div>
@@ -286,23 +293,20 @@ export const DualProfitScenarios = (
                           {rchConfig?.name || 'RCH'}
                         </span>
                       </span>
-                      {(priceIndex.prices[props.linkedCcy] &&
-                        priceIndex.prices['RCH'] && (
-                          <span className={styles['est']}>
-                            ≈
-                            <span className={styles['amount']}>
-                              {amountFormatter(
-                                (props.rchReturnAmount *
-                                  priceIndex.prices['RCH']) /
-                                  priceIndex.prices[props.linkedCcy]!,
-                                rchConfig?.precision,
-                              )}
-                            </span>
-                            <span className={styles['unit']}>
-                              {forCcyConfig?.name || props.linkedCcy}
-                            </span>
+                      {(linkedCcyToRCH && (
+                        <span className={styles['est']}>
+                          ≈
+                          <span className={styles['amount']}>
+                            {amountFormatter(
+                              props.rchReturnAmount / linkedCcyToRCH,
+                              linkedCcyConfig?.precision,
+                            )}
                           </span>
-                        )) ||
+                          <span className={styles['unit']}>
+                            {linkedCcyConfig?.name || props.linkedCcy}
+                          </span>
+                        </span>
+                      )) ||
                         undefined}
                     </div>
                   </div>
@@ -445,23 +449,20 @@ export const DualProfitScenarios = (
                           {rchConfig?.name || 'RCH'}
                         </span>
                       </span>
-                      {(priceIndex.prices[props.depositCcy] &&
-                        priceIndex.prices['RCH'] && (
-                          <span className={styles['est']}>
-                            ≈
-                            <span className={styles['amount']}>
-                              {amountFormatter(
-                                (props.rchReturnAmount *
-                                  priceIndex.prices['RCH']) /
-                                  priceIndex.prices[props.depositCcy]!,
-                                rchConfig?.precision,
-                              )}
-                            </span>
-                            <span className={styles['unit']}>
-                              {depositCcyConfig?.name || props.depositCcy}
-                            </span>
+                      {(depositCcyToRCH && (
+                        <span className={styles['est']}>
+                          ≈
+                          <span className={styles['amount']}>
+                            {amountFormatter(
+                              props.rchReturnAmount / depositCcyToRCH,
+                              depositCcyConfig?.precision,
+                            )}
                           </span>
-                        )) ||
+                          <span className={styles['unit']}>
+                            {depositCcyConfig?.name || props.depositCcy}
+                          </span>
+                        </span>
+                      )) ||
                         undefined}
                     </div>
                   </div>
