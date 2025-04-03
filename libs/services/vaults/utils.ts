@@ -27,21 +27,10 @@ export function getCollateralDecimal(chainId: number, depositCcy: string) {
 export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
   if (project === ProjectType.Dual) {
     return {
-      RCH: 1,
-      stRCH: 1,
-      zRCH: 1,
-      USDT: 1,
-      aUSDT: 1,
-      USDC: 1,
-      aArbSepUSDC: 1,
-      aUSDC: 1,
-      crvUSD: 1,
-      scrvUSD: 1,
-      WETH: 0.0003,
-      stETH: 0.0003,
-      WBTC: 0.00002,
-      CRV: 1,
-      sUSDa: 1,
+      RCH: 10,
+      USDT: 10,
+      crvUSD: 10,
+      CRV: 10,
     }[depositCcy];
   }
   if (Env.isPre || Env.isDaily) {
@@ -100,6 +89,14 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
 }
 
 export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
+  if (project === ProjectType.Dual) {
+    return {
+      RCH: 1,
+      USDT: 1,
+      crvUSD: 1,
+      CRV: 1,
+    }[depositCcy];
+  }
   if (Env.isPre || Env.isDaily) {
     // 大约 0.05U
     return {
