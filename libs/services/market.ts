@@ -193,11 +193,6 @@ export class MarketService {
         toCcy: 'USD',
         includeNow: true,
       }).then((res) => ({ USDC: res.now })),
-      MarketService.getPPS({
-        fromCcy: 'CRV',
-        toCcy: 'USD',
-        includeNow: true,
-      }).then((res) => ({ CRV: res.now })),
     ]).then(([scrvPPS, zrchPPS, ...prices]) => {
       const obj = prices.reduce(
         (pre, it) => Object.assign(pre, it),
