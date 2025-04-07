@@ -6,10 +6,6 @@
   margin: 0;
 }
 
-.amount-input-wrapper:has(> div.quick-widget) {
-  height: auto;
-}
-
 .input-wrapper {
   @include flex-center;
 
@@ -43,6 +39,13 @@
     &::placeholder {
       color: rgba($color-main, 0.3);
     }
+  }
+}
+
+.amount-input-wrapper:has(> div.quick-widget) {
+  height: auto;
+  > .input-wrapper {
+    height: 48px;
   }
 }
 

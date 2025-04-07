@@ -212,7 +212,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
           </div>
         )}
       </div>
-      {!!props.max && props.type === 'normal' && (
+      {!!props.max && (props.type || 'normal') === 'normal' && (
         <div className={classNames('quick-widget', styles['quick-widget'])}>
           <Button
             className={styles['btn-minus']}
