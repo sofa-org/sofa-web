@@ -13,6 +13,10 @@
   color: #fff;
   background: rgba(#fff, 0.16);
 
+  > :global(.semi-select-prefix-text) {
+    color: #fff !important;
+  }
+
   &:hover {
     background: rgba(#fff, 0.26);
   }
