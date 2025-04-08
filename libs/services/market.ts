@@ -297,6 +297,13 @@ export class MarketService {
       if (it.interestType && !pre.includes(it.depositCcy)) {
         pre.push(it.depositCcy);
       }
+      if (
+        it.interestType &&
+        it.depositBaseCcy &&
+        !pre.includes(it.depositBaseCcy)
+      ) {
+        pre.push(it.depositBaseCcy);
+      }
       return pre;
     }, [] as string[]);
     const defaultApy = {
