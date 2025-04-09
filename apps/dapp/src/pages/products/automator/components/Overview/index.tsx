@@ -232,7 +232,9 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
               {/* <IconPeople tabIndex={-1} /> */}
             </Tooltip>
           </div>
-          <div className={styles['value']}>{data?.participantNum || '-'}</div>
+          <div className={styles['value']}>
+            {data?.currentParticipantNum || '-'}
+          </div>
         </div>
       </div>
     </Spin>

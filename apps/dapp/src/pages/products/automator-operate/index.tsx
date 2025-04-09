@@ -184,7 +184,7 @@ const Index = () => {
               </div>
               <div className={styles['item']}>
                 <IconPeople className={styles['label']} />
-                {automator?.participantNum || '-'}
+                {automator?.currentParticipantNum || '-'}
               </div>
               <div className={styles['item']}>
                 <IconRisk className={styles['label']} />

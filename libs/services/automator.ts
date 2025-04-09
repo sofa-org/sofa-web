@@ -25,6 +25,7 @@ export interface OriginAutomatorInfo {
   automatorDescription?: string; // automator说明
   automatorVault: string; // Automator vault
   participantNum: number; // 参与者数量
+  currentParticipantNum: number; // 参与者数量
   aumByVaultDepositCcy: number | string; // aum
   aumByClientDepositCcy: number | string; // aum
   aumBySharesToken: number | string; // aum
@@ -258,7 +259,13 @@ export class AutomatorService {
       .get<unknown, HttpResponse<OriginAutomatorInfo[]>>(`/automator/list`, {
         params,
       })
-      .then((res) => res.value.map(AutomatorService.cvtAutomatorInfo));
+      .then((res) =>
+        res.value.map(AutomatorService.cvtAutomatorInfo).sort((a, b) => {
+          const index = (it: typeof a) =>
+            it.currentParticipantNum + +it.yieldPercentage / 100;
+          return index(b) - index(a);
+        }),
+      );
   }
 
   @asyncShare(

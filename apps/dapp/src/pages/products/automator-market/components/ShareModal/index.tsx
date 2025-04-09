@@ -295,7 +295,7 @@ const AutomatorUserShareModal = forwardRef<
                 {t({ enUS: 'Followers:', zhCN: '粉丝数：' })}
               </div>
               <div className={styles['value']}>
-                {props.automatorInfo.participantNum || '-'}
+                {props.automatorInfo.currentParticipantNum || '-'}
               </div>
             </div>
 

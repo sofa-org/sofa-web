@@ -159,7 +159,7 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         </div>
         <div className={styles['people']}>
           <IconPeople />
-          {props.info.participantNum || '-'}
+          {props.info.currentParticipantNum || '-'}
         </div>
       </div>
 
