@@ -31,3 +31,9 @@
     background: rgba(#fff, 0.24);
   }
 }
+
+.light {
+  &.chain-select {
+    color: #000;
+  }
+}

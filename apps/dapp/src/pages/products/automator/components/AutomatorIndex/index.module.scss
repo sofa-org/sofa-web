@@ -1,5 +1,6 @@
 .section {
   @include flex-column-center;
+
   align-items: stretch;
   flex-wrap: wrap;
   gap: min(40px, 5vw);
@@ -13,20 +14,22 @@
   }
 }
 
-.featured {
+.featured-list {
   @include flex-center;
+
   :global {
     .address {
       .chain-icon {
         font-size: 20px;
         height: 16px;
-        border-left: 1px solid rgba($color: #000000, $alpha: 0.12);
+        border-left: 1px solid rgba($color: #000, $alpha: 12%);
         padding-left: 6px;
         margin-left: 4px;
       }
     }
   }
 }
+
 .deposit-btn {
   @include bold;
   @include pointer;
@@ -50,6 +53,7 @@
     opacity: 0.65;
   }
 }
+
 .deposit-btn-mask {
   display: none;
   text-align: center;
@@ -64,10 +68,12 @@
   background: rgba(#fff, 0.4);
   backdrop-filter: blur(5px);
 }
+
 .automators-wrapper {
   .name {
     max-width: 150px;
   }
+
   tr {
     position: relative;
 
@@ -75,6 +81,7 @@
       .deposit-btn-mask {
         display: flex;
       }
+
       td {
         background: transparent !important;
       }

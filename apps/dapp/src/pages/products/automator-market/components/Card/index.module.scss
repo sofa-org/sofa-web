@@ -17,6 +17,7 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
   &.share-btn {
     span {
       &::before {
@@ -207,6 +208,16 @@
 
   &:last-child::after {
     content: none;
+  }
+}
+
+.mode-featured {
+  .risk,
+  .runtime,
+  .people {
+    &::after {
+      content: none;
+    }
   }
 }
 

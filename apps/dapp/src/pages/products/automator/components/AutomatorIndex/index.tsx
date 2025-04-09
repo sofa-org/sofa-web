@@ -152,17 +152,19 @@ export const AutomatorIndex = (props: BaseProps) => {
           </div>
         ) : (
           <>
-            <div className={styles['featured']}>
+            <div className={styles['featured-list']}>
               {featuredVaultsByDepositCcy.map((it) => (
-                <AutomatorCard
-                  key={it.vaultInfo.vault}
-                  modalController={modalController}
-                  info={it}
-                  showShareBtn={false}
-                  onShareClicked={() => {}}
-                  mode="featured"
-                  switchChain
-                />
+                <div className={styles['featured']}>
+                  <AutomatorCard
+                    key={it.vaultInfo.vault}
+                    modalController={modalController}
+                    info={it}
+                    showShareBtn={false}
+                    onShareClicked={() => {}}
+                    mode="featured"
+                    switchChain
+                  />
+                </div>
               ))}
             </div>
             <ChainList />
