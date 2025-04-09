@@ -102,7 +102,7 @@ function locationMatches(
 
   if (origin && window.location.origin !== origin) return false;
   if (options?.strict && location.pathname != path) return false;
-  if (!location.pathname.includes(path)) return false;
+  if (!location.pathname.startsWith(path)) return false;
   if (search.split(/[?&]/).some((it) => !location.search.includes(it)))
     return false;
   return location.hash === hash;

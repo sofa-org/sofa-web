@@ -146,7 +146,7 @@ const allMenuItems = (
                 enUS: 'Review your active and past performance records.',
                 zhCN: '查看您的当前和历史绩效记录。',
               }),
-            path: '/positions/automator',
+            path: '/automator/positions',
           },
           {
             icon: <IconOverview />,

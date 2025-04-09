@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
@@ -67,7 +66,6 @@ export const PositionsEl = (props: { automator?: AutomatorVaultInfo }) => {
 
 const Positions = () => {
   const [t] = useTranslation('Positions');
-  const navigate = useNavigate();
   const [project, setProject] = useProjectChange();
   const projects = useMemo(
     () =>
@@ -85,9 +83,10 @@ const Positions = () => {
 
   useEffect(() => {
     if (project === ProjectType.Automator) {
-      navigate(`/transactions${window.location.search}`, { replace: true });
+      setProject(ProjectType.Earn);
     }
-  }, [navigate, project]);
+  }, [project, setProject]);
+
   if (project === ProjectType.Automator) {
     return <></>;
   }

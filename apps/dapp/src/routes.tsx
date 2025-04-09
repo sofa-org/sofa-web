@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { ComponentType } from 'react';
 
 const Test = React.lazy(() => import('@/pages/test'));
@@ -91,7 +90,7 @@ export const routes: {
     Component: OrderHistory,
   },
   {
-    path: '/positions/automator',
+    path: '/automator/positions',
     Component: AutomatorPositions,
   },
   {
