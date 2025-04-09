@@ -28,6 +28,7 @@ const Address = memo<{
   link?: string | boolean | { chainId: number };
   linkBtn?: string | boolean | { chainId: number };
   noWeb3Name?: boolean;
+  chainIcon?: { chainId: number };
 }>((props) => {
   const [t] = useTranslation('Address');
 
@@ -94,6 +95,13 @@ const Address = memo<{
         />
       )}
       {props.linkBtn && <IconShare onClick={handleLink} />}
+      {props.chainIcon && (
+        <img
+          className={classNames(styles['chain-icon'], 'chain-icon')}
+          src={ChainMap[props.chainIcon.chainId].icon}
+          alt=""
+        />
+      )}
     </div>
   ) : (
     <div

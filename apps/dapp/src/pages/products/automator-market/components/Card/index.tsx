@@ -4,7 +4,7 @@ import { AutomatorInfo } from '@sofa/services/automator';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
-import { useIsPortrait } from '@sofa/utils/hooks';
+import { useIsPortrait, useLazyCallback } from '@sofa/utils/hooks';
 import { formatDurationToDay, MsIntervals } from '@sofa/utils/time';
 import classNames from 'classnames';
 
@@ -12,6 +12,7 @@ import Address from '@/components/Address';
 import AmountDisplay from '@/components/AmountDisplay';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { MsgDisplay } from '@/components/MsgDisplay';
+import { useWalletStore } from '@/components/WalletConnector/store';
 import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 import { AutomatorRiskExposureMap } from '@/pages/products/automator-create/util';
 
@@ -27,6 +28,8 @@ export interface AutomatorCardProps {
   modalController: ReturnType<typeof useAutomatorModal>[1];
   showShareBtn?: boolean;
   onShareClicked: (v: AutomatorInfo) => void;
+  mode: 'card' | 'featured';
+  switchChain?: boolean;
 }
 
 export const AutomatorCard = (props: AutomatorCardProps) => {
@@ -37,15 +40,27 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
     [props.info.vaultInfo.depositCcy],
   );
   const isPortrait = useIsPortrait();
+  const onClick = useLazyCallback(() => {
+    if (
+      props.switchChain &&
+      useWalletStore.getState().chainId !== props.info.vaultInfo.chainId
+    ) {
+      useWalletStore.setChain(props.info.vaultInfo.chainId);
+      setTimeout(() => {
+        props.modalController.open(props.info.vaultInfo, undefined);
+      }, 50);
+      return;
+    }
+    props.modalController.open(props.info.vaultInfo, undefined);
+  });
   return (
     <div
       className={classNames(
         styles['card'],
         isMobileUI ? styles['mobile-ui'] : undefined,
+        styles['mode-' + props.mode],
       )}
-      onClick={() =>
-        props.modalController.open(props.info.vaultInfo, undefined)
-      }
+      onClick={() => onClick()}
     >
       <div className={styles['header']}>
         <img src={depositCcyConfig?.icon} alt="" />
@@ -58,6 +73,11 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
           address={props.info.vaultInfo.vault.toLowerCase()}
           simple
           linkBtn
+          chainIcon={
+            props.mode === 'featured'
+              ? { chainId: props.info.vaultInfo.chainId }
+              : undefined
+          }
         />
       </div>
       <div className={styles['yield']}>
@@ -176,6 +196,24 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
               {t({
                 enUS: 'Share',
                 zhCN: '分享',
+              })}
+            </span>
+          </div>
+        </div>
+      ) : undefined}
+      {props.mode === 'featured' ? (
+        <div className={styles['deposit-btn-mask']}>
+          <div
+            className={styles['deposit-btn']}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick();
+            }}
+          >
+            <span>
+              {t({
+                enUS: 'Deposit',
+                zhCN: '存入',
               })}
             </span>
           </div>

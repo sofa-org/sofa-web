@@ -1,0 +1,33 @@
+.chain-select {
+  @include flex-center;
+
+  justify-content: flex-start;
+  color: #fff;
+  margin: 12px 0 24px;
+}
+
+.chain {
+  @include pointer;
+  @include flex-center;
+
+  background: rgba(#fff, 0.12);
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+
+  img {
+    width: 1.2em;
+    height: 1.2em;
+  }
+
+  .count {
+    padding: 0 0 0 6px;
+    margin: 0 0 0 4px;
+    line-height: 1em;
+    border-left: 1px dashed rgba(#fff, 0.1);
+  }
+
+  &.active {
+    background: rgba(#fff, 0.24);
+  }
+}

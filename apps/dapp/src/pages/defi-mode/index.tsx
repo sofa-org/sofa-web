@@ -9,7 +9,7 @@ import { useIsPortraitUI } from '@/components/MobileOnly';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 
-import { AutomatorEl } from '../products/automator';
+import { AutomatorIndex } from '../products/automator/components/AutomatorIndex';
 import { ProductCustomize } from '../products/customize';
 
 import { DIY } from './components/DIY';
@@ -31,7 +31,7 @@ const tabs = [
     ),
     icon: ProjectTypeRefs.Automator.icon,
     value: 'automator',
-    comp: () => <AutomatorEl className={styles['automator']} />,
+    comp: () => <AutomatorIndex className={styles['automator']} />,
   },
   {
     label: (t: TFunction) => (
