@@ -219,6 +219,54 @@
       content: none;
     }
   }
+
+  .header {
+    padding: 0 0 0 48px;
+  }
+
+  &.card {
+    max-width: 322px;
+    width: 100%;
+    padding: 24px 16px;
+    z-index: 4;
+
+    .header {
+      :global {
+        .address {
+          color: rgb(0 0 0 / 65%);
+          opacity: 1;
+
+          svg {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .yield {
+    margin: 20px 0;
+
+    .value {
+      font-size: 24px;
+    }
+  }
+
+  .creator,
+  .size {
+    .value {
+      font-weight: 510;
+    }
+  }
+
+  .footer {
+    gap: 16px;
+  }
+
+  .deposit-btn {
+    width: calc(100% - 80px);
+    margin-bottom: 30px;
+  }
 }
 
 .mobile-ui {

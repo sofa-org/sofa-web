@@ -14,8 +14,42 @@
   }
 }
 
+.section:has(.featured-list) {
+  gap: 0;
+}
+
 .featured-list {
   @include flex-center;
+
+  justify-content: space-between;
+  gap: 16px;
+
+  .featured {
+    max-width: 322px;
+    min-width: max(calc((100% - (16px * 2)) / 3), 200px);
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    position: relative;
+    z-index: 4;
+
+    &:hover::before {
+      content: "";
+      border-radius: 16px;
+      position: absolute;
+      inset: -1px;
+      z-index: 2;
+      background: linear-gradient(to right, #50d113, #ffe550);
+    }
+
+    &:hover::after {
+      content: "";
+      border-radius: 14px;
+      background: #fafafa;
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+    }
+  }
 
   :global {
     .address {
@@ -34,9 +68,9 @@
   @include bold;
   @include pointer;
 
-  min-width: 100px;
-  height: 40px;
-  line-height: 40px;
+  min-width: 120px;
+  height: 32px;
+  line-height: 32px;
   text-align: center;
   border-radius: 80px;
   background: #000;
@@ -61,17 +95,17 @@
   right: 0;
   bottom: 0;
   top: 0;
-  width: 300px;
+  width: 220px;
   align-items: center;
-  justify-content: center;
-  padding-bottom: 10px;
-  background: rgba(#fff, 0.4);
-  backdrop-filter: blur(5px);
+  justify-content: start;
+  background: transparent;
+  backdrop-filter: blur(1000px);
 }
 
 .automators-wrapper {
-  .name {
-    max-width: 150px;
+  th,
+  td {
+    white-space: nowrap;
   }
 
   tr {
@@ -85,6 +119,118 @@
       td {
         background: transparent !important;
       }
+    }
+  }
+
+  :global {
+    .semi-table-row {
+      position: relative;
+
+      &:hover > td {
+        // 去掉覆盖变色
+        background: transparent !important;
+      }
+    }
+
+    .semi-table-tbody {
+      tr:nth-child(odd) {
+        background: rgb(0 0 0 / 4%);
+      }
+
+      > .semi-table-row {
+        > .semi-table-row-cell {
+          border-bottom: none;
+          height: min(72px, 12vw);
+        }
+      }
+    }
+
+    .semi-table-row-head {
+      color: rgb(0 0 0 / 85%) !important;
+      font-size: 14px;
+      height: 40px;
+      font-weight: 400 !important;
+      background: rgb(0 0 0 / 12%) !important;
+    }
+
+    .semi-table-thead > .semi-table-row > .semi-table-row-head {
+      border-bottom: 1px solid #eee;
+    }
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .name {
+    max-width: 150px;
+  }
+
+  .header {
+    display: flex;
+    gap: 8px;
+
+    img {
+      width: 34px;
+      height: 34px;
+    }
+
+    :global {
+      .address {
+        padding: 0;
+        justify-content: start;
+        opacity: 0.45;
+      }
+    }
+  }
+
+  .pool-size,
+  .creator {
+    color: rgb(0 0 0 / 85%);
+
+    .unit {
+      margin-left: 5px;
+    }
+  }
+
+  .creator {
+    font-weight: 400;
+    color: rgb(0 0 0 / 45%);
+
+    .percent {
+      @include gradient-txt(linear-gradient(to right, #e88947, #ffdec3));
+
+      font-weight: 510;
+      margin-left: 5px;
+    }
+  }
+
+  .pool-size,
+  .creator,
+  .apy,
+  .deposit-ccy,
+  .risk,
+  .runtime,
+  .people,
+  .fee {
+    font-weight: 510;
+    font-size: 14px;
+  }
+}
+
+.mobile-ui {
+  .featured-list {
+    flex-direction: column;
+    width: 100%;
+
+    .featured {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .card {
+      width: 100%;
     }
   }
 }

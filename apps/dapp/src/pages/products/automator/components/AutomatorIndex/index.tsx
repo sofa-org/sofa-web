@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Spin, Table } from '@douyinfe/semi-ui';
+import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { AutomatorDetail, AutomatorInfo } from '@sofa/services/automator';
 import { AutomatorVaultInfo, VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
@@ -132,6 +133,7 @@ export const AutomatorIndex = (props: BaseProps) => {
           styles['section'],
           styles['section-top'],
           props.className,
+          { [styles['mobile-ui']]: isMobileUI },
         )}
       >
         {!vault && !automators.length ? (
@@ -174,167 +176,204 @@ export const AutomatorIndex = (props: BaseProps) => {
             >
               <Table<AutomatorInfo>
                 pagination={false}
-                columns={[
-                  {
-                    title: t({ enUS: 'Network', zhCN: '网络' }),
-                    render: (_, v) => (
-                      <img src={ChainMap[v.vaultInfo.chainId]?.icon} alt="" />
-                    ),
-                  },
-                  {
-                    title: t({ enUS: 'Name', zhCN: '名称' }),
-                    render: (_, v) => (
-                      <div className={styles['header']}>
-                        <img
-                          src={
-                            CCYService.ccyConfigs[v.vaultInfo.depositCcy]?.icon
-                          }
-                          alt=""
-                        />
-                        <div className={styles['name']}>
-                          <MsgDisplay expandDisabled>
-                            {v.vaultInfo.name || v.vaultInfo.depositCcy}
-                          </MsgDisplay>
-                        </div>
-                        <Address
-                          address={v.vaultInfo.vault.toLowerCase()}
-                          simple
-                          linkBtn
-                        />
-                      </div>
-                    ),
-                  },
-                  {
-                    title: t({ enUS: '7D Target Yield', zhCN: '7日年化' }),
-                    render: (_, v) => (
-                      <div
-                        className={styles['apy']}
-                        style={{
-                          color:
-                            +(v as AutomatorDetail).yieldPercentage >= 0
-                              ? 'var(--color-rise)'
-                              : 'var(--color-fall)',
-                        }}
-                      >
-                        {+(v as AutomatorDetail).yieldPercentage >= 0 && '+'}
-                        {displayPercentage(
-                          +(v as AutomatorDetail).yieldPercentage / 100,
-                        )}
-                      </div>
-                    ),
-                  },
-                  {
-                    title: t({ enUS: "Pool Size & Optivisor's", zhCN: '持仓' }),
-                    render: (_, v) => (
-                      <>
-                        <div className={styles['pool-size']}>
-                          <AmountDisplay
-                            amount={+v.aumByClientDepositCcy}
-                            ccy={v.vaultInfo.depositCcy}
+                onRow={(v, index) => {
+                  return {
+                    onClick: (event) => {
+                      if (!isMobileUI || !v) {
+                        event.stopPropagation();
+                        return;
+                      }
+                      modalController.open(v.vaultInfo);
+                    },
+                  };
+                }}
+                columns={(
+                  [
+                    !isMobileUI && {
+                      title: t({ enUS: 'Network', zhCN: '网络' }),
+                      render: (_, v) => (
+                        <img src={ChainMap[v.vaultInfo.chainId]?.icon} alt="" />
+                      ),
+                    },
+                    {
+                      title: t({ enUS: 'Name', zhCN: '名称' }),
+                      render: (_, v) => (
+                        <div className={styles['header']}>
+                          <img
+                            src={
+                              CCYService.ccyConfigs[v.vaultInfo.depositCcy]
+                                ?.icon
+                            }
+                            alt=""
                           />
-                          <span className={styles['unit']}>
-                            {v.vaultInfo.depositCcy}
-                          </span>
-                        </div>
-                        <div className={styles['creator']}>
-                          <AmountDisplay
-                            amount={v.creatorAmountByClientDepositCcy || 0}
-                            ccy={v.vaultInfo.depositCcy}
-                          />
-                          <span className={styles['unit']}>
-                            {v.vaultInfo.depositCcy}
-                          </span>
-                          <span className={styles['percent']}>
-                            {displayPercentage(
-                              Number(v.creatorAmountByVaultDepositCcy) /
-                                Number(v.aumByVaultDepositCcy),
-                            )}
-                          </span>
-                        </div>
-                      </>
-                    ),
-                  },
-                  {
-                    title: t({ enUS: 'Deposit', zhCN: '存入币种' }),
-                    render: (_, v) => (
-                      <>
-                        <div className={styles['deposit-ccy']}>
-                          {CCYService.ccyConfigs[v.vaultInfo.depositCcy]
-                            ?.name || v.vaultInfo.depositCcy}
-                        </div>
-                      </>
-                    ),
-                  },
-                  {
-                    title: t({ enUS: 'Risk', zhCN: '风险等级' }),
-                    render: (_, v) => (
-                      <>
-                        <div
-                          className={styles['risk']}
-                          style={{
-                            color:
-                              AutomatorRiskExposureMap[
-                                v.vaultInfo.riskExposure!
-                              ]?.color || 'inherit',
-                          }}
-                        >
-                          {AutomatorRiskExposureMap[v.vaultInfo.riskExposure!]
-                            ?.label || 'R-'}
-                        </div>
-                      </>
-                    ),
-                  },
-                  {
-                    title: t({ enUS: 'Running', zhCN: '运行天数' }),
-                    render: (_, v) => (
-                      <>
-                        <div className={styles['runtime']}>
-                          {v.vaultInfo.createTime
-                            ? formatDurationToDay(
-                                Date.now() - +v.vaultInfo.createTime,
-                              )
-                            : '-'}
-                        </div>
-                      </>
-                    ),
-                  },
-                  {
-                    title: t({ enUS: 'Followers', zhCN: '投资人数' }),
-                    render: (_, v) => (
-                      <>
-                        <div className={styles['people']}>
-                          {v.currentParticipantNum || '-'}
-                        </div>
-                      </>
-                    ),
-                  },
-                  {
-                    title: t({ enUS: 'Fee', zhCN: '盈利抽成' }),
-                    render: (_, v) => (
-                      <>
-                        <div className={styles['fee']}>
-                          {displayPercentage(v.vaultInfo.creatorFeeRate, 0)}
-                          <div className={styles['deposit-btn-mask']}>
-                            <div
-                              className={styles['deposit-btn']}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                modalController.open(v.vaultInfo, 'deposit');
-                              }}
-                            >
-                              <span>
-                                {t({
-                                  enUS: 'Deposit',
-                                  zhCN: '存入',
-                                })}
-                              </span>
+                          <div>
+                            <div className={styles['name']}>
+                              <MsgDisplay expandDisabled>
+                                {v.vaultInfo.name || v.vaultInfo.depositCcy}
+                              </MsgDisplay>
                             </div>
+                            {isMobileUI ? (
+                              <div
+                                className={styles['apy']}
+                                style={{
+                                  color:
+                                    +(v as AutomatorDetail).yieldPercentage >= 0
+                                      ? 'var(--color-rise)'
+                                      : 'var(--color-fall)',
+                                }}
+                              >
+                                {+(v as AutomatorDetail).yieldPercentage >= 0 &&
+                                  '+'}
+                                {displayPercentage(
+                                  +(v as AutomatorDetail).yieldPercentage / 100,
+                                )}
+                              </div>
+                            ) : (
+                              <Address
+                                address={v.vaultInfo.vault.toLowerCase()}
+                                simple
+                                linkBtn
+                              />
+                            )}
                           </div>
                         </div>
-                      </>
-                    ),
-                  },
-                ]}
+                      ),
+                    },
+                    !isMobileUI && {
+                      title: t({ enUS: '7D Target Yield', zhCN: '7日年化' }),
+                      render: (_, v) => (
+                        <div
+                          className={styles['apy']}
+                          style={{
+                            color:
+                              +(v as AutomatorDetail).yieldPercentage >= 0
+                                ? 'var(--color-rise)'
+                                : 'var(--color-fall)',
+                          }}
+                        >
+                          {+(v as AutomatorDetail).yieldPercentage >= 0 && '+'}
+                          {displayPercentage(
+                            +(v as AutomatorDetail).yieldPercentage / 100,
+                          )}
+                        </div>
+                      ),
+                    },
+                    !isMobileUI && {
+                      title: t({
+                        enUS: "Pool Size & Optivisor's",
+                        zhCN: '持仓',
+                      }),
+                      render: (_, v) => (
+                        <>
+                          <div className={styles['pool-size']}>
+                            <AmountDisplay
+                              amount={+v.aumByClientDepositCcy}
+                              ccy={v.vaultInfo.depositCcy}
+                            />
+                            <span className={styles['unit']}>
+                              {v.vaultInfo.depositCcy}
+                            </span>
+                          </div>
+                          <div className={styles['creator']}>
+                            <AmountDisplay
+                              amount={v.creatorAmountByClientDepositCcy || 0}
+                              ccy={v.vaultInfo.depositCcy}
+                            />
+                            <span className={styles['unit']}>
+                              {v.vaultInfo.depositCcy}
+                            </span>
+                            <span className={styles['percent']}>
+                              {displayPercentage(
+                                Number(v.creatorAmountByVaultDepositCcy) /
+                                  Number(v.aumByVaultDepositCcy),
+                              )}
+                            </span>
+                          </div>
+                        </>
+                      ),
+                    },
+                    !isMobileUI && {
+                      title: t({ enUS: 'Deposit', zhCN: '存入币种' }),
+                      render: (_, v) => (
+                        <>
+                          <div className={styles['deposit-ccy']}>
+                            {CCYService.ccyConfigs[v.vaultInfo.depositCcy]
+                              ?.name || v.vaultInfo.depositCcy}
+                          </div>
+                        </>
+                      ),
+                    },
+                    !isMobileUI && {
+                      title: t({ enUS: 'Risk', zhCN: '风险等级' }),
+                      render: (_, v) => (
+                        <>
+                          <div
+                            className={styles['risk']}
+                            style={{
+                              color:
+                                AutomatorRiskExposureMap[
+                                  v.vaultInfo.riskExposure!
+                                ]?.color || 'inherit',
+                            }}
+                          >
+                            {AutomatorRiskExposureMap[v.vaultInfo.riskExposure!]
+                              ?.label || 'R-'}
+                          </div>
+                        </>
+                      ),
+                    },
+                    !isMobileUI && {
+                      title: t({ enUS: 'Running', zhCN: '运行天数' }),
+                      render: (_, v) => (
+                        <>
+                          <div className={styles['runtime']}>
+                            {v.vaultInfo.createTime
+                              ? formatDurationToDay(
+                                  Date.now() - +v.vaultInfo.createTime,
+                                )
+                              : '-'}
+                          </div>
+                        </>
+                      ),
+                    },
+                    {
+                      title: t({ enUS: 'Followers', zhCN: '投资人数' }),
+                      render: (_, v) => (
+                        <>
+                          <div className={styles['people']}>
+                            {v.currentParticipantNum || '-'}
+                          </div>
+                        </>
+                      ),
+                    },
+                    !isMobileUI && {
+                      title: t({ enUS: 'Fee', zhCN: '盈利抽成' }),
+                      render: (_, v) => (
+                        <>
+                          <div className={styles['fee']}>
+                            {displayPercentage(v.vaultInfo.creatorFeeRate, 0)}
+                            <div className={styles['deposit-btn-mask']}>
+                              <div
+                                className={styles['deposit-btn']}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  modalController.open(v.vaultInfo);
+                                }}
+                              >
+                                <span>
+                                  {t({
+                                    enUS: 'Deposit',
+                                    zhCN: '存入',
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      ),
+                    },
+                  ] as ColumnProps<AutomatorInfo>[]
+                ).filter(Boolean)}
                 dataSource={data.vaultsOfCurrentChain}
               />
             </Spin>
@@ -345,12 +384,3 @@ export const AutomatorIndex = (props: BaseProps) => {
     </>
   );
 };
-function ussPrevious(
-  arg0: () => (AutomatorInfo & Partial<AutomatorDetail>)[],
-  arg1: {
-    vaultsOfCurrentChain: (AutomatorInfo & Partial<AutomatorDetail>)[];
-    featuredVaultsByDepositCcy: (AutomatorInfo & Partial<AutomatorDetail>)[];
-  }[],
-) {
-  throw new Error('Function not implemented.');
-}

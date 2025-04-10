@@ -4,6 +4,7 @@
   justify-content: flex-start;
   color: #fff;
   margin: 12px 0 24px;
+  flex-wrap: wrap;
 }
 
 .chain {
@@ -34,6 +35,25 @@
 
 .light {
   &.chain-select {
+    margin: 48px 0 24px;
     color: #000;
+    gap: 12px;
+  }
+
+  .chain {
+    border-radius: 40px;
+    background: rgb(0 0 0 / 4%);
+
+    .count {
+      padding: 0 0 0 9px;
+      margin: 0 0 0 3px;
+      border-left: 1px solid rgba(#000, 0.3);
+    }
+
+    &.active {
+      @include bold;
+
+      background: rgb(0 0 0 / 12%);
+    }
   }
 }
