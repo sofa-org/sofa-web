@@ -108,12 +108,28 @@
     white-space: nowrap;
   }
 
+  .pool-size,
+  .creator,
+  .apy,
+  .deposit-ccy,
+  .risk,
+  .runtime,
+  .people,
+  .fee {
+    font-weight: 510;
+    font-size: 14px;
+  }
   tr {
     position: relative;
 
     &:hover {
       .deposit-btn-mask {
         display: flex;
+      }
+      .fee,
+      .runtime,
+      .people {
+        display: none;
       }
 
       td {
@@ -204,18 +220,6 @@
       font-weight: 510;
       margin-left: 5px;
     }
-  }
-
-  .pool-size,
-  .creator,
-  .apy,
-  .deposit-ccy,
-  .risk,
-  .runtime,
-  .people,
-  .fee {
-    font-weight: 510;
-    font-size: 14px;
   }
 }
 

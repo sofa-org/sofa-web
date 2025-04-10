@@ -352,21 +352,21 @@ export const AutomatorIndex = (props: BaseProps) => {
                         <>
                           <div className={styles['fee']}>
                             {displayPercentage(v.vaultInfo.creatorFeeRate, 0)}
-                            <div className={styles['deposit-btn-mask']}>
-                              <div
-                                className={styles['deposit-btn']}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  modalController.open(v.vaultInfo);
-                                }}
-                              >
-                                <span>
-                                  {t({
-                                    enUS: 'Deposit',
-                                    zhCN: '存入',
-                                  })}
-                                </span>
-                              </div>
+                          </div>
+                          <div className={styles['deposit-btn-mask']}>
+                            <div
+                              className={styles['deposit-btn']}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                modalController.open(v.vaultInfo);
+                              }}
+                            >
+                              <span>
+                                {t({
+                                  enUS: 'Deposit',
+                                  zhCN: '存入',
+                                })}
+                              </span>
                             </div>
                           </div>
                         </>
