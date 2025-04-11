@@ -36,7 +36,6 @@ export const AutomatorIndex = (props: BaseProps) => {
     tab: p['automator-trade-tab'] as string,
     v: p['automator-vault'] as string,
   }));
-  const { address } = useWalletStore((state) => state);
   const isMobileUI = useIsMobileUI();
   const { automator: vault, automators } = useAutomatorMarketSelector();
   const chains = useMemo(
@@ -68,7 +67,8 @@ export const AutomatorIndex = (props: BaseProps) => {
             !acc[element.depositCcy]?.yieldPercentage ||
             (info.yieldPercentage &&
               Date.now() - +info.vaultInfo.createTime > 30 * MsIntervals.day &&
-              acc[element.depositCcy].yieldPercentage! < info.yieldPercentage)
+              Number(acc[element.depositCcy].yieldPercentage!) <
+                Number(info.yieldPercentage))
           ) {
             acc[element.depositCcy] = info;
           }
@@ -81,6 +81,22 @@ export const AutomatorIndex = (props: BaseProps) => {
       >,
     );
 
+    const featuredVaultsByDepositCcySortted = Object.values(
+      featuredVaultsByDepositCcy,
+    )
+      .sort((a, b) => {
+        if (/btc/i.test(a.vaultInfo.depositCcy)) return -1;
+        else if (/btc/i.test(b.vaultInfo.depositCcy)) return 1;
+        if (/eth/i.test(a.vaultInfo.depositCcy)) return -1;
+        else if (/eth/i.test(b.vaultInfo.depositCcy)) return 1;
+        if (/crvusd/i.test(a.vaultInfo.depositCcy)) return -1;
+        else if (/crvusd/i.test(b.vaultInfo.depositCcy)) return 1;
+        if (/usd/i.test(a.vaultInfo.depositCcy)) return -1;
+        else if (/usd/i.test(b.vaultInfo.depositCcy)) return 1;
+        return 0;
+      })
+      .slice(0, 3);
+
     return {
       vaultsOfCurrentChain: Object.values(
         state.vaults[wallet.chainId] || {},
@@ -88,29 +104,27 @@ export const AutomatorIndex = (props: BaseProps) => {
         (it) =>
           state.vaultOverviews[`${it.chainId}-${it.vault.toLowerCase()}-`],
       ),
-      featuredVaultsByDepositCcy: Object.values(featuredVaultsByDepositCcy)
-        .sort((a, b) => {
-          if (/btc/i.test(a.vaultInfo.depositCcy)) return -1;
-          else if (/btc/i.test(b.vaultInfo.depositCcy)) return 1;
-          if (/eth/i.test(a.vaultInfo.depositCcy)) return -1;
-          else if (/eth/i.test(b.vaultInfo.depositCcy)) return 1;
-          if (/crvusd/i.test(a.vaultInfo.depositCcy)) return -1;
-          else if (/crvusd/i.test(b.vaultInfo.depositCcy)) return 1;
-          if (/usd/i.test(a.vaultInfo.depositCcy)) return -1;
-          else if (/usd/i.test(b.vaultInfo.depositCcy)) return 1;
-          return 0;
-        })
-        .slice(0, 3),
+      featuredVaultsByDepositCcy: featuredVaultsByDepositCcySortted,
+      hash: featuredVaultsByDepositCcySortted
+        .map((it) => it.vaultInfo.vault)
+        .join(','),
     };
   });
-  const [featuredVaultsByDepositCcy, setfeaturedVaultsByDepositCcy] = useState(
-    data.featuredVaultsByDepositCcy,
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  useEffect(
+    useLazyCallback(() => {
+      const hash = data.hash;
+      setFeaturedLoading(true);
+      const t = setTimeout(() => {
+        if (hash != data.hash) {
+          return;
+        }
+        setFeaturedLoading(false);
+      }, 500);
+      return () => clearTimeout(t);
+    }),
+    [data.hash],
   );
-  useEffect(() => {
-    if (featuredVaultsByDepositCcy.length < 3) {
-      setfeaturedVaultsByDepositCcy(data.featuredVaultsByDepositCcy);
-    }
-  }, [data.featuredVaultsByDepositCcy, featuredVaultsByDepositCcy]);
   useEffect(() => {
     if (wallet.address)
       return useAutomatorStore.subscribeUserInfoList(
@@ -118,13 +132,6 @@ export const AutomatorIndex = (props: BaseProps) => {
         wallet.address,
       );
   }, [wallet.address, wallet.chainId]);
-
-  const handleSuccess = useLazyCallback(() => {
-    if (vault && address) {
-      useAutomatorStore.updateUserInfo(vault, address);
-      useWalletStore.updateBalanceByAutomatorVault(vault);
-    }
-  });
 
   return (
     <>
@@ -154,8 +161,12 @@ export const AutomatorIndex = (props: BaseProps) => {
           </div>
         ) : (
           <>
-            <div className={styles['featured-list']}>
-              {featuredVaultsByDepositCcy.map((it) => (
+            <div
+              className={classNames(styles['featured-list'], {
+                [styles['loading']]: featuredLoading,
+              })}
+            >
+              {data.featuredVaultsByDepositCcy.map((it) => (
                 <div className={styles['featured']}>
                   <AutomatorCard
                     key={it.vaultInfo.vault}
@@ -166,6 +177,8 @@ export const AutomatorIndex = (props: BaseProps) => {
                     mode="featured"
                     switchChain
                   />
+                  <Spin size="large" />
+                  {/* {featuredLoading && <Spin />} */}
                 </div>
               ))}
             </div>

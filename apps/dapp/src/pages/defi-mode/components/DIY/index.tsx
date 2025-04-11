@@ -100,12 +100,15 @@ const MarketView = () => {
           }).skipCurrentOptionValue,
       )
       .map((productType) => ({
-        label: (
-          <>
-            {ProductTypeRefs[productType].icon1}
-            {ProductTypeRefs[productType].label1(t)}
-          </>
-        ),
+        label:
+          formData?.riskType == RiskType.DUAL ? (
+            <>{ProductTypeRefs[productType].dualDesc(t).op2}</>
+          ) : (
+            <>
+              {ProductTypeRefs[productType].icon1}
+              {ProductTypeRefs[productType].label1(t)}
+            </>
+          ),
         value: productType,
         disabled: options.every(
           (it) => it.data.productType !== productType || it.disabled,
