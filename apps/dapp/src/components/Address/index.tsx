@@ -94,7 +94,14 @@ const Address = memo<{
           }}
         />
       )}
-      {props.linkBtn && <IconShare onClick={handleLink} />}
+      {props.linkBtn && (
+        <IconShare
+          onClick={(e) => {
+            e.stopPropagation();
+            handleLink();
+          }}
+        />
+      )}
       {props.chainIcon && (
         <img
           className={classNames(styles['chain-icon'], 'chain-icon')}
