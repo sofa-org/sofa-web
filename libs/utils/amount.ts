@@ -95,6 +95,14 @@ export function roundWith<T extends number | string | undefined>(
   roundType: 'default' | 'upper' | 'lower' = 'default',
 ): string | undefined {
   if (isNullLike(num) || !isLegalNum(num)) return undefined;
+  if (
+    !isNullLike(minSize) &&
+    !isNullLike(minSize) &&
+    Number(minSize) > Number(maxSize)
+  ) {
+    // illegal minSize
+    return undefined;
+  }
   if (Number(num) < Number(minSize)) {
     return roundWith(minSize, tickSize, minSize, maxSize, 'upper') as string;
   }
