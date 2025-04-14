@@ -202,7 +202,7 @@ export const AutomatorIndex = (props: BaseProps) => {
                 }}
                 columns={(
                   [
-                    !isMobileUI && {
+                    {
                       title: t({ enUS: 'Network', zhCN: '网络' }),
                       render: (_, v) => (
                         <img src={ChainMap[v.vaultInfo.chainId]?.icon} alt="" />
@@ -225,34 +225,16 @@ export const AutomatorIndex = (props: BaseProps) => {
                                 {v.vaultInfo.name || v.vaultInfo.depositCcy}
                               </MsgDisplay>
                             </div>
-                            {isMobileUI ? (
-                              <div
-                                className={styles['apy']}
-                                style={{
-                                  color:
-                                    +(v as AutomatorDetail).yieldPercentage >= 0
-                                      ? 'var(--color-rise)'
-                                      : 'var(--color-fall)',
-                                }}
-                              >
-                                {+(v as AutomatorDetail).yieldPercentage >= 0 &&
-                                  '+'}
-                                {displayPercentage(
-                                  +(v as AutomatorDetail).yieldPercentage / 100,
-                                )}
-                              </div>
-                            ) : (
-                              <Address
-                                address={v.vaultInfo.vault.toLowerCase()}
-                                simple
-                                linkBtn
-                              />
-                            )}
+                            <Address
+                              address={v.vaultInfo.vault.toLowerCase()}
+                              simple
+                              linkBtn
+                            />
                           </div>
                         </div>
                       ),
                     },
-                    !isMobileUI && {
+                    {
                       title: t({ enUS: '7D Target Yield', zhCN: '7日年化' }),
                       render: (_, v) => (
                         <div
@@ -271,7 +253,7 @@ export const AutomatorIndex = (props: BaseProps) => {
                         </div>
                       ),
                     },
-                    !isMobileUI && {
+                    {
                       title: t({
                         enUS: "Pool Size & Optivisor's",
                         zhCN: '持仓',
@@ -305,7 +287,7 @@ export const AutomatorIndex = (props: BaseProps) => {
                         </>
                       ),
                     },
-                    !isMobileUI && {
+                    {
                       title: t({ enUS: 'Deposit', zhCN: '存入币种' }),
                       render: (_, v) => (
                         <>
@@ -316,7 +298,7 @@ export const AutomatorIndex = (props: BaseProps) => {
                         </>
                       ),
                     },
-                    !isMobileUI && {
+                    {
                       title: t({ enUS: 'Risk', zhCN: '风险等级' }),
                       render: (_, v) => (
                         <>
@@ -335,7 +317,7 @@ export const AutomatorIndex = (props: BaseProps) => {
                         </>
                       ),
                     },
-                    !isMobileUI && {
+                    {
                       title: t({ enUS: 'Running', zhCN: '运行天数' }),
                       render: (_, v) => (
                         <>
@@ -381,6 +363,27 @@ export const AutomatorIndex = (props: BaseProps) => {
                                 })}
                               </span>
                             </div>
+                          </div>
+                        </>
+                      ),
+                    },
+                    isMobileUI && {
+                      title: '',
+                      render: (_, v) => (
+                        <>
+                          <div
+                            className={styles['deposit-btn']}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              modalController.open(v.vaultInfo);
+                            }}
+                          >
+                            <span>
+                              {t({
+                                enUS: 'Deposit',
+                                zhCN: '存入',
+                              })}
+                            </span>
                           </div>
                         </>
                       ),
