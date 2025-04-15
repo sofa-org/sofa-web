@@ -199,6 +199,7 @@ export const CustomQuote = (props: {
             min={minPrice}
             tick={dualConfig?.minStepSize}
             roundingMethodForTick={productTypeRef.dualIsBuy ? 'lower' : 'upper'}
+            type="no_widgets"
             onChange={(v) => {
               props.onChangedPrice(
                 v === undefined || v === '' ? undefined : Number(v),
