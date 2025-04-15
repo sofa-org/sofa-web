@@ -49,6 +49,50 @@ const SUSDaVaults = [
     depositBaseCcy: 'USDa',
     usePermit2: false,
   },
+  // SmartBullAAVEVault(ETH/USDC)
+  {
+    chainId: 1329,
+    vault: '0x64bb275066E7275FB0803c3e617Ae3ab2A882fF3',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDC',
+    depositCcy: 'USDC',
+    usePermit2: false,
+  },
+  // SmartBearAAVEVault(ETH/USDC)
+  {
+    chainId: 1329,
+    vault: '0x634B69cC4168Cfc1c366078FDeB874AfFBb478b5',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USDC',
+    depositCcy: 'USDC',
+    usePermit2: false,
+  },
+  // SmartBullAAVEVault(BTC/USDC)
+  {
+    chainId: 1329,
+    vault: '0x088dBBeEC1489c557f8D4fD6146E0590E303d7d9',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDC',
+    depositCcy: 'USDC',
+    usePermit2: false,
+  },
+  // SmartBearAAVEVault(BTC/USDC)
+  {
+    chainId: 1329,
+    vault: '0xFFf0d064B1cbf5D4C97D0af56a73a4C7e31DFb0D',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USDC',
+    depositCcy: 'USDC',
+    usePermit2: false,
+  },
 ];
 
 const Vaults = [...SUSDaVaults];
