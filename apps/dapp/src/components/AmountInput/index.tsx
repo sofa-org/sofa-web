@@ -33,7 +33,7 @@ export interface AmountInputProps extends BaseInputProps<string | number> {
   prefix?: ReactNode;
   suffix?: ReactNode;
   // @default normal; 选择 internal 之后加减按钮会出现在输入框内部
-  type?: 'normal' | 'internal' | 'internal_max';
+  type?: 'normal' | 'internal' | 'internal_max' | 'no_widgets';
   onBlur?(e: FocusEvent): void;
   disabledUnlessWalletConnected?: boolean;
   roundingMethodForTick?: 'upper' | 'lower';
