@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Button, Modal } from '@douyinfe/semi-ui';
 import { useTranslation } from '@sofa/services/i18n';
 import { MsIntervals, next8h } from '@sofa/utils/expiry';
+import { joinUrl } from '@sofa/utils/url';
 import { useLocalStorageState } from 'ahooks';
 import classNames from 'classnames';
 
@@ -13,7 +14,7 @@ import styles from './index.module.scss';
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
-  const [data, setData] = useLocalStorageState('global-modal-5', {
+  const [data, setData] = useLocalStorageState('global-modal-6', {
     defaultValue: { closedAt: 0, count: 0 },
   });
   const visible = useMemo(() => {
@@ -48,34 +49,19 @@ export const GlobalModal = () => {
         className={styles['head']}
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: '1. Poker Museum Temporarily Closed',
-            zhCN: '1. 扑克博物馆暂时下线',
+            enUS: 'SOFA Dual Function is Now Live!',
+            zhCN: 'SOFA 双币交易上线！',
           }),
         }}
       />
       <p
         dangerouslySetInnerHTML={{
           __html: t({
-            enUS: `The Poker Museum will be temporarily closed from 8 AM UTC on February 15, 2025. Please make sure to draw all your cards before then, as any undrawn cards will be forfeited. We're planning a new event, so stay tuned for updates!`,
-            zhCN: '扑克博物馆将于 2025年2月15日 16:00 (UTC+8) 暂时下线。请在截止时间前完成抽卡，逾期未抽取的卡片将作废。新活动正在筹划中，敬请期待！',
-          }),
-        }}
-      />
-      <p
-        className={styles['head']}
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: '2. Automator Follow-Up Feature Now Available',
-            zhCN: '2. Automator 跟单功能上线',
-          }),
-        }}
-      />
-      <p
-        dangerouslySetInnerHTML={{
-          __html: t({
-            enUS: 'The Automator follow-up feature is here! You can now entrust your funds to top-performing Automator traders and strategies. Your funds will be automatically reinvested, harnessing the power of compound interest to help you easily implement volatility arbitrage strategies.',
-            zhCN: 'Automator 跟单功能现已上线！将资金托管给高绩效的 Automator 交易者和策略，资金将自动循环投资，充分发挥复利效应，助你轻松执行波动率套利策略！',
-          }),
+            enUS: `Set your target price and expiration time — the system will automatically execute your trade, whether you're buying low or selling high.
+No matter the outcome, you'll earn both basic rewards and RCH airdrop rewards!`,
+            zhCN: `设置目标价格和到期时间，系统自动执行交易，高点卖出 / 低点买入。
+无论成功与否，均可获得基础收益和RCH空投奖励！`,
+          }).replace(/\n/, '<br />'),
         }}
       />
       <div className={styles['footer']}>
@@ -88,10 +74,13 @@ export const GlobalModal = () => {
               closedAt: Date.now(),
               count: (pre?.count || 0) + 1,
             }));
-            window.location.href = EnvLinks.config.VITE_AUTOMATOR_LINK;
+            window.location.href = joinUrl(
+              EnvLinks.config.VITE_DUAL_LINK,
+              '/customize',
+            );
           }}
         >
-          {t({ enUS: 'Go to Automator', zhCN: '前往 Automator' })}
+          {t({ enUS: 'Start your journey now!', zhCN: '立即体验' })}
         </Button>
       </div>
     </Modal>
