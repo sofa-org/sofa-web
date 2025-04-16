@@ -139,6 +139,12 @@ export const useProductsState = Object.assign(
       if (isDualQuoteParams(params)) {
         if (!params?.anchorPrices?.[0])
           return new Error('Please input the price');
+      } else {
+        if (
+          !params.anchorPrices?.length ||
+          params.anchorPrices.some((it) => !it)
+        )
+          return new Error('Please select the prices');
       }
       if (
         vault.riskType === RiskType.PROTECTED &&

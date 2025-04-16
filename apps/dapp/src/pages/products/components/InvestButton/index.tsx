@@ -229,7 +229,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
     const amount = simplePlus(...quoteInfos.map((it) => it?.amounts.own)) || 0;
     const insufficient = props.isInsufficientBalance(amount);
     if (insufficient) {
-      return Toast.warning(t('Balance is no enough!'));
+      return Toast.warning(t('Balance is not enough!'));
     }
     const delRfq = (key: NonNullable<TransactionProgress['details']>[0][0]) => {
       quoteInfos.forEach((quote) => {

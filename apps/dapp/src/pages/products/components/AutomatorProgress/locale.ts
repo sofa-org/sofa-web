@@ -18,7 +18,7 @@ export default {
     Failed: 'Failed',
     'Deposit successful. <a href="{{url}}">Go to position page</a> to see your successful records':
       'Deposit successful. <a href="{{url}}">Go to position page</a> to see your successful records',
-    'Balance is no enough!': 'Balance is no enough!',
+    'Balance is not enough!': 'Balance is not enough!',
     Deposit: 'Deposit',
     QuoteIds: 'QuoteIds',
     Status: 'Status',
@@ -77,7 +77,7 @@ export default {
     'Request For Quote': '请求报价',
     'Connect Wallet': '导入钱包',
     'Insufficient Balance': '余额不足',
-    'Balance is no enough!': '余额不足！',
+    'Balance is not enough!': '余额不足！',
     'Purchase All Tickets': '购买所有票券',
     Deposit: '存入',
     QuoteIds: '报价编号',
