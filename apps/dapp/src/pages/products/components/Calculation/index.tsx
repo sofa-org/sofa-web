@@ -66,7 +66,6 @@ export const Calculation = (props: CalculationProps) => {
       ProductsService.vaultLeverageInfo(vault, props.quote.timestamp * 1000),
     [vault, props.quote.timestamp],
   );
-  // console.log(1111, quote, props.quote);
   const data = useMemo(
     () =>
       !quote

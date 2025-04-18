@@ -286,7 +286,6 @@ export class ProductsService {
       const expiry = it.quote.expiry * 1000;
       if (!it.vault.depositBaseCcy) return pre;
       const apy = apyMap[it.vault.depositBaseCcy];
-      console.log(1111, apyMap, it.vault.depositBaseCcy);
       if (isNullLike(apy))
         throw new Error(`Can not find apy of ${it.vault.depositBaseCcy}`);
       const key = genPPSKey(it.vault);
