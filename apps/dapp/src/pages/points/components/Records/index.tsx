@@ -76,7 +76,7 @@ export const PointRecords = () => {
           if (/automator/i.test(it.categoryText))
             return `${it.tradeInfoDTO.depositCcy}_Automator`;
           if (/dual/i.test(it.tradeInfoDTO.rfqType)) {
-            return `Dual_${it.tradeInfoDTO.forCcy}/${it.tradeInfoDTO.domCcy}_${it.tradeInfoDTO.dualTradeFlag!}_${displayExpiry(
+            return `${it.tradeInfoDTO.forCcy}/${it.tradeInfoDTO.domCcy}_${it.tradeInfoDTO.dualTradeFlag!}_${displayExpiry(
               it.tradeInfoDTO.expiry * 1000,
             )}_${it.tradeInfoDTO.anchorPrices?.[0]}`;
           }
