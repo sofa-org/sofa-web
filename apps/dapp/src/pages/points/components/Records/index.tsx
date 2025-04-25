@@ -75,6 +75,11 @@ export const PointRecords = () => {
           if (!it.tradeInfoDTO) return;
           if (/automator/i.test(it.categoryText))
             return `${it.tradeInfoDTO.depositCcy}_Automator`;
+          if (/dual/i.test(it.tradeInfoDTO.rfqType)) {
+            return `${it.tradeInfoDTO.forCcy}/${it.tradeInfoDTO.domCcy}_${it.tradeInfoDTO.dualTradeFlag!}_${displayExpiry(
+              it.tradeInfoDTO.expiry * 1000,
+            )}_${it.tradeInfoDTO.anchorPrices?.[0]}`;
+          }
           return `${
             {
               DNT: 'Rangebound',

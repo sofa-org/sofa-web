@@ -20,8 +20,10 @@ export interface PointItem {
     //	交易类型的才不为空
     depositCcy: string; // 币种 RCH USDT
     forCcy?: string; // 标的币种 BTC/ETH
+    domCcy?: string; // 计价币种 USDT
     anchorPrices?: (string | number)[]; // 价格列表
     expiry: number; // 到期时间
+    dualTradeFlag?: 'Buy Low' | 'Sell High';
     rfqType: 'DNT' | 'BULL_TREND' | 'BEAR_TREND';
   };
   tgConvertInfoDTO?: {
