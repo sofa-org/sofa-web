@@ -245,6 +245,15 @@ export const useWalletStore = Object.assign(
 export function useCheckAuth() {
   const address = useWalletStore((state) => state.address);
   useEffect(() => {
+    if (!address) {
+      useWalletStore.disconnect();
+      setTimeout(() => {
+        useWalletUIState.getState().bringUpConnect({
+          enableServerAuth: true,
+        });
+      }, 0);
+      return;
+    }
     if (!address || AuthToken.get(address?.toLowerCase())) return;
     // mismatch, let's signout
     useWalletStore.disconnect();

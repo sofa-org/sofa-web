@@ -1,4 +1,5 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Modal } from '@douyinfe/semi-ui';
 import { useTranslation } from '@sofa/services/i18n';
 import { calcVal } from '@sofa/utils/fns';
@@ -27,6 +28,13 @@ const WalletConnector = (
   const [t] = useTranslation('WalletConnector');
   const wallet = useWalletStore();
   const { connectVisible, bringUpConnect, dismissConnect } = useWalletUIState();
+  const location = useLocation();
+  const enableServerAuth = useMemo(() => {
+    if (typeof props.enableServerAuth === 'boolean') {
+      return true;
+    }
+    return ['/points'].includes(location.pathname);
+  }, [props.enableServerAuth, location.pathname]);
 
   useEffect(() => {
     const pro = useWalletStore.subscribeAccountChange();
@@ -44,9 +52,7 @@ const WalletConnector = (
           props.className,
         )}
         style={props.style}
-        onClick={() =>
-          bringUpConnect({ enableServerAuth: props.enableServerAuth })
-        }
+        onClick={() => bringUpConnect({ enableServerAuth })}
       >
         {(() => {
           if (props.children) return calcVal(props.children, connectVisible);
