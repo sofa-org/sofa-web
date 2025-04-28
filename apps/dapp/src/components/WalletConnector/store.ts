@@ -75,25 +75,31 @@ addHttpErrorHandler(async (err) => {
       [401, 403].includes(err.response.data.code) ||
       err.response.data.message?.toLowerCase() == 'invalid token'
     ) {
-      console.warn('Received invalid token response', err.response.data);
+      const address = useWalletStore.getState().address;
+      const token =
+        (address && AuthToken.get(address.toLowerCase())) || undefined;
+      console.warn('Received invalid token response', err.response.data, {
+        address,
+        token,
+      });
       const urlStr = err.request.responseURL || err.request.url;
       if (!urlStr) return;
-      const uri = new URL(urlStr);
-      if (/(^|\.)sofa\.org$/i.test(uri.hostname)) {
-        if (AuthToken.get(useWalletStore.getState().address?.toLowerCase())) {
+      if (address && token) {
+        const uri = new URL(urlStr);
+        if (/(^|\.)sofa\.org$/i.test(uri.hostname)) {
           useWalletStore.disconnect()?.catch((e) => {
             console.error(
               'error while useWalletStore.disconnect after token invalid',
               e,
             );
           });
+          return new Error(
+            t({
+              enUS: 'Session timeout, please login again',
+              zhCN: '会话超时，请重新登入',
+            }),
+          );
         }
-        return new Error(
-          t({
-            enUS: 'Session timeout, please login again',
-            zhCN: '会话超时，请重新登入',
-          }),
-        );
       }
     }
   }
