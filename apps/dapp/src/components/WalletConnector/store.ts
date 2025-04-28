@@ -127,7 +127,11 @@ export const useWalletStore = Object.assign(
             icon: undefined,
           }));
         });
-      if (AuthToken.get(address?.toLowerCase())) AuthService.logout();
+      if (AuthToken.get(address.toLowerCase())) {
+        return AuthService.logout(address)
+          .catch(() => AuthToken.remove(address.toLowerCase()))
+          .then(() => finalDisconnect());
+      }
       return finalDisconnect();
     },
     connect: (chainId?: number) => {
