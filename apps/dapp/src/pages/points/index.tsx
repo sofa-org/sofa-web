@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import logoUniswap from '@/assets/logo-uniswap.svg?url';
 import WalletConnector from '@/components/WalletConnector';
 import {
-  useCheckAuth,
+  useCheckServerAuth,
   useWalletStore,
 } from '@/components/WalletConnector/store';
 import { EnvLinks } from '@/env-links';
@@ -115,7 +115,7 @@ const Points = () => {
   const [t] = useTranslation('Points');
   const wallet = useWalletStore();
 
-  useCheckAuth();
+  useCheckServerAuth();
 
   const { data: total, loading: totalLoading } = useRequest(
     async () => (!wallet.address ? undefined : PointService.total()),

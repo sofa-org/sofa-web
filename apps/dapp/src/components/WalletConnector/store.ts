@@ -242,10 +242,11 @@ export const useWalletStore = Object.assign(
 /**
  * 检查是否有服务端登入，且和当前wallet地址一致
  */
-export function useCheckAuth() {
+export function useCheckServerAuth() {
   const address = useWalletStore((state) => state.address);
   useEffect(() => {
-    if (!address) {
+    if (address && !AuthToken.get(address.toLowerCase())) {
+      // 登入了，但是没有服务器token
       useWalletStore.disconnect();
       setTimeout(() => {
         useWalletUIState.getState().bringUpConnect({
