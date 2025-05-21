@@ -91,7 +91,10 @@ const List = (props: {
     {
       target: () => document.querySelector('#root'),
       isNoMore: (d) => !d?.hasMore,
-      onError: (err) => Toast.error(getErrorMsg(err)),
+      onError: (err) => {
+        console.error(err);
+        return Toast.error(getErrorMsg(err));
+      },
       reloadDeps: [wallet.chainId, address, props.riskType, props.productType],
     },
   );

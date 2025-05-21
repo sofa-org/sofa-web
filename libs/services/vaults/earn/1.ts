@@ -513,12 +513,38 @@ const crvUSDVaults = [
   },
 ];
 
+const R2MNERVaults = [
+  // R2MNERSmartBullVault(BTC/R2MNER)
+  {
+    chainId: 1,
+    vault: '0x09DF1703F353A3345261359a43a210448aE4FF6f',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'R2MNER',
+    usePermit2: false,
+  },
+  // R2MNERSmartBearVault(BTC/R2MNER)
+  {
+    chainId: 1,
+    vault: '0xF2A7d953b2d7D821cade13f8A3AF257B092cfe71',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'R2MNER',
+    usePermit2: false,
+  },
+];
+
 const vaults = [
   ...crvUSDVaults,
   ...USDTVaults,
   ...OKXCampaignVaults,
   ...RCHVaults,
   ...stETHVaults,
+  ...R2MNERVaults,
 ];
 
 export default vaults;

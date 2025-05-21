@@ -175,7 +175,7 @@ export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
         ),
         value: it.depositCcy,
       })),
-    [chainId, productType],
+    [chainId, productType, riskType],
   );
   return (
     <CSelect
