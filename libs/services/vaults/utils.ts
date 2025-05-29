@@ -16,6 +16,7 @@ export function getCollateralDecimal(chainId: number, depositCcy: string) {
     scrvUSD: 1e18,
     WETH: 1e18,
     stETH: 1e18,
+    R2MNER: 1e18,
     WBTC: 1e18,
     CRV: 1e18,
     sUSDa: 1e18,
@@ -48,6 +49,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
       scrvUSD: 0.05,
       WETH: 0.000015,
       stETH: 0.000015,
+      R2MNER: 0.000015,
       WBTC: 0.000001,
       CRV: 0.05,
       sUSDa: 0.05,
@@ -67,6 +69,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
         scrvUSD: 20,
         WETH: 0.01,
         stETH: 0.01,
+        R2MNER: 0.01,
         WBTC: 0.0005,
         sUSDa: 0.05,
       }[depositCcy]
@@ -83,6 +86,7 @@ export function getDepositMinAmount(depositCcy: string, project: ProjectType) {
         scrvUSD: 100,
         WETH: 0.05,
         stETH: 0.05,
+        R2MNER: 0.05,
         WBTC: 0.002,
         sUSDa: 0.05,
       }[depositCcy];
@@ -112,6 +116,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
       scrvUSD: 0.05,
       WETH: 0.000001,
       stETH: 0.000001,
+      R2MNER: 0.000001,
       WBTC: 0.000001,
       sUSDa: 0.05,
     }[depositCcy];
@@ -131,6 +136,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
         scrvUSD: 20,
         WETH: 0.01,
         stETH: 0.01,
+        R2MNER: 0.01,
         WBTC: 0.0005,
         sUSDa: 0.05,
       }[depositCcy]
@@ -147,6 +153,7 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
         scrvUSD: 1,
         WETH: 0.0001,
         stETH: 0.0001,
+        R2MNER: 0.0001,
         WBTC: 0.0001,
         sUSDa: 0.05,
       }[depositCcy];

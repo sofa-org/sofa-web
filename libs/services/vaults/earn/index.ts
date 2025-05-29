@@ -89,6 +89,7 @@ export const earnVaults = vaults.map((it) => {
       stETH: InterestType.LIDO,
       crvUSD: InterestType.CURVE,
       sUSDa: InterestType.AriesMarkets,
+      R2MNER: InterestType.LIDO,
     }[it.depositCcy],
   } as VaultInfo;
 });

@@ -184,6 +184,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
       interestRate?.apyUsed,
       customDev,
     );
+    console.log(1111, interestRate, apyList);
     return apyList.map((value) => ({
       label: `${displayPercentage(value)} Yield`,
       value,
