@@ -69,6 +69,7 @@ export function useForCcySelect(options?: {
 export function useDepositCcySelect() {
   const query = useQuery();
   const [project] = useProjectChange();
+  const [forCcy] = useForCcySelect();
   const [riskType] = useRiskSelect(project);
   const [productType] = useProductSelect();
   const chainId = useWalletStore((state) => state.chainId);
@@ -82,6 +83,7 @@ export function useDepositCcySelect() {
         (it) =>
           !it.tradeDisable &&
           it.chainId === chainId &&
+          it.forCcy === forCcy &&
           it.riskType === riskType &&
           it.productType === productType &&
           it.depositCcy === $ccy,
@@ -94,7 +96,7 @@ export function useDepositCcySelect() {
               it.riskType === riskType &&
               it.productType === productType,
           )?.depositCcy || 'USDT',
-    [$ccy, chainId, productType, riskType],
+    [$ccy, chainId, forCcy, productType, riskType],
   );
   return [ccy, setDepositCcy] as const;
 }
@@ -151,6 +153,7 @@ export const CCYSelector = (
 export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
   const [project] = useProjectChange();
   const [productType] = useProductSelect();
+  const [forCcy] = useForCcySelect();
   const [riskType] = useRiskSelect(project);
   const chainId = useWalletStore((state) => state.chainId);
   const [ccy, setCcy] = useDepositCcySelect();
@@ -161,6 +164,7 @@ export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
         ContractsService.vaults.filter(
           (it) =>
             it.chainId === chainId &&
+            it.forCcy === forCcy &&
             it.productType === productType &&
             it.riskType === riskType &&
             !it.tradeDisable,
@@ -175,7 +179,7 @@ export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
         ),
         value: it.depositCcy,
       })),
-    [chainId, productType],
+    [chainId, forCcy, productType, riskType],
   );
   return (
     <CSelect
