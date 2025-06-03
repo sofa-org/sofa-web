@@ -15,6 +15,8 @@ export interface MenuItem {
 
   hide?(): boolean;
 
+  extraSearch?: string; // 不影响路径 match
+
   active?: boolean;
 }
 

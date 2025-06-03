@@ -93,6 +93,7 @@ export function useDepositCcySelect() {
             (it) =>
               !it.tradeDisable &&
               it.chainId === chainId &&
+              it.forCcy === forCcy &&
               it.riskType === riskType &&
               it.productType === productType,
           )?.depositCcy || 'USDT',

@@ -189,7 +189,7 @@ export const RenderMenu = (it: MenuItem) => {
   if (!it.children?.length && it.path && !it.path.startsWith('http')) {
     return (
       <NavLink
-        to={joinUrl(it.path, location.search)}
+        to={joinUrl(it.path, location.search, it.extraSearch)}
         className={classNames(styles['link'], 'link', {
           [styles['active']]: it.active,
           ['active']: it.active,
@@ -203,7 +203,7 @@ export const RenderMenu = (it: MenuItem) => {
   if (!it.children?.length) {
     return (
       <a
-        href={joinUrl(it.path, location.search)}
+        href={joinUrl(it.path, location.search, it.extraSearch)}
         className={classNames(styles['link'], 'link', {
           [styles['active']]: it.active,
           ['active']: it.active,

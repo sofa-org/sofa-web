@@ -5,6 +5,7 @@ import { ProjectType } from '@sofa/services/base-type.ts';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
+import { updateQuery } from '@sofa/utils/history';
 import { useIsPortrait } from '@sofa/utils/hooks';
 import { formatHighlightedText } from '@sofa/utils/string';
 import { joinUrl } from '@sofa/utils/url';
@@ -116,6 +117,7 @@ const allMenuItems = (
                 enUS: 'Your Earn, Surge & Dual Positions.',
                 zhCN: '你交易的 Earn、Surge 和 双币交易 的头寸',
               }),
+            extraSearch: '?project=Earn',
             path: '/positions',
           },
         ],
