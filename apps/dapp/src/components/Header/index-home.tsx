@@ -291,7 +291,11 @@ export const RenderMenu = (it: MenuItem) => {
                         },
                       )}
                       onClick={() => {
-                        const path = joinUrl(location.search, m.path);
+                        const path = joinUrl(
+                          location.search,
+                          m.path,
+                          m.extraSearch,
+                        );
                         if (path.startsWith('http'))
                           window.location.href = path;
                         else navigate(path);
