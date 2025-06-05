@@ -1,18 +1,29 @@
-import { parse, stringify } from 'qs';
+import { parse, ParsedQs, stringify } from 'qs';
 
 export function parseUrl(url: string) {
   const res = url.match(/^((\w+:?\/\/)([^/?#]+))?([^?#]+)?(\?[^#]+)?(#.*)?$/);
   if (!res) {
     throw new Error(`Parse failed: Invalid url - ${url}`);
   }
-  const [, origin, protocol, host, pathname = '', search, hash] = res;
+  const [, origin, protocol, host, pathname = '/', search, hash] = res;
   return { protocol, host, origin, pathname, search, hash, url };
 }
 
-export function stringifyUrl(
-  url: Omit<ReturnType<typeof parseUrl>, 'url' | 'protocol' | 'host'>,
-) {
-  return `${url.origin}${url.pathname || '/'}${url.search}${url.hash}`;
+export function stringifyUrl(url: {
+  origin?: string;
+  pathname?: string;
+  search?: string;
+  hash?: string;
+  query?: ParsedQs;
+}) {
+  const search = stringify(
+    {
+      ...parse(url.search || '?', { ignoreQueryPrefix: true }),
+      ...url.query,
+    },
+    { addQueryPrefix: true },
+  );
+  return `${url.origin || ''}${url.pathname || '/'}${search}${url.hash}`;
 }
 
 export function joinUrl(...urls: (string | undefined)[]) {
