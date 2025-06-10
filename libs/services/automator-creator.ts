@@ -57,9 +57,10 @@ export class AutomatorCreatorService {
   })
   static async automatorFactories(params: { chainId: number; wallet: string }) {
     return http
-      .get<unknown, HttpResponse<AutomatorFactory[]>>(
-        `/optivisors/automator/factories`,
-      )
+      .get<
+        unknown,
+        HttpResponse<AutomatorFactory[]>
+      >(`/optivisors/automator/factories`)
       .then((res) => res.value);
   }
 
@@ -616,10 +617,10 @@ export class AutomatorCreatorService {
 
   private static async $createAutomator(data: OriginAutomatorCreateParams) {
     return http
-      .post<unknown, HttpResponse<boolean>>(
-        '/optivisors/automator/create',
-        data,
-      )
+      .post<
+        unknown,
+        HttpResponse<boolean>
+      >('/optivisors/automator/create', data)
       .then(() => data.automatorAddress);
   }
 }
