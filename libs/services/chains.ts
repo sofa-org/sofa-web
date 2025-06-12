@@ -242,7 +242,7 @@ export const ChainMap: Record<
       name: 'Sei',
       currency: 'SEI',
       icon: IconSei,
-      explorerUrl: 'https://www.seitrace.com',
+      explorerUrl: 'https://seitrace.com',
       rpcUrl: 'https://sei.drpc.org',
       rpcUrlsForAddNetwork: [
         'https://sei.drpc.org',
