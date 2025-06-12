@@ -358,8 +358,8 @@ const AutomatorShareModal = forwardRef<
                         </span>
                       </div>
                       <div className={styles['value']}>
-                        {data.map((row) => (
-                          <div className={styles['follower']}>
+                        {data.map((row, idx) => (
+                          <div className={styles['follower']} key={idx}>
                             <span className={styles['wallet']}>
                               {row.wallet.replace(
                                 /^(\w{8})\w+$/,

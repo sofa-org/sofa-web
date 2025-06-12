@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useRef } from 'react';
+import { Fragment, ReactNode, useMemo, useRef } from 'react';
 import { ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { TFunction, useTranslation } from '@sofa/services/i18n';
@@ -123,13 +123,13 @@ const Index = () => {
       banner={
         <>
           <h1 className={styles['head-title']}>
-            <h2 className={styles['title']}>
+            <div className={styles['title']}>
               {ProjectTypeRefs[ProjectType.Automator].icon}
               {t({
                 enUS: 'My Automator',
                 zhCN: '我的 Automator',
               })}
-            </h2>
+            </div>
             <div>
               <CreatorAutomatorSelector className={styles['selector']} />
               <div
@@ -222,10 +222,10 @@ const Index = () => {
                   {(automatorDetail?.vaultInfo.desc || '...')
                     .split('\n')
                     .map((line, idx) => (
-                      <>
-                        {idx > 0 ? <br key={`lb-${idx}`} /> : undefined}
+                      <Fragment key={`lb-${idx}`}>
+                        {idx > 0 ? <br /> : undefined}
                         {line}
-                      </>
+                      </Fragment>
                     ))}
                 </MsgDisplay>
               </div>
