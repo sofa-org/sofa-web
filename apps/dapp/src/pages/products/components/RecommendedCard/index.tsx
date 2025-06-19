@@ -29,7 +29,6 @@ import {
   useProductSelect,
   useProjectChange,
 } from '@/components/ProductSelector';
-import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
@@ -124,11 +123,7 @@ export const RecommendedCardItem = (props: {
         maxApy: simplePlus(it.apyInfo?.rch, it.apyInfo?.max),
       },
     } as PayoffProps;
-  }, [
-    it.vault.riskType,
-    it.vault.depositBaseCcy,
-    it.convertedCalculatedInfoByDepositBaseCcy,
-  ]);
+  }, [it, positionAmount]);
 
   return (
     <div
