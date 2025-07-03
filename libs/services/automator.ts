@@ -41,6 +41,7 @@ export interface OriginAutomatorInfo {
   sharesToken: string; // Automator 的份额代币
   redemptionPeriodDay: number | string; // 赎回观察时间
   riskExposure: number | string; // 最多能亏损多少比例的本金
+  joinedBittensor?: boolean; // 是否加入了 bittensor，true 表示已加入
 }
 
 // server 返回的结构

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Select, Toast, Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { ProjectType } from '@sofa/services/base-type';
@@ -30,6 +30,7 @@ import { useAutomatorCreateStore } from './store';
 
 addI18nResources(locale, 'AutomatorCreate');
 
+import { useLocation } from 'react-router-dom';
 import { Env } from '@sofa/utils/env';
 
 import AsyncButton from '@/components/AsyncButton';
@@ -132,6 +133,11 @@ const FAQ = (t: TFunction) => {
 
 const AutomatorCreate = () => {
   const [t] = useTranslation('AutomatorCreate');
+  const location = useLocation();
+  const fromSignalPlus = useMemo(
+    () => /from=SignalPlus/.test(location.search),
+    [location.search],
+  );
   const wallet = useWalletStore((state) => state);
   const { bringUpConnect } = useWalletUIState();
   const isMobileUI = useIsMobileUI();
@@ -166,6 +172,18 @@ const AutomatorCreate = () => {
       AutomatorCreatorService.automatorFactories({
         chainId: wallet.chainId,
         wallet: wallet.address!,
+      }).then((res) => {
+        if (fromSignalPlus) {
+          return res.filter((c) =>
+            [
+              [1, 'USDT'],
+              [1329, 'USDC'],
+              [42161, 'USDT'],
+              [421614, 'USDC'],
+            ].some((it) => it[0] === c.chainId && it[1] === c.clientDepositCcy),
+          );
+        }
+        return res;
       }),
     {
       refreshDeps: [wallet.address, wallet.chainId],
@@ -258,10 +276,23 @@ const AutomatorCreate = () => {
           <>
             <h1 className={styles['head-title']}>
               {ProjectTypeRefs[ProjectType.Automator]?.icon}
-              {t({
-                enUS: 'Create Your Automator Strategies',
-                zhCN: '创建你 Automator 策略',
-              })}
+              {fromSignalPlus ? (
+                <>
+                  {t({
+                    enUS: 'Create Mining Automator',
+                    zhCN: '创建挖矿策略',
+                  })}
+                  <div className={styles['badge']}>
+                    SOFA x Bittensor{' '}
+                    <span className={styles['highlight']}>Trade Mining</span>
+                  </div>
+                </>
+              ) : (
+                t({
+                  enUS: 'Create Your Automator Strategies',
+                  zhCN: '创建你 Automator 策略',
+                })
+              )}
             </h1>
           </>
         }

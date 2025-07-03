@@ -9,6 +9,7 @@ import {
   cvtAmountsInCcy,
   displayPercentage,
 } from '@sofa/utils/amount';
+import { Env } from '@sofa/utils/env';
 import { formatDurationToDay } from '@sofa/utils/time';
 import classNames from 'classnames';
 
@@ -54,6 +55,9 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
           props.modalController.open(props.info.vaultInfo, undefined)
         }
       >
+        {props.info.joinedBittensor && (
+          <div className={styles['badge']}>Mining</div>
+        )}
         <div className={styles['header']}>
           <div className={styles['left']}>
             <img src={depositCcyConfig?.icon} alt="" />
@@ -273,6 +277,25 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
             </span>
           </div>
         </div>
+        {props.info.joinedBittensor && (
+          <div className={styles['item']}>
+            <div className={styles['label']}>
+              {t({ enUS: 'Total Mining Rewards', zhCN: '总挖矿奖励' })}
+            </div>
+            <div
+              className={styles['value']}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <a
+                className={styles['link-signalplus']}
+                href={`https://t.signalplus.com/mining`}
+                target={Env.isMetaMaskAndroid ? undefined : '_blank'}
+              >
+                {t({ enUS: 'view details', zhCN: '查看详情' })} &gt;
+              </a>
+            </div>
+          </div>
+        )}
         <div className={styles['footer']}>
           <AsyncButton
             className={styles['btn-trade']}

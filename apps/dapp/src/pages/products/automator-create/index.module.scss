@@ -217,6 +217,17 @@
   }
 }
 
+.badge {
+  padding: 6px 12px;
+  font-size: 14px;
+  background: rgba(#fff, 0.1);
+  border-radius: 4px;
+
+  .highlight {
+    color: #f59a23;
+  }
+}
+
 @media (orientation: portrait) {
   .form {
     &:first-child {

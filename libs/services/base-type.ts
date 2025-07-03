@@ -108,7 +108,7 @@ export interface AutomatorFactory {
   chainId: number; // 链代码
   chainName: string; // 链名称
   factoryAddress: string; // Factory地址
-  vaultDepositCcy: string; // USDC
+  vaultDepositCcy: string; // automator 投资的标的物
   clientDepositCcy: string; // 用户存入的标的物
   vaultDepositCcyAddress: string; // 地址
   clientDepositCcyAddress: string; // 地址
