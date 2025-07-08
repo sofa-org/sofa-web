@@ -39,7 +39,8 @@ export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
       : undefined,
   );
   const redeemInfo = useMemo(() => {
-    if (!redemptionInfo?.pendingSharesWithDecimals || !vault)
+    const pendingShares = Number(redemptionInfo?.pendingSharesWithDecimals);
+    if (!pendingShares || !vault)
       return {
         cancelable: false,
         claimable: false,
@@ -47,7 +48,7 @@ export const AutomatorWithdraw = (props: AutomatorWithdrawProps) => {
         claimableEndAt: undefined,
       };
     const claimableStartAt = dayjs(
-      redemptionInfo.createTime * 1000 + Number(vault.redeemWaitPeriod),
+      redemptionInfo!.createTime * 1000 + Number(vault.redeemWaitPeriod),
     ).valueOf();
     const claimableEndAt = dayjs(claimableStartAt)
       .add(Number(vault.claimPeriod))
