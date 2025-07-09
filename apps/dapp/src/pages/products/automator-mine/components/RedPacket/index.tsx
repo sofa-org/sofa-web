@@ -56,7 +56,9 @@ export const RedPacket = (props: { automator: AutomatorVaultInfo }) => {
           else
             return AutomatorUserService.sendRedPacket(props.automator, amount!)
               .then(() => {
-                Toast.info(t({ enUS: 'Send successful', zhCN: '发送成功' }));
+                Toast.info(
+                  t({ enUS: 'Bonus has been recharged', zhCN: '发送成功' }),
+                );
                 setVisible(false);
               })
               .catch((err) => Toast.error(getErrorMsg(err)));
