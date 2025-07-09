@@ -258,7 +258,7 @@ export class AutomatorService {
                 return '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2';
             }
             if (it.chainId === 1329) {
-              if (it.clientDepositCcy === 'USDT')
+              if (it.clientDepositCcy === 'USDC')
                 return '0x4a4d9abD36F923cBA0Af62A39C01dEC2944fb638';
             }
             return undefined;
