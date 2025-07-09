@@ -152,7 +152,7 @@ const AmountInput = memo<AmountInputProps>((props) => {
         <input
           id={id}
           type="text"
-          placeholder={'0'}
+          placeholder={props.placeholder || 'type'}
           value={tempValue}
           onChange={(e) =>
             setTempValue(

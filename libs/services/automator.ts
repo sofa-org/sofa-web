@@ -244,6 +244,25 @@ export class AutomatorService {
             })(),
           createTime: it.createTime * 1000 || vault?.createTime,
           riskExposure: it.riskExposure || 0,
+          redPacketContract: (() => {
+            if (it.chainId === 421614) {
+              if (it.clientDepositCcy === 'USDC')
+                return '0xBfC91D59fdAA134A4ED45f7B584cAf96D7792Eff';
+            }
+            if (it.chainId === 42161) {
+              if (it.clientDepositCcy === 'USDT')
+                return '0x794a61358D6845594F94dc1DB02A252b5b4814aD';
+            }
+            if (it.chainId === 1) {
+              if (it.clientDepositCcy === 'USDT')
+                return '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2';
+            }
+            if (it.chainId === 1329) {
+              if (it.clientDepositCcy === 'USDT')
+                return '0x4a4d9abD36F923cBA0Af62A39C01dEC2944fb638';
+            }
+            return undefined;
+          })(),
         },
         (it) => isNullLike(it),
       ),

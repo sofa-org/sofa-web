@@ -429,4 +429,28 @@ export class AutomatorUserService {
     }
     return AutomatorUserService.$$claim(cb, vault);
   }
+
+  static async sendRedPacket(
+    automator: AutomatorVaultInfo,
+    amount: string | number,
+  ) {
+    if (!automator.redPacketContract)
+      throw new Error(
+        'Red packet sending is not supported - no red packet contract is configured',
+      );
+    if (!+amount || +amount < 0) throw new Error('Invalid amount');
+    const { signer } = await WalletService.connect(automator.chainId);
+    const Automator = await ContractsService.automatorContract(
+      automator,
+      signer,
+    );
+    const collateral = await Automator.collateral();
+    return WalletService.sendByAave(
+      automator.chainId,
+      automator.redPacketContract,
+      collateral,
+      amount,
+      automator.vault,
+    );
+  }
 }

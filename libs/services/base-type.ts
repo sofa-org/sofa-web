@@ -102,6 +102,7 @@ export interface AutomatorVaultInfo {
   createTime: number | string; // 创建时间, ms
   interestType?: InterestType; // 生息方式，一期的没有
   riskExposure?: string | number; // 最多亏损多少比例的本金
+  redPacketContract?: string; // 发红包的合约
 }
 
 export interface AutomatorFactory {

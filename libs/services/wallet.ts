@@ -6,7 +6,7 @@ import { sentry } from '@sofa/utils/sentry';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { createWeb3Name } from '@web3-name-sdk/core';
 import Big from 'big.js';
-import { AbstractProvider, ethers } from 'ethers';
+import { AbstractProvider, Contract, ethers } from 'ethers';
 import { pick } from 'lodash-es';
 
 import { CommonAbis } from './abis/common-abis';
@@ -758,5 +758,28 @@ export class WalletService {
       address,
       queryChainIdList: Object.keys(ChainMap).map(Number),
     });
+  }
+
+  static async sendByAave(
+    chainId: number,
+    aaveContractAddress: string,
+    assetAddress: string,
+    amount: string | number,
+    to: string,
+  ) {
+    const abi =
+      'function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode)';
+    const { signer } = await WalletService.connect(chainId);
+    const contract = new Contract(aaveContractAddress, [abi], signer);
+    const asset = new Contract(assetAddress, [CommonAbis.decimals], signer);
+    const decimals = await asset.decimals();
+    const amountWithDecimals = ethers.parseUnits(String(amount), decimals);
+    await WalletService.$approve(
+      assetAddress,
+      amountWithDecimals,
+      signer,
+      aaveContractAddress,
+    );
+    return contract.supply(asset, amountWithDecimals, to, 0);
   }
 }

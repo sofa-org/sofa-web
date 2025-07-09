@@ -253,21 +253,23 @@ export class ContractsService {
     vault: string | AutomatorVaultInfo,
     signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider, // 提供 provider 时无法调用 vault 的 mint, burn 和 burnBatch 方法
   ) {
-    const network =
-      'address' in signerOrProvider
-        ? await signerOrProvider.provider._detectNetwork()
-        : await signerOrProvider._detectNetwork();
-    const chainId = Number(network.chainId);
     const info =
       typeof vault === 'string'
-        ? AutomatorVaults.find(
-            (it) =>
-              it.vault.toLowerCase() === vault.toLowerCase() &&
-              it.chainId === chainId,
-          )
+        ? await (async () => {
+            const network =
+              'address' in signerOrProvider
+                ? await signerOrProvider.provider._detectNetwork()
+                : await signerOrProvider._detectNetwork();
+            const chainId = Number(network.chainId);
+            return AutomatorVaults.find(
+              (it) =>
+                it.vault.toLowerCase() === vault.toLowerCase() &&
+                it.chainId === chainId,
+            );
+          })()
         : vault;
     if (!info) {
-      throw new Error(`Automator vault ${vault} (${chainId}) not found`);
+      throw new Error(`Automator vault ${vault} not found`);
     }
     return new ethers.Contract(info.vault, info.abis, signerOrProvider);
   }

@@ -25,6 +25,7 @@ import { AutomatorShareModalPropsRef } from '@/pages/products/automator-operate/
 
 import { Comp as IconCalendar } from '../../assets/icon-calendar.svg';
 import { Comp as IconPeople } from '../../assets/icon-people.svg';
+import { RedPacket } from '../RedPacket';
 
 import styles from './index.module.scss';
 
@@ -326,6 +327,9 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
               </span>
             )}
           </AsyncButton>
+          {props.info.vaultInfo.redPacketContract && (
+            <RedPacket automator={props.info.vaultInfo} />
+          )}
           <AsyncButton
             className={classNames(styles['btn'], 'btn-ghost')}
             onClick={() =>
