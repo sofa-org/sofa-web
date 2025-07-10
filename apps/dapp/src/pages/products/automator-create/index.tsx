@@ -275,15 +275,17 @@ const AutomatorCreate = () => {
         banner={
           <>
             <h1 className={styles['head-title']}>
-              {ProjectTypeRefs[ProjectType.Automator]?.icon}
+              {fromSignalPlus
+                ? ProjectTypeRefs[ProjectType.Earn].icon
+                : ProjectTypeRefs[ProjectType.Automator].icon}
               {fromSignalPlus ? (
                 <>
                   {t({
-                    enUS: 'Create Mining Automator',
+                    enUS: 'Create Strategy Vaults',
                     zhCN: '创建挖矿策略',
                   })}
                   <div className={styles['badge']}>
-                    SOFA x Bittensor{' '}
+                    SOFA x Efficient Frontier{' '}
                     <span className={styles['highlight']}>Trade Mining</span>
                   </div>
                 </>
