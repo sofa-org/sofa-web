@@ -38,6 +38,7 @@ export enum InterestType {
   SOFA = 'Sofa', // ZRCH 是净值增加，但是 stRCH 是 rebase 数量增加的
   CURVE = 'Curve', // 净值增加
   AriesMarkets = 'AriesMarkets', // 净值增加
+  CICADA = 'CICADA', // 净值增加
 }
 
 export const InterestTypeRefs = {
@@ -46,6 +47,7 @@ export const InterestTypeRefs = {
   [InterestType.SOFA]: { isRebaseInAutomator: false },
   [InterestType.CURVE]: { isRebaseInAutomator: false },
   [InterestType.AriesMarkets]: { isRebaseInAutomator: false },
+  [InterestType.CICADA]: { isRebaseInAutomator: false },
 };
 
 export enum AutomatorTransactionStatus {
