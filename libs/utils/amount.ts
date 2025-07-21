@@ -128,7 +128,7 @@ export function displayPercentage(
 ) {
   if (!isLegalNum(val)) return '-%';
   const signal = +val <= 0 ? '' : addSignal ? '+' : '';
-  if (+val > 100) return '>10000%';
+  if (+val > 1000) return '>100000%';
   const v = +val * 100;
   if (v > 1) return `${signal}${v.toFixed(precision)}%`;
   const exponent = -Number(v).toExponential().split('e')[1] || 0;

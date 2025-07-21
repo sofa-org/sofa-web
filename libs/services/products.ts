@@ -603,7 +603,8 @@ export class ProductsService {
     if (min === max) return [max / 100];
     const list = [];
     for (let i = min; i <= max; i += 1) {
-      list.push(i / 100);
+      if (i < 20 || (i < 100 && i % 5 === 0) || i % 10 === 0)
+        list.push(i / 100);
     }
     return list;
   }
