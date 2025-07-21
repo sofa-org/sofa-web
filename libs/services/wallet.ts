@@ -226,6 +226,7 @@ export class WalletService {
       collateralAddress,
       approveTo,
       signer,
+      forceClearAllowance,
     });
     if (
       Number(allowance) &&
