@@ -208,6 +208,7 @@ export class WalletService {
     amount: string | number | bigint, // 交易金额，用于判断 allowance 是否够用（应该已经乘以了系数，比如实际为 1,000ETH，应该变成 1,000,000,000）
     signer: ethers.JsonRpcSigner,
     approveTo = PERMIT2_ADDRESS,
+    forceClearAllowance = false, // 是否强制清空 allowance
   ) {
     const collateralContract = new ethers.Contract(
       collateralAddress,
@@ -228,9 +229,10 @@ export class WalletService {
     });
     if (
       Number(allowance) &&
-      ['0xdac17f958d2ee523a2206206994597c13d831ec7'].includes(
+      (['0xdac17f958d2ee523a2206206994597c13d831ec7'].includes(
         collateralAddress.toLowerCase(),
-      )
+      ) ||
+        forceClearAllowance)
     ) {
       // 这几个合约的 approve 方法只能在 allowance 全部用完才能继续 approve，否则只能清空
       await WalletService.$$approve(signer, collateralContract, approveTo, 0); // 清空
@@ -273,6 +275,7 @@ export class WalletService {
       amount,
       ctx.signer,
       data.vault.vault,
+      true, // 强制清空 allowance
     );
     const args = (gasLimit?: number) => [
       data.quote.totalCollateral,
