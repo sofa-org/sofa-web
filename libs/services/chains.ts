@@ -154,8 +154,10 @@ export const ChainMap: Record<
       currency: 'BNB',
       icon: IconBNB,
       explorerUrl: 'https://bscscan.com',
-      rpcUrl: 'https://binance.llamarpc.com',
+      rpcUrl: 'https://bsc-dataseed.binance.org',
       rpcUrlsForAddNetwork: [
+        'https://bsc-dataseed.binance.org',
+        'https://bsc-dataseed1.ninicoin.io',
         'https://binance.llamarpc.com',
         'https://rpc.ankr.com/bsc',
         'https://bsc.meowrpc.com',
