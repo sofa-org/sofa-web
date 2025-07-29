@@ -310,9 +310,9 @@ export class WalletConnect {
     const modal = await WalletConnect.getModal();
 
     if (Env.isMobile && !Env.isTelegram) {
-      const validConnectors = await WalletConnect.getValidConnectors();
-      if (validConnectors.length === 1) {
-        const originProvider = validConnectors[0].originProvider;
+      const providers = await getProviderByEip6963();
+      if (providers?.length === 1) {
+        const originProvider = providers[0].provider;
         await new BrowserProvider(originProvider).getSigner();
         const provider = await (async () => {
           let p = new BrowserProvider(originProvider);
@@ -324,7 +324,9 @@ export class WalletConnect {
         const signer = await provider.getSigner();
         modal.close();
         WalletConnect._wallet = {
-          ...validConnectors[0],
+          id: 'injected',
+          type: 'injected',
+          originProvider,
           provider,
           signer,
           chainId,
@@ -332,6 +334,29 @@ export class WalletConnect {
         };
         return WalletConnect._wallet;
       }
+
+      // const validConnectors = await WalletConnect.getValidConnectors();
+      // if (validConnectors.length === 1) {
+      //   const originProvider = validConnectors[0].originProvider;
+      //   await new BrowserProvider(originProvider).getSigner();
+      //   const provider = await (async () => {
+      //     let p = new BrowserProvider(originProvider);
+      //     if (switchNetwork) await WalletConnect.switchNetwork(p, chainId);
+      //     p = new BrowserProvider(originProvider);
+      //     await p._detectNetwork();
+      //     return p;
+      //   })();
+      //   const signer = await provider.getSigner();
+      //   modal.close();
+      //   WalletConnect._wallet = {
+      //     ...validConnectors[0],
+      //     provider,
+      //     signer,
+      //     chainId,
+      //     disconnect: () => modal.disconnect(),
+      //   };
+      //   return WalletConnect._wallet;
+      // }
     }
 
     if (!modal.getWalletProvider()) {
