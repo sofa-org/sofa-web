@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Modal, Toast } from '@douyinfe/semi-ui';
+import { wait } from '@livelybone/promise-wait';
 import { ChainMap, defaultChain } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import { updateQuery } from '@sofa/utils/history';
@@ -40,28 +41,49 @@ const NetworkSelector = () => {
   const chainIdInQuery = useQuery((q) => Number(q['chain-id']));
 
   useEffect(() => {
-    if (
-      !envMatched ||
-      (/rch/.test(location.pathname) && chainId !== defaultChain.chainId)
-    ) {
-      // RCH 页面固定切换到
-      setVisible(true);
-    } else if (
-      chainIdInQuery &&
-      ChainMap[chainIdInQuery] &&
-      chainId !== chainIdInQuery
-    ) {
-      Toast.info(
-        t(
+    const switchToChainId = (() => {
+      if (
+        !envMatched ||
+        (/rch/.test(location.pathname) && chainId !== defaultChain.chainId)
+      ) {
+        // RCH 页面固定切换到 defaultChain
+        return defaultChain.chainId;
+      } else if (
+        chainIdInQuery &&
+        ChainMap[chainIdInQuery] &&
+        chainId !== chainIdInQuery
+      ) {
+        return chainIdInQuery;
+      }
+    })();
+    if (switchToChainId) {
+      Modal.confirm({
+        icon: null,
+        centered: true,
+        content: t(
           {
-            enUS: 'Switched to the {{chainName}} chain',
-            zhCN: '已切换到 {{chainName}} 链',
+            enUS: 'Please switched to the {{chainName}} chain',
+            zhCN: '请切换到 {{chainName}} 链',
           },
-          { chainName: ChainMap[chainIdInQuery].name },
+          { chainName: ChainMap[switchToChainId].name },
         ),
-      );
-      useWalletStore.setChain(chainIdInQuery);
-      updateQuery({ 'chain-id': undefined });
+        cancelButtonProps: { style: { display: 'none' } },
+        onOk: () =>
+          wait(2000)
+            .then(() => useWalletStore.setChain(switchToChainId))
+            .then(() => {
+              Toast.info(
+                t(
+                  {
+                    enUS: 'Switched to the {{chainName}} chain',
+                    zhCN: '已切换到 {{chainName}} 链',
+                  },
+                  { chainName: ChainMap[switchToChainId].name },
+                ),
+              );
+              updateQuery({ 'chain-id': undefined });
+            }),
+      });
     }
   }, [chainId, envMatched, location.pathname, chainIdInQuery, t]);
 
