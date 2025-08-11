@@ -63,7 +63,7 @@ const NetworkSelector = () => {
         content: t(
           {
             enUS: 'Please switch to the {{chainName}}',
-            zhCN: '请切换到 {{chainName}} 链',
+            zhCN: '请切换到 {{chainName}}',
           },
           { chainName: ChainMap[switchToChainId].name },
         ),
@@ -77,7 +77,7 @@ const NetworkSelector = () => {
                 t(
                   {
                     enUS: 'Switched to the {{chainName}}',
-                    zhCN: '已切换到 {{chainName}} 链',
+                    zhCN: '已切换到 {{chainName}}',
                   },
                   { chainName: ChainMap[switchToChainId].name },
                 ),
