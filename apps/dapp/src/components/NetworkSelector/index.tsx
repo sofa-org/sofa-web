@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Modal } from '@douyinfe/semi-ui';
+import { Modal, Toast } from '@douyinfe/semi-ui';
 import { ChainMap, defaultChain } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
+import { updateQuery } from '@sofa/utils/history';
+import { useQuery } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 
 import { addI18nResources } from '@/locales';
@@ -35,13 +37,33 @@ const NetworkSelector = () => {
   const chainInfo = ChainMap[chainId] || ChainMap[NetworkTypes[0]?.chainId];
   const envMatched = !!chainInfo;
 
+  const chainIdInQuery = useQuery((q) => Number(q['chain-id']));
+
   useEffect(() => {
     if (
       !envMatched ||
       (/rch/.test(location.pathname) && chainId !== defaultChain.chainId)
-    )
+    ) {
+      // RCH 页面固定切换到
       setVisible(true);
-  }, [chainId, envMatched, location.pathname]);
+    } else if (
+      chainIdInQuery &&
+      ChainMap[chainIdInQuery] &&
+      chainId !== chainIdInQuery
+    ) {
+      Toast.info(
+        t(
+          {
+            enUS: 'Switched to the {{chainName}} chain',
+            zhCN: '已切换到 {{chainName}} 链',
+          },
+          { chainName: ChainMap[chainIdInQuery].name },
+        ),
+      );
+      useWalletStore.setChain(chainIdInQuery);
+      updateQuery({ 'chain-id': undefined });
+    }
+  }, [chainId, envMatched, location.pathname, chainIdInQuery, t]);
 
   useEffect(() => {
     useGlobalState.updateInterestRate();
