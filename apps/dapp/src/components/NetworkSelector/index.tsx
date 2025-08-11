@@ -62,7 +62,7 @@ const NetworkSelector = () => {
         centered: true,
         content: t(
           {
-            enUS: 'Please switch to the {{chainName}} chain',
+            enUS: 'Please switch to the {{chainName}}',
             zhCN: '请切换到 {{chainName}} 链',
           },
           { chainName: ChainMap[switchToChainId].name },
@@ -76,7 +76,7 @@ const NetworkSelector = () => {
               Toast.info(
                 t(
                   {
-                    enUS: 'Switched to the {{chainName}} chain',
+                    enUS: 'Switched to the {{chainName}}',
                     zhCN: '已切换到 {{chainName}} 链',
                   },
                   { chainName: ChainMap[switchToChainId].name },
