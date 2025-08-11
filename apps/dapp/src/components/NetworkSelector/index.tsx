@@ -70,20 +70,18 @@ const NetworkSelector = () => {
         cancelButtonProps: { style: { display: 'none' } },
         okText: t({ enUS: 'OK', zhCN: '确定' }),
         onOk: () =>
-          wait(2000)
-            .then(() => useWalletStore.setChain(switchToChainId))
-            .then(() => {
-              Toast.info(
-                t(
-                  {
-                    enUS: 'Switched to the {{chainName}}',
-                    zhCN: '已切换到 {{chainName}}',
-                  },
-                  { chainName: ChainMap[switchToChainId].name },
-                ),
-              );
-              updateQuery({ 'chain-id': undefined });
-            }),
+          useWalletStore.setChain(switchToChainId).then(() => {
+            Toast.info(
+              t(
+                {
+                  enUS: 'Switched to the {{chainName}}',
+                  zhCN: '已切换到 {{chainName}}',
+                },
+                { chainName: ChainMap[switchToChainId].name },
+              ),
+            );
+            updateQuery({ 'chain-id': undefined });
+          }),
       });
     }
   }, [chainId, envMatched, location.pathname, chainIdInQuery, t]);
