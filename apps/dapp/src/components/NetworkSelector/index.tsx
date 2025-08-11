@@ -62,12 +62,13 @@ const NetworkSelector = () => {
         centered: true,
         content: t(
           {
-            enUS: 'Please switched to the {{chainName}} chain',
+            enUS: 'Please switch to the {{chainName}} chain',
             zhCN: '请切换到 {{chainName}} 链',
           },
           { chainName: ChainMap[switchToChainId].name },
         ),
         cancelButtonProps: { style: { display: 'none' } },
+        okText: t({ enUS: 'OK', zhCN: '确定' }),
         onOk: () =>
           wait(2000)
             .then(() => useWalletStore.setChain(switchToChainId))
