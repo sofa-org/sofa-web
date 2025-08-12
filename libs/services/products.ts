@@ -599,7 +599,7 @@ export class ProductsService {
     if (isNullLike(apy)) return [];
     if (!apy) return [-0.01];
     const max = Math.max(Math.floor(apy * 100) - 3, 1);
-    const min = Math.min(1, max);
+    const min = Math.min(apy > 0.5 ? 20 : 1, max);
     if (min === max) return [max / 100];
     const list = [];
     for (let i = min; i <= max; i += 1) {
