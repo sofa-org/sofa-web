@@ -83,7 +83,9 @@ const IndexPrices = (props: BaseProps) => {
         y: Math.max(
           12,
           Math.min(
-            document.querySelector<HTMLDivElement>('#root')!.scrollHeight - 76,
+            Number(
+              document.querySelector<HTMLDivElement>('#root')?.scrollHeight,
+            ) - 76,
             $position.y,
           ),
         ),
