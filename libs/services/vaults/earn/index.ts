@@ -85,6 +85,7 @@ export const earnVaults = vaults.map((it) => {
     interestType: {
       USDT: InterestType.AAVE,
       USDC: InterestType.AAVE,
+      NativeUSDC: InterestType.AAVE,
       RCH: InterestType.SOFA,
       stETH: InterestType.LIDO,
       crvUSD: InterestType.CURVE,
