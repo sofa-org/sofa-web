@@ -14,11 +14,18 @@ import styles from './index.module.scss';
 export const GlobalModal = () => {
   const [t] = useTranslation('GlobalModal');
   const location = useLocation();
+  const fromSignalPlus = useMemo(
+    () => /from=SignalPlus/.test(location.search),
+    [location.search],
+  );
   const [data, setData] = useLocalStorageState('global-modal-6', {
     defaultValue: { closedAt: 0, count: 0 },
   });
   const visible = useMemo(() => {
-    if (!/products|positions|transactions/.test(location.pathname)) {
+    if (
+      !/products|positions|transactions/.test(location.pathname) ||
+      fromSignalPlus
+    ) {
       return false;
     }
     if (Number(data?.count) >= 3) return false;

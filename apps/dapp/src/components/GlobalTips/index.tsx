@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from '@sofa/services/i18n';
 import { next8h } from '@sofa/utils/expiry';
 import { useLocalStorageState } from 'ahooks';
@@ -13,12 +14,20 @@ import styles from './index.module.scss';
 export const GlobalTips = () => {
   const [t] = useTranslation('GlobalTips');
 
+  const location = useLocation();
+  const fromSignalPlus = useMemo(
+    () => /from=SignalPlus/.test(location.search),
+    [location.search],
+  );
   const [data, setData] = useLocalStorageState('global-tips-1', {
     defaultValue: { closedAt: 0 },
   });
 
   const visible = useMemo(() => {
-    if (!/products|positions|transactions/.test(window.location.pathname))
+    if (
+      !/products|positions|transactions/.test(window.location.pathname) ||
+      fromSignalPlus
+    )
       return false;
     // if (Date.now() < dayjs('2024-11-08T10:00Z').valueOf()) return false;
     if (Date.now() >= dayjs('2025-01-11T03:00Z').valueOf()) return false;
