@@ -272,7 +272,7 @@ export class PositionsService {
       : undefined;
     return {
       ...it,
-      vault,
+      product: { ...it.product, vault: { ...it.product.vault, ...vault } },
       pricesForCalculation: it.relevantDollarPrices.reduce(
         (pre, it) => ({ ...pre, [it.ccy]: it.price }),
         {},

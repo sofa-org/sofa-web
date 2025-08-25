@@ -200,10 +200,12 @@ const List = (props: {
     () =>
       data?.reduce(
         (prev, it) => {
-          if (!prev[it.product.vault.depositCcy]) {
-            prev[it.product.vault.depositCcy] = [];
+          const depositCcy =
+            it.product.vault.realDepositCcy ?? it.product.vault.depositCcy;
+          if (!prev[depositCcy]) {
+            prev[depositCcy] = [];
           }
-          prev[it.product.vault.depositCcy].push(it);
+          prev[depositCcy].push(it);
           return prev;
         },
         {} as Record<

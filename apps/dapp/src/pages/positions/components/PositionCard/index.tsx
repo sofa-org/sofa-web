@@ -42,6 +42,7 @@ const ProtectedAmounts = (
   const [t] = useTranslation('PositionCard');
   const position = props.position;
   const product = position.product;
+  const vault = product.vault;
 
   const hasSettled = usePositionSettled(position);
 
@@ -53,8 +54,8 @@ const ProtectedAmounts = (
   const maxRedemption = position.amounts.maxRedeemable;
 
   const pnlPrecision = useMemo(
-    () => (product.vault.depositCcy.startsWith('USD') ? 2 : 4),
-    [product.vault.depositCcy],
+    () => (vault.depositCcy.startsWith('USD') ? 2 : 4),
+    [vault.depositCcy],
   );
 
   const claimable = Number(position.amounts.redeemable) > 0 && hasSettled;
@@ -62,7 +63,7 @@ const ProtectedAmounts = (
   return !hasSettled ? (
     <div
       className={classNames(styles['amounts'], {
-        [styles['has-deposit-base-ccy']]: !!position.vault.depositBaseCcy,
+        [styles['has-deposit-base-ccy']]: !!vault.depositBaseCcy,
       })}
     >
       <div className={styles['amount']}>
@@ -71,68 +72,65 @@ const ProtectedAmounts = (
             amount={position.amounts.own}
             precision={pnlPrecision}
           />{' '}
-          {product.vault.realDepositCcy ?? product.vault.depositCcy}
+          {vault.realDepositCcy ?? vault.depositCcy}
         </span>
       </div>
-      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
+      {!!(vault.depositBaseCcy && props.showBaseCcyEst) && (
         <div className={styles['base-ccy-amount-own']}>
           ≈{' '}
           {amountFormatter(
             position.convertedCalculatedInfoByDepositBaseCcy?.amounts?.own,
-            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
+            CCYService.ccyConfigs[vault.depositBaseCcy]?.precision,
           )}{' '}
-          {position.vault.depositBaseCcy}
+          {vault.depositBaseCcy}
         </div>
-      )) ||
-        undefined}
+      )}
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Min Payout')}</span>{' '}
         <span>
           <AmountDisplay amount={minRedemption} precision={pnlPrecision} />{' '}
           <span className={styles['unit']}>
-            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+            {vault.realDepositCcy ?? vault.depositCcy}
           </span>
         </span>
       </div>
-      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
+      {!!(vault.depositBaseCcy && props.showBaseCcyEst) && (
         <div className={styles['base-ccy-amount']}>
           ≈{' '}
           {amountFormatter(
             position.convertedCalculatedInfoByDepositBaseCcy?.amounts
               ?.minRedeemable,
-            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
+            CCYService.ccyConfigs[vault.depositBaseCcy]?.precision,
           )}{' '}
-          {position.vault.depositBaseCcy}
+          {vault.depositBaseCcy}
         </div>
-      )) ||
-        undefined}
+      )}
       <div className={styles['amount']}>
         <span className={styles['label']}>{t('Max Payout')}</span>{' '}
         <span>
           <AmountDisplay amount={maxRedemption} precision={pnlPrecision} />{' '}
           <span className={styles['unit']}>
-            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+            {vault.realDepositCcy ?? vault.depositCcy}
           </span>
         </span>
       </div>
-      {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
+      {!!(vault.depositBaseCcy && props.showBaseCcyEst) && (
         <div className={styles['base-ccy-amount']}>
           ≈{' '}
           {amountFormatter(
             position.convertedCalculatedInfoByDepositBaseCcy?.amounts
               ?.maxRedeemable,
-            CCYService.ccyConfigs[position.vault.depositBaseCcy]?.precision,
+            CCYService.ccyConfigs[vault.depositBaseCcy]?.precision,
           )}{' '}
-          {position.vault.depositBaseCcy}
+          {vault.depositBaseCcy}
         </div>
-      )) ||
-        undefined}
+      )}
     </div>
   ) : (
     <div
       className={classNames(styles['amounts'], {
         [styles['has-deposit-base-ccy']]:
-          !!position.vault.depositBaseCcy && props.showBaseCcyEst,
+          !!vault.depositBaseCcy && props.showBaseCcyEst,
       })}
     >
       <div className={classNames(styles['amount'], styles['amount-for-claim'])}>
@@ -140,7 +138,7 @@ const ProtectedAmounts = (
           amount={+position.amounts.own + pnl}
           precision={pnlPrecision}
         />{' '}
-        {product.vault.realDepositCcy ?? product.vault.depositCcy}
+        {vault.realDepositCcy ?? vault.depositCcy}
         {claimable && (
           <span className={styles['badge-est']}>| {t('Est.')}</span>
         )}
@@ -169,18 +167,18 @@ const RiskyAmounts = (
   const [t] = useTranslation('PositionCard');
   const position = props.position;
   const product = position.product;
+  const vault = product.vault;
 
   const hasSettled = usePositionSettled(position);
 
   const pnlPrecision = useMemo(
-    () => (product.vault.depositCcy.startsWith('USD') ? 2 : 4),
-    [product.vault.depositCcy],
+    () => (vault.depositCcy.startsWith('USD') ? 2 : 4),
+    [vault.depositCcy],
   );
 
   const ticketMeta = useMemo(
-    () =>
-      TicketTypeOptions.find((it) => it.value === product.vault.depositCcy)!,
-    [product.vault.depositCcy],
+    () => TicketTypeOptions.find((it) => it.value === vault.depositCcy)!,
+    [vault.depositCcy],
   );
 
   const claimable = Number(position.amounts.redeemable) > 0 && hasSettled;
@@ -195,8 +193,7 @@ const RiskyAmounts = (
       ) : (
         <div className={styles['amount']}>
           {amountFormatter(+position.amounts.own)}{' '}
-          {position.product.vault.realDepositCcy ??
-            position.product.vault.depositCcy}
+          {vault.realDepositCcy ?? vault.depositCcy}
         </div>
       )}
       <div className={styles['amount']}>
@@ -207,7 +204,7 @@ const RiskyAmounts = (
             precision={pnlPrecision}
           />{' '}
           <span className={styles['unit']}>
-            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+            {vault.realDepositCcy ?? vault.depositCcy}
           </span>
         </span>
       </div>
@@ -219,7 +216,7 @@ const RiskyAmounts = (
             precision={pnlPrecision}
           />{' '}
           <span className={styles['unit']}>
-            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+            {vault.realDepositCcy ?? vault.depositCcy}
           </span>
         </span>
       </div>
@@ -234,8 +231,7 @@ const RiskyAmounts = (
       ) : (
         <div className={styles['amount']}>
           {amountFormatter(+position.amounts.own)}{' '}
-          {position.product.vault.realDepositCcy ??
-            position.product.vault.depositCcy}
+          {vault.realDepositCcy ?? vault.depositCcy}
         </div>
       )}
       <div className={styles['amount']}>
@@ -246,7 +242,7 @@ const RiskyAmounts = (
             precision={pnlPrecision}
           />{' '}
           <span className={styles['unit']}>
-            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+            {vault.realDepositCcy ?? vault.depositCcy}
           </span>
         </span>
       </div>
@@ -272,33 +268,28 @@ const PositionCard = (props: PositionCardProps) => {
   const [t] = useTranslation('PositionCard');
   const position = props.position;
   const product = position.product;
-  const riskTypeRef = RiskTypeRefs[product.vault.riskType];
-  const productTypeRef = ProductTypeRefs[product.vault.productType];
+  const vault = product.vault;
+
+  const riskTypeRef = RiskTypeRefs[vault.riskType];
+  const productTypeRef = ProductTypeRefs[vault.productType];
   const icon = useMemo(() => {
-    if (product.vault.riskType == RiskType.DUAL) {
+    if (vault.riskType == RiskType.DUAL) {
       // 特殊样式，没有 icon 定义
       return undefined;
     }
     return productTypeRef.icon(
-      product.vault.riskType,
-      !(product.vault.realDepositCcy ?? product.vault.depositCcy).startsWith(
-        'USD',
-      ),
+      vault.riskType,
+      !(vault.realDepositCcy ?? vault.depositCcy).startsWith('USD'),
     );
-  }, [
-    product.vault.realDepositCcy,
-    product.vault.depositCcy,
-    product.vault.riskType,
-    productTypeRef,
-  ]);
+  }, [vault.realDepositCcy, vault.depositCcy, vault.riskType, productTypeRef]);
   // const leverageInfo = useAsyncMemo(
-  //   () => ProductsService.vaultLeverageInfo(product.vault, position.createdAt),
-  //   [product.vault, position.createdAt],
+  //   () => ProductsService.vaultLeverageInfo(vault, position.createdAt),
+  //   [vault, position.createdAt],
   // );
 
   const pnlPrecision = useMemo(
-    () => (product.vault.depositCcy.startsWith('USD') ? 2 : 4),
-    [product.vault.depositCcy],
+    () => (vault.depositCcy.startsWith('USD') ? 2 : 4),
+    [vault.depositCcy],
   );
 
   const hasExpired = useMemo(
@@ -317,21 +308,17 @@ const PositionCard = (props: PositionCardProps) => {
     [position.amounts.own, position.amounts.redeemable],
   );
   const isWin = useMemo(() => {
-    if (position.product.vault.riskType === RiskType.RISKY)
+    if (vault.riskType === RiskType.RISKY)
       return +position.amounts.redeemable! > 0;
     return +position.amounts.redeemable! - +position.amounts.own >= 0;
-  }, [
-    position.amounts.own,
-    position.product.vault.riskType,
-    position.amounts.redeemable,
-  ]);
+  }, [position.amounts.own, vault.riskType, position.amounts.redeemable]);
 
   const params = useMemo(
     () => ({
       positionId: position.id,
-      vault: product.vault.vault,
-      productType: product.vault.productType,
-      chainId: product.vault.chainId,
+      vault: vault.vault,
+      productType: vault.productType,
+      chainId: vault.chainId,
       owner: position.wallet,
       term: position.claimParams.term,
       expiry: product.expiry,
@@ -339,19 +326,20 @@ const PositionCard = (props: PositionCardProps) => {
       collateralAtRiskPercentage:
         position.claimParams.collateralAtRiskPercentage,
       isMaker: position.claimParams.maker,
-      riskType: position.vault.riskType,
+      riskType: vault.riskType,
     }),
     [
+      position.id,
+      position.wallet,
+      position.claimParams.term,
       position.claimParams.anchorPrices,
       position.claimParams.collateralAtRiskPercentage,
-      position.id,
-      position.claimParams.term,
       position.claimParams.maker,
-      position.wallet,
+      vault.vault,
+      vault.productType,
+      vault.chainId,
+      vault.riskType,
       product.expiry,
-      product.vault.chainId,
-      product.vault.productType,
-      product.vault.vault,
     ],
   );
 
@@ -365,7 +353,7 @@ const PositionCard = (props: PositionCardProps) => {
     };
     return PositionsService.claim(cb, params);
   });
-  if (product.vault.riskType == RiskType.DUAL) {
+  if (vault.riskType == RiskType.DUAL) {
     return (
       <DualPositionCard
         {...props}
@@ -383,7 +371,7 @@ const PositionCard = (props: PositionCardProps) => {
         className={classNames(styles['card'], {
           [styles['has-rch-amount']]: !position.claimParams.maker,
           [styles['has-deposit-base-ccy']]:
-            !!product.vault.depositBaseCcy && props.showBaseCcyEst,
+            !!vault.depositBaseCcy && props.showBaseCcyEst,
         })}
         onClick={() => props.onClick?.()}
       >
@@ -420,21 +408,21 @@ const PositionCard = (props: PositionCardProps) => {
             >
               <span className={styles['range']}>
                 {(() => {
-                  if (product.vault.productType === ProductType.DNT)
+                  if (vault.productType === ProductType.DNT)
                     return Number(position.takerAllocationRate) === 1 &&
                       !position.claimParams.maker
                       ? t('In Range')
                       : t('Out of Range');
                   if (!isWin) return '';
-                  return product.vault.riskType !== RiskType.RISKY
+                  return vault.riskType !== RiskType.RISKY
                     ? t('Profits')
                     : t('Payout');
                 })()}
               </span>
-              {product.vault.riskType !== RiskType.RISKY ? (
+              {vault.riskType !== RiskType.RISKY ? (
                 <>
                   <AmountDisplay amount={pnl} precision={pnlPrecision} signed />{' '}
-                  {product.vault.realDepositCcy ?? product.vault.depositCcy}
+                  {vault.realDepositCcy ?? vault.depositCcy}
                 </>
               ) : Number(position.amounts.redeemable) ? (
                 <>
@@ -442,7 +430,7 @@ const PositionCard = (props: PositionCardProps) => {
                     amount={position.amounts.redeemable}
                     precision={pnlPrecision}
                   />{' '}
-                  {product.vault.realDepositCcy ?? product.vault.depositCcy}
+                  {vault.realDepositCcy ?? vault.depositCcy}
                 </>
               ) : (
                 t('Lose')
@@ -470,14 +458,14 @@ const PositionCard = (props: PositionCardProps) => {
             {props.isAutomator
               ? productTypeRef.label3(t)
               : productTypeRef.alias}
-            _{product.vault.forCcy.replace(/^W/i, '')}
-            {product.vault.riskType === RiskType.LEVERAGE && (
+            _{vault.forCcy.replace(/^W/i, '')}
+            {vault.riskType === RiskType.LEVERAGE && (
               <span className={styles['badge-leverage']}>Lev.</span>
             )}
             {riskTypeRef.icon}
           </div>
         </div>
-        {product.vault.riskType !== RiskType.RISKY ? (
+        {vault.riskType !== RiskType.RISKY ? (
           <ProtectedAmounts {...props} onClaim={handleClaim} />
         ) : (
           <RiskyAmounts {...props} onClaim={handleClaim} />
@@ -494,8 +482,8 @@ const PositionCard = (props: PositionCardProps) => {
 
       <PositionClaimProgress
         ref={claimProgressRef}
-        chainId={product.vault.chainId}
-        riskType={product.vault.riskType}
+        chainId={vault.chainId}
+        riskType={vault.riskType}
         positions={[position]}
       />
     </>

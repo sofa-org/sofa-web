@@ -227,10 +227,7 @@ const OrderHistory = () => {
       {
         title: t({ enUS: 'State', zhCN: '状态' }),
         render: (_, record) => {
-          const { status } = DualService.getClaimStatus(
-            { ...record, vault: record.product.vault },
-            new Date(),
-          );
+          const { status } = DualService.getClaimStatus(record, new Date());
           return (
             <span className={styles['dual-state']}>
               {status == DualPositionClaimStatus.NotExpired
