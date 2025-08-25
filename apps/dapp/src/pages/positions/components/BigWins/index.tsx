@@ -88,7 +88,7 @@ const BigWins = () => {
             return (
               <span className={styles['earning']}>
                 {amountFormatter(it.amounts.redeemable)}{' '}
-                {it.product.vault.depositCcy}
+                {it.product.vault.realDepositCcy ?? it.product.vault.depositCcy}
                 <span className={styles['deposit-amount']}>
                   Cost: {ticketMeta.per} {ticketMeta.value} * {count}
                 </span>

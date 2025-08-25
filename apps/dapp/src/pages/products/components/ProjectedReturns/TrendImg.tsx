@@ -92,7 +92,7 @@ export const TrendImg = (props: { data: Partial<PositionInfo> }) => {
           ),
           2,
         )}{' '}
-        {product.vault.depositCcy}
+        {product.vault.realDepositCcy ?? product.vault.depositCcy}
       </span>
       <span className={styles['return-max']}>
         {amountFormatter(
@@ -102,7 +102,7 @@ export const TrendImg = (props: { data: Partial<PositionInfo> }) => {
           ),
           2,
         )}{' '}
-        {product.vault.depositCcy}
+        {product.vault.realDepositCcy ?? product.vault.depositCcy}
       </span>
     </div>
   );

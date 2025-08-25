@@ -203,10 +203,14 @@ const PoolSize = () => {
             <span className={styles['separator']}>≈</span>
             <AmountDisplay
               amount={automator?.aumByClientDepositCcy}
-              ccy={automator?.vaultInfo.depositCcy}
+              ccy={
+                automator?.vaultInfo.realDepositCcy ??
+                automator?.vaultInfo.depositCcy
+              }
             />
             <span className={styles['unit']}>
-              {automator?.vaultInfo.depositCcy}
+              {automator?.vaultInfo.realDepositCcy ??
+                automator?.vaultInfo.depositCcy}
             </span>
           </span>
         </div>
@@ -302,7 +306,8 @@ const PoolSize = () => {
               ccy={automator?.vaultInfo?.vaultDepositCcy}
             />
             <span className={styles['unit']}>
-              {automator?.vaultInfo?.depositCcy}
+              {automator?.vaultInfo?.realDepositCcy ??
+                automator?.vaultInfo?.depositCcy}
             </span>
             <span className={styles['percent']}>
               {displayPercentage(
@@ -382,10 +387,14 @@ const PnL = () => {
           >
             <AmountDisplay
               amount={automator?.totalPnlByClientDepositCcy}
-              ccy={automator?.vaultInfo.depositCcy}
+              ccy={
+                automator?.vaultInfo.realDepositCcy ??
+                automator?.vaultInfo.depositCcy
+              }
             />
             <span className={styles['unit']}>
-              {automator?.vaultInfo.depositCcy}
+              {automator?.vaultInfo.realDepositCcy ??
+                automator?.vaultInfo.depositCcy}
             </span>
           </span>
           <span className={styles['separator']}>+</span>
@@ -401,10 +410,14 @@ const PnL = () => {
             <span className={styles['separator']}>≈</span>
             <AmountDisplay
               amount={automator?.totalPnlWithRchByClientDepositCcy}
-              ccy={automator?.vaultInfo.depositCcy}
+              ccy={
+                automator?.vaultInfo.realDepositCcy ??
+                automator?.vaultInfo.depositCcy
+              }
             />
             <span className={styles['unit']}>
-              {automator?.vaultInfo.depositCcy}
+              {automator?.vaultInfo.realDepositCcy ??
+                automator?.vaultInfo.depositCcy}
             </span>
           </span>
         </div>
@@ -479,10 +492,14 @@ const PnL = () => {
                     prices,
                     automator.vaultInfo.depositCcy,
                   )}
-                  ccy={automator.vaultInfo.depositCcy}
+                  ccy={
+                    automator.vaultInfo.realDepositCcy ??
+                    automator.vaultInfo.depositCcy
+                  }
                 />
                 <span className={styles['unit']}>
-                  {automator.vaultInfo.depositCcy}
+                  {automator.vaultInfo.realDepositCcy ??
+                    automator.vaultInfo.depositCcy}
                 </span>
               </span>
             )}

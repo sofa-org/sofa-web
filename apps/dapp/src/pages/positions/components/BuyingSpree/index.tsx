@@ -80,7 +80,8 @@ const BuyingSpree = () => {
         {
           title: t('Buying'),
           key: 'amount',
-          render: (_, it) => `${it.amounts.own} ${it.product.vault.depositCcy}`,
+          render: (_, it) =>
+            `${it.amounts.own} ${it.product.vault.realDepositCcy ?? it.product.vault.depositCcy}`,
         },
       ] as ColumnProps<PositionInfo>[],
     [t],

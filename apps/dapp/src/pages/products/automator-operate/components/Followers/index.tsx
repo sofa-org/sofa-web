@@ -63,9 +63,11 @@ export const AutomatorFollowers = () => {
                 <span className={styles['separator']}>≈</span>
                 <AmountDisplay
                   amount={record.amountByClientDepositCcy}
-                  ccy={vault?.depositCcy}
+                  ccy={vault?.realDepositCcy ?? vault?.depositCcy}
                 />
-                <span className={styles['unit']}>{vault?.depositCcy}</span>
+                <span className={styles['unit']}>
+                  {vault?.realDepositCcy ?? vault?.depositCcy}
+                </span>
               </div>
             </>
           ),
@@ -104,9 +106,11 @@ export const AutomatorFollowers = () => {
                     record.totalPnlByClientDepositCcy,
                     record.totalRchPnlByClientDepositCcy,
                   )}
-                  ccy={vault?.depositCcy}
+                  ccy={vault?.realDepositCcy ?? vault?.depositCcy}
                 />
-                <span className={styles['unit']}>{vault?.depositCcy}</span>
+                <span className={styles['unit']}>
+                  {vault?.realDepositCcy ?? vault?.depositCcy}
+                </span>
               </div>
             </>
           ),

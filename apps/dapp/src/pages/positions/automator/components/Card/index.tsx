@@ -95,7 +95,8 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
               )}
             />
             <span className={styles['unit']}>
-              {props.info.vaultInfo.depositCcy}
+              {props.info.vaultInfo.realDepositCcy ??
+                props.info.vaultInfo.depositCcy}
             </span>
           </div>
         </div>
@@ -107,7 +108,8 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
         <div className={styles['value']}>
           <AmountDisplay amount={props.info?.totalPnlByClientDepositCcy} />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.depositCcy}
+            {props.info.vaultInfo.realDepositCcy ??
+              props.info.vaultInfo.depositCcy}
           </span>
           <span className={styles['operator']}>+</span>
           <span style={{ color: 'var(--color-rch)' }}>
@@ -122,7 +124,8 @@ export const AutomatorPositionCard = (props: AutomatorCardProps) => {
             <span className={styles['operator']}>≈</span>
             <AmountDisplay amount={convertedPnl} />
             <span className={styles['unit']}>
-              {props.info.vaultInfo.depositCcy}
+              {props.info.vaultInfo.realDepositCcy ??
+                props.info.vaultInfo.depositCcy}
             </span>
           </div>
         </div>

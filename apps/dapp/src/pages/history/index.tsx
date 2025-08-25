@@ -168,7 +168,8 @@ const OrderHistory = () => {
                     amount={redeemable}
                     ccy={record.product.vault.depositCcy}
                   />{' '}
-                  {record.product.vault.depositCcy}
+                  {record.product.vault.realDepositCcy ??
+                    record.product.vault.depositCcy}
                 </span>
               )) ||
                 undefined}
@@ -321,7 +322,8 @@ const OrderHistory = () => {
                       ccy={record.product.vault.depositCcy}
                       signed
                     />{' '}
-                    {record.product.vault.depositCcy}
+                    {record.product.vault.realDepositCcy ??
+                      record.product.vault.depositCcy}
                   </span>
                 );
               },
@@ -409,7 +411,8 @@ const OrderHistory = () => {
               <span className={styles['label']}>{t('Return')}</span>
               <span className={styles['value']}>
                 {amountFormatter(returnInDepositCcy, 2)}{' '}
-                {record.product.vault.depositCcy}
+                {record.product.vault.realDepositCcy ??
+                  record.product.vault.depositCcy}
               </span>
             </div>
             <div className={styles['extra-item']}>

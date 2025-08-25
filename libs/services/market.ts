@@ -306,11 +306,6 @@ export class MarketService {
       }
       return pre;
     }, [] as string[]);
-    console.log(
-      1111,
-      ccyList,
-      ContractsService.vaults.filter((it) => it.chainId === chainId),
-    );
     const defaultApy = {
       current: 0,
       avgWeekly: 0,

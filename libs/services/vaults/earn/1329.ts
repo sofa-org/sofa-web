@@ -58,6 +58,7 @@ const SUSDaVaults = [
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
     usePermit2: false,
   },
   // SmartBearAAVEVault(ETH/USDC)
@@ -69,6 +70,7 @@ const SUSDaVaults = [
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
     usePermit2: false,
   },
   // SmartBullAAVEVault(BTC/USDC)
@@ -80,6 +82,7 @@ const SUSDaVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
     usePermit2: false,
   },
   // SmartBearAAVEVault(BTC/USDC)
@@ -91,6 +94,7 @@ const SUSDaVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
     usePermit2: false,
   },
   // SmartBullAAVEVault(ETH/NativeUSDC)
@@ -102,6 +106,7 @@ const SUSDaVaults = [
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
     usePermit2: false,
   },
   // SmartBearAAVEVault(ETH/NativeUSDC)
@@ -113,6 +118,7 @@ const SUSDaVaults = [
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
     usePermit2: false,
   },
   // SmartBullAAVEVault(BTC/NativeUSDC)
@@ -124,6 +130,7 @@ const SUSDaVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
     usePermit2: false,
   },
   // SmartBearAAVEVault(BTC/NativeUSDC)
@@ -135,6 +142,7 @@ const SUSDaVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
     usePermit2: false,
   },
 ];

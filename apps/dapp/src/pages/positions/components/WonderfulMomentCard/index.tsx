@@ -85,7 +85,9 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
             <span className={styles['value']}>
               {amountFormatter(position.amounts.redeemable, pnlPrecision)}
             </span>
-            <span className={styles['unit']}>{product.vault.depositCcy}</span>
+            <span className={styles['unit']}>
+              {product.vault.realDepositCcy ?? product.vault.depositCcy}
+            </span>
           </div>
         ) : (
           <div className={styles['profit']}>
@@ -93,7 +95,9 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
               {pnl >= 0 ? '+' : ''}
               {amountFormatter(pnl, pnlPrecision)}
             </span>
-            <span className={styles['unit']}>{product.vault.depositCcy}</span>
+            <span className={styles['unit']}>
+              {product.vault.realDepositCcy ?? product.vault.depositCcy}
+            </span>
           </div>
         )}
         <div className={styles['profit']}>
@@ -138,7 +142,9 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
             </span>
             <span>
               {amountFormatter(position.amounts.own, pnlPrecision)}{' '}
-              <span className={styles['unit']}>{product.vault.depositCcy}</span>
+              <span className={styles['unit']}>
+                {product.vault.realDepositCcy ?? product.vault.depositCcy}
+              </span>
             </span>
           </div>
           {product.vault.riskType === RiskType.RISKY ? (
@@ -147,7 +153,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
               <span>
                 {amountFormatter(position.amounts.redeemable, pnlPrecision)}{' '}
                 <span className={styles['unit']}>
-                  {product.vault.depositCcy}
+                  {product.vault.realDepositCcy ?? product.vault.depositCcy}
                 </span>
               </span>
             </div>
@@ -157,7 +163,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
               <span>
                 +{amountFormatter(pnl, pnlPrecision)}{' '}
                 <span className={styles['unit']}>
-                  {product.vault.depositCcy}
+                  {product.vault.realDepositCcy ?? product.vault.depositCcy}
                 </span>
               </span>
             </div>

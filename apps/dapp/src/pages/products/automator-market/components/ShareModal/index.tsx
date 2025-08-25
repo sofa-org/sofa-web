@@ -211,7 +211,8 @@ const AutomatorUserShareModal = forwardRef<
               )}
             />
             <span className={styles['unit']}>
-              {props.automatorInfo.vaultInfo.depositCcy}
+              {props.automatorInfo.vaultInfo.realDepositCcy ??
+                props.automatorInfo.vaultInfo.depositCcy}
             </span>
             <span className={styles['operator']}>+</span>
             <span style={{ color: 'var(--color-rch)' }}>
@@ -285,7 +286,8 @@ const AutomatorUserShareModal = forwardRef<
                   ccy={props.automatorInfo.vaultInfo.depositCcy}
                 />
                 <span className={styles['unit']}>
-                  {props.automatorInfo.vaultInfo.depositCcy}
+                  {props.automatorInfo.vaultInfo.realDepositCcy ??
+                    props.automatorInfo.vaultInfo.depositCcy}
                 </span>
               </div>
             </div>

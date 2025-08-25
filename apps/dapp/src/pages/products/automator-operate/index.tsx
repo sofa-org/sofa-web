@@ -155,12 +155,15 @@ const Index = () => {
                 <span className={styles['label']}>
                   {t({ enUS: 'Deposit', zhCN: '投资币种' })}
                 </span>
-                {automator?.vaultInfo.depositCcy}
+                {automator?.vaultInfo.realDepositCcy ??
+                  automator?.vaultInfo.depositCcy}
                 {automator?.vaultInfo.depositCcy && (
                   <img
                     src={
-                      CCYService.ccyConfigs[automator?.vaultInfo.depositCcy]
-                        ?.icon
+                      CCYService.ccyConfigs[
+                        automator?.vaultInfo.realDepositCcy ??
+                          automator?.vaultInfo.depositCcy
+                      ]?.icon
                     }
                     alt=""
                   />

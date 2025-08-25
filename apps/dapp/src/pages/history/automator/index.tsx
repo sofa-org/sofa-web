@@ -121,14 +121,16 @@ export const AutomatorHistory = (props: {
             title: `${t({
               enUS: 'Amount',
               zhCN: '金额',
-            })} (${vault?.depositCcy || ''})`,
+            })} (${vault?.realDepositCcy ?? (vault?.depositCcy || '')})`,
             render: (_, record) =>
               record.status === AutomatorTransactionStatus.PENDING ? (
                 '-'
               ) : (
                 <>
                   {amountFormatter(record.amountByClientDepositCcy, 2)}
-                  <span className={styles['unit']}>{vault?.depositCcy}</span>
+                  <span className={styles['unit']}>
+                    {vault?.realDepositCcy ?? vault?.depositCcy}
+                  </span>
                 </>
               ),
           },

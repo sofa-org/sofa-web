@@ -67,7 +67,7 @@ export const CheckboxBorrow = (props: CheckboxBorrowProps) => {
         className={classNames(styles['checkbox-borrow'], props.className)}
         style={props.style}
       >
-        {t('Borrow')} {props.vault.depositCcy}
+        {t('Borrow')} {props.vault.realDepositCcy ?? props.vault.depositCcy}
         <span
           className={styles['tip']}
           title={t(
@@ -91,21 +91,27 @@ export const CheckboxBorrow = (props: CheckboxBorrowProps) => {
                 principal * (Number(leverageInfo?.leverage) - 1),
                 2,
               )}
-              <span className={styles['unit']}>{props.vault.depositCcy}</span>
+              <span className={styles['unit']}>
+                {props.vault.realDepositCcy ?? props.vault.depositCcy}
+              </span>
             </div>
           </div>
           <div className={styles['item']}>
             <div className={styles['label']}>{t('Total Notional Value')}</div>
             <div className={styles['value']}>
               {amountFormatter(principal * Number(leverageInfo?.leverage), 2)}
-              <span className={styles['unit']}>{props.vault.depositCcy}</span>
+              <span className={styles['unit']}>
+                {props.vault.realDepositCcy ?? props.vault.depositCcy}
+              </span>
             </div>
           </div>
           <div className={styles['item']}>
             <div className={styles['label']}>{t('Est.Borrowing Cost ')}</div>
             <div className={styles['value']}>
               {amountFormatter(props.borrowFee, 2)}
-              <span className={styles['unit']}>{props.vault.depositCcy}</span>
+              <span className={styles['unit']}>
+                {props.vault.realDepositCcy ?? props.vault.depositCcy}
+              </span>
             </div>
           </div>
         </div>

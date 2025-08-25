@@ -133,7 +133,7 @@ export const AutomatorPerformanceChart = (
             result += `${amountFormatter(
               !isSpecial || item.value >= 0 ? item.value : item.value * 10,
               2,
-            )} ${props.vault?.depositCcy}`;
+            )} ${props.vault?.realDepositCcy ?? props.vault?.depositCcy}`;
             result += '</div>';
           });
           return result; // 返回最终的内容字符串

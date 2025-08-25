@@ -85,7 +85,9 @@ const useAutomatorRedeemAwaitEl = (props: {
                 ),
                 2,
               )}{' '}
-          <span className={styles['unit']}>{vault?.depositCcy}</span>
+          <span className={styles['unit']}>
+            {vault?.realDepositCcy ?? vault?.depositCcy}
+          </span>
         </span>
       </div>
     </>,

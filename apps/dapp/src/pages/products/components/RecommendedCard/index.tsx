@@ -145,7 +145,7 @@ export const RecommendedCardItem = (props: {
           riskType={it.vault.riskType}
           productType={it.vault.productType}
           forCcy={it.vault.forCcy}
-          depositCcy={it.vault.depositCcy}
+          depositCcy={it.vault.realDepositCcy ?? it.vault.depositCcy}
           depositAmount={+it.amounts.own}
           positionAmount={positionAmount(it)}
           refMs={next8h(it.timestamp * 1000)}
@@ -170,11 +170,6 @@ export const RecommendedCardItem = (props: {
             🎯 {it.anchorPrices.map((i) => amountFormatter(i, 0)).join(' - ')}
           </div>
           <div className={styles['info-item']}>
-            {/* {t('win')}
-            <span className={styles['value']}>
-              {amountFormatter(positionAmount(it), precision)}
-            </span>
-            <span className={styles['unit']}>{it.vault.depositCcy}</span> */}
             <span className={styles['value']}>
               {amountFormatter(
                 simplePlus(it.oddsInfo?.max, it.oddsInfo?.rch),
@@ -386,27 +381,6 @@ const RecommendedCard = (props: RecommendedCardProps) => {
           <span>{t('Reference')}</span>
         </h3>
         <div />
-        {/* <div className={styles['risk-type']}>
-          {riskTypeRef.icon}
-          {riskTypeRef.label2(t)}
-        </div> */}
-        {/* {riskType !== RiskType.RISKY ? (
-          <div className={styles['amount-wrapper']}>
-            <div>
-              <span className={styles['amount']}>
-                {t('Deposit')} {vault?.depositCcy}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className={styles['amount-wrapper']}>
-            <div>
-              <span className={styles['amount']}>{ticketMeta?.per}</span>
-              <span className={styles['unit']}>{vault?.depositCcy}</span>
-            </div>
-            <span className={styles['desc']}>{t('Per Ticket')}</span>
-          </div>
-        )} */}
         <Skeleton
           className={styles['products']}
           placeholder={

@@ -71,7 +71,7 @@ const ProtectedAmounts = (
             amount={position.amounts.own}
             precision={pnlPrecision}
           />{' '}
-          {product.vault.depositCcy}
+          {product.vault.realDepositCcy ?? product.vault.depositCcy}
         </span>
       </div>
       {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
@@ -89,7 +89,9 @@ const ProtectedAmounts = (
         <span className={styles['label']}>{t('Min Payout')}</span>{' '}
         <span>
           <AmountDisplay amount={minRedemption} precision={pnlPrecision} />{' '}
-          <span className={styles['unit']}>{product.vault.depositCcy}</span>
+          <span className={styles['unit']}>
+            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+          </span>
         </span>
       </div>
       {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
@@ -108,7 +110,9 @@ const ProtectedAmounts = (
         <span className={styles['label']}>{t('Max Payout')}</span>{' '}
         <span>
           <AmountDisplay amount={maxRedemption} precision={pnlPrecision} />{' '}
-          <span className={styles['unit']}>{product.vault.depositCcy}</span>
+          <span className={styles['unit']}>
+            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+          </span>
         </span>
       </div>
       {(position.vault.depositBaseCcy && props.showBaseCcyEst && (
@@ -136,7 +140,7 @@ const ProtectedAmounts = (
           amount={+position.amounts.own + pnl}
           precision={pnlPrecision}
         />{' '}
-        {product.vault.depositCcy}
+        {product.vault.realDepositCcy ?? product.vault.depositCcy}
         {claimable && (
           <span className={styles['badge-est']}>| {t('Est.')}</span>
         )}
@@ -191,7 +195,8 @@ const RiskyAmounts = (
       ) : (
         <div className={styles['amount']}>
           {amountFormatter(+position.amounts.own)}{' '}
-          {position.product.vault.depositCcy}
+          {position.product.vault.realDepositCcy ??
+            position.product.vault.depositCcy}
         </div>
       )}
       <div className={styles['amount']}>
@@ -201,7 +206,9 @@ const RiskyAmounts = (
             amount={position.amounts.own}
             precision={pnlPrecision}
           />{' '}
-          <span className={styles['unit']}>{product.vault.depositCcy}</span>
+          <span className={styles['unit']}>
+            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+          </span>
         </span>
       </div>
       <div className={styles['amount']}>
@@ -211,7 +218,9 @@ const RiskyAmounts = (
             amount={position.amounts.maxRedeemable}
             precision={pnlPrecision}
           />{' '}
-          <span className={styles['unit']}>{product.vault.depositCcy}</span>
+          <span className={styles['unit']}>
+            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+          </span>
         </span>
       </div>
     </div>
@@ -225,7 +234,8 @@ const RiskyAmounts = (
       ) : (
         <div className={styles['amount']}>
           {amountFormatter(+position.amounts.own)}{' '}
-          {position.product.vault.depositCcy}
+          {position.product.vault.realDepositCcy ??
+            position.product.vault.depositCcy}
         </div>
       )}
       <div className={styles['amount']}>
@@ -235,7 +245,9 @@ const RiskyAmounts = (
             amount={position.amounts.own}
             precision={pnlPrecision}
           />{' '}
-          <span className={styles['unit']}>{product.vault.depositCcy}</span>
+          <span className={styles['unit']}>
+            {product.vault.realDepositCcy ?? product.vault.depositCcy}
+          </span>
         </span>
       </div>
       {claimable && !props.isAutomator && (
@@ -269,9 +281,16 @@ const PositionCard = (props: PositionCardProps) => {
     }
     return productTypeRef.icon(
       product.vault.riskType,
-      !product.vault.depositCcy.startsWith('USD'),
+      !(product.vault.realDepositCcy ?? product.vault.depositCcy).startsWith(
+        'USD',
+      ),
     );
-  }, [product.vault.depositCcy, product.vault.riskType, productTypeRef]);
+  }, [
+    product.vault.realDepositCcy,
+    product.vault.depositCcy,
+    product.vault.riskType,
+    productTypeRef,
+  ]);
   // const leverageInfo = useAsyncMemo(
   //   () => ProductsService.vaultLeverageInfo(product.vault, position.createdAt),
   //   [product.vault, position.createdAt],
@@ -415,7 +434,7 @@ const PositionCard = (props: PositionCardProps) => {
               {product.vault.riskType !== RiskType.RISKY ? (
                 <>
                   <AmountDisplay amount={pnl} precision={pnlPrecision} signed />{' '}
-                  {product.vault.depositCcy}
+                  {product.vault.realDepositCcy ?? product.vault.depositCcy}
                 </>
               ) : Number(position.amounts.redeemable) ? (
                 <>
@@ -423,7 +442,7 @@ const PositionCard = (props: PositionCardProps) => {
                     amount={position.amounts.redeemable}
                     precision={pnlPrecision}
                   />{' '}
-                  {product.vault.depositCcy}
+                  {product.vault.realDepositCcy ?? product.vault.depositCcy}
                 </>
               ) : (
                 t('Lose')

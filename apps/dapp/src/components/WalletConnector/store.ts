@@ -189,6 +189,7 @@ export const useWalletStore = Object.assign(
         address,
         chainId,
       ).then((balance) => {
+        console.log(1111, balance, vault);
         useWalletStore.setState((pre) => ({
           balance: { ...pre.balance, ...balance },
         }));
