@@ -177,13 +177,15 @@ const AutomatorCreate = () => {
           return res.filter((c) =>
             [
               [1, 'USDT'],
-              [1329, 'USDC'],
+              // [1329, 'USDC'],
               [42161, 'USDT'],
               [421614, 'USDC'],
             ].some((it) => it[0] === c.chainId && it[1] === c.clientDepositCcy),
           );
         }
-        return res;
+        return res.filter(
+          (it) => !(it.chainId === 1329 && it.clientDepositCcy === 'USDC'),
+        );
       }),
     {
       refreshDeps: [wallet.address, wallet.chainId],

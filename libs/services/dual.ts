@@ -78,10 +78,7 @@ export class DualService {
     return new Date((Number(product.expiry) + 2 * 3600) * 1000);
   }
 
-  static getClaimStatus(
-    position: positions.PositionInfo & { vault: VaultInfo },
-    now: Date,
-  ) {
+  static getClaimStatus(position: positions.PositionInfo, now: Date) {
     if (position.claimed) {
       return { status: DualPositionClaimStatus.Claimed, leftTime: 0 };
     }
@@ -314,20 +311,18 @@ export class DualService {
     }
   }
   static async getProfitRenderProps(
-    originData:
-      | (Partial<positions.PositionInfo> & {
-          vault: VaultInfo;
-        })
-      | ProductQuoteResult,
+    originData: Partial<positions.PositionInfo> | ProductQuoteResult,
   ) {
-    if (!originData) {
-      return undefined;
-    }
+    if (!originData) return undefined;
     const data = { ...originData } as typeof originData;
+    const vault =
+      'vault' in originData ? originData.vault : originData.product?.vault;
+    if (!vault) return undefined;
+
     const product =
       (data as Partial<positions.PositionInfo>).product ||
       (data as ProductQuoteResult);
-    if (!data || !data.amounts || !data.vault || !product) {
+    if (!data || !data.amounts || !vault || !product) {
       return undefined;
     }
     const claimStatus = DualService.getClaimStatus(
@@ -357,7 +352,7 @@ export class DualService {
       return undefined;
     }
     const res = {
-      productType: data.vault.productType,
+      productType: vault.productType,
       executionResult: [
         DualPositionExecutionStatus.Executed,
         DualPositionExecutionStatus.NotExecuted,
@@ -373,8 +368,8 @@ export class DualService {
         true,
       ),
     } as DualProfitRenderProps;
-    if (data.vault.productType == ProductType.BearSpread) {
-      res.linkedCcy = data.vault.forCcy;
+    if (vault.productType == ProductType.BearSpread) {
+      res.linkedCcy = vault.forCcy;
       // 低买： anchorPrice[0] = RCH/USDT
       res.depositAmount = Number(data.amounts.own || 0);
       // anchorPrice[0] * depositAmount(usdt)
@@ -383,14 +378,14 @@ export class DualService {
       res.linkedCcyExtraRewardWhenSuccessfulExecuted =
         Number(data.amounts.maxRedeemableOfLinkedCcy) -
         res.linkedCcyAmountWhenSuccessfulExecuted;
-      res.depositCcy = data.vault.depositCcy;
+      res.depositCcy = vault.depositCcy;
 
       // maxRedeemable - own
       res.depositCcyExtraRewardWhenNoExecuted =
         Number(data.amounts.maxRedeemable) - res.depositAmount;
       res.rchReturnAmount = Number(data.amounts.rchAirdrop || 0);
     } else {
-      res.linkedCcy = data.vault.domCcy;
+      res.linkedCcy = vault.domCcy;
       // 高卖： anchorPrice[0] = USDT/RCH
       res.depositAmount = Number(data.amounts.own || 0);
       // (anchorPrice[0] * depositAmount(rch))

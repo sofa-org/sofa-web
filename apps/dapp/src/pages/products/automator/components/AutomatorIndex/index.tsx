@@ -222,7 +222,9 @@ export const AutomatorIndex = (props: BaseProps) => {
                           <div>
                             <div className={styles['name']}>
                               <MsgDisplay expandDisabled>
-                                {v.vaultInfo.name || v.vaultInfo.depositCcy}
+                                {(v.vaultInfo.name ||
+                                  v.vaultInfo.realDepositCcy) ??
+                                  v.vaultInfo.depositCcy}
                               </MsgDisplay>
                             </div>
                             <Address
@@ -266,7 +268,8 @@ export const AutomatorIndex = (props: BaseProps) => {
                               ccy={v.vaultInfo.depositCcy}
                             />
                             <span className={styles['unit']}>
-                              {v.vaultInfo.depositCcy}
+                              {v.vaultInfo.realDepositCcy ??
+                                v.vaultInfo.depositCcy}
                             </span>
                           </div>
                           <div className={styles['creator']}>
@@ -275,7 +278,8 @@ export const AutomatorIndex = (props: BaseProps) => {
                               ccy={v.vaultInfo.depositCcy}
                             />
                             <span className={styles['unit']}>
-                              {v.vaultInfo.depositCcy}
+                              {v.vaultInfo.realDepositCcy ??
+                                v.vaultInfo.depositCcy}
                             </span>
                             <span className={styles['percent']}>
                               {displayPercentage(
@@ -292,8 +296,12 @@ export const AutomatorIndex = (props: BaseProps) => {
                       render: (_, v) => (
                         <>
                           <div className={styles['deposit-ccy']}>
-                            {CCYService.ccyConfigs[v.vaultInfo.depositCcy]
-                              ?.name || v.vaultInfo.depositCcy}
+                            {(CCYService.ccyConfigs[
+                              v.vaultInfo.realDepositCcy ??
+                                v.vaultInfo.depositCcy
+                            ]?.name ||
+                              v.vaultInfo.realDepositCcy) ??
+                              v.vaultInfo.depositCcy}
                           </div>
                         </>
                       ),

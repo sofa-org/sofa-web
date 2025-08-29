@@ -74,7 +74,7 @@ export const AutomatorClaim = (props: {
                   ),
                   2,
                 )}{' '}
-            {vault?.depositCcy}
+            {vault?.realDepositCcy ?? vault?.depositCcy}
           </span>
         </div>
       </div>

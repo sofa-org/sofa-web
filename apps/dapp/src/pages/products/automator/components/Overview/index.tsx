@@ -91,7 +91,9 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                 amount={!props.vault ? '' : data?.aumByClientDepositCcy}
                 ccy={props.vault?.depositCcy}
               />
-              <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+              <span className={styles['unit']}>
+                {props.vault?.realDepositCcy ?? props.vault?.depositCcy}
+              </span>
             </div>
           </div>
         </div>
@@ -118,7 +120,9 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
                 }
                 ccy={props.vault?.vaultDepositCcy}
               />
-              <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+              <span className={styles['unit']}>
+                {props.vault?.realDepositCcy ?? props.vault?.depositCcy}
+              </span>
               <span className={styles['percentage']}>
                 {displayPercentage(
                   Number(data?.creatorAmountByVaultDepositCcy) /
@@ -144,7 +148,7 @@ export const AutomatorOverview = (props: AutomatorOverviewProps) => {
         </div>
         <div className={styles['value']}>
           ≈ {amountFormatter(data?.nav, 4)}
-          <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+          <span className={styles['unit']}>{props.vault?.realDepositCcy ?? props.vault?.depositCcy}</span>
         </div>
       </div> */}
         <div className={styles['tips']}>

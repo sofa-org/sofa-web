@@ -295,7 +295,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
           key: 'cost',
           render: (_, it) =>
             `${amountFormatter(it.amounts.own, precision)} ${
-              it.product.vault.depositCcy
+              it.product.vault.realDepositCcy ?? it.product.vault.depositCcy
             }`,
         },
         {
@@ -310,7 +310,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                     ? it.amounts.redeemable
                     : Number(it.amounts.redeemable) - +it.amounts.own,
                   precision,
-                )} ${it.product.vault.depositCcy}`,
+                )} ${it.product.vault.realDepositCcy ?? it.product.vault.depositCcy}`,
         },
       ] as ColumnProps<TransactionInfo>[],
     [precision, expiry, product.vault.riskType, t, ticketMeta],
@@ -398,7 +398,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
               </div>
               <div className={styles['value']}>
                 {amountFormatter(position.amounts.own, 0)}{' '}
-                {product.vault.depositCcy}
+                {product.vault.realDepositCcy ?? product.vault.depositCcy}
               </div>
             </div>
             <div className={styles['ticket-item']}>
@@ -422,7 +422,7 @@ const PositionDetails = (props: PositionDetailsProps) => {
                         +position.amounts.own,
                   precision,
                 )}{' '}
-                {product.vault.depositCcy}
+                {product.vault.realDepositCcy ?? product.vault.depositCcy}
               </div>
             </div>
           </div>

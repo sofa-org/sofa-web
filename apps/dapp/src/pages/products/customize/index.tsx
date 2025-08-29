@@ -107,7 +107,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
   const depositCcyOptions = useMemo(
     () =>
       uniqBy(vaultOptions, (it) => it.vault.depositCcy).map((it) => ({
-        label: it.vault.depositCcy,
+        label: it.vault.realDepositCcy ?? it.vault.depositCcy,
         value: it.vault.depositCcy,
       })),
     [vaultOptions],
@@ -263,6 +263,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
     vault,
     quoteResult: quoteInfo,
   });
+
   return (
     <div
       className={classNames(styles['customize'], {
@@ -432,8 +433,14 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
               <div className={styles['balance']}>
                 <span className={styles['label']}>{t('Wallet Balance')}</span>
                 <span className={styles['value']}>
-                  {amountFormatter(wallet.balance?.[depositCcy], 2)}{' '}
-                  {depositCcy}
+                  {amountFormatter(
+                    wallet.balance?.[
+                      product?.vault?.realDepositCcy ??
+                        (product?.vault?.depositCcy || depositCcy)
+                    ],
+                    2,
+                  )}{' '}
+                  {product?.vault?.realDepositCcy ?? product?.vault?.depositCcy}
                 </span>
               </div>
               {vault && (
@@ -499,9 +506,6 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                   <div className={styles['value']}>
                     <span className={styles['amount']}>
                       {displayPercentage(quoteInfo.apyInfo?.max)}
-                      {/* <span className={styles['unit']}>
-                        {quoteInfo.depositCcy}
-                      </span> */}
                     </span>
                     <span className={styles['sep']}>+</span>
                     <span className={styles['amount-rch']}>

@@ -58,6 +58,7 @@ const SUSDaVaults = [
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
     usePermit2: false,
   },
   // SmartBearAAVEVault(ETH/USDC)
@@ -69,6 +70,7 @@ const SUSDaVaults = [
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
     usePermit2: false,
   },
   // SmartBullAAVEVault(BTC/USDC)
@@ -80,6 +82,7 @@ const SUSDaVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
     usePermit2: false,
   },
   // SmartBearAAVEVault(BTC/USDC)
@@ -91,6 +94,55 @@ const SUSDaVaults = [
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'USDC',
+    realDepositCcy: 'USDC.n',
+    usePermit2: false,
+  },
+  // SmartBullAAVEVault(ETH/NativeUSDC)
+  {
+    chainId: 1329,
+    vault: '0x4f1B513F846821559d59e8324EaeF201Cb5B0479',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
+    usePermit2: false,
+  },
+  // SmartBearAAVEVault(ETH/NativeUSDC)
+  {
+    chainId: 1329,
+    vault: '0x989897f1D976EE0b59Bf0A3172C170D8f3Cb84e3',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
+    usePermit2: false,
+  },
+  // SmartBullAAVEVault(BTC/NativeUSDC)
+  {
+    chainId: 1329,
+    vault: '0x00aEca021D0f06c7dee54D58ee6Af47B5645aB19',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
+    usePermit2: false,
+  },
+  // SmartBearAAVEVault(BTC/NativeUSDC)
+  {
+    chainId: 1329,
+    vault: '0x6E72C8726c71a4Cbc6e31ff7d47B399Fa983C7B8',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'NativeUSDC',
+    realDepositCcy: 'USDC',
     usePermit2: false,
   },
 ];

@@ -63,7 +63,9 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
           <div className={styles['left']}>
             <img src={depositCcyConfig?.icon} alt="" />
             <div className={styles['name']}>
-              {props.info.vaultInfo.name || props.info.vaultInfo.depositCcy}
+              {(props.info.vaultInfo.name ||
+                props.info.vaultInfo.realDepositCcy) ??
+                props.info.vaultInfo.depositCcy}
             </div>
             <div className={styles['infos']}>
               <Address
@@ -131,7 +133,10 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
                 +props.info.aumBySharesToken ||
                 +props.info.aumByVaultDepositCcy / +props.info.nav
               }
-              ccy={props.info.vaultInfo.depositCcy}
+              ccy={
+                props.info.vaultInfo.realDepositCcy ??
+                props.info.vaultInfo.depositCcy
+              }
             />
             <span className={styles['unit']}>
               {props.info.vaultInfo.positionCcy}
@@ -143,15 +148,20 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
                 ccy={props.info.vaultInfo.vaultDepositCcy}
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.depositCcy}
+                {props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy}
               </span>
               <span className={styles['separator']}>≈</span>
               <AmountDisplay
                 amount={props.info.aumByClientDepositCcy}
-                ccy={props.info.vaultInfo.depositCcy}
+                ccy={
+                  props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy
+                }
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.depositCcy}
+                {props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy}
               </span>
             </span>
           </div>
@@ -192,10 +202,14 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
             >
               <AmountDisplay
                 amount={props.info.totalPnlByClientDepositCcy}
-                ccy={props.info.vaultInfo.depositCcy}
+                ccy={
+                  props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy
+                }
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.depositCcy}
+                {props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy}
               </span>
             </span>
             <span className={styles['separator']}>+</span>
@@ -211,10 +225,14 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
               <span className={styles['separator']}>≈</span>
               <AmountDisplay
                 amount={props.info.totalPnlWithRchByClientDepositCcy}
-                ccy={props.info.vaultInfo.depositCcy}
+                ccy={
+                  props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy
+                }
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.depositCcy}
+                {props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy}
               </span>
             </span>
           </div>
@@ -270,10 +288,14 @@ export const AutomatorCreatorCard = (props: AutomatorCreatorCardProps) => {
                   prices,
                   props.info.vaultInfo.depositCcy,
                 )}
-                ccy={props.info.vaultInfo.depositCcy}
+                ccy={
+                  props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy
+                }
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.depositCcy}
+                {props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy}
               </span>
             </span>
           </div>

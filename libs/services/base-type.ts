@@ -66,7 +66,8 @@ export interface VaultInfo {
   forCcy: Exclude<CCY, 'stETH'>; // 标的物币种
   domCcy: USDS; // 标的物币种的币对
   trackingSource: string; // 追踪指数源
-  depositCcy: CCY | USDS; // 申购币种
+  realDepositCcy?: CCY | USDS; // 申购币种合约的 token name
+  depositCcy: CCY | USDS; // 申购币种在服务端的名称，正常来讲就是 realDepositCcy，但 SEI 链的一些合约有些历史原因，导致 deposit ccy 和链上的名字不一样
   depositBaseCcy?: CCY | USDS; // 净值成长类的申购币种销毁时能得到的币种，比如 scrvUSD 销毁得到 crvUSD，sUSDa 销毁得到 USDa
   depositMinAmount: number; // 申购币种数量的最小数量
   depositTickAmount: number; // 申购币种数量的步增
@@ -90,7 +91,8 @@ export interface AutomatorVaultInfo {
   desc?: string;
   vault: string; // 合约地址
   chainId: number;
-  depositCcy: CCY | USDS; // 申购币种
+  realDepositCcy?: CCY | USDS; // 申购币种合约的 token name
+  depositCcy: CCY | USDS; // 申购币种在服务端的名称，正常来讲就是 realDepositCcy，但 SEI 链的一些合约有些历史原因，导致 deposit ccy 和链上的名字不一样
   vaultDepositCcy: CCY | USDS; // 申购币种存入 automator 时被转化成的币种（也是 trend/dnt 合约的 depositCcy），比如 USDT -> aUSDT, crvUSD -> scrvUSD
   depositMinAmount: number; // 申购币种数量的最小数量
   depositTickAmount: number; // 申购币种数量的步增

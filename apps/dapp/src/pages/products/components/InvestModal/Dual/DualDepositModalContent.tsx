@@ -253,7 +253,7 @@ export const DualDepositModalContent = (
                     value={product?.depositAmount}
                     suffix={
                       <span className={styles['unit-1']}>
-                        {vault?.depositCcy}
+                        {vault?.realDepositCcy ?? vault?.depositCcy}
                       </span>
                     }
                     onChange={(v) => {
@@ -273,7 +273,7 @@ export const DualDepositModalContent = (
                   <span className={styles['value']}>
                     {amountFormatter(wallet.balance?.[data.vault.depositCcy])}
                     <span className={styles['unit']}>
-                      {data.vault.depositCcy}
+                      {data.vault.realDepositCcy ?? data.vault.depositCcy}
                     </span>
                   </span>
                 </div>

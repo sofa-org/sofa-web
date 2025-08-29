@@ -174,8 +174,13 @@ export const DepositCCYSelector = (props: DepositCCYSelectorProps) => {
       ).map((it) => ({
         label: (
           <span className={styles['ccy-item']}>
-            <img src={CCYService.ccyConfigs[it.depositCcy]?.icon} alt="" />
-            {it.depositCcy}
+            <img
+              src={
+                CCYService.ccyConfigs[it.realDepositCcy ?? it.depositCcy]?.icon
+              }
+              alt=""
+            />
+            {it.realDepositCcy ?? it.depositCcy}
           </span>
         ),
         value: it.depositCcy,
@@ -254,7 +259,9 @@ export const BaseDepositCcySelector = ({
       }
     >
       <Radio value={vault.depositBaseCcy}>{vault.depositBaseCcy}</Radio>
-      <Radio value={vault.depositCcy}>{vault.depositCcy}</Radio>
+      <Radio value={vault.depositCcy}>
+        {vault.realDepositCcy ?? vault.depositCcy}
+      </Radio>
     </RadioGroup>
   ) : undefined;
 };

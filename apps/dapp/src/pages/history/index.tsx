@@ -168,7 +168,8 @@ const OrderHistory = () => {
                     amount={redeemable}
                     ccy={record.product.vault.depositCcy}
                   />{' '}
-                  {record.product.vault.depositCcy}
+                  {record.product.vault.realDepositCcy ??
+                    record.product.vault.depositCcy}
                 </span>
               )) ||
                 undefined}
@@ -226,10 +227,7 @@ const OrderHistory = () => {
       {
         title: t({ enUS: 'State', zhCN: '状态' }),
         render: (_, record) => {
-          const { status } = DualService.getClaimStatus(
-            { ...record, vault: record.product.vault },
-            new Date(),
-          );
+          const { status } = DualService.getClaimStatus(record, new Date());
           return (
             <span className={styles['dual-state']}>
               {status == DualPositionClaimStatus.NotExpired
@@ -321,7 +319,8 @@ const OrderHistory = () => {
                       ccy={record.product.vault.depositCcy}
                       signed
                     />{' '}
-                    {record.product.vault.depositCcy}
+                    {record.product.vault.realDepositCcy ??
+                      record.product.vault.depositCcy}
                   </span>
                 );
               },
@@ -409,7 +408,8 @@ const OrderHistory = () => {
               <span className={styles['label']}>{t('Return')}</span>
               <span className={styles['value']}>
                 {amountFormatter(returnInDepositCcy, 2)}{' '}
-                {record.product.vault.depositCcy}
+                {record.product.vault.realDepositCcy ??
+                  record.product.vault.depositCcy}
               </span>
             </div>
             <div className={styles['extra-item']}>

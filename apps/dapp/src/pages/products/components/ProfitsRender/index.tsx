@@ -1,5 +1,4 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react';
-import { Radio, RadioGroup } from '@douyinfe/semi-ui';
+import { ReactNode, useMemo } from 'react';
 import { RiskType, VaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';

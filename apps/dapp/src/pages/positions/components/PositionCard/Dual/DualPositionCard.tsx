@@ -189,7 +189,8 @@ const DualPositionCard = (
                   )}
                 </span>
                 <span className={styles['unit']}>
-                  {depositCcyConfig?.name || product.vault.depositCcy}
+                  {(depositCcyConfig?.name || product.vault.realDepositCcy) ??
+                    product.vault.depositCcy}
                 </span>
               </div>
               {/* 如果是未到期的卖，价格显示在上面 */}
@@ -298,7 +299,9 @@ const DualPositionCard = (
                       )}
                     </span>
                     <span className={styles['unit']}>
-                      {depositCcyConfig?.name || product.vault.depositCcy}
+                      {(depositCcyConfig?.name ||
+                        product.vault.realDepositCcy) ??
+                        product.vault.depositCcy}
                     </span>
                   </div>
                   <div className={styles['profits']}>
@@ -345,7 +348,9 @@ const DualPositionCard = (
                       )}
                     </span>
                     <span className={styles['unit']}>
-                      {depositCcyConfig?.name || product.vault.depositCcy}
+                      {(depositCcyConfig?.name ||
+                        product.vault.realDepositCcy) ??
+                        product.vault.depositCcy}
                     </span>
                   </div>
                 </>

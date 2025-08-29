@@ -190,7 +190,10 @@ const DepositToken = () => {
   const options = useMemo(
     () =>
       useDIYState
-        .getVaultOptions({ chainId, ...formData }, ['depositCcy'])
+        .getVaultOptions({ chainId, ...formData }, [
+          'depositCcy',
+          'realDepositCcy',
+        ])
         .filter(
           (it) =>
             !ProductsDIYService.getSupportMatrix({
@@ -203,11 +206,17 @@ const DepositToken = () => {
         .map((it) => ({
           label: (
             <>
-              <img src={CCYService.ccyConfigs[it.data.depositCcy!]?.icon} />
-              {it.data.depositCcy}
+              <img
+                src={
+                  CCYService.ccyConfigs[
+                    it.data.realDepositCcy ?? it.data.depositCcy!
+                  ]?.icon
+                }
+              />
+              {it.data.realDepositCcy ?? it.data.depositCcy}
             </>
           ),
-          value: it.key,
+          value: it.data.depositCcy!,
           disabled: it.disabled,
           data: it.data,
         })),

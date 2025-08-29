@@ -177,7 +177,6 @@ const RecommendedTickets = (props: TicketsProps) => {
                     )}
                     x
                   </span>
-                  {/* <span className={styles['unit']}>{it.vault.depositCcy}</span> */}
                 </>
               )}
             </div>

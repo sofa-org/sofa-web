@@ -290,10 +290,14 @@ const AutomatorShareModal = forwardRef<
                     +props.automatorDetail.aumByVaultDepositCcy /
                       +props.automatorDetail.nav
                   }
-                  ccy={props.automatorDetail.vaultInfo.depositCcy}
+                  ccy={
+                    props.automatorDetail.vaultInfo.realDepositCcy ??
+                    props.automatorDetail.vaultInfo.depositCcy
+                  }
                 />
                 <span className={styles['unit']}>
-                  {props.automatorDetail.vaultInfo.depositCcy}
+                  {props.automatorDetail.vaultInfo.realDepositCcy ??
+                    props.automatorDetail.vaultInfo.depositCcy}
                 </span>
               </div>
             </div>
@@ -311,10 +315,14 @@ const AutomatorShareModal = forwardRef<
                         props.automatorDetail.creatorAmountByClientDepositCcy ||
                         0
                       }
-                      ccy={props.automatorDetail.vaultInfo.depositCcy}
+                      ccy={
+                        props.automatorDetail.vaultInfo.realDepositCcy ??
+                        props.automatorDetail.vaultInfo.depositCcy
+                      }
                     />
                     <span className={styles['unit']}>
-                      {props.automatorDetail.vaultInfo.depositCcy}
+                      {props.automatorDetail.vaultInfo.realDepositCcy ??
+                        props.automatorDetail.vaultInfo.depositCcy}
                     </span>
                     <span className={styles['percent']}>
                       {displayPercentage(

@@ -62,7 +62,9 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
 
   const depositCcyConfig = !props.vault?.depositCcy
     ? undefined
-    : CCYService.ccyConfigs[props.vault.depositCcy];
+    : CCYService.ccyConfigs[
+        props.vault?.realDepositCcy ?? props.vault.depositCcy
+      ];
 
   return (
     <Spin
@@ -72,7 +74,8 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
       <div className={styles['vault-info']}>
         <img src={depositCcyConfig?.icon} alt="" />
         <div className={styles['name']}>
-          {props.vault?.name || props.vault?.depositCcy}
+          {(props.vault?.name || props.vault?.realDepositCcy) ??
+            props.vault?.depositCcy}
         </div>
         <Address address={props.vault?.vault || ''} simple linkBtn />
         <MsgDisplay className={styles['desc']}>
@@ -110,7 +113,9 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
                       )
                 }
               />{' '}
-              <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+              <span className={styles['unit']}>
+                {props.vault?.realDepositCcy ?? props.vault?.depositCcy}
+              </span>
             </span>
             {!!+pendingSharesWithDecimals && (
               <div
@@ -146,7 +151,9 @@ export const AutomatorUserInfo = (props: AutomatorUserInfoProps) => {
                       )
                 }
               />{' '}
-              <span className={styles['unit']}>{props.vault?.depositCcy}</span>
+              <span className={styles['unit']}>
+                {props.vault?.realDepositCcy ?? props.vault?.depositCcy}
+              </span>
             </span>
             <span className={styles['separator']}>+</span>
             <span className={classNames(styles['amount'], styles['rch'])}>

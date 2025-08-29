@@ -111,7 +111,9 @@ export const AutomatorDeposit = (props: AutomatorDepositProps) => {
                 vault?.depositCcy,
               ),
             )}
-        <span className={styles['unit']}>{vault?.depositCcy}</span>
+        <span className={styles['unit']}>
+          {vault?.realDepositCcy ?? vault?.depositCcy}
+        </span>
       </div>
       <div className={styles['buttons']}>
         <BaseInvestButton

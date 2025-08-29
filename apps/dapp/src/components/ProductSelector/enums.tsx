@@ -1,19 +1,11 @@
-import {
-  ProjectType,
-  VaultInfo,
-  VisibleRiskType,
-} from '@sofa/services/base-type';
+import { ProjectType, VisibleRiskType } from '@sofa/services/base-type';
 import { TFunction } from '@sofa/services/i18n';
-import { t } from '@sofa/services/i18n';
 import {
-  ProductInfo,
   ProductType,
-  QuoteInfo,
   RiskType,
   WinningProbabilities,
 } from '@sofa/services/products';
 import { displayPercentage } from '@sofa/utils/amount';
-import { isNullLike } from '@sofa/utils/fns';
 
 import { EnvLinks } from '@/env-links';
 import { addI18nResources } from '@/locales';

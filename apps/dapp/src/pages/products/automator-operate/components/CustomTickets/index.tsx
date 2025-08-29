@@ -439,7 +439,8 @@ const TicketEditor = (props: CustomTicketProps) => {
               }}
               suffix={
                 <span className={styles['unit-in-input']}>
-                  {props.product.vault.depositCcy}
+                  {props.product.vault.realDepositCcy ??
+                    props.product.vault.depositCcy}
                 </span>
               }
             />
@@ -518,7 +519,9 @@ const TicketEditor = (props: CustomTicketProps) => {
                     amountFormatter(quoteInfo.amounts.maxRedeemable, 2)) ||
                     '-'}
                 </span>
-                <span className={styles['unit']}>{vault.depositCcy}</span>
+                <span className={styles['unit']}>
+                  {vault.realDepositCcy ?? vault.depositCcy}
+                </span>
               </div>
             </div>
             <div className={styles['or']}>
@@ -550,7 +553,9 @@ const TicketEditor = (props: CustomTicketProps) => {
                     amountFormatter(props.product.depositAmount, 2)) ||
                     '-'}
                 </span>
-                <span className={styles['unit']}>{vault.depositCcy}</span>
+                <span className={styles['unit']}>
+                  {vault.realDepositCcy ?? vault.depositCcy}
+                </span>
                 {percentOfPool !== undefined ? (
                   <div className={styles['desc']}>
                     {t(
@@ -775,7 +780,10 @@ const CustomTickets = (props: {
                 <>
                   <b>{amountFormatter(it.depositAmount, 2)}</b>
                   <span className={styles['unit']}>
-                    {CCYService.ccyConfigs[it.vault.depositCcy]?.name ||
+                    {(CCYService.ccyConfigs[
+                      it.vault.realDepositCcy ?? it.vault.depositCcy
+                    ]?.name ||
+                      it.vault.realDepositCcy) ??
                       it.vault.depositCcy}
                   </span>
                 </>
@@ -790,7 +798,10 @@ const CustomTickets = (props: {
                 <>
                   <b>{amountFormatter(q.amounts.maxRedeemable, 2)}</b>
                   <span className={styles['unit']}>
-                    {CCYService.ccyConfigs[it.vault.depositCcy]?.name ||
+                    {(CCYService.ccyConfigs[
+                      it.vault.realDepositCcy ?? it.vault.depositCcy
+                    ]?.name ||
+                      it.vault.realDepositCcy) ??
                       it.vault.depositCcy}
                   </span>
                 </>

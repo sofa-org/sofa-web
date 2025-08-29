@@ -126,7 +126,7 @@ export const AutomatorRedeemApply = (props: {
                     ),
                     2,
                   )}{' '}
-              {vault?.depositCcy}
+              {vault?.realDepositCcy ?? vault?.depositCcy}
             </span>
           </span>
         </div>

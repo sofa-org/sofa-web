@@ -187,7 +187,7 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
                   {t('Will win')}{' '}
                   <span style={{ color: 'var(--color-rise)' }}>
                     {amountFormatter(hover.quoteInfo.amounts.maxRedeemable, 2)}{' '}
-                    {vault?.depositCcy}
+                    {vault?.realDepositCcy ?? vault?.depositCcy}
                   </span>
                   <span className={styles['win-rch']}>
                     {amountFormatter(hover.quoteInfo.amounts.rchAirdrop, 2)} RCH

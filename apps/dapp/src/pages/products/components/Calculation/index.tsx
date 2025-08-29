@@ -76,7 +76,9 @@ export const Calculation = (props: CalculationProps) => {
                 name: t('Deposit Notional'),
                 value: (
                   <>
-                    {+quote.amounts.own} {props.baseCcy || vault.depositCcy}
+                    {+quote.amounts.own}{' '}
+                    {(props.baseCcy || vault.realDepositCcy) ??
+                      vault.depositCcy}
                   </>
                 ),
                 desc: t("User's Deposit Amount"),
@@ -141,7 +143,8 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.premium)}{' '}
-                    {props.baseCcy || vault.depositCcy}
+                    {(props.baseCcy || vault.realDepositCcy) ??
+                      vault.depositCcy}
                   </>
                 ),
                 // Premium Amount used for the following calculation.
@@ -155,7 +158,8 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(quote.amounts.counterparty)}{' '}
-                    {props.baseCcy || vault.depositCcy}
+                    {(props.baseCcy || vault.realDepositCcy) ??
+                      vault.depositCcy}
                   </>
                 ),
                 desc: t('From Market Maker Price'),
@@ -171,7 +175,8 @@ export const Calculation = (props: CalculationProps) => {
                         +quote.amounts.minRedeemable +
                         +quote.amounts.maxSettlementFee,
                     )}{' '}
-                    {props.baseCcy || vault.depositCcy}
+                    {(props.baseCcy || vault.realDepositCcy) ??
+                      vault.depositCcy}
                   </>
                 ),
                 desc: t('(MM Collateral + Premium). From Market Maker Price'),
@@ -212,7 +217,8 @@ export const Calculation = (props: CalculationProps) => {
                 value: (
                   <>
                     {amountFormatter(+quote.amounts.tradingFee)}{' '}
-                    {props.baseCcy || vault.depositCcy}
+                    {(props.baseCcy || vault.realDepositCcy) ??
+                      vault.depositCcy}
                   </>
                 ),
                 desc: t('DepositAmount * Trading Fee Rate'),
@@ -225,7 +231,8 @@ export const Calculation = (props: CalculationProps) => {
                       value: (
                         <>
                           {amountFormatter(quote.amounts.settlementFee)}{' '}
-                          {props.baseCcy || vault.depositCcy}
+                          {(props.baseCcy || vault.realDepositCcy) ??
+                            vault.depositCcy}
                         </>
                       ),
                       desc: t('Protocol Settlement Fee'),
@@ -238,7 +245,8 @@ export const Calculation = (props: CalculationProps) => {
                       value: (
                         <>
                           {amountFormatter(+quote.amounts.maxSettlementFee)}{' '}
-                          {props.baseCcy || vault.depositCcy}
+                          {(props.baseCcy || vault.realDepositCcy) ??
+                            vault.depositCcy}
                         </>
                       ),
                       desc: t('Protocol Upside Fee (Winning Only)'),
@@ -285,7 +293,9 @@ export const Calculation = (props: CalculationProps) => {
                   name: t('User Actual Deposit'),
                   value: (
                     <>
-                      {+quote.amounts.own} {props.baseCcy || vault.depositCcy}
+                      {+quote.amounts.own}{' '}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t("User's Deposit Amount"),
@@ -384,7 +394,8 @@ export const Calculation = (props: CalculationProps) => {
                       {amountFormatter(
                         +quote.amounts.own - +quote.amounts.borrowCost,
                       )}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: '',
@@ -395,7 +406,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(+quote.amounts.borrow)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: '',
@@ -412,7 +424,8 @@ export const Calculation = (props: CalculationProps) => {
                           (+quote.amounts.borrow * leverageInfo.leverage) /
                             (leverageInfo.leverage - 1),
                         )}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: '',
@@ -423,7 +436,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(+quote.amounts.borrowCost)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: '',
@@ -434,7 +448,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(quote.amounts.spreadCost)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t('Fee on Borrowing Cost'),
@@ -446,7 +461,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(+quote.amounts.borrowCost)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t(
@@ -456,7 +472,13 @@ export const Calculation = (props: CalculationProps) => {
                 },
                 {
                   name: t('Base Yield Amount'),
-                  value: <>0 {props.baseCcy || vault.depositCcy}</>,
+                  value: (
+                    <>
+                      0{' '}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
+                    </>
+                  ),
                   desc: '',
                   className: styles['gray'],
                 },
@@ -466,7 +488,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(+quote.amounts.premium)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t('Premium Amount used for the following calculation.'),
@@ -477,7 +500,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(quote.amounts.counterparty)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t('From Market Maker Price'),
@@ -492,7 +516,8 @@ export const Calculation = (props: CalculationProps) => {
                           +quote.amounts.minRedeemable +
                           +quote.amounts.maxSettlementFee,
                       )}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t('(MM Collateral+Premium). From Market Maker Price'),
@@ -500,13 +525,25 @@ export const Calculation = (props: CalculationProps) => {
                 },
                 {
                   name: t('Trading Fee'),
-                  value: <>0 {props.baseCcy || vault.depositCcy}</>,
+                  value: (
+                    <>
+                      0{' '}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
+                    </>
+                  ),
                   desc: t('No Trading Fee'),
                   className: styles['gray'],
                 },
                 {
                   name: t('Settlement Fee'),
-                  value: <>0 {props.baseCcy || vault.depositCcy}</>,
+                  value: (
+                    <>
+                      0{' '}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
+                    </>
+                  ),
                   desc: t('No Settlement Fee'),
                   className: styles['gray'],
                 },
@@ -587,7 +624,9 @@ export const Calculation = (props: CalculationProps) => {
                   name: t('Deposit Notional'),
                   value: (
                     <>
-                      {+quote.amounts.own} {props.baseCcy || vault.depositCcy}
+                      {+quote.amounts.own}{' '}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t("User's Deposit Amount"),
@@ -664,7 +703,8 @@ export const Calculation = (props: CalculationProps) => {
                           +quote.amounts.own,
                         4,
                       )}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t(
@@ -689,7 +729,8 @@ export const Calculation = (props: CalculationProps) => {
                         ),
                         4,
                       )}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t('(Deposit*(1+Base_APY_Est)^(Tenor/365)-Deposit)'),
@@ -700,7 +741,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(+quote.amounts.premium)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   // Premium Amount used for the following calculation.
@@ -714,7 +756,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(quote.amounts.counterparty)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t('From Market Maker Price'),
@@ -730,7 +773,8 @@ export const Calculation = (props: CalculationProps) => {
                           +quote.amounts.minRedeemable +
                           +quote.amounts.maxSettlementFee,
                       )}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t(
@@ -781,7 +825,8 @@ export const Calculation = (props: CalculationProps) => {
                   value: (
                     <>
                       {amountFormatter(+quote.amounts.tradingFee)}{' '}
-                      {props.baseCcy || vault.depositCcy}
+                      {(props.baseCcy || vault.realDepositCcy) ??
+                        vault.depositCcy}
                     </>
                   ),
                   desc: t(
@@ -796,7 +841,8 @@ export const Calculation = (props: CalculationProps) => {
                         value: (
                           <>
                             {amountFormatter(quote.amounts.settlementFee)}{' '}
-                            {props.baseCcy || vault.depositCcy}
+                            {(props.baseCcy || vault.realDepositCcy) ??
+                              vault.depositCcy}
                           </>
                         ),
                         desc: t('Protocol Settlement Fee'),
@@ -809,7 +855,8 @@ export const Calculation = (props: CalculationProps) => {
                         value: (
                           <>
                             {amountFormatter(quote.amounts.settlementFee)}{' '}
-                            {props.baseCcy || vault.depositCcy}
+                            {(props.baseCcy || vault.realDepositCcy) ??
+                              vault.depositCcy}
                           </>
                         ),
                         desc: t('Protocol Upside Fee (Winning Only)'),

@@ -190,7 +190,7 @@ const DepositModalContent = (
             </div>
             <PayoffChart
               className={styles['payoff-chart']}
-              depositCcy={data.vault.depositCcy}
+              depositCcy={data.vault.realDepositCcy ?? data.vault.depositCcy}
               productType={data.vault.productType}
               anchorPrices={data.anchorPrices}
               protectedYield={Number(apyInfo?.min)}
@@ -245,7 +245,9 @@ const DepositModalContent = (
             tick={vault?.depositTickAmount}
             value={product?.depositAmount}
             suffix={
-              <span className={styles['unit-1']}>{vault?.depositCcy}</span>
+              <span className={styles['unit-1']}>
+                {vault?.realDepositCcy ?? vault?.depositCcy}
+              </span>
             }
             onChange={(v) => {
               return (
@@ -272,7 +274,9 @@ const DepositModalContent = (
             <span className={styles['label']}>{t('wallet.balance')}</span>
             <span className={styles['value']}>
               {amountFormatter(wallet.balance?.[data.vault.depositCcy])}
-              <span className={styles['unit']}>{data.vault.depositCcy}</span>
+              <span className={styles['unit']}>
+                {data.vault.realDepositCcy ?? data.vault.depositCcy}
+              </span>
             </span>
           </div>
           {vault && (

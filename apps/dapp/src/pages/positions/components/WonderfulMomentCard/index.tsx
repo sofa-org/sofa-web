@@ -31,22 +31,24 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
   const prices = useIndexPrices((state) => state.prices);
   const position = props.position;
   const product = position.product;
-  const riskTypeRef = RiskTypeRefs[product.vault.riskType];
-  const productTypeRef = ProductTypeRefs[product.vault.productType];
+  const vault = product.vault;
+
+  const riskTypeRef = RiskTypeRefs[vault.riskType];
+  const productTypeRef = ProductTypeRefs[vault.productType];
   const productIcon = useMemo(
     () =>
-      product.vault.riskType == RiskType.DUAL
+      vault.riskType == RiskType.DUAL
         ? undefined
         : productTypeRef.icon(
-            product.vault.riskType,
-            !product.vault.depositCcy.startsWith('USD'),
+            vault.riskType,
+            !vault.depositCcy.startsWith('USD'),
           ),
-    [product.vault.depositCcy, product.vault.riskType, productTypeRef],
+    [vault.depositCcy, vault.riskType, productTypeRef],
   );
 
   // const leverageInfo = useAsyncMemo(
-  //   () => ProductsService.vaultLeverageInfo(product.vault, position.createdAt),
-  //   [product.vault, position.createdAt],
+  //   () => ProductsService.vaultLeverageInfo(vault, position.createdAt),
+  //   [vault, position.createdAt],
   // );
 
   const pnl = useMemo(
@@ -56,7 +58,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
   const levelRef = useMemo(() => {
     const returnInUsd = cvtAmountsInUsd(
       [
-        [product.vault.depositCcy, pnl],
+        [vault.depositCcy, pnl],
         ['RCH', position.amounts.rchAirdrop],
       ],
       prices,
@@ -65,10 +67,10 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
       WonderfulMomentLevels.find((it) => it.is(returnInUsd)) ||
       WonderfulMomentLevels[WonderfulMomentLevels.length - 1]
     );
-  }, [pnl, product.vault.depositCcy, position.amounts.rchAirdrop, prices]);
+  }, [pnl, vault.depositCcy, position.amounts.rchAirdrop, prices]);
   const pnlPrecision = useMemo(
-    () => (product.vault.depositCcy.startsWith('USD') ? 2 : 5),
-    [product.vault.depositCcy],
+    () => (vault.depositCcy.startsWith('USD') ? 2 : 5),
+    [vault.depositCcy],
   );
   if (!levelRef || !productIcon) return <></>;
   return (
@@ -80,12 +82,14 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
           alt="icon"
         />
         <span className={styles['level-icon']}>{levelRef.icon}</span>
-        {product.vault.riskType === RiskType.RISKY ? (
+        {vault.riskType === RiskType.RISKY ? (
           <div className={styles['profit']}>
             <span className={styles['value']}>
               {amountFormatter(position.amounts.redeemable, pnlPrecision)}
             </span>
-            <span className={styles['unit']}>{product.vault.depositCcy}</span>
+            <span className={styles['unit']}>
+              {vault.realDepositCcy ?? vault.depositCcy}
+            </span>
           </div>
         ) : (
           <div className={styles['profit']}>
@@ -93,7 +97,9 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
               {pnl >= 0 ? '+' : ''}
               {amountFormatter(pnl, pnlPrecision)}
             </span>
-            <span className={styles['unit']}>{product.vault.depositCcy}</span>
+            <span className={styles['unit']}>
+              {vault.realDepositCcy ?? vault.depositCcy}
+            </span>
           </div>
         )}
         <div className={styles['profit']}>
@@ -105,7 +111,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
 
         <div className={styles['risk-type']}>
           {productTypeRef.alias}
-          {product.vault.riskType === RiskType.LEVERAGE && (
+          {vault.riskType === RiskType.LEVERAGE && (
             <span className={styles['badge-leverage']}>Lev.</span>
           )}
           {riskTypeRef.icon}
@@ -132,22 +138,22 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
         <div className={styles['amounts']}>
           <div className={styles['amount']}>
             <span className={styles['label']}>
-              {product.vault.riskType === RiskType.RISKY
-                ? t('Cost')
-                : t('Deposit')}
+              {vault.riskType === RiskType.RISKY ? t('Cost') : t('Deposit')}
             </span>
             <span>
               {amountFormatter(position.amounts.own, pnlPrecision)}{' '}
-              <span className={styles['unit']}>{product.vault.depositCcy}</span>
+              <span className={styles['unit']}>
+                {vault.realDepositCcy ?? vault.depositCcy}
+              </span>
             </span>
           </div>
-          {product.vault.riskType === RiskType.RISKY ? (
+          {vault.riskType === RiskType.RISKY ? (
             <div className={styles['amount']}>
               <span className={styles['label']}>{t('Payout')}</span>
               <span>
                 {amountFormatter(position.amounts.redeemable, pnlPrecision)}{' '}
                 <span className={styles['unit']}>
-                  {product.vault.depositCcy}
+                  {vault.realDepositCcy ?? vault.depositCcy}
                 </span>
               </span>
             </div>
@@ -157,7 +163,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
               <span>
                 +{amountFormatter(pnl, pnlPrecision)}{' '}
                 <span className={styles['unit']}>
-                  {product.vault.depositCcy}
+                  {vault.realDepositCcy ?? vault.depositCcy}
                 </span>
               </span>
             </div>

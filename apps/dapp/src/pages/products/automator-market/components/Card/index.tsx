@@ -66,7 +66,9 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         <img src={depositCcyConfig?.icon} alt="" />
         <div className={styles['name']}>
           <MsgDisplay expandDisabled>
-            {props.info.vaultInfo.name || props.info.vaultInfo.depositCcy}
+            {(props.info.vaultInfo.name ||
+              props.info.vaultInfo.realDepositCcy) ??
+              props.info.vaultInfo.depositCcy}
           </MsgDisplay>
         </div>
         <Address
@@ -129,7 +131,8 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
             ccy={props.info.vaultInfo.depositCcy}
           />
           <span className={styles['unit']}>
-            {props.info.vaultInfo.depositCcy}
+            {props.info.vaultInfo.realDepositCcy ??
+              props.info.vaultInfo.depositCcy}
           </span>
         </div>
       </div>
@@ -145,7 +148,8 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
                 ccy={props.info.vaultInfo.depositCcy}
               />
               <span className={styles['unit']}>
-                {props.info.vaultInfo.depositCcy}
+                {props.info.vaultInfo.realDepositCcy ??
+                  props.info.vaultInfo.depositCcy}
               </span>
               <span className={styles['percent']}>
                 {displayPercentage(

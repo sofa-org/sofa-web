@@ -140,7 +140,7 @@ const ProductLottery = (
               <InvestButton
                 vault={vault.vault.toLowerCase()}
                 chainId={vault.chainId}
-                depositCcy={vault.depositCcy}
+                depositCcy={vault.realDepositCcy ?? vault.depositCcy}
                 autoQuote
               />
             </div>
@@ -546,9 +546,11 @@ const AutomatorTrade = (props: BaseProps & { onlyForm?: boolean }) => {
                                   ]?.precision || undefined,
                                 )}
                                 <span className={styles['unit']}>
-                                  {CCYService.ccyConfigs[
+                                  {(CCYService.ccyConfigs[
                                     automator.vaultInfo.depositCcy
-                                  ]?.name || automator.vaultInfo.depositCcy}
+                                  ]?.name ||
+                                    automator.vaultInfo.realDepositCcy) ??
+                                    automator.vaultInfo.depositCcy}
                                 </span>
                               </span>
                             ) : (

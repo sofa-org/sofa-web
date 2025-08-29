@@ -75,7 +75,7 @@ export const RedPacket = (props: { automator: AutomatorVaultInfo }) => {
           value={amount}
           onChange={setAmount}
           prefix={t({ enUS: 'Bonus', zhCN: '金额' })}
-          suffix={props.automator.depositCcy}
+          suffix={props.automator.realDepositCcy ?? props.automator.depositCcy}
           placeholder={t({ enUS: 'Amount', zhCN: '输入金额' })}
         />
         <div className={styles['balance']}>
@@ -83,7 +83,8 @@ export const RedPacket = (props: { automator: AutomatorVaultInfo }) => {
             {t({ enUS: 'Wallet Balance', zhCN: '钱包余额' })}
           </span>
           <span className={styles['value']}>
-            {amountFormatter(balance, 2)} {props.automator.depositCcy}
+            {amountFormatter(balance, 2)}{' '}
+            {props.automator.realDepositCcy ?? props.automator.depositCcy}
           </span>
         </div>
       </Modal>

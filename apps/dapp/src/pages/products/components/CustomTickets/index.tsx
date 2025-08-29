@@ -203,7 +203,9 @@ const CustomTicket = (props: CustomTicketProps) => {
                   2,
                 )}
               </span>
-              <span className={styles['unit']}>{vault.depositCcy}</span>
+              <span className={styles['unit']}>
+                {vault.realDepositCcy ?? vault.depositCcy}
+              </span>
             </span>
             <span className={styles['rch-return']}>
               <span className={styles['amount']}>
