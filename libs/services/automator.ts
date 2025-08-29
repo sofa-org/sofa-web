@@ -216,6 +216,11 @@ export class AutomatorService {
             vault?.creatorFeeRate,
             0,
           ].find((x) => !Number.isNaN(x) && !isNullLike(x)),
+          realDepositCcy: (() => {
+            if (it.chainId === 1329 && it.clientDepositCcy === 'USDC')
+              return 'USDC.n';
+            return it.clientDepositCcy;
+          })(),
           depositCcy: it.clientDepositCcy,
           vaultDepositCcy: it.vaultDepositCcy,
           positionCcy: it.sharesToken,
