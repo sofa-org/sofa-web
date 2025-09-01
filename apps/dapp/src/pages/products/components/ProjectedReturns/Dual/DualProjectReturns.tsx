@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Tooltip } from '@douyinfe/semi-ui';
-import { ProductType, VaultInfo } from '@sofa/services/base-type';
+import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import {
   DualPositionExecutionStatus,
@@ -9,7 +9,6 @@ import {
 } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';
-import { ProductQuoteResult } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
 import { useAsyncMemo } from '@sofa/utils/hooks';
 import { simplePlus } from '@sofa/utils/object';
@@ -528,7 +527,7 @@ export const DualProfitScenarios = (
 
 export const DualProjectedReturns = (
   props: BaseProps & {
-    data: Partial<PositionInfo> & { vault: VaultInfo };
+    data: Partial<PositionInfo>;
     scenario: 'quote' | 'position';
   },
 ) => {
@@ -541,8 +540,8 @@ export const DualProjectedReturns = (
   );
   const [basedCcy, setBasedCcy] = useState<CCY | USDS | undefined>(undefined);
   useEffect(() => {
-    if (!basedCcy && position.vault.depositBaseCcy) {
-      setBasedCcy(position.vault.depositBaseCcy);
+    if (!basedCcy && position.product?.vault.depositBaseCcy) {
+      setBasedCcy(position.product?.vault.depositBaseCcy);
     }
   }, [basedCcy, position]);
   if (!product || !profitsProps)

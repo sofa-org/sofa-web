@@ -343,16 +343,16 @@ const Right = (props: BaseProps & { data: Partial<PositionInfo> }) => {
   );
 };
 export const ProjectedReturns = (
-  props: BaseProps & { data: Partial<PositionInfo> & { vault: VaultInfo } },
+  props: BaseProps & { data: Partial<PositionInfo> },
 ) => {
   const [t] = useTranslation('ProjectedReturns');
   const position = props.data;
   const product = position.product;
   const { depositCcy, calculatedInfo } = useBaseDepositCcySelector({
-    vault: position.vault,
+    vault: product?.vault,
     position: position,
   });
-  if (position.vault.riskType == RiskType.DUAL) {
+  if (product?.vault.riskType == RiskType.DUAL) {
     return <DualProjectedReturns {...props} scenario="position" />;
   }
   if (!position.amounts || !position.pricesForCalculation || !product)
@@ -390,7 +390,7 @@ export const ProjectedReturns = (
         )}
         <div className={styles['out-right']}>
           <BaseDepositCcySelector
-            vault={position.vault}
+            vault={product?.vault}
             className={styles['base-ccy-select']}
           />
           <Right

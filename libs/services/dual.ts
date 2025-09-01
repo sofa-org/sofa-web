@@ -47,9 +47,7 @@ export class DualService {
   static getLinkedCcy(vault: VaultInfo) {
     return vault.forCcy == vault.depositCcy ? vault.domCcy : vault.forCcy;
   }
-  private static $getExecutionStatus(
-    position: positions.PositionInfo & { vault: VaultInfo },
-  ) {
+  private static $getExecutionStatus(position: positions.PositionInfo) {
     const claimStatus = DualService.getClaimStatus(position, new Date());
     if (
       [
@@ -326,7 +324,7 @@ export class DualService {
       return undefined;
     }
     const claimStatus = DualService.getClaimStatus(
-      data as positions.PositionInfo & { vault: VaultInfo },
+      data as positions.PositionInfo,
       new Date(),
     ).status;
     if (
@@ -345,7 +343,7 @@ export class DualService {
       }
     }
     const executionStatus = DualService.$getExecutionStatus(
-      data as positions.PositionInfo & { vault: VaultInfo },
+      data as positions.PositionInfo,
     );
     const price = DualService.getPrice(product);
     if (price === undefined) {

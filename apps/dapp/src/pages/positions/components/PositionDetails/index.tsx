@@ -1,8 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { Modal, Table, Toast } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
-import { CCYService } from '@sofa/services/ccy';
-import { ProductType, RiskType, VaultInfo } from '@sofa/services/contracts';
+import { ProductType, RiskType } from '@sofa/services/contracts';
 import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -47,7 +46,7 @@ import styles from './index.module.scss';
 addI18nResources(locale, 'PositionDetails');
 
 export interface PositionDetailsProps {
-  position: PositionInfo & { vault: VaultInfo };
+  position: PositionInfo;
   onStatusChange?(status: PositionStatus): void;
 }
 
@@ -202,16 +201,14 @@ const PositionDetails = (props: PositionDetailsProps) => {
           ]),
     ],
     [
-      leftTime,
+      product,
+      t,
+      expiry,
+      observationStart,
+      position.product.vault.tickPrice,
       position.triggerPrice,
       position.triggerTime,
-      product.anchorPrices,
-      expiry,
-      product.vault.forCcy,
-      observationStart,
-      product.vault.productType,
-      product.vault.riskType,
-      t,
+      leftTime,
     ],
   );
 
@@ -228,19 +225,20 @@ const PositionDetails = (props: PositionDetailsProps) => {
       collateralAtRiskPercentage:
         position.claimParams.collateralAtRiskPercentage,
       isMaker: position.claimParams.maker,
-      riskType: position.vault.riskType,
+      riskType: product.vault.riskType,
     }),
     [
+      position.id,
+      position.wallet,
+      position.claimParams.term,
       position.claimParams.anchorPrices,
       position.claimParams.collateralAtRiskPercentage,
-      position.id,
-      position.claimParams.term,
       position.claimParams.maker,
-      position.wallet,
-      product.expiry,
-      product.vault.chainId,
-      product.vault.productType,
       product.vault.vault,
+      product.vault.productType,
+      product.vault.chainId,
+      product.vault.riskType,
+      product.expiry,
     ],
   );
 

@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
 import { DualService } from '@sofa/services/dual';
 import { PositionInfo } from '@sofa/services/positions';
-import { ProductQuoteResult, VaultInfo } from '@sofa/services/products';
+import { ProductQuoteResult } from '@sofa/services/products';
 import { useAsyncMemo } from '@sofa/utils/hooks';
 
 import { addI18nResources } from '@/locales';
@@ -12,11 +11,7 @@ addI18nResources(locale, 'ProfitsRenders');
 
 export const DualProfitsRender = (
   props: BaseProps & {
-    data:
-      | ProductQuoteResult
-      | (PositionInfo & {
-          vault: VaultInfo;
-        });
+    data: ProductQuoteResult | PositionInfo;
     baseCcy?: CCY | USDS;
     scenario: 'quote' | 'position';
   },

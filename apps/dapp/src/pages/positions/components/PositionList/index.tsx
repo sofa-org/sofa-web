@@ -106,7 +106,7 @@ const List = (props: {
         `${it.id}-${it.product.vault.vault.toLowerCase()}-${it.createdAt}`,
     );
     console.info('Positions', list);
-    return list as (PositionInfo & { vault: VaultInfo })[];
+    return list as PositionInfo[];
   }, [$data, wallet.chainId, address]);
 
   const claimProgressRef = useRef<PositionClaimProgressRef>(null);
@@ -174,9 +174,7 @@ const List = (props: {
     return PositionsService.claimBatch(cb, data);
   });
 
-  const [selectedPosition, setSelectedPosition] = useState<
-    PositionInfo & { vault: VaultInfo }
-  >();
+  const [selectedPosition, setSelectedPosition] = useState<PositionInfo>();
 
   const handleStatusChange = useLazyCallback(
     (status: PositionStatus, $position?: PositionInfo) => {
@@ -208,10 +206,7 @@ const List = (props: {
           prev[depositCcy].push(it);
           return prev;
         },
-        {} as Record<
-          VaultInfo['depositCcy'],
-          (PositionInfo & { vault: VaultInfo })[]
-        >,
+        {} as Record<VaultInfo['depositCcy'], PositionInfo[]>,
       ) || {},
     [data],
   );
@@ -228,7 +223,7 @@ const List = (props: {
         spinning={loading || (!data && !!address)}
       >
         {Object.entries(dataGroupByDepositCcy).map((e) => (
-          <>
+          <Fragment key={e[0]}>
             <div
               key={`${e[0]}-title`}
               className={classNames(
@@ -240,7 +235,7 @@ const List = (props: {
                 display:
                   Object.entries(dataGroupByDepositCcy).length > 1 ||
                   Object.values(dataGroupByDepositCcy).find(
-                    (p) => p[0]?.vault?.depositBaseCcy,
+                    (p) => p[0]?.product.vault?.depositBaseCcy,
                   )
                     ? undefined
                     : 'none',
@@ -252,7 +247,7 @@ const List = (props: {
                 alt=""
               />
               <span>{CCYService.ccyConfigs[e[0]]?.name || e[0]}</span>
-              {(e[1]?.[0]?.vault?.depositBaseCcy && (
+              {(e[1]?.[0]?.product.vault?.depositBaseCcy && (
                 <span
                   className={classNames(styles['base-ccy-est-toggle'], {
                     [styles['selected']]: positionListConfig?.showBaseCcyEst,
@@ -276,13 +271,13 @@ const List = (props: {
                         zhCN: '显示 [[{{baseCcy}}]] 预计收益',
                       },
                       {
-                        baseCcy: e[1][0].vault.depositBaseCcy,
+                        baseCcy: e[1][0].product.vault.depositBaseCcy,
                       },
                     ),
                     {
                       hightlightedClassName: styles['base-ccy'],
                       hightlightedStyle: {
-                        backgroundImage: `url(${CCYService.ccyConfigs[e[1][0].vault.depositBaseCcy]?.icon || ''})`,
+                        backgroundImage: `url(${CCYService.ccyConfigs[e[1][0].product.vault.depositBaseCcy]?.icon || ''})`,
                       },
                     },
                   )}
@@ -309,7 +304,7 @@ const List = (props: {
                 ),
               )}
             </div>
-          </>
+          </Fragment>
         ))}
 
         {!data?.length && !loading && (
