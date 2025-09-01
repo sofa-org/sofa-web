@@ -1,16 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ProductType, RiskType, VaultInfo } from '@sofa/services/base-type';
+import { ProductType, RiskType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductsDIYService } from '@sofa/services/products-diy';
-import { getDualDepositCcy } from '@sofa/services/vaults/dual';
 import { displayPercentage } from '@sofa/utils/amount';
-import { Env } from '@sofa/utils/env';
 import { MsIntervals, nearest8h, next8h } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
-import { useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
-import { pick } from 'lodash-es';
 
 import { MobileOnly, useIsMobileUI } from '@/components/MobileOnly';
 import {
@@ -147,6 +143,13 @@ const HowLong = () => {
     if (!options) return [next8h(undefined, 2), next8h(undefined, 7)];
     return [options[0] * 1000, options[options.length - 1] * 1000];
   }, [chainId, config, formData]);
+
+  useEffect(() => {
+    if (!formData?.expiry || formData.expiry < min || formData.expiry > max) {
+      useDIYState.updateExpiry(chainId, min + MsIntervals.day);
+    }
+  }, [chainId, formData?.expiry, min, max]);
+
   const term = Math.floor(
     (Number(formData?.expiry) - Date.now()) / MsIntervals.day,
   );
@@ -341,6 +344,17 @@ const ApyTarget = () => {
     useDIYState.getApyList(chainId, state),
   );
   const max = rest[rest.length - 1];
+
+  useEffect(() => {
+    if (
+      !formData?.apyTarget ||
+      formData.apyTarget < min ||
+      formData.apyTarget > max
+    ) {
+      useDIYState.updateApyTarget(chainId, min);
+    }
+  }, [chainId, formData?.apyTarget, min, max]);
+
   const [decimalMappingFn, decimalReverseMappingFn] = useMemo(
     () =>
       formData?.riskType == RiskType.DUAL
@@ -443,6 +457,16 @@ const OddsTarget = () => {
     () => [safeLog(min), safeLog(max)],
     [max, min],
   );
+
+  useEffect(() => {
+    if (
+      !formData?.oddsTarget ||
+      formData.oddsTarget < min ||
+      formData.oddsTarget > max
+    ) {
+      useDIYState.updateMultipleTarget(chainId, min);
+    }
+  }, [chainId, formData?.oddsTarget, min, max]);
 
   const percentage = useMemo(() => {
     if (isNullLike(formData?.oddsTarget)) return 0;

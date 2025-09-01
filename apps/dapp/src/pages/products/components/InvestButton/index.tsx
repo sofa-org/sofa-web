@@ -165,12 +165,15 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
     quoteInfos,
     useProductsState,
   );
-  const insufficient = useMemo(() => {
+  const amount = useMemo(
+    () => simplePlus(...products.map((it) => it.depositAmount))!,
+    [products],
+  );
+  const insufficient = (() => {
     if (!vault?.depositCcy) return false;
     if (shouldQuote) return false;
-    const amount = simplePlus(...products.map((it) => it.depositAmount))!;
     return props.isInsufficientBalance(amount);
-  }, [products, shouldQuote, vault?.depositCcy]);
+  })();
 
   const showQuote = shouldQuote || !quoteInfos.length;
   const quote = useLazyCallback(async (noToast?: boolean) => {
