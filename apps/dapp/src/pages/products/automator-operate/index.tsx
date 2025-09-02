@@ -6,6 +6,7 @@ import { displayPercentage } from '@sofa/utils/amount';
 import { updateQuery } from '@sofa/utils/history';
 import { useIsPortrait, useQuery } from '@sofa/utils/hooks';
 import { formatDurationToDay } from '@sofa/utils/time';
+import classNames from 'classnames';
 
 import Address from '@/components/Address';
 import { MsgDisplay } from '@/components/MsgDisplay';
@@ -13,6 +14,7 @@ import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
 import { addI18nResources } from '@/locales';
 
+import BadgeBittensor from '../assets/badge-bittensor.png';
 import { useAutomatorStore } from '../automator/store';
 import { AutomatorRiskExposureMap } from '../automator-create/util';
 import { Comp as IconCalendar } from '../automator-mine/assets/icon-calendar.svg';
@@ -120,121 +122,127 @@ const Index = () => {
     <TopTabs
       type="banner-expandable-tab"
       className={styles['container']}
+      bannerClassName={classNames({
+        [styles['banner-bittensor']]: automatorDetail?.joinedBittensor,
+      })}
       banner={
-        <>
-          <h1 className={styles['head-title']}>
-            <div className={styles['title']}>
-              {ProjectTypeRefs[ProjectType.Automator].icon}
-              {t({
-                enUS: 'My Automator',
-                zhCN: '我的 Automator',
-              })}
+        <h1 className={styles['head-title']}>
+          {automatorDetail?.joinedBittensor && (
+            <img
+              className={styles['badge-bittensor']}
+              src={BadgeBittensor}
+              alt="Bittensor"
+            />
+          )}
+          <div className={styles['title']}>
+            {ProjectTypeRefs[ProjectType.Automator].icon}
+            {t({
+              enUS: 'My Automator',
+              zhCN: '我的 Automator',
+            })}
+          </div>
+          <div>
+            <CreatorAutomatorSelector className={styles['selector']} />
+            <div
+              className={styles['share-btn']}
+              onClick={() => shareModalRef.current?.show()}
+            >
+              <span>
+                {t({
+                  enUS: 'Share',
+                  zhCN: '分享',
+                })}
+              </span>
             </div>
-            <div>
-              <CreatorAutomatorSelector className={styles['selector']} />
-              <div
-                className={styles['share-btn']}
-                onClick={() => shareModalRef.current?.show()}
-              >
-                <span>
-                  {t({
-                    enUS: 'Share',
-                    zhCN: '分享',
-                  })}
-                </span>
-              </div>
-            </div>
+          </div>
 
-            <div className={styles['infos']}>
-              <Address
-                address={automator?.vaultInfo.vault.toLowerCase() || ''}
-                simple
-                linkBtn
-              />
-              <div className={styles['item']}>
-                <span className={styles['label']}>
-                  {t({ enUS: 'Deposit', zhCN: '投资币种' })}
-                </span>
-                {automator?.vaultInfo.realDepositCcy ??
-                  automator?.vaultInfo.depositCcy}
-                {automator?.vaultInfo.depositCcy && (
-                  <img
-                    src={
-                      CCYService.ccyConfigs[
-                        automator?.vaultInfo.realDepositCcy ??
-                          automator?.vaultInfo.depositCcy
-                      ]?.icon
-                    }
-                    alt=""
-                  />
-                )}
-              </div>
-              <div className={styles['item']}>
-                <span className={styles['label']}>
-                  {t({ enUS: 'Fee', zhCN: '手续费' })}
-                </span>
-                {automator?.vaultInfo.creatorFeeRate !== undefined
-                  ? displayPercentage(automator.vaultInfo.creatorFeeRate, 0)
-                  : '-'}
-              </div>
-              <div className={styles['item']}>
-                <IconCalendar className={styles['label']} />
-                {automator?.vaultInfo.createTime
-                  ? formatDurationToDay(
-                      Date.now() - +automator?.vaultInfo.createTime,
-                    )
-                  : '-'}
-              </div>
-              <div className={styles['item']}>
-                <IconPeople className={styles['label']} />
-                {automator?.currentParticipantNum || '-'}
-              </div>
-              <div className={styles['item']}>
-                <IconRisk className={styles['label']} />
-                {automator &&
-                  (() => {
-                    const ref =
-                      AutomatorRiskExposureMap[
-                        automator.vaultInfo.riskExposure!
-                      ];
-                    return ref ? (
-                      <>
-                        <span
-                          style={{
-                            color: ref?.color || 'inherit',
-                          }}
-                        >
-                          {ref.label} - {ref.desc(t)}
-                        </span>
-                        <span className={styles['risk-desc']}>
-                          {t({
-                            enUS: 'Max Risk Exposure',
-                            zhCN: '最大风险敞口',
-                          })}
-                          : {displayPercentage(ref.value)}
-                        </span>
-                      </>
-                    ) : (
-                      'R-'
-                    );
-                  })()}
-              </div>
-              <div className={styles['desc']}>
-                <MsgDisplay>
-                  {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
-                  {(automatorDetail?.vaultInfo.desc || '...')
-                    .split('\n')
-                    .map((line, idx) => (
-                      <Fragment key={`lb-${idx}`}>
-                        {idx > 0 ? <br /> : undefined}
-                        {line}
-                      </Fragment>
-                    ))}
-                </MsgDisplay>
-              </div>
+          <div className={styles['infos']}>
+            <Address
+              address={automator?.vaultInfo.vault.toLowerCase() || ''}
+              simple
+              linkBtn
+            />
+            <div className={styles['item']}>
+              <span className={styles['label']}>
+                {t({ enUS: 'Deposit', zhCN: '投资币种' })}
+              </span>
+              {automator?.vaultInfo.realDepositCcy ??
+                automator?.vaultInfo.depositCcy}
+              {automator?.vaultInfo.depositCcy && (
+                <img
+                  src={
+                    CCYService.ccyConfigs[
+                      automator?.vaultInfo.realDepositCcy ??
+                        automator?.vaultInfo.depositCcy
+                    ]?.icon
+                  }
+                  alt=""
+                />
+              )}
             </div>
-          </h1>
-        </>
+            <div className={styles['item']}>
+              <span className={styles['label']}>
+                {t({ enUS: 'Fee', zhCN: '手续费' })}
+              </span>
+              {automator?.vaultInfo.creatorFeeRate !== undefined
+                ? displayPercentage(automator.vaultInfo.creatorFeeRate, 0)
+                : '-'}
+            </div>
+            <div className={styles['item']}>
+              <IconCalendar className={styles['label']} />
+              {automator?.vaultInfo.createTime
+                ? formatDurationToDay(
+                    Date.now() - +automator?.vaultInfo.createTime,
+                  )
+                : '-'}
+            </div>
+            <div className={styles['item']}>
+              <IconPeople className={styles['label']} />
+              {automator?.currentParticipantNum || '-'}
+            </div>
+            <div className={styles['item']}>
+              <IconRisk className={styles['label']} />
+              {automator &&
+                (() => {
+                  const ref =
+                    AutomatorRiskExposureMap[automator.vaultInfo.riskExposure!];
+                  return ref ? (
+                    <>
+                      <span
+                        style={{
+                          color: ref?.color || 'inherit',
+                        }}
+                      >
+                        {ref.label} - {ref.desc(t)}
+                      </span>
+                      <span className={styles['risk-desc']}>
+                        {t({
+                          enUS: 'Max Risk Exposure',
+                          zhCN: '最大风险敞口',
+                        })}
+                        : {displayPercentage(ref.value)}
+                      </span>
+                    </>
+                  ) : (
+                    'R-'
+                  );
+                })()}
+            </div>
+            <div className={styles['desc']}>
+              <MsgDisplay>
+                {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
+                {(automatorDetail?.vaultInfo.desc || '...')
+                  .split('\n')
+                  .map((line, idx) => (
+                    <Fragment key={`lb-${idx}`}>
+                      {idx > 0 ? <br /> : undefined}
+                      {line}
+                    </Fragment>
+                  ))}
+              </MsgDisplay>
+            </div>
+          </div>
+        </h1>
       }
       options={options}
       value={tab}

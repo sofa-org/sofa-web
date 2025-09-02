@@ -1,3 +1,14 @@
+.banner-bittensor {
+  background: url("../assets/bg-bittensor.png") no-repeat center / cover !important;
+}
+
+.badge-bittensor {
+  width: min(378px, $width-content);
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 36px;
+}
+
 .position-size {
   display: inline-block;
   padding: 0 0 0 6px;
@@ -144,6 +155,15 @@
     .title {
       display: flex;
       margin: -56px 0 32px;
+    }
+
+    .badge-bittensor {
+      display: block;
+      margin: -56px auto 32px;
+
+      + .title {
+        display: none;
+      }
     }
 
     .infos {

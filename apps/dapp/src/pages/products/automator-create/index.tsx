@@ -20,6 +20,8 @@ import {
 } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
+import BadgeBittensor from '../assets/badge-bittensor.png';
+
 import { Comp as IconInfo } from './assets/icon-info.svg';
 import { Comp as IconPoints } from './assets/icon-points.svg';
 import { Comp as IconShare } from './assets/icon-share.svg';
@@ -274,31 +276,25 @@ const AutomatorCreate = () => {
         type={'banner-expandable'}
         className={styles['container']}
         tabClassName={styles['tabs']}
+        bannerClassName={classNames({
+          [styles['banner-bittensor']]: fromSignalPlus,
+        })}
         banner={
-          <>
-            <h1 className={styles['head-title']}>
-              {fromSignalPlus
-                ? ProjectTypeRefs[ProjectType.Earn].icon
-                : ProjectTypeRefs[ProjectType.Automator].icon}
-              {fromSignalPlus ? (
-                <>
-                  {t({
-                    enUS: 'Create Strategy Vaults',
-                    zhCN: '创建挖矿策略',
-                  })}
-                  <div className={styles['badge']}>
-                    SOFA x Efficient Frontier{' '}
-                    <span className={styles['highlight']}>Trade Mining</span>
-                  </div>
-                </>
-              ) : (
-                t({
-                  enUS: 'Create Your Automator Strategies',
-                  zhCN: '创建你 Automator 策略',
-                })
-              )}
-            </h1>
-          </>
+          <h1 className={styles['head-title']}>
+            {!fromSignalPlus && ProjectTypeRefs[ProjectType.Automator].icon}
+            {fromSignalPlus ? (
+              <img
+                className={styles['badge-bittensor']}
+                src={BadgeBittensor}
+                alt="Bittensor"
+              />
+            ) : (
+              t({
+                enUS: 'Create Your Automator Strategies',
+                zhCN: '创建你 Automator 策略',
+              })
+            )}
+          </h1>
         }
         dark
         options={[]}
@@ -308,6 +304,15 @@ const AutomatorCreate = () => {
             [styles['mobile-ui']]: isMobileUI,
           })}
         >
+          {fromSignalPlus && (
+            <div className={styles['title-bittensor']}>
+              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {t({
+                enUS: 'Create A Bittensor Mining Strategy',
+                zhCN: '创建 Bittensor Automator 策略',
+              })}
+            </div>
+          )}
           <div className={classNames(styles['chain-and-ccy'])}>
             <Select
               className={styles['select-chain']}

@@ -8,6 +8,23 @@
   color: #fff;
 }
 
+.banner-bittensor {
+  background: url("../assets/bg-bittensor.png") no-repeat center / cover !important;
+}
+
+.badge-bittensor {
+  width: min(532px, $width-content);
+  height: auto;
+  object-fit: contain;
+}
+
+.title-bittensor {
+  @include flex-center;
+  margin-top: -16px;
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
 .form {
   width: $width-content;
 
