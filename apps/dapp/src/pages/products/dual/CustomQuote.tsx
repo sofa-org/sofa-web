@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { DatePicker, Toast } from '@douyinfe/semi-ui';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { ContractsService } from '@sofa/services/contracts';
 import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
@@ -45,8 +46,7 @@ export const CustomQuote = (props: {
   const [lazyPrice, setLazyPrice] = useState<number | undefined>(undefined);
   const [lazyExpiry, setLazyExpiry] = useState<number | undefined>(undefined);
   const dualConfig = useProductsState(
-    (s) =>
-      s.dualConfig[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`],
+    (s) => s.dualConfig[ContractsService.genVaultInputKey(props.vault)],
   );
   const lazyTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,

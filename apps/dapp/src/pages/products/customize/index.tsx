@@ -136,14 +136,14 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
 
   const product = useProductsState(
     (state) =>
-      vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]?.[0],
+      vault && state.cart[ContractsService.genVaultInputKey(vault)]?.[0],
   );
   const updateProduct = useLazyCallback(
     (action: SetStateAction<Partial<typeof product>>) => {
       if (!vault) return;
       const old =
         useProductsState.getState().cart[
-          `${vault.vault.toLowerCase()}-${vault.chainId}`
+          ContractsService.genVaultInputKey(vault)
         ]?.[0];
       const val = calcVal(action, old);
       useProductsState.updateCart({
@@ -516,9 +516,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                 </div>
               </div>
             )}
-            {vault && (
-              <InvestButton vault={vault.vault} chainId={vault.chainId} />
-            )}
+            {vault && <InvestButton vault={vault} />}
           </div>
         </div>
       </div>

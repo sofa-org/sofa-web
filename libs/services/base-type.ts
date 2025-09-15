@@ -58,16 +58,24 @@ export enum AutomatorTransactionStatus {
   CANCELLED = 'CANCELLED',
 }
 
-export interface VaultInfo {
-  vault: string; // 合约地址
+export interface VaultInputInfo {
   chainId: number;
   productType: ProductType;
   riskType: RiskType; // 风险类型：PROTECTED, LEVERAGE, RISKY
   forCcy: Exclude<CCY, 'stETH'>; // 标的物币种
   domCcy: USDS; // 标的物币种的币对
-  trackingSource: string; // 追踪指数源
-  realDepositCcy?: CCY | USDS; // 申购币种合约的 token name
   depositCcy: CCY | USDS; // 申购币种在服务端的名称，正常来讲就是 realDepositCcy，但 SEI 链的一些合约有些历史原因，导致 deposit ccy 和链上的名字不一样
+  realDepositCcy: CCY | USDS; // 申购币种合约的 token name
+  onlyForAutomator: boolean; // 只允许作为主理人为 automator 交易
+}
+
+export type VaultInputKey =
+  | ''
+  | `${VaultInputInfo['chainId']}-${VaultInputInfo['productType']}-${VaultInputInfo['riskType']}-${VaultInputInfo['forCcy']}-${VaultInputInfo['domCcy']}-${VaultInputInfo['realDepositCcy']}`;
+
+export interface VaultInfo extends VaultInputInfo {
+  vault: string; // 合约地址
+  trackingSource: string; // 追踪指数源
   depositBaseCcy?: CCY | USDS; // 净值成长类的申购币种销毁时能得到的币种，比如 scrvUSD 销毁得到 crvUSD，sUSDa 销毁得到 USDa
   depositMinAmount: number; // 申购币种数量的最小数量
   depositTickAmount: number; // 申购币种数量的步增
@@ -76,12 +84,12 @@ export interface VaultInfo {
   observationStyle?: 'Continuous'; // Continuous 连续敲出 属于合约的属性
   rchMultiplier?: number; // rch 空投乘数，没用了
   tradeDisable: boolean | undefined; // 是否不允许交易，但是允许查看头寸，交易记录，允许 claim
-  onlyForAutomator: boolean | undefined; // 只允许作为主理人为 automator 交易
   usePermit2: boolean; // 合约是否使用了 permit2 签名
   balanceDecimal: number; // 头寸余额的精度
   interestType: InterestType | undefined; // 生息方式，undefined 表示 vault 内部没有生息功能
   abis: ethers.InterfaceAbi;
   earlyClaimable: boolean | undefined;
+  priority: number; // 用户相同的选择（VaultInputInfo）下，优先级越高，报价越优先
 
   tickPrice?: number; // 只有 DUAL 的position里会返回
 }
@@ -91,8 +99,8 @@ export interface AutomatorVaultInfo {
   desc?: string;
   vault: string; // 合约地址
   chainId: number;
-  realDepositCcy?: CCY | USDS; // 申购币种合约的 token name
   depositCcy: CCY | USDS; // 申购币种在服务端的名称，正常来讲就是 realDepositCcy，但 SEI 链的一些合约有些历史原因，导致 deposit ccy 和链上的名字不一样
+  realDepositCcy: CCY | USDS; // 申购币种合约的 token name
   vaultDepositCcy: CCY | USDS; // 申购币种存入 automator 时被转化成的币种（也是 trend/dnt 合约的 depositCcy），比如 USDT -> aUSDT, crvUSD -> scrvUSD
   depositMinAmount: number; // 申购币种数量的最小数量
   depositTickAmount: number; // 申购币种数量的步增

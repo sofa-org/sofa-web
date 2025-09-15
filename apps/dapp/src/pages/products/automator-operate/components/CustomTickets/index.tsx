@@ -33,7 +33,10 @@ import { ProductTypeRefs } from '@/components/ProductSelector/enums';
 import { Time } from '@/components/TimezoneSelector';
 import { useAutomatorStore } from '@/pages/products/automator/store';
 
-import { useHoverTicket, useProductsState } from '../../../automator-store';
+import {
+  useAutomatorProductsState,
+  useHoverTicket,
+} from '../../../automator-store';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 
 import { Comp as IconBear } from './assets/icon-bear.svg';
@@ -136,7 +139,7 @@ const TicketEditor = (props: CustomTicketProps) => {
   ]);
 
   const onChange = useLazyCallback((val: Partial<ProductQuoteParams>) => {
-    useProductsState.updateCart(props.automatorVault, {
+    useAutomatorProductsState.updateCart(props.automatorVault, {
       ...props.product,
       ...val,
     });
@@ -144,14 +147,14 @@ const TicketEditor = (props: CustomTicketProps) => {
 
   useEffect(() => {
     if (vault && vault != props.product.vault) {
-      useProductsState.updateCart(props.automatorVault, {
+      useAutomatorProductsState.updateCart(props.automatorVault, {
         id: props.product.id,
         vault,
       });
     }
   }, [props.automatorVault, props.product.id, props.product.vault, vault]);
 
-  const quoteInfo = useProductsState(
+  const quoteInfo = useAutomatorProductsState(
     (state) => state.quoteInfos[ProductsService.productKey(props.product)],
   );
 
@@ -585,7 +588,7 @@ const TicketEditor = (props: CustomTicketProps) => {
         <div
           className={styles['icon-del']}
           onClick={() =>
-            useProductsState.updateCart(props.automatorVault, {
+            useAutomatorProductsState.updateCart(props.automatorVault, {
               ...props.product,
               depositAmount: 0,
             })
@@ -669,7 +672,7 @@ const CustomTickets = (props: {
       depositAmount: 1,
     } as PartialRequired<ProductQuoteParams, 'id' | 'vault'>;
   });
-  const products = useProductsState((state) => {
+  const products = useAutomatorProductsState((state) => {
     return (
       state.cart[
         `${props.vault.vault?.toLowerCase()}-${props.vault.chainId}`
@@ -688,7 +691,7 @@ const CustomTickets = (props: {
     // const recommendedListMap = arrToDict(recommendedList, key);
     // return list.filter((it) => !recommendedListMap[key(it)]);
   });
-  const quoteInfos = useProductsState((state) => state.quoteInfos);
+  const quoteInfos = useAutomatorProductsState((state) => state.quoteInfos);
   const [hoverTicket, setHoverTicket] = useHoverTicket(props.vault);
   // useEffect(() => {
   //   console.log('hoverTicket', hoverTicket);
@@ -696,7 +699,7 @@ const CustomTickets = (props: {
   useEffect(() => {
     if (!products.length) {
       const product = init();
-      useProductsState.updateCart(props.vault, product);
+      useAutomatorProductsState.updateCart(props.vault, product);
       setHoverTicket(product.id);
     }
   }, [init, products.length, props.vault, setHoverTicket]);
@@ -815,7 +818,9 @@ const CustomTickets = (props: {
               <>
                 <div
                   className={styles['icon-del']}
-                  onClick={() => useProductsState.clearCart(props.vault)}
+                  onClick={() =>
+                    useAutomatorProductsState.clearCart(props.vault)
+                  }
                 >
                   <IconDel />
                 </div>
@@ -825,7 +830,7 @@ const CustomTickets = (props: {
               <div
                 className={styles['icon-del']}
                 onClick={() =>
-                  useProductsState.updateCart(props.vault, {
+                  useAutomatorProductsState.updateCart(props.vault, {
                     ...it,
                     depositAmount: 0,
                   })
@@ -863,7 +868,7 @@ const CustomTickets = (props: {
           className={classNames('btn-ghost', styles['btn-add'])}
           onClick={() => {
             const newItem = init();
-            useProductsState.updateCart(props.vault, newItem);
+            useAutomatorProductsState.updateCart(props.vault, newItem);
             setHoverTicket(newItem.id);
           }}
         >

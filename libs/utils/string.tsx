@@ -23,7 +23,11 @@ export function formatHighlightedText(
 ) {
   const _create =
     ops.createElement ||
-    ((_, children, props) => <span {...props}>{children}</span>);
+    ((_, children, props) => (
+      <span {...props} key={props.key}>
+        {children}
+      </span>
+    ));
   return txt
     .replace(/\[([^[\]]+)\]/g, (_, n) => `__fht__${n}`)
     .split(/\[|\]/)

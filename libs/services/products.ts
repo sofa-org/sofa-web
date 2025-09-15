@@ -196,8 +196,6 @@ export function extractFromPPSKey(key: PPSKey) {
 }
 
 export interface ProductsRecommendRequest {
-  productType: ProductType;
-  riskType: RiskType;
   chainId: number;
   vault: string; // 合约地址
 }
@@ -206,6 +204,7 @@ export class ProductsService {
   static ccyEqual(ccy1: CCY | USDS, ccy2: CCY | USDS) {
     return ccy1 === ccy2 || `W${ccy1}` === ccy2 || ccy1 === `W${ccy2}`;
   }
+
   static readyForQuote(params: Partial<ProductQuoteParams>) {
     if (isDualQuoteParams(params)) {
       if (
@@ -226,6 +225,7 @@ export class ProductsService {
       return false;
     return true;
   }
+
   static productKey(
     product?: PartialRequired<ProductQuoteParams, 'vault'> & {
       protectedReturnApy?: number;
@@ -234,11 +234,11 @@ export class ProductsService {
     },
   ) {
     if (!product) return '';
+    const vault = ContractsService.genVaultInputKey(product.vault);
     if (isDualQuoteParams(product)) {
       const depositAmount = product.depositAmount || product.amounts?.own;
-      return `${product.vault.vault.toLowerCase()}-${product.vault?.chainId}-${product.expiry}-${amountFormatter(product.anchorPrices?.[0], 8, true)}-${depositAmount}`;
+      return `${vault}-${product.expiry}-${amountFormatter(product.anchorPrices?.[0], 8, true)}-${depositAmount}`;
     }
-    const vault = product.vault?.vault?.toLowerCase();
     const prices = product.anchorPrices?.map(Number).join('-');
     const protectedApy =
       product.vault?.riskType === RiskType.LEVERAGE ||
@@ -252,7 +252,7 @@ export class ProductsService {
             return +(!v ? 0 : Number(v)).toFixed(3);
           })();
     const depositAmount = product.depositAmount || product.amounts?.own;
-    return `${vault}-${product.vault?.chainId}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
+    return `${vault}-${product.expiry}-${prices}-${protectedApy}-${depositAmount}`;
   }
 
   static async dealOriginQuotes(
@@ -374,49 +374,53 @@ export class ProductsService {
     alsoFindOldVault = false, // 是否把老的合约（不能交易但能看头寸）也查出来
     strictRiskType = false,
   ) {
-    return vaults.filter((it) => {
-      if (!alsoFindOldVault && it.tradeDisable) return false;
-      for (const $k in it) {
-        const k = $k as keyof VaultInfo;
-        if (
-          isNullLike(filters[k]) ||
-          [
-            'vault',
-            'abis',
-            'borrowApr',
-            'spreadApr',
-            'leverage',
-            'usePermit2',
-            'balanceDecimal',
-          ].includes(k)
-        ) {
-          continue;
+    return vaults
+      .filter((it) => {
+        if (!alsoFindOldVault && it.tradeDisable) return false;
+        for (const $k in it) {
+          const k = $k as keyof VaultInfo;
+          if (
+            isNullLike(filters[k]) ||
+            [
+              'vault',
+              'abis',
+              'borrowApr',
+              'spreadApr',
+              'leverage',
+              'usePermit2',
+              'balanceDecimal',
+              'priority',
+            ].includes(k)
+          ) {
+            continue;
+          }
+          if (k === 'riskType' && !strictRiskType) {
+            if (filters.riskType === RiskType.DUAL) {
+              if (it.riskType !== RiskType.DUAL) return false;
+            } else if (it.riskType === RiskType.DUAL) return false;
+            if (filters.riskType === RiskType.RISKY) {
+              if (it.riskType !== RiskType.RISKY) return false;
+            } else if (it.riskType === RiskType.RISKY) return false;
+            continue;
+          }
+          if (k === 'vault') {
+            if (it.vault.toLowerCase() === filters.vault!.toLowerCase())
+              continue;
+            return false;
+          }
+          if (k.includes('forCcy')) {
+            if (ProductsService.ccyEqual(it.forCcy, filters.forCcy!)) continue;
+            return false;
+          }
+          if (k === 'onlyForAutomator') {
+            if (!!it[k] === !!filters[k]) continue;
+            else return false;
+          }
+          if (it[k] !== filters[k]) return false;
         }
-        if (k === 'riskType' && !strictRiskType) {
-          if (filters.riskType === RiskType.DUAL) {
-            if (it.riskType !== RiskType.DUAL) return false;
-          } else if (it.riskType === RiskType.DUAL) return false;
-          if (filters.riskType === RiskType.RISKY) {
-            if (it.riskType !== RiskType.RISKY) return false;
-          } else if (it.riskType === RiskType.RISKY) return false;
-          continue;
-        }
-        if (k === 'vault') {
-          if (it.vault.toLowerCase() === filters.vault!.toLowerCase()) continue;
-          return false;
-        }
-        if (k.includes('forCcy')) {
-          if (ProductsService.ccyEqual(it.forCcy, filters.forCcy!)) continue;
-          return false;
-        }
-        if (k === 'onlyForAutomator') {
-          if (!!it[k] === !!filters[k]) continue;
-          else return false;
-        }
-        if (it[k] !== filters[k]) return false;
-      }
-      return true;
-    });
+        return true;
+      })
+      .sort((a, b) => b.priority - a.priority);
   }
 
   static findVault(
@@ -441,8 +445,12 @@ export class ProductsService {
 
   @applyMock('listRecommended')
   static async listRecommended(req: ProductsRecommendRequest) {
+    const vault = ProductsService.findVault(ContractsService.vaults, req);
+    if (!vault)
+      throw new Error(`Invalid vault(${req.vault}) chainId(${req.chainId})`);
+
     let url: string;
-    if (req.riskType === RiskType.DUAL) {
+    if (vault.riskType === RiskType.DUAL) {
       url = '/rfq/dual/recommended-list';
     } else {
       const urls: Record<ProductType, string> = {
@@ -450,14 +458,29 @@ export class ProductsService {
         [ProductType.BullSpread]: '/rfq/smart-trend/recommended-list',
         [ProductType.BearSpread]: '/rfq/smart-trend/recommended-list',
       };
-      if (!urls[req.productType]) return [];
-      url = urls[req.productType];
+      if (!urls[vault.productType]) return [];
+      url = urls[vault.productType];
     }
-    return http
-      .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(url, {
-        params: pick(req, ['chainId', 'vault']),
-      })
-      .then((res) => ProductsService.dealOriginQuotes(res.value));
+
+    const vaultList = ProductsService.filterVaults(
+      ContractsService.vaults,
+      omit(vault, 'vault'),
+    );
+
+    const res = await (async () => {
+      for (let i = 0; i < vaultList.length; i++) {
+        const result = await http
+          .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(url, {
+            params: pick(vaultList[i], ['chainId', 'vault']),
+          })
+          .catch((err) =>
+            i === vaultList.length - 1 ? Promise.reject(err) : null,
+          );
+        if (result?.value.length) return result;
+      }
+      return { value: [] };
+    })();
+    return ProductsService.dealOriginQuotes(res.value);
   }
 
   static TicketTypeOptions = uniqBy(
@@ -473,20 +496,19 @@ export class ProductsService {
   }));
 
   @applyMock('productQuote')
-  private static async $quote(
-    product: {
-      productType: ProductType;
-      riskType: RiskType;
-      domCcy: VaultInfo['domCcy'];
-    },
-    params: OriginProductQuoteParams,
-  ) {
+  private static async $quote(params: OriginProductQuoteParams) {
     let url: string;
-    if (product.riskType == RiskType.DUAL) {
+    const vault = ProductsService.findVault(ContractsService.vaults, params);
+    if (!vault)
+      throw new Error(
+        `Invalid vault(${params.vault}) chainId(${params.chainId})`,
+      );
+
+    if (vault.riskType == RiskType.DUAL) {
       url = '/rfq/dual/quote';
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (params as any).strike = DualService.getPrice({
-        vault: product,
+        vault,
         anchorPrices: [params.lowerStrike],
       });
       params.lowerStrike = undefined!;
@@ -498,7 +520,7 @@ export class ProductsService {
         [ProductType.DNT]: '/rfq/dnt/quote',
         [ProductType.BullSpread]: '/rfq/smart-trend/quote',
         [ProductType.BearSpread]: '/rfq/smart-trend/quote',
-      }[product.productType];
+      }[vault.productType];
     }
     if (!url) return Promise.reject();
     return http.get<unknown, HttpResponse<OriginProductQuoteResult>>(url, {
@@ -515,9 +537,13 @@ export class ProductsService {
       delete data.protectedApy;
     }
 
-    return ProductsService.$quote(
-      pick(data.vault, ['productType', 'riskType', 'domCcy']),
-      {
+    const vaultList = ProductsService.filterVaults(
+      ContractsService.vaults,
+      omit(data.vault, 'vault'),
+    );
+
+    for (let i = 0; i < vaultList.length; i++) {
+      const res = await ProductsService.$quote({
         ...pick(data, [
           'expiry',
           'depositAmount',
@@ -525,8 +551,8 @@ export class ProductsService {
           'fundingApy',
           'takerWallet',
         ]),
-        vault: data.vault.vault,
-        chainId: data.vault.chainId,
+        vault: vaultList[i].vault,
+        chainId: vaultList[i].chainId,
         inputApyDefinition: ApyDefinition.AaveLendingAPY,
         lowerBarrier: data.anchorPrices[0],
         upperBarrier: isDualQuoteParams(data)
@@ -536,12 +562,18 @@ export class ProductsService {
         upperStrike: isDualQuoteParams(data)
           ? data.anchorPrices[0]
           : data.anchorPrices[1],
-      },
-    )
-      .then((res) =>
-        ProductsService.dealOriginQuotes([res.value], data.protectedApy),
-      )
-      .then((res) => res[0]);
+      }).catch((err) =>
+        i === vaultList.length - 1 ? Promise.reject(err) : null,
+      );
+      if (res?.value)
+        return ProductsService.dealOriginQuotes(
+          [res.value],
+          data.protectedApy,
+        ).then((v) => v[0]);
+    }
+    throw new Error(
+      `No quote for the vault(${data.vault.vault}) chainId(${data.vault.chainId})`,
+    );
   }
 
   @asyncCache({

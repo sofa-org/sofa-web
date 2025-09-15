@@ -108,7 +108,7 @@ const DepositModalContent = (
 
   const product = useProductsState(
     (state) =>
-      vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]?.[0],
+      vault && state.cart[ContractsService.genVaultInputKey(vault)]?.[0],
   );
 
   const setVaultAddress = useLazyCallback((v?: string) => {
@@ -295,8 +295,7 @@ const DepositModalContent = (
             <Calculation quote={data} className={styles['calculation']} />
           </Spin>
           <InvestButton
-            vault={data.vault.vault.toLowerCase()}
-            chainId={data.vault.chainId}
+            vault={data.vault}
             afterInvest={() => props.setVisible(false)}
           />
         </div>

@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { Toast } from '@douyinfe/semi-ui';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
+import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { ProductType, RiskType } from '@sofa/services/contracts';
 import { ProductsService } from '@sofa/services/products';
 
 import { calcAvailableBalance } from '@/pages/products/automator-create/util';
-import { useProductsState } from '@/pages/products/automator-store';
+import { useAutomatorProductsState } from '@/pages/products/automator-store';
 import {
   ProductInvestButton,
   ProductInvestButtonProps,
@@ -16,29 +17,40 @@ import {
   useCreatorAutomatorSelector,
 } from '../AutomatorSelector';
 
-const InvestButton = (
+export const AutomatorInvestButton = (
   props: Omit<
     ProductInvestButtonProps,
-    | 'useProductsState'
+    | 'vault'
+    | 'delQuote'
+    | 'quote'
+    | 'updateRecommendedList'
+    | 'clearCart'
     | 'products'
     | 'quoteInfos'
     | 'mint'
     | 'isInsufficientBalance'
   > & {
-    depositCcy: string;
+    vault: AutomatorVaultInfo;
   },
 ) => {
   const { automator } = useCreatorAutomatorSelector();
-  const $products = useProductsState(
+  const $products = useAutomatorProductsState(
     (state) =>
-      state.cart[`${props.vault.toLowerCase()}-${props.chainId}`] || [],
+      state.cart[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`] ||
+      [],
   );
   const products = useMemo(
-    () => $products.filter((it) => !useProductsState.productValidator(it)),
+    () =>
+      $products.filter((it) => !useAutomatorProductsState.productValidator(it)),
     [$products],
   );
-  const quoteInfos = useProductsState((state) =>
-    products.map((it) => state.quoteInfos[ProductsService.productKey(it)]),
+  const quoteInfos = useAutomatorProductsState((state) =>
+    Object.fromEntries(
+      products.map((it) => {
+        const k = ProductsService.productKey(it);
+        return [k, state.quoteInfos[k]];
+      }),
+    ),
   );
 
   const availableBalance = useMemo(
@@ -48,17 +60,23 @@ const InvestButton = (
 
   return (
     <ProductInvestButton
-      products={products}
-      quoteInfos={quoteInfos}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      useProductsState={useProductsState as any}
-      vaultInfo={{
-        depositCcy: props.depositCcy,
+      {...props}
+      vault={{
+        chainId: props.vault.chainId,
+        vault: props.vault.vault,
+        depositCcy: props.vault.depositCcy,
+        realDepositCcy: props.vault.realDepositCcy,
         riskType: RiskType.RISKY,
         // for automator, there is no recommended list, so the value of productType doesn't matter
         productType: ProductType.BearSpread,
         onlyForAutomator: true,
       }}
+      products={products}
+      quoteInfos={quoteInfos}
+      delQuote={useAutomatorProductsState.delQuote}
+      quote={useAutomatorProductsState.quote}
+      updateRecommendedList={useAutomatorProductsState.updateRecommendedList}
+      clearCart={useAutomatorProductsState.clearCart}
       mint={async (cb, data) => {
         const a = getCurrentCreatorAutomator();
         if (!a.automator) {
@@ -72,8 +90,6 @@ const InvestButton = (
         );
       }}
       isInsufficientBalance={(amount) => availableBalance < +amount}
-      {...props}
     />
   );
 };
-export default InvestButton;

@@ -26,6 +26,7 @@ export const AutomatorVaults = vaults.map((it) => {
   const collateralDecimal = getCollateralDecimal(it.chainId, it.depositCcy);
   return {
     ...it,
+    realDepositCcy: it.depositCcy,
     name: get(it, 'name') || it.depositCcy,
     depositMinAmount: getDepositMinAmount(it.depositCcy, ProjectType.Automator),
     depositTickAmount: getDepositTickAmount(

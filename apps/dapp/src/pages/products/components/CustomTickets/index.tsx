@@ -284,17 +284,14 @@ const CustomTickets = (props: { vault: VaultInfo }) => {
       }) as PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
   );
   const products = useProductsState((state) => {
-    return (
-      state.cart[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`] ||
-      []
-    );
+    return state.cart[ContractsService.genVaultInputKey(props.vault)] || [];
     // const list =
-    //   state.cart[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`] ||
+    //   state.cart[ContractsService.genVaultInputKey(props.vault)] ||
     //   [];
     // if (!list.length) return [];
     // const recommendedList =
     //   state.recommendedList[
-    //     `${props.vault.vault.toLowerCase()}-${props.vault.chainId}`
+    //     ContractsService.genVaultInputKey(props.vault)
     //   ];
     // const key = (it: Partial<ProductQuoteParams>) =>
     //   [it.expiry, it.anchorPrices].flat().join('-');

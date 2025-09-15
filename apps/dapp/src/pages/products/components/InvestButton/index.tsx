@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Button, Toast } from '@douyinfe/semi-ui';
 import { wait, waitUntil } from '@livelybone/promise-wait';
-import { ProjectType } from '@sofa/services/base-type';
+import { ProjectType, VaultInputInfo } from '@sofa/services/base-type';
 import { ContractsService, VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
@@ -91,22 +91,20 @@ export const BaseInvestButton = (props: BaseInvestButtonProps) => {
     </AsyncButton>
   );
 };
-type ProductsStateType = Pick<
-  typeof useProductsState,
-  'delQuote' | 'getState' | 'quote' | 'updateRecommendedList' | 'clearCart'
->;
+
 export interface ProductInvestButtonProps extends BaseProps {
-  vault: string;
-  chainId: number;
+  vault: Omit<VaultInputInfo, 'forCcy' | 'domCcy'> & { vault: string };
   autoQuote?: boolean;
   afterInvest?(): void;
-  vaultInfo?: Pick<
-    VaultInfo,
-    'depositCcy' | 'riskType' | 'productType' | 'onlyForAutomator'
-  >;
-  useProductsState: ProductsStateType;
+  delQuote: (typeof useProductsState)['delQuote'];
+  quote: (typeof useProductsState)['quote'];
+  updateRecommendedList: (typeof useProductsState)['updateRecommendedList'];
+  clearCart: (typeof useProductsState)['clearCart'];
   products: PartialRequired<ProductQuoteParams, 'id' | 'vault'>[];
-  quoteInfos: (ProductQuoteResult | undefined)[];
+  quoteInfos: PartialRecord<
+    ReturnType<typeof ProductsService.productKey>,
+    ProductQuoteResult
+  >;
   mint: (
     cb: (progress: TransactionProgress) => void,
     data: ProductQuoteResult[],
@@ -117,28 +115,27 @@ export interface ProductInvestButtonProps extends BaseProps {
 function useShouldQuote(
   wallet: { address?: string },
   products: PartialRequired<ProductQuoteParams, 'vault' | 'id'>[],
-  quoteInfos: (ProductQuoteResult | undefined)[],
-  _useProductsState: ProductsStateType,
+  quoteInfos: PartialRecord<
+    ReturnType<typeof ProductsService.productKey>,
+    ProductQuoteResult
+  >,
+  delQuote: (typeof useProductsState)['delQuote'],
 ) {
   // 每三秒触发一次检查，如果性能差可以再放宽些
   const time = useTime({ interval: 3000 });
   return useMemo(() => {
-    const map = arrToDict<(typeof quoteInfos)[0]>(
-      quoteInfos,
-      ProductsService.productKey,
-    );
     const shouldQuoteList = products.filter((it) => {
-      const quoteInfo = map[ProductsService.productKey(it)];
+      const quoteInfo = quoteInfos[ProductsService.productKey(it)];
       const shouldQuote =
         !quoteInfo ||
         (wallet.address && !quoteInfo.quote.signature) ||
         quoteInfo.quote.deadline * 1000 - 0.3 * MsIntervals.min <= time || // 提前
         (it && quoteInfo.amounts.own != it.depositAmount);
-      if (shouldQuote && quoteInfo) _useProductsState.delQuote(quoteInfo);
+      if (shouldQuote && quoteInfo) delQuote(quoteInfo);
       return shouldQuote;
     });
     return !!shouldQuoteList.length;
-  }, [_useProductsState, products, quoteInfos, time, wallet.address]);
+  }, [delQuote, products, quoteInfos, time, wallet.address]);
 }
 
 export const ProductInvestButton = (props: ProductInvestButtonProps) => {
@@ -146,24 +143,15 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   const progressRef = useRef<ProgressRef>(null);
   const wallet = useWalletStore();
   useEffect(() => {
-    useWalletStore.updateBalanceByVault(props.vault);
-  }, [props.vault, wallet.address]);
+    useWalletStore.updateBalanceByVault(props.vault.vault);
+  }, [props.vault.vault, wallet.address]);
 
-  const { useProductsState, products, quoteInfos, vaultInfo } = props;
-  const vault = useMemo(
-    () =>
-      vaultInfo && {
-        vault: props.vault,
-        chainId: props.chainId,
-        ...vaultInfo,
-      },
-    [props.chainId, props.vault, vaultInfo],
-  );
+  const { products, quoteInfos, vault } = props;
   const shouldQuote = useShouldQuote(
     wallet,
     products,
     quoteInfos,
-    useProductsState,
+    props.delQuote,
   );
   const amount = useMemo(
     () => simplePlus(...products.map((it) => it.depositAmount))!,
@@ -179,16 +167,9 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
   const quote = useLazyCallback(async (noToast?: boolean) => {
     if (!showQuote || !vault) return;
     await wait(100);
-    const list =
-      useProductsState.getState().cart[
-        `${props.vault.toLowerCase()}-${props.chainId}`
-      ] || [];
     return Promise.all(
-      list.map((it) => {
-        const quoteInfo =
-          useProductsState.getState().quoteInfos[
-            ProductsService.productKey(it)
-          ];
+      products.map((it) => {
+        const quoteInfo = quoteInfos[ProductsService.productKey(it)];
         if (
           quoteInfo &&
           quoteInfo.quote.signature &&
@@ -196,13 +177,13 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
           it.depositAmount == quoteInfo.amounts.own
         )
           return;
-        return useProductsState.quote(it);
+        return props.quote(it);
       }),
     )
       .then(() => {
         // 彩票产品在询价之后更新一下推荐列表
         if (vault.riskType === RiskType.RISKY)
-          useProductsState.updateRecommendedList(vault);
+          props.updateRecommendedList(vault);
       })
       .catch((err) => {
         if (noToast) return;
@@ -229,20 +210,21 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
 
   const handleSubmit = useLazyCallback(async () => {
     if (!vault) return;
-    const amount = simplePlus(...quoteInfos.map((it) => it?.amounts.own)) || 0;
+    const quoteList = products.map(
+      (it) => quoteInfos[ProductsService.productKey(it)],
+    ) as ProductQuoteResult[];
+    const amount = simplePlus(...quoteList.map((it) => it?.amounts.own)) || 0;
     const insufficient = props.isInsufficientBalance(amount);
     if (insufficient) {
       return Toast.warning(t('Balance is not enough!'));
     }
     const delRfq = (key: NonNullable<TransactionProgress['details']>[0][0]) => {
-      quoteInfos.forEach((quote) => {
+      quoteList.forEach((quote) => {
         if (!quote) return;
-        const k = `${quote.vault.vault.toLowerCase()}-${quote.vault.chainId}-${
-          quote.vault.depositCcy
-        }`;
+        const k = `${quote.vault.vault.toLowerCase()}-${quote.vault.chainId}-${quote.vault.depositCcy}`;
         if (k === key) {
           ProductsService.delRfq(quote.rfqId);
-          useProductsState.delQuote(quote);
+          props.delQuote(quote);
         }
       });
     };
@@ -264,11 +246,10 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
         });
         if (vault.riskType === RiskType.RISKY && !vault.onlyForAutomator)
           pokerRightsReminder();
-        useWalletStore.updateBalanceByVault(props.vault);
+        useWalletStore.updateBalanceByVault(props.vault.vault);
       }
       if (/Success/i.test(progress.status)) {
-        if (vault.riskType === RiskType.RISKY)
-          useProductsState.clearCart(vault);
+        if (vault.riskType === RiskType.RISKY) props.clearCart(vault);
         waitUntil(() => !progressRef.current?.visible, {
           interval: 300,
           timeout: 10000000,
@@ -279,7 +260,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       progressRef.current?.update(it);
       judgeConsumed(it);
       judgeSuccess(it);
-    }, quoteInfos as ProductQuoteResult[]);
+    }, quoteList);
   });
 
   if (!vault) return <></>;
@@ -322,56 +303,60 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
     </>
   );
 };
+
 const InvestButton = (
   props: Omit<
     ProductInvestButtonProps,
-    | 'useProductsState'
+    | 'vault'
+    | 'delQuote'
+    | 'quote'
+    | 'updateRecommendedList'
+    | 'clearCart'
     | 'products'
     | 'quoteInfos'
     | 'mint'
     | 'isInsufficientBalance'
     | 'insufficientDeps'
-  >,
+  > & { vault: VaultInfo },
 ) => {
   const wallet = useWalletStore();
   const $products = useProductsState(
-    (state) =>
-      state.cart[`${props.vault.toLowerCase()}-${props.chainId}`] || [],
+    (state) => state.cart[ContractsService.genVaultInputKey(props.vault)] || [],
   );
   const products = useMemo(
     () => $products.filter((it) => !useProductsState.productValidator(it)),
     [$products],
   );
   const quoteInfos = useProductsState((state) =>
-    products.map((it) => state.quoteInfos[ProductsService.productKey(it)]),
+    Object.fromEntries(
+      products.map((it) => {
+        const k = ProductsService.productKey(it);
+        return [k, state.quoteInfos[k]];
+      }),
+    ),
   );
 
-  const vault = useMemo(
-    () =>
-      ProductsService.findVault(ContractsService.vaults, {
-        chainId: props.chainId,
-        vault: props.vault,
-      }),
-    [props.chainId, props.vault],
-  );
   return (
     <ProductInvestButton
+      {...props}
       products={products}
+      delQuote={useProductsState.delQuote}
+      quote={useProductsState.quote}
+      updateRecommendedList={useProductsState.updateRecommendedList}
+      clearCart={useProductsState.clearCart}
       quoteInfos={quoteInfos}
-      useProductsState={useProductsState}
-      vaultInfo={vault}
       mint={(cb, data) => {
+        console.log(1111, data);
         if (data.length === 1) {
           return PositionsService.deposit(cb, data[0]!);
         }
         return PositionsService.batchDeposit(cb, data as ProductQuoteResult[]);
       }}
       isInsufficientBalance={(amount) =>
-        !vault ||
+        !props.vault ||
         !wallet.balance ||
-        Number(wallet.balance[vault.depositCcy]) < +amount
+        Number(wallet.balance[props.vault.realDepositCcy]) < +amount
       }
-      {...props}
     />
   );
 };

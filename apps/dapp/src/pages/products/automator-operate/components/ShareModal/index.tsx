@@ -78,7 +78,7 @@ const AutomatorShareModal = forwardRef<
               zhCN: 'Automator',
             })}
           </span>
-          {(globalAutomatorStatus && (
+          {globalAutomatorStatus && (
             <>
               <span className={'segmentation'}>|</span>
               <span className={'status'}>
@@ -101,8 +101,7 @@ const AutomatorShareModal = forwardRef<
                 )}
               </span>
             </>
-          )) ||
-            undefined}
+          )}
         </div>
       }
       width={971}

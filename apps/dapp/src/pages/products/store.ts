@@ -1,4 +1,6 @@
 import { Toast } from '@douyinfe/semi-ui';
+import { VaultInputKey } from '@sofa/services/base-type';
+import { ContractsService } from '@sofa/services/contracts';
 import {
   isDualQuoteParams,
   ProductQuoteParams,
@@ -20,25 +22,19 @@ export const useProductsState = Object.assign(
   createWithEqualityFn(
     persist(
       () => ({
-        recommendedList: {} as Record<
-          `${VaultInfo['vault']}-${VaultInfo['chainId']}`,
-          ProductQuoteResult[]
-        >,
+        recommendedList: {} as Record<VaultInputKey, ProductQuoteResult[]>,
         cart: {} as PartialRecord<
-          `${VaultInfo['vault']}-${VaultInfo['chainId']}`, // 按照 vault+chainId 来区分购物车
+          VaultInputKey, // 按照 vault+chainId 来区分购物车
           PartialRequired<ProductQuoteParams, 'id' | 'vault'>[]
         >,
         quoteInfos: {} as PartialRecord<
           ReturnType<typeof ProductsService.productKey>,
           ProductQuoteResult
         >,
-        hoverTicketIds: {} as Record<
-          `${VaultInfo['vault']}-${VaultInfo['chainId']}`,
-          string | undefined
-        >,
+        hoverTicketIds: {} as Record<VaultInputKey, string | undefined>,
         // 双币需要的配置
         dualConfig: {} as Record<
-          `${VaultInfo['vault']}-${VaultInfo['chainId']}`,
+          VaultInputKey,
           {
             minStepSize: number | string;
           }
@@ -53,14 +49,18 @@ export const useProductsState = Object.assign(
   ),
   {
     updateRecommendedList: async (
-      vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType' | 'riskType'>,
+      vault: Pick<VaultInfo, 'vault' | 'chainId'>,
     ) => {
       const list = await ProductsService.listRecommended(vault);
+      const vaultInfo = ProductsService.findVault(
+        ContractsService.vaults,
+        vault,
+      );
       const dualList = list.filter((it) => it.vault.riskType === RiskType.DUAL);
       useProductsState.setState((pre) => ({
         recommendedList: {
           ...pre.recommendedList,
-          [`${vault.vault.toLowerCase()}-${vault.chainId}`]: list,
+          [ContractsService.genVaultInputKey(vaultInfo)]: list,
         },
         dualConfig: dualList.length
           ? {
@@ -68,7 +68,7 @@ export const useProductsState = Object.assign(
               ...dualList.reduce(
                 (acc, it) => ({
                   ...acc,
-                  [`${it.vault.vault.toLowerCase()}-${it.vault.chainId}`]: {
+                  [ContractsService.genVaultInputKey(it.vault)]: {
                     minStepSize: it.minStepSize,
                   },
                 }),
@@ -79,10 +79,14 @@ export const useProductsState = Object.assign(
       }));
     },
     clearCart: (vault: Pick<VaultInfo, 'vault' | 'chainId'>) => {
+      const vaultInfo = ProductsService.findVault(
+        ContractsService.vaults,
+        vault,
+      );
       useProductsState.setState((pre) => ({
         cart: {
           ...pre.cart,
-          [`${vault.vault.toLowerCase()}-${vault.chainId}`]: undefined,
+          [ContractsService.genVaultInputKey(vaultInfo)]: undefined,
         },
       }));
     },
@@ -91,7 +95,7 @@ export const useProductsState = Object.assign(
       params: PartialRequired<ProductQuoteParams, 'id' | 'vault'>,
     ) => {
       const vault = params.vault;
-      const key = `${vault.vault.toLowerCase()}-${vault.chainId}` as const;
+      const key = ContractsService.genVaultInputKey(vault);
       if (
         [RiskType.PROTECTED, RiskType.LEVERAGE, RiskType.DUAL].includes(
           vault.riskType,
@@ -184,7 +188,7 @@ export const useProductsState = Object.assign(
               ...dualQuotes.reduce(
                 (acc, it) => ({
                   ...acc,
-                  [`${it.vault.vault.toLowerCase()}-${it.vault.chainId}`]: {
+                  [ContractsService.genVaultInputKey(it.vault)]: {
                     minStepSize: it.minStepSize,
                   },
                 }),
@@ -229,7 +233,7 @@ export const useProductsState = Object.assign(
       useProductsState.setState((pre) => ({
         hoverTicketIds: {
           ...pre.hoverTicketIds,
-          [`${vault.vault.toLowerCase()}-${vault.chainId}`]: id,
+          [ContractsService.genVaultInputKey(vault)]: id,
         },
       }));
     },
@@ -245,7 +249,7 @@ useWalletStore.subscribe((state, preState) => {
 export function useHoverTicket(vault?: VaultInfo) {
   const hoverTicket = useProductsState((state) => {
     if (!vault) return undefined;
-    const key = `${vault.vault.toLowerCase()}-${vault.chainId}` as const;
+    const key = ContractsService.genVaultInputKey(vault);
     const id = state.hoverTicketIds[key];
     const ticket =
       state.cart[key]?.find((it) => it.id === id) || state.cart[key]?.[0];

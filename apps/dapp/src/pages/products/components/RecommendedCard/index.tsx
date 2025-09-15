@@ -209,7 +209,7 @@ export async function handleRecommendCardClick(
       const currProducts =
         vault &&
         useProductsState.getState().cart[
-          `${vault.vault.toLowerCase()}-${vault.chainId}`
+          ContractsService.genVaultInputKey(vault)
         ];
       const product = currProducts?.find(
         ($it) =>
@@ -294,7 +294,7 @@ const RecommendedCard = (props: RecommendedCardProps) => {
   const data = useProductsState((state) => {
     if (!vault) return [];
     const list =
-      state.recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
+      state.recommendedList[ContractsService.genVaultInputKey(vault)];
     if (!list) return [];
     return list
       .filter((it) => Date.now() < it.expiry * 1000)

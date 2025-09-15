@@ -59,43 +59,15 @@ export const DualDepositModalContent = (
   const currentForCcyPriceInDomCcy = useLivePPS(props.product.vault);
 
   const dualConfig = useProductsState(
-    (s) =>
-      s.dualConfig[
-        `${props.product.vault.vault.toLowerCase()}-${props.product.vault.chainId}`
-      ],
+    (s) => s.dualConfig[ContractsService.genVaultInputKey(props.product.vault)],
   );
-  const $vault = useMemo(
-    () =>
-      ProductsService.findVault(ContractsService.vaults, {
-        chainId: props.product.vault.chainId,
-        vault: props.product.vault.vault,
-      }),
-    [props.product.vault.chainId, props.product.vault.vault],
-  );
-
-  const [vaultAddress, $setVaultAddress] = useState<string>();
-  const vault = useMemo(
-    () =>
-      ProductsService.findVault(ContractsService.vaults, {
-        ...omit($vault, [
-          'abis',
-          'vault',
-          'riskType',
-          'usePermit2',
-          'balanceDecimal',
-        ]),
-        ...(!vaultAddress
-          ? { riskType: $vault?.riskType }
-          : { vault: vaultAddress }),
-      }),
-    [$vault, vaultAddress],
-  );
+  const vault = props.product.vault;
 
   const product = useProductsState(
     (state) =>
       vault &&
       (state.cart[
-        `${vault.vault.toLowerCase()}-${vault.chainId}`
+        ContractsService.genVaultInputKey(vault)
       ]?.[0] as PartialRequired<ProductQuoteParams, 'id' | 'vault'>),
   );
 
@@ -448,8 +420,7 @@ export const DualDepositModalContent = (
         </div>
         <div className={styles['left-button']}>
           <InvestButton
-            vault={data.vault.vault.toLowerCase()}
-            chainId={data.vault.chainId}
+            vault={data.vault}
             afterInvest={() => props.setVisible(false)}
           />
         </div>

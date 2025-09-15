@@ -69,14 +69,12 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
 
   const products = useProductsState(
     (state) =>
-      (vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]) ||
-      [],
+      (vault && state.cart[ContractsService.genVaultInputKey(vault)]) || [],
   );
   const quoteInfos = useProductsState((state) =>
-    (
-      (vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]) ||
-      []
-    ).map((it) => state.quoteInfos[ProductsService.productKey(it)]),
+    ((vault && state.cart[ContractsService.genVaultInputKey(vault)]) || []).map(
+      (it) => state.quoteInfos[ProductsService.productKey(it)],
+    ),
   );
   const totalCost = useMemo(
     () =>
@@ -251,11 +249,7 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
                   <IconDel />
                 </div>
               )}
-              <InvestButton
-                vault={vault.vault.toLowerCase()}
-                chainId={vault.chainId}
-                autoQuote
-              />
+              <InvestButton vault={vault} autoQuote />
             </div>
           )}
         </div>

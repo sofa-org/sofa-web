@@ -250,13 +250,12 @@ const Index = () => {
       onChange={(v) => updateQuery({ 'automator-operate-tab': v })}
     >
       <div className={styles['container']}>{item.content()}</div>
-      {(automatorDetail && (
+      {automatorDetail && (
         <AutomatorShareModal
           automatorDetail={automatorDetail}
           ref={shareModalRef}
         />
-      )) ||
-        undefined}
+      )}
     </TopTabs>
   );
 };

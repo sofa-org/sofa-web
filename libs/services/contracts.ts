@@ -29,6 +29,8 @@ import {
   RiskType,
   TransactionStatus,
   VaultInfo,
+  VaultInputInfo,
+  VaultInputKey,
 } from './base-type';
 import { ChainMap, defaultChain } from './chains';
 import { WalletConnect } from './wallet-connect';
@@ -46,11 +48,30 @@ export class ContractsService {
   static vaults = [...earnVaults, ...surgeVaults, ...dualVaults].map((it) => ({
     ...it,
     tradeDisable: it.tradeDisable || undefined,
-    onlyForAutomator: it.onlyForAutomator || undefined,
+    onlyForAutomator: it.onlyForAutomator || false,
     interestType: it.interestType || undefined,
     earlyClaimable: it.earlyClaimable || undefined,
+    realDepositCcy: it.realDepositCcy || it.depositCcy,
+    priority: it.priority || 0,
   }));
   static AutomatorVaults = AutomatorVaults;
+
+  static VaultInputInfoKeys = [
+    'chainId',
+    'productType',
+    'riskType',
+    'forCcy',
+    'domCcy',
+    'realDepositCcy',
+    'onlyForAutomator',
+  ] as const;
+
+  static genVaultInputKey(vault: VaultInputInfo | undefined) {
+    if (!vault) return '';
+    return ContractsService.VaultInputInfoKeys.map((k) => vault[k]).join(
+      '-',
+    ) as VaultInputKey;
+  }
 
   static rchAddress() {
     return ChainMap[defaultChain.chainId].rchAddress;

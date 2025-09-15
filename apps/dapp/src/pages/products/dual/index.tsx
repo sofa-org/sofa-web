@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Toast } from '@douyinfe/semi-ui';
-import { ProductType, ProjectType, VaultInfo } from '@sofa/services/base-type';
+import {
+  ProductType,
+  ProjectType,
+  RiskType,
+  VaultInfo,
+} from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { ContractsService } from '@sofa/services/contracts';
 import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
-import { dualVaults } from '@sofa/services/vaults/dual';
 import { displayPercentage } from '@sofa/utils/amount';
 import { MsIntervals } from '@sofa/utils/expiry';
 import { isNullLike } from '@sofa/utils/fns';
@@ -57,8 +62,9 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
   }, []);
   const vaults = useMemo(
     () =>
-      ProductsService.filterVaults(dualVaults, {
+      ProductsService.filterVaults(ContractsService.vaults, {
         chainId,
+        riskType: RiskType.DUAL,
         productType: product,
       }),
     [chainId, product],
@@ -83,7 +89,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
           return undefined;
         }
         const allProducts =
-          recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
+          recommendedList[ContractsService.genVaultInputKey(vault)];
         const allApys = allProducts
           ?.map((p) => p.apyInfo?.max)
           .filter((v) => !isNullLike(v))
@@ -117,8 +123,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
 
   const data = useMemo(() => {
     if (!vault) return [];
-    const list =
-      recommendedList[`${vault.vault.toLowerCase()}-${vault.chainId}`];
+    const list = recommendedList[ContractsService.genVaultInputKey(vault)];
     if (!list) return [];
     return list
       .filter((it) => Date.now() < it.expiry * 1000)
@@ -338,7 +343,7 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
                 ))}
               </div>
             )}
-            {vault === undefined ? undefined : (
+            {vault && (
               <RecommendedList
                 data={data}
                 dates={dates}

@@ -25,10 +25,10 @@ import { useAutomatorStore } from '@/pages/products/automator/store';
 import { calcAvailableBalance } from '@/pages/products/automator-create/util';
 import { useGlobalState } from '@/store';
 
-import { useProductsState } from '../../../automator-store';
+import { useAutomatorProductsState } from '../../../automator-store';
 import { useCreatorAutomatorSelector } from '../AutomatorSelector';
 import CustomTickets from '../CustomTickets';
-import InvestButton from '../InvestButton';
+import { AutomatorInvestButton } from '../InvestButton';
 
 import { Comp as IconDetail } from './assets/icon-detail.svg';
 
@@ -49,12 +49,12 @@ const ProductLottery = (
     [automator],
   );
   const vault = useMemo(() => automator?.vaultInfo, [automator]);
-  const products = useProductsState(
+  const products = useAutomatorProductsState(
     (state) =>
       (vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]) ||
       [],
   );
-  const quoteInfos = useProductsState((state) =>
+  const quoteInfos = useAutomatorProductsState((state) =>
     (
       (vault && state.cart[`${vault.vault.toLowerCase()}-${vault.chainId}`]) ||
       []
@@ -64,7 +64,7 @@ const ProductLottery = (
     () =>
       simplePlus(
         ...products
-          .filter((it) => !useProductsState.productValidator(it))
+          .filter((it) => !useAutomatorProductsState.productValidator(it))
           .map((it) => it.depositAmount),
       ) || 0,
     [products],
@@ -137,12 +137,7 @@ const ProductLottery = (
           </div>
           {vault && (
             <div className={styles['btn-deposit']}>
-              <InvestButton
-                vault={vault.vault.toLowerCase()}
-                chainId={vault.chainId}
-                depositCcy={vault.realDepositCcy ?? vault.depositCcy}
-                autoQuote
-              />
+              <AutomatorInvestButton vault={vault} autoQuote />
             </div>
           )}
         </div>

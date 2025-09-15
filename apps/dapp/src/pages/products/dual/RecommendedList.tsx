@@ -3,6 +3,7 @@ import { Table } from '@douyinfe/semi-ui';
 import { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import { VaultInfo } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
+import { ContractsService } from '@sofa/services/contracts';
 import { DualService } from '@sofa/services/dual';
 import { useTranslation } from '@sofa/services/i18n';
 import { ProductQuoteResult, ProductsService } from '@sofa/services/products';
@@ -45,8 +46,7 @@ export const RecommendedList = (props: {
   const { data, dates, date, setDate } = props;
   const isMobileUI = useIsMobileUI();
   const dualConfig = useProductsState(
-    (s) =>
-      s.dualConfig[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`],
+    (s) => s.dualConfig[ContractsService.genVaultInputKey(props.vault)],
   );
   const domCcyConfig = useMemo(
     () => CCYService.ccyConfigs[props.vault.domCcy],

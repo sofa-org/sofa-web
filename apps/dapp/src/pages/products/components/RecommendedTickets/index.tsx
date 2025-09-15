@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Spin } from '@douyinfe/semi-ui';
-import { VaultInfo } from '@sofa/services/contracts';
+import { ContractsService, VaultInfo } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   isDualQuoteParams,
@@ -40,16 +40,14 @@ const RecommendedTickets = (props: TicketsProps) => {
   );
   const products = useProductsState((state) =>
     arrToDict(
-      state.cart[`${props.vault.vault.toLowerCase()}-${props.vault.chainId}`],
+      state.cart[ContractsService.genVaultInputKey(props.vault)],
       (it) =>
         ProductsService.productKey({ ...it, depositAmount: ticketMeta.per }),
     ),
   );
   const data = useProductsState((state) => {
     const list =
-      state.recommendedList[
-        `${props.vault.vault.toLowerCase()}-${props.vault.chainId}`
-      ];
+      state.recommendedList[ContractsService.genVaultInputKey(props.vault)];
     if (!list) return [];
     return list
       .filter((it) => Date.now() < it.expiry * 1000)
@@ -129,9 +127,7 @@ const RecommendedTickets = (props: TicketsProps) => {
                 (() => {
                   const currProducts =
                     useProductsState.getState().cart[
-                      `${props.vault.vault.toLowerCase()}-${
-                        props.vault.chainId
-                      }`
+                      ContractsService.genVaultInputKey(props.vault)
                     ];
                   const $id = currProducts?.find(
                     (it) =>

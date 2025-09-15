@@ -1,5 +1,7 @@
 import { applyMock } from '@sofa/utils/decorators';
 import { http } from '@sofa/utils/http';
+import { omit } from 'lodash-es';
+import { it } from 'vitest';
 
 import {
   ContractsService,
@@ -64,7 +66,23 @@ export class ProductsDIYService {
         .get<unknown, HttpResponse<OriginProductQuoteResult[]>>(url, { params })
         .then((res) => ProductsService.dealOriginQuotes(res.value));
     };
-    return Promise.all(vaultInfoList.map((it) => fetch(it))).then((res) => {
+    return Promise.all(
+      vaultInfoList.map(async (it) => {
+        const vaults = ProductsService.filterVaults(
+          ContractsService.vaults,
+          omit(it, 'vault'),
+        );
+        for (let i = 0; i < vaults.length; i++) {
+          const res = await fetch(vaults[i]).catch((err) =>
+            i === vaults.length - 1 ? Promise.reject(err) : null,
+          );
+          if (res) return res;
+        }
+        throw new Error(
+          `No quote for vault(${it.vault}) chainId(${it.chainId})`,
+        );
+      }),
+    ).then((res) => {
       const result = res.flat();
       return result;
     });

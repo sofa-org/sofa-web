@@ -15,14 +15,10 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import { useWalletStore } from '@/components/WalletConnector/store';
 
 import { getCurrentCreatorAutomator } from './automator-operate/components/AutomatorSelector';
-export const useProductsState = Object.assign(
+export const useAutomatorProductsState = Object.assign(
   createWithEqualityFn(
     persist(
       () => ({
-        recommendedList: {} as Record<
-          `${AutomatorVaultInfo['vault']}-${AutomatorVaultInfo['chainId']}`,
-          ProductQuoteResult[]
-        >,
         cart: {} as PartialRecord<
           `${AutomatorVaultInfo['vault']}-${AutomatorVaultInfo['chainId']}`, // 按照 vault+chainId 来区分购物车
           PartialRequired<ProductQuoteParams, 'id' | 'vault'>[]
@@ -45,12 +41,12 @@ export const useProductsState = Object.assign(
   ),
   {
     updateRecommendedList: async (
-      vault: Pick<VaultInfo, 'vault' | 'chainId' | 'productType'>,
+      vault: Pick<VaultInfo, 'vault' | 'chainId'>,
     ) => {
       // automator don't support recommended list yet
     },
     clearCart: (vault: Pick<AutomatorVaultInfo, 'vault' | 'chainId'>) => {
-      useProductsState.setState((pre) => ({
+      useAutomatorProductsState.setState((pre) => ({
         cart: {
           ...pre.cart,
           [`${vault.vault.toLowerCase()}-${vault.chainId}`]: undefined,
@@ -67,7 +63,7 @@ export const useProductsState = Object.assign(
       }` as const;
       const vault = params.vault;
       if ([RiskType.PROTECTED, RiskType.LEVERAGE].includes(vault.riskType)) {
-        useProductsState.setState((pre) => {
+        useAutomatorProductsState.setState((pre) => {
           return {
             cart: {
               ...pre.cart,
@@ -76,7 +72,7 @@ export const useProductsState = Object.assign(
           };
         });
       } else {
-        useProductsState.setState((pre) => {
+        useAutomatorProductsState.setState((pre) => {
           const oldArr = pre.cart[key] || [];
           const index = oldArr.findIndex((it) => it.id === params.id);
           const arr = (() => {
@@ -120,7 +116,7 @@ export const useProductsState = Object.assign(
       quote: ProductQuoteResult | ProductQuoteResult[],
       replaceAll?: boolean,
     ) => {
-      useProductsState.setState((pre) => ({
+      useAutomatorProductsState.setState((pre) => ({
         quoteInfos: {
           ...(replaceAll
             ? {}
@@ -139,19 +135,19 @@ export const useProductsState = Object.assign(
       }));
     },
     quote: async (params: PartialRequired<ProductQuoteParams, 'vault'>) => {
-      const error = useProductsState.productValidator(params);
+      const error = useAutomatorProductsState.productValidator(params);
       if (error) throw error;
       const { automator } = getCurrentCreatorAutomator();
       return ProductsService.quote({
         ...params,
         takerWallet: automator?.vaultInfo?.vault,
       } as ProductQuoteParams).then((res) => {
-        useProductsState.updateQuotes(res);
+        useAutomatorProductsState.updateQuotes(res);
         return res;
       });
     },
     delQuote: (quoteInfo: ProductQuoteResult) => {
-      useProductsState.setState((pre) => {
+      useAutomatorProductsState.setState((pre) => {
         const quoteInfos = { ...pre.quoteInfos };
         delete quoteInfos[ProductsService.productKey(quoteInfo)];
         return { quoteInfos };
@@ -166,13 +162,13 @@ export const useProductsState = Object.assign(
       )
         return false;
       const key = ProductsService.productKey(params as ProductQuoteParams);
-      return !useProductsState.getState().quoteInfos[key];
+      return !useAutomatorProductsState.getState().quoteInfos[key];
     },
     updateHoverTicket: (
       vault: Pick<AutomatorVaultInfo, 'vault' | 'chainId'>,
       id?: string,
     ) => {
-      useProductsState.setState((pre) => ({
+      useAutomatorProductsState.setState((pre) => ({
         hoverTicketIds: {
           ...pre.hoverTicketIds,
           [`${vault.vault.toLowerCase()}-${vault.chainId}`]: id,
@@ -185,13 +181,13 @@ export const useProductsState = Object.assign(
 // 钱包发生变化时，清除所有的报价（因为需要重新签名）
 useWalletStore.subscribe((state, preState) => {
   if (state.address !== preState.address)
-    useProductsState.setState({ quoteInfos: {} });
+    useAutomatorProductsState.setState({ quoteInfos: {} });
 });
 
 export function useHoverTicket(
   vault?: Pick<AutomatorVaultInfo, 'vault' | 'chainId'>,
 ) {
-  const hoverTicket = useProductsState((state) => {
+  const hoverTicket = useAutomatorProductsState((state) => {
     if (!vault) return undefined;
     const key = `${vault.vault.toLowerCase()}-${vault.chainId}` as const;
     const id = state.hoverTicketIds[key];
@@ -202,7 +198,7 @@ export function useHoverTicket(
   });
   const setHoverTicket = useLazyCallback((id?: string) => {
     if (!vault) return undefined;
-    return useProductsState.updateHoverTicket(vault, id);
+    return useAutomatorProductsState.updateHoverTicket(vault, id);
   });
   return [hoverTicket, setHoverTicket] as const;
 }
