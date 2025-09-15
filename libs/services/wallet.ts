@@ -219,7 +219,7 @@ export class WalletService {
       signer.address,
       approveTo,
     );
-    if (Big(allowance).gte(Big(String(amount)))) return;
+    if (Big(allowance).gte(Big(String(amount))) && !forceClearAllowance) return;
     console.info('Approve:', {
       allowance,
       amount,
