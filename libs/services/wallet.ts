@@ -236,7 +236,12 @@ export class WalletService {
         forceClearAllowance)
     ) {
       // 这几个合约的 approve 方法只能在 allowance 全部用完才能继续 approve，否则只能清空
-      await WalletService.$$approve(signer, collateralContract, approveTo, 0); // 清空
+      await WalletService.$$approve(
+        signer,
+        collateralContract,
+        approveTo,
+        '0x0',
+      ); // 清空
     }
     return WalletService.$$approve(
       signer,
