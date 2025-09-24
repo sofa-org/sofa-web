@@ -15,6 +15,7 @@ import { ProductCustomize } from '../products/customize';
 import { DIY } from './components/DIY';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 const tabs = [
   {
@@ -69,23 +70,29 @@ const Index = () => {
     widthThreshold: portraitModeWidthThreshold,
   });
   return (
-    <TopTabs
-      bannerClassName={styles['banner']}
-      tabClassName={classNames(styles['tabs'], {
-        [styles['portrait-ui']]: isPortrait,
-      })}
-      className={classNames(styles['content'], {
-        [styles['portrait-ui']]: isPortrait,
-      })}
-      contentDecorationClassName={styles['decoration']}
-      banner={<></>}
-      value={(mode as string) || 'diy'}
-      options={options}
-      onChange={(v) => updateQuery({ mode: v })}
-      portraitModeWidthThreshold={portraitModeWidthThreshold}
-    >
-      {tab.comp()}
-    </TopTabs>
+    <>
+      <Helmet>
+        <title>Products - SOFA.org</title>
+        <meta name="description" content="Trade options products like Earn, Surge, and Dual, and follow Automator strategies on our protocol to get $RCH airdrops." />
+      </Helmet>
+      <TopTabs
+        bannerClassName={styles['banner']}
+        tabClassName={classNames(styles['tabs'], {
+          [styles['portrait-ui']]: isPortrait,
+        })}
+        className={classNames(styles['content'], {
+          [styles['portrait-ui']]: isPortrait,
+        })}
+        contentDecorationClassName={styles['decoration']}
+        banner={<></>}
+        value={(mode as string) || 'diy'}
+        options={options}
+        onChange={(v) => updateQuery({ mode: v })}
+        portraitModeWidthThreshold={portraitModeWidthThreshold}
+      >
+        {tab.comp()}
+      </TopTabs>
+    </>
   );
 };
 

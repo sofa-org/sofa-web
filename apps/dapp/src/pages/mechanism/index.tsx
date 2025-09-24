@@ -14,6 +14,7 @@ import { MechanismCards } from './components/Cards';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'Mechanism');
 
@@ -21,6 +22,10 @@ const Index = () => {
   const [t] = useTranslation('Mechanism');
   return (
     <>
+      <Helmet>
+        <title>Project - SOFA.org</title>
+        <meta name="description" content="100% on-chain and tokenized positions." />
+      </Helmet>      
       <div className={styles['banner']}>
         <AutoBg type="swirl" style={{ height: '100vh', opacity: 0.3 }} />
         {/* <CAnimation animationType={1}>

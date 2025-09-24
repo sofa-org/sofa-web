@@ -32,6 +32,7 @@ import img2 from './assets/img-2.png';
 import { PointRecords } from './components/Records';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 const cards = [
   {
@@ -124,6 +125,10 @@ const Points = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Points - SOFA.org</title>
+        <meta name="description" content="Discover the rules for earning $SOFA points on the SOFA protocol. See how interacting with our DeFi products and options qualifies you for $SOFA airdrop." />
+      </Helmet>
       <section className={styles['section']}>
         <div className={styles['content']}>
           <h1 className={styles['title']}>

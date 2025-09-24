@@ -39,6 +39,7 @@ import { useGlobalState } from './store';
 
 import './index.scss';
 import 'locomotive-scroll/dist/locomotive-scroll.css';
+import { HelmetProvider } from 'react-helmet-async';
 
 configReactI18next({
   useTranslation: useTranslation_,
@@ -67,32 +68,34 @@ const Root = WasmSuspenseHoc(
     const headerHeight = useHeaderHeight();
 
     return (
-      <ConfigProvider
-        locale={i18n.getResourceBundle(i18n.language, 'global')}
-        timeZone={timezone}
-        direction={undefined} // 后面增加多语言的时候有用
-      >
-        <ErrorBoundary style={{ height: '100vh' }}>
-          <Header />
-          <main
-            className={classNames(
-              'main-content',
-              RootDomainPaths.includes(location.pathname)
-                ? 'main-home'
-                : undefined,
-            )}
-            style={{ marginTop: headerHeight }}
-          >
-            <Suspense>
-              <Outlet />
-            </Suspense>
-          </main>
-          <Footer />
-          {/* <CursorTail /> */}
-          <GlobalModal />
-          <CampaignEntry />
-        </ErrorBoundary>
-      </ConfigProvider>
+      <HelmetProvider>
+        <ConfigProvider
+          locale={i18n.getResourceBundle(i18n.language, 'global')}
+          timeZone={timezone}
+          direction={undefined} // 后面增加多语言的时候有用
+        >
+          <ErrorBoundary style={{ height: '100vh' }}>
+            <Header />
+            <main
+              className={classNames(
+                'main-content',
+                RootDomainPaths.includes(location.pathname)
+                  ? 'main-home'
+                  : undefined,
+              )}
+              style={{ marginTop: headerHeight }}
+            >
+              <Suspense>
+                <Outlet />
+              </Suspense>
+            </main>
+            <Footer />
+            {/* <CursorTail /> */}
+            <GlobalModal />
+            <CampaignEntry />
+          </ErrorBoundary>
+        </ConfigProvider>
+      </HelmetProvider>
     );
   },
   [init, initI18n, useGlobalState.getVaults],

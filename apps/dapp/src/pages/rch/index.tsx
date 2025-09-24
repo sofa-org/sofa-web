@@ -11,6 +11,7 @@ import Account from './components/Account';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'RCH');
 
@@ -29,6 +30,10 @@ const Index = () => {
 
   return (
     <>
+      <Helmet>
+        <title>RCH - SOFA.org</title>
+        <meta name="description" content="Earn $RCH via protocol use, liquidity provision, and governance." />
+      </Helmet>
       <TopTabs
         bannerClassName={styles['banner']}
         className={styles['container']}

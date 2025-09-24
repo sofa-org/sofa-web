@@ -56,6 +56,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
+    "react-helmet-async": "^2.0.5",
     "react-i18next": "^13.3.1",
     "react-infinite-ticker": "^2.2.0",
     "react-rnd": "^10.4.11",
