@@ -18,6 +18,7 @@ import img5 from './assets/img5.png';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'Advantages');
 
@@ -117,6 +118,10 @@ const Advantages = () => {
   const contentList = useMemo(() => contents(t), [t]);
   return (
     <>
+      <Helmet>
+        <title>Capabilities - SOFA.org</title>
+        <meta name="description" content="The SOFA protocol is our ambitious attempt to establish standards of how financial assets can be atomically settled on-chain, while simultaneously catalyzing DeFi capital liquidity through transferrable Position Tokens." />
+      </Helmet>
       {createPortal(
         <svg style={{ position: 'fixed' }}>
           <defs>

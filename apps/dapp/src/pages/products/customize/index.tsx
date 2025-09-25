@@ -71,6 +71,7 @@ import { Comp as IconExpand } from './assets/icon-expand.svg';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'ProductCustomize');
 
@@ -271,6 +272,10 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
         [styles['mobile-ui']]: isMobileUI,
       })}
     >
+      <Helmet>
+        <title>Earn - SOFA.org</title>
+        <meta name="description" content="Earn is a low-free DeFi options product that offers stable returns and exclusive $RCH airdrops." />
+      </Helmet> 
       <ProductBanner title={<></>} />
       {!props.onlyForm && (
         <div className={styles['header']}>

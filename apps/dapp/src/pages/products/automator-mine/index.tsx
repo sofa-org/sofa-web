@@ -17,6 +17,7 @@ import { AutomatorCreatorCard } from './components/Card';
 import { useAutomatorCreatorStore } from './store';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 const Index = () => {
   const [t] = useTranslation('AutomatorMarket');
@@ -40,46 +41,52 @@ const Index = () => {
   const [modal, modalController] = useAutomatorModal();
 
   return (
-    <TopTabs
-      type={'banner-expandable'}
-      className={styles['container']}
-      tabClassName={styles['tabs']}
-      banner={
-        <>
-          <h1 className={styles['head-title']}>
-            {ProjectTypeRefs[ProjectType.Automator].icon}
-            {t({
-              enUS: 'My Automator',
-              zhCN: '我的 Automator',
-            })}
-          </h1>
-          {/* <div className={styles['desc']}>
-              {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-            </div> */}
-        </>
-      }
-      dark
-      options={[]}
-      prefix={t({ enUS: 'Product', zhCN: '产品' })}
-      sticky
-      value={tab}
-      onChange={(v) => updateQuery({ 'automator-market-tab': v })}
-    >
-      <Spin
-        wrapperClassName={classNames(styles['cards-wrapper'])}
-        spinning={loading}
+    <>
+      <Helmet>
+        <title>Automator - SOFA.org</title>
+        <meta name="description" content="" />
+      </Helmet>       
+      <TopTabs
+        type={'banner-expandable'}
+        className={styles['container']}
+        tabClassName={styles['tabs']}
+        banner={
+          <>
+            <h1 className={styles['head-title']}>
+              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {t({
+                enUS: 'My Automator',
+                zhCN: '我的 Automator',
+              })}
+            </h1>
+            {/* <div className={styles['desc']}>
+                {ProjectTypeRefs[ProjectType.Automator].desc(t)}
+              </div> */}
+          </>
+        }
+        dark
+        options={[]}
+        prefix={t({ enUS: 'Product', zhCN: '产品' })}
+        sticky
+        value={tab}
+        onChange={(v) => updateQuery({ 'automator-market-tab': v })}
       >
-        {list?.map((a) => (
-          <AutomatorCreatorCard
-            key={a.vaultInfo.vault.toLowerCase()}
-            info={a}
-            modalController={modalController}
-          />
-        ))}
-        {!list?.length && !loading && <CEmpty className="semi-always-dark" />}
-      </Spin>
-      {modal}
-    </TopTabs>
+        <Spin
+          wrapperClassName={classNames(styles['cards-wrapper'])}
+          spinning={loading}
+        >
+          {list?.map((a) => (
+            <AutomatorCreatorCard
+              key={a.vaultInfo.vault.toLowerCase()}
+              info={a}
+              modalController={modalController}
+            />
+          ))}
+          {!list?.length && !loading && <CEmpty className="semi-always-dark" />}
+        </Spin>
+        {modal}
+      </TopTabs>
+    </>
   );
 };
 

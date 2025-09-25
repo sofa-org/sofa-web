@@ -36,6 +36,7 @@ import { AutomatorTransactions } from './components/Transactions';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'AutomatorOperate');
 const PositionTab = () => {
@@ -119,145 +120,151 @@ const Index = () => {
   const shareModalRef = useRef<AutomatorShareModalPropsRef>(null);
 
   return (
-    <TopTabs
-      type="banner-expandable-tab"
-      className={styles['container']}
-      bannerClassName={classNames({
-        [styles['banner-bittensor']]: automatorDetail?.joinedBittensor,
-      })}
-      banner={
-        <h1 className={styles['head-title']}>
-          {automatorDetail?.joinedBittensor && (
-            <img
-              className={styles['badge-bittensor']}
-              src={BadgeBittensor}
-              alt="Bittensor"
-            />
-          )}
-          <div className={styles['title']}>
-            {ProjectTypeRefs[ProjectType.Automator].icon}
-            {t({
-              enUS: 'My Automator',
-              zhCN: '我的 Automator',
-            })}
-          </div>
-          <div>
-            <CreatorAutomatorSelector className={styles['selector']} />
-            <div
-              className={styles['share-btn']}
-              onClick={() => shareModalRef.current?.show()}
-            >
-              <span>
-                {t({
-                  enUS: 'Share',
-                  zhCN: '分享',
-                })}
-              </span>
+    <>
+      <Helmet>
+        <title>Automator - SOFA.org</title>
+        <meta name="description" content="" />
+      </Helmet>
+      <TopTabs
+        type="banner-expandable-tab"
+        className={styles['container']}
+        bannerClassName={classNames({
+          [styles['banner-bittensor']]: automatorDetail?.joinedBittensor,
+        })}
+        banner={
+          <h1 className={styles['head-title']}>
+            {automatorDetail?.joinedBittensor && (
+              <img
+                className={styles['badge-bittensor']}
+                src={BadgeBittensor}
+                alt="Bittensor"
+              />
+            )}
+            <div className={styles['title']}>
+              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {t({
+                enUS: 'My Automator',
+                zhCN: '我的 Automator',
+              })}
             </div>
-          </div>
+            <div>
+              <CreatorAutomatorSelector className={styles['selector']} />
+              <div
+                className={styles['share-btn']}
+                onClick={() => shareModalRef.current?.show()}
+              >
+                <span>
+                  {t({
+                    enUS: 'Share',
+                    zhCN: '分享',
+                  })}
+                </span>
+              </div>
+            </div>
 
-          <div className={styles['infos']}>
-            <Address
-              address={automator?.vaultInfo.vault.toLowerCase() || ''}
-              simple
-              linkBtn
-            />
-            <div className={styles['item']}>
-              <span className={styles['label']}>
-                {t({ enUS: 'Deposit', zhCN: '投资币种' })}
-              </span>
-              {automator?.vaultInfo.realDepositCcy ??
-                automator?.vaultInfo.depositCcy}
-              {automator?.vaultInfo.depositCcy && (
-                <img
-                  src={
-                    CCYService.ccyConfigs[
-                      automator?.vaultInfo.realDepositCcy ??
-                        automator?.vaultInfo.depositCcy
-                    ]?.icon
-                  }
-                  alt=""
-                />
-              )}
+            <div className={styles['infos']}>
+              <Address
+                address={automator?.vaultInfo.vault.toLowerCase() || ''}
+                simple
+                linkBtn
+              />
+              <div className={styles['item']}>
+                <span className={styles['label']}>
+                  {t({ enUS: 'Deposit', zhCN: '投资币种' })}
+                </span>
+                {automator?.vaultInfo.realDepositCcy ??
+                  automator?.vaultInfo.depositCcy}
+                {automator?.vaultInfo.depositCcy && (
+                  <img
+                    src={
+                      CCYService.ccyConfigs[
+                        automator?.vaultInfo.realDepositCcy ??
+                          automator?.vaultInfo.depositCcy
+                      ]?.icon
+                    }
+                    alt=""
+                  />
+                )}
+              </div>
+              <div className={styles['item']}>
+                <span className={styles['label']}>
+                  {t({ enUS: 'Fee', zhCN: '手续费' })}
+                </span>
+                {automator?.vaultInfo.creatorFeeRate !== undefined
+                  ? displayPercentage(automator.vaultInfo.creatorFeeRate, 0)
+                  : '-'}
+              </div>
+              <div className={styles['item']}>
+                <IconCalendar className={styles['label']} />
+                {automator?.vaultInfo.createTime
+                  ? formatDurationToDay(
+                      Date.now() - +automator?.vaultInfo.createTime,
+                    )
+                  : '-'}
+              </div>
+              <div className={styles['item']}>
+                <IconPeople className={styles['label']} />
+                {automator?.currentParticipantNum || '-'}
+              </div>
+              <div className={styles['item']}>
+                <IconRisk className={styles['label']} />
+                {automator &&
+                  (() => {
+                    const ref =
+                      AutomatorRiskExposureMap[automator.vaultInfo.riskExposure!];
+                    return ref ? (
+                      <>
+                        <span
+                          style={{
+                            color: ref?.color || 'inherit',
+                          }}
+                        >
+                          {ref.label} - {ref.desc(t)}
+                        </span>
+                        <span className={styles['risk-desc']}>
+                          {t({
+                            enUS: 'Max Risk Exposure',
+                            zhCN: '最大风险敞口',
+                          })}
+                          : {displayPercentage(ref.value)}
+                        </span>
+                      </>
+                    ) : (
+                      'R-'
+                    );
+                  })()}
+              </div>
+              <div className={styles['desc']}>
+                <MsgDisplay>
+                  {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
+                  {(automatorDetail?.vaultInfo.desc || '...')
+                    .split('\n')
+                    .map((line, idx) => (
+                      <Fragment key={`lb-${idx}`}>
+                        {idx > 0 ? <br /> : undefined}
+                        {line}
+                      </Fragment>
+                    ))}
+                </MsgDisplay>
+              </div>
             </div>
-            <div className={styles['item']}>
-              <span className={styles['label']}>
-                {t({ enUS: 'Fee', zhCN: '手续费' })}
-              </span>
-              {automator?.vaultInfo.creatorFeeRate !== undefined
-                ? displayPercentage(automator.vaultInfo.creatorFeeRate, 0)
-                : '-'}
-            </div>
-            <div className={styles['item']}>
-              <IconCalendar className={styles['label']} />
-              {automator?.vaultInfo.createTime
-                ? formatDurationToDay(
-                    Date.now() - +automator?.vaultInfo.createTime,
-                  )
-                : '-'}
-            </div>
-            <div className={styles['item']}>
-              <IconPeople className={styles['label']} />
-              {automator?.currentParticipantNum || '-'}
-            </div>
-            <div className={styles['item']}>
-              <IconRisk className={styles['label']} />
-              {automator &&
-                (() => {
-                  const ref =
-                    AutomatorRiskExposureMap[automator.vaultInfo.riskExposure!];
-                  return ref ? (
-                    <>
-                      <span
-                        style={{
-                          color: ref?.color || 'inherit',
-                        }}
-                      >
-                        {ref.label} - {ref.desc(t)}
-                      </span>
-                      <span className={styles['risk-desc']}>
-                        {t({
-                          enUS: 'Max Risk Exposure',
-                          zhCN: '最大风险敞口',
-                        })}
-                        : {displayPercentage(ref.value)}
-                      </span>
-                    </>
-                  ) : (
-                    'R-'
-                  );
-                })()}
-            </div>
-            <div className={styles['desc']}>
-              <MsgDisplay>
-                {/* vaultInfo.desc is from user, better not to use dangerouslySetInnerHTML (prevent XSS attack) */}
-                {(automatorDetail?.vaultInfo.desc || '...')
-                  .split('\n')
-                  .map((line, idx) => (
-                    <Fragment key={`lb-${idx}`}>
-                      {idx > 0 ? <br /> : undefined}
-                      {line}
-                    </Fragment>
-                  ))}
-              </MsgDisplay>
-            </div>
-          </div>
-        </h1>
-      }
-      options={options}
-      value={tab}
-      dark
-      onChange={(v) => updateQuery({ 'automator-operate-tab': v })}
-    >
-      <div className={styles['container']}>{item.content()}</div>
-      {(automatorDetail && (
-        <AutomatorShareModal
-          automatorDetail={automatorDetail}
-          ref={shareModalRef}
-        />
-      )) ||
-        undefined}
-    </TopTabs>
+          </h1>
+        }
+        options={options}
+        value={tab}
+        dark
+        onChange={(v) => updateQuery({ 'automator-operate-tab': v })}
+      >
+        <div className={styles['container']}>{item.content()}</div>
+        {(automatorDetail && (
+          <AutomatorShareModal
+            automatorDetail={automatorDetail}
+            ref={shareModalRef}
+          />
+        )) ||
+          undefined}
+      </TopTabs>
+    </>
   );
 };
 

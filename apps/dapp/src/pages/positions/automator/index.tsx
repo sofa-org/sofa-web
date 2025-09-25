@@ -17,6 +17,7 @@ import { useAutomatorModal } from '@/pages/products/automator/index-modal';
 import { AutomatorPositionCard } from './components/Card';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 const tabOptions = [
   {
@@ -64,45 +65,51 @@ const Index = () => {
   const [modal, modalController] = useAutomatorModal();
 
   return (
-    <TopTabs
-      type={'banner-expandable-tab'}
-      className={styles['container']}
-      tabClassName={styles['tabs']}
-      banner={
-        <>
-          <h1 className={styles['head-title']}>
-            {ProjectTypeRefs[ProjectType.Automator].icon}
-            {t({
-              enUS: 'Automator: Portfolio Record',
-              zhCN: 'Automator 记录',
-            })}
-          </h1>
-          {/* <div className={styles['desc']}>
-              {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-            </div> */}
-        </>
-      }
-      dark
-      options={options}
-      prefix={t({ enUS: 'Product', zhCN: '产品' })}
-      sticky
-      value={tab}
-      onChange={(v) => updateQuery({ 'automator-positions-tab': v })}
-    >
-      <Spin wrapperClassName={styles['cards']} spinning={loading}>
-        {data?.map((it) => {
-          return (
-            <AutomatorPositionCard
-              key={it.vaultInfo.vault.toLowerCase()}
-              info={it}
-              modalController={modalController}
-            />
-          );
-        })}
-        {!data?.length && !loading && <CEmpty className="semi-always-dark" />}
-      </Spin>
-      {modal}
-    </TopTabs>
+    <>
+      <Helmet>
+        <title>Automator - SOFA.org</title>
+        <meta name="description" content="" />
+      </Helmet>    
+      <TopTabs
+        type={'banner-expandable-tab'}
+        className={styles['container']}
+        tabClassName={styles['tabs']}
+        banner={
+          <>
+            <h1 className={styles['head-title']}>
+              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {t({
+                enUS: 'Automator: Portfolio Record',
+                zhCN: 'Automator 记录',
+              })}
+            </h1>
+            {/* <div className={styles['desc']}>
+                {ProjectTypeRefs[ProjectType.Automator].desc(t)}
+              </div> */}
+          </>
+        }
+        dark
+        options={options}
+        prefix={t({ enUS: 'Product', zhCN: '产品' })}
+        sticky
+        value={tab}
+        onChange={(v) => updateQuery({ 'automator-positions-tab': v })}
+      >
+        <Spin wrapperClassName={styles['cards']} spinning={loading}>
+          {data?.map((it) => {
+            return (
+              <AutomatorPositionCard
+                key={it.vaultInfo.vault.toLowerCase()}
+                info={it}
+                modalController={modalController}
+              />
+            );
+          })}
+          {!data?.length && !loading && <CEmpty className="semi-always-dark" />}
+        </Spin>
+        {modal}
+      </TopTabs>
+    </>
   );
 };
 

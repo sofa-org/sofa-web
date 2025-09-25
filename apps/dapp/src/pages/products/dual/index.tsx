@@ -37,6 +37,7 @@ import locale from './locale';
 import { RecommendedList } from './RecommendedList';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'ProductDual');
 
@@ -188,6 +189,10 @@ const ProductDual = (props: BaseProps & { onlyForm?: boolean }) => {
   );
   return (
     <>
+      <Helmet>
+        <title>Dual - SOFA.org</title>
+        <meta name="description" content="Discover Dual, an innovative DeFi options product that lets you sell high, buy low, and receive $RCH airdrops for extra trading rewards." />
+      </Helmet>       
       <TopTabs
         bannerClassName={styles['banner']}
         className={classNames(styles['container'], {

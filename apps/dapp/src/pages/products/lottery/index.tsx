@@ -38,6 +38,7 @@ import { useHoverTicket, useProductsState } from '../store';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'ProductLottery');
 
@@ -142,6 +143,10 @@ const ProductLottery = (props: BaseProps & { onlyForm?: boolean }) => {
 
   return (
     <>
+      <Helmet>
+        <title>Surge - SOFA.org</title>
+        <meta name="description" content="Surge: a high-risk DeFi options product that delivers high returns and rewards traders with exclusive $RCH airdrops." />
+      </Helmet>        
       <ProductBanner title={<></>} />
       <div className={styles['header']}>
         <ProductTypeSelector />

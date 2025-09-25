@@ -18,6 +18,7 @@ import WonderfulMoments from './components/WonderfulMoments';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'Positions');
 
@@ -92,26 +93,32 @@ const Positions = () => {
   }
 
   return (
-    <TopTabs
-      type="banner-expandable-tab"
-      tabClassName={styles['tabs']}
-      banner={
-        <div className={styles['banner']}>
-          <span className={styles['banner-txt']}>
-            {t("{{project}}'s Position", {
-              project: ProjectTypeRefs[project].label(t),
-            })}
-          </span>
-          <PositionTips project={project} />
-        </div>
-      }
-      value={project}
-      onChange={(v) => setProject(v as ProjectType)}
-      options={projects}
-      dark
-    >
-      <PositionsEl />
-    </TopTabs>
+    <>
+      <Helmet>
+        <title>Position - SOFA.org</title>
+        <meta name="description" content="" />
+      </Helmet> 
+      <TopTabs
+        type="banner-expandable-tab"
+        tabClassName={styles['tabs']}
+        banner={
+          <div className={styles['banner']}>
+            <span className={styles['banner-txt']}>
+              {t("{{project}}'s Position", {
+                project: ProjectTypeRefs[project].label(t),
+              })}
+            </span>
+            <PositionTips project={project} />
+          </div>
+        }
+        value={project}
+        onChange={(v) => setProject(v as ProjectType)}
+        options={projects}
+        dark
+      >
+        <PositionsEl />
+      </TopTabs>
+    </>
   );
 };
 

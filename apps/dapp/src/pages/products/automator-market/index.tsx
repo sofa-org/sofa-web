@@ -35,6 +35,7 @@ import AutomatorUserShareModal, {
 } from './components/ShareModal';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 const tabOptions = [
   {
@@ -167,104 +168,110 @@ const Index = () => {
     }
   }, [currentShareDetail]);
   return (
-    <TopTabs
-      type={'banner-expandable-tab'}
-      className={styles['container']}
-      tabClassName={styles['tabs']}
-      banner={
-        <>
-          <h1 className={styles['head-title']}>
-            {ProjectTypeRefs[ProjectType.Automator].icon}
-            {t({
-              enUS: 'Automator: Follow The Best',
-              zhCN: 'Automator: 跟单',
-            })}
-          </h1>
-          {/* <div className={styles['desc']}>
-              {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-            </div> */}
-        </>
-      }
-      dark
-      options={options}
-      prefix={t({ enUS: 'Product', zhCN: '产品' })}
-      sticky
-      value={tab}
-      onChange={(v) => updateQuery({ 'automator-market-tab': v })}
-    >
-      <ChainList dark />
-      <CreateBtn />
-      <Spin wrapperClassName={styles['cards-wrapper']} spinning={loading}>
-        {lists?.map((it) => {
-          return (
-            <div className={styles['cards']} key={it[0]}>
-              {lists.length > 1 && (
-                <div className={styles['title']}>
-                  <img src={CCYService.ccyConfigs[it[0]]?.icon} alt="" />
-                  {it[0]}
-                </div>
-              )}
-              {it[1].map((a) => (
-                <AutomatorCard
-                  key={a.vaultInfo.vault.toLowerCase()}
-                  info={a}
-                  mode="card"
-                  modalController={modalController}
-                  showShareBtn={true}
-                  onShareClicked={(v) => {
-                    setCurrentShareInfo(v);
-                    if (tab === 'holding') {
-                      setTimeout(() => {
-                        shareUserModalRef.current?.show();
-                      }, 0);
-                    } else {
-                      setCurrentShareDetail(undefined);
-                      AutomatorService.info(v.vaultInfo)
-                        .then((d) => {
-                          setCurrentShareDetail(d);
-                        })
-                        .catch((e) => Toast.error(getErrorMsg(e)));
-                    }
-                  }}
-                />
-              ))}
-            </div>
-          );
-        })}
-        {!lists?.length && !loading && (
-          <CEmpty
-            className="semi-always-dark"
-            description={
-              tab === 'holding'
-                ? undefined
-                : t(
-                    {
-                      enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
-                      zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
-                    },
-                    { chains },
-                  )
-            }
-          />
-        )}
-      </Spin>
-      {modal}
+    <>
+      <Helmet>
+        <title>Automator - SOFA.org</title>
+        <meta name="description" content="Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops." />
+      </Helmet>      
+      <TopTabs
+        type={'banner-expandable-tab'}
+        className={styles['container']}
+        tabClassName={styles['tabs']}
+        banner={
+          <>
+            <h1 className={styles['head-title']}>
+              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {t({
+                enUS: 'Automator: Follow The Best',
+                zhCN: 'Automator: 跟单',
+              })}
+            </h1>
+            {/* <div className={styles['desc']}>
+                {ProjectTypeRefs[ProjectType.Automator].desc(t)}
+              </div> */}
+          </>
+        }
+        dark
+        options={options}
+        prefix={t({ enUS: 'Product', zhCN: '产品' })}
+        sticky
+        value={tab}
+        onChange={(v) => updateQuery({ 'automator-market-tab': v })}
+      >
+        <ChainList dark />
+        <CreateBtn />
+        <Spin wrapperClassName={styles['cards-wrapper']} spinning={loading}>
+          {lists?.map((it) => {
+            return (
+              <div className={styles['cards']} key={it[0]}>
+                {lists.length > 1 && (
+                  <div className={styles['title']}>
+                    <img src={CCYService.ccyConfigs[it[0]]?.icon} alt="" />
+                    {it[0]}
+                  </div>
+                )}
+                {it[1].map((a) => (
+                  <AutomatorCard
+                    key={a.vaultInfo.vault.toLowerCase()}
+                    info={a}
+                    mode="card"
+                    modalController={modalController}
+                    showShareBtn={true}
+                    onShareClicked={(v) => {
+                      setCurrentShareInfo(v);
+                      if (tab === 'holding') {
+                        setTimeout(() => {
+                          shareUserModalRef.current?.show();
+                        }, 0);
+                      } else {
+                        setCurrentShareDetail(undefined);
+                        AutomatorService.info(v.vaultInfo)
+                          .then((d) => {
+                            setCurrentShareDetail(d);
+                          })
+                          .catch((e) => Toast.error(getErrorMsg(e)));
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            );
+          })}
+          {!lists?.length && !loading && (
+            <CEmpty
+              className="semi-always-dark"
+              description={
+                tab === 'holding'
+                  ? undefined
+                  : t(
+                      {
+                        enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
+                        zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
+                      },
+                      { chains },
+                    )
+              }
+            />
+          )}
+        </Spin>
+        {modal}
 
-      {(currentShareInfo && (
-        <AutomatorUserShareModal
-          automatorInfo={currentShareInfo}
-          ref={shareUserModalRef}
-        />
-      )) ||
-        undefined}
-      {(currentShareDetail && (
-        <AutomatorShareModal
-          automatorDetail={currentShareDetail}
-          ref={shareModalRef}
-        />
-      )) ||
-        undefined}
-    </TopTabs>
+        {(currentShareInfo && (
+          <AutomatorUserShareModal
+            automatorInfo={currentShareInfo}
+            ref={shareUserModalRef}
+          />
+        )) ||
+          undefined}
+        {(currentShareDetail && (
+          <AutomatorShareModal
+            automatorDetail={currentShareDetail}
+            ref={shareModalRef}
+          />
+        )) ||
+          undefined}
+      </TopTabs>
+    </>
   );
 };
 

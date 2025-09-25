@@ -24,6 +24,7 @@ import { useWalletStore } from '@/components/WalletConnector/store';
 import { useAutomatorMarketSelector } from '@/pages/products/automator-market/hooks';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 export const AutomatorHistory = (props: {
   automator?: AutomatorVaultInfo;
@@ -197,14 +198,20 @@ export const AutomatorHistory = (props: {
   );
 
   return (
-    <Table
-      className={classNames(styles['table'], props.className)}
-      columns={columns}
-      dataSource={data?.list}
-      loading={loading && !data}
-      pagination={false}
-      rowKey={(record) => String(record?.dateTime)}
-      empty={<CEmpty />}
-    />
+    <>
+      <Helmet>
+        <title>Automator - SOFA.org</title>
+        <meta name="description" content="" />
+      </Helmet>       
+      <Table
+        className={classNames(styles['table'], props.className)}
+        columns={columns}
+        dataSource={data?.list}
+        loading={loading && !data}
+        pagination={false}
+        rowKey={(record) => String(record?.dateTime)}
+        empty={<CEmpty />}
+      />
+    </>
   );
 };

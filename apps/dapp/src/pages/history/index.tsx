@@ -38,6 +38,7 @@ import { AutomatorHistory } from './automator';
 import locale from './locale';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 addI18nResources(locale, 'History');
 
@@ -376,78 +377,84 @@ const OrderHistory = () => {
   );
 
   return (
-    <Table
-      className={classNames(
-        styles['table'],
-        styles['table-' + riskType.toLowerCase()],
-      )}
-      columns={columns}
-      dataSource={data?.list}
-      loading={loading}
-      pagination={false}
-      rowKey={(record) => `${record?.product.vault.productType}-${record?.id}`}
-      empty={<CEmpty />}
-      expandedRowKeys={expandedRowKeys}
-      expandedRowRender={(record) => {
-        if (!record) return null;
-        if (record.product.vault.riskType == RiskType.DUAL) return null;
-        const hasSettled = judgeSettled(record);
-        const returnInDepositCcy = !hasSettled
-          ? undefined
-          : cvtAmountsInCcy(
-              [
-                [record.product.vault.depositCcy, record.amounts.redeemable],
-                ['RCH', record.amounts.rchAirdrop],
-              ],
-              prices,
-              record.product.vault.depositCcy,
-            );
-        return (
-          <div className={styles['extra']}>
-            <div className={styles['extra-item']}>
-              <span className={styles['label']}>{t('Return')}</span>
-              <span className={styles['value']}>
-                {amountFormatter(returnInDepositCcy, 2)}{' '}
-                {record.product.vault.realDepositCcy ??
-                  record.product.vault.depositCcy}
-              </span>
+    <>
+      <Helmet>
+        <title>History - SOFA.org</title>
+        <meta name="description" content="" />
+      </Helmet>
+      <Table
+        className={classNames(
+          styles['table'],
+          styles['table-' + riskType.toLowerCase()],
+        )}
+        columns={columns}
+        dataSource={data?.list}
+        loading={loading}
+        pagination={false}
+        rowKey={(record) => `${record?.product.vault.productType}-${record?.id}`}
+        empty={<CEmpty />}
+        expandedRowKeys={expandedRowKeys}
+        expandedRowRender={(record) => {
+          if (!record) return null;
+          if (record.product.vault.riskType == RiskType.DUAL) return null;
+          const hasSettled = judgeSettled(record);
+          const returnInDepositCcy = !hasSettled
+            ? undefined
+            : cvtAmountsInCcy(
+                [
+                  [record.product.vault.depositCcy, record.amounts.redeemable],
+                  ['RCH', record.amounts.rchAirdrop],
+                ],
+                prices,
+                record.product.vault.depositCcy,
+              );
+          return (
+            <div className={styles['extra']}>
+              <div className={styles['extra-item']}>
+                <span className={styles['label']}>{t('Return')}</span>
+                <span className={styles['value']}>
+                  {amountFormatter(returnInDepositCcy, 2)}{' '}
+                  {record.product.vault.realDepositCcy ??
+                    record.product.vault.depositCcy}
+                </span>
+              </div>
+              <div className={styles['extra-item']}>
+                <span className={styles['label']}>{t('Settlement Info')}</span>
+                <span className={styles['value']}>
+                  {record.triggerTime ? (
+                    <>
+                      {record.product.vault.productType === ProductType.DNT
+                        ? t('Out of Range')
+                        : t('Settled')}{' '}
+                      (
+                      {t(
+                        {
+                          enUS: 'reached ${{price}} before {{time}}',
+                          zhCN: '在 {{time}} 之前到达 ${{price}}',
+                        },
+                        {
+                          price: amountFormatter(record.triggerPrice, 2),
+                          time: formatTime(
+                            record.triggerTime * 1000,
+                            'YYYY-MM-DD HH:mm',
+                          ),
+                        },
+                      )}
+                      )
+                    </>
+                  ) : record.product.vault.productType === ProductType.DNT &&
+                    hasSettled ? (
+                    t('In Range')
+                  ) : (
+                    '-'
+                  )}
+                </span>
+              </div>
             </div>
-            <div className={styles['extra-item']}>
-              <span className={styles['label']}>{t('Settlement Info')}</span>
-              <span className={styles['value']}>
-                {record.triggerTime ? (
-                  <>
-                    {record.product.vault.productType === ProductType.DNT
-                      ? t('Out of Range')
-                      : t('Settled')}{' '}
-                    (
-                    {t(
-                      {
-                        enUS: 'reached ${{price}} before {{time}}',
-                        zhCN: '在 {{time}} 之前到达 ${{price}}',
-                      },
-                      {
-                        price: amountFormatter(record.triggerPrice, 2),
-                        time: formatTime(
-                          record.triggerTime * 1000,
-                          'YYYY-MM-DD HH:mm',
-                        ),
-                      },
-                    )}
-                    )
-                  </>
-                ) : record.product.vault.productType === ProductType.DNT &&
-                  hasSettled ? (
-                  t('In Range')
-                ) : (
-                  '-'
-                )}
-              </span>
-            </div>
-          </div>
-        );
-      }}
-    />
+          );
+        }}
+      />
+    </>
   );
 };
 

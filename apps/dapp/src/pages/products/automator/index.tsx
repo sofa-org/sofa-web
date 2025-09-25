@@ -25,6 +25,7 @@ import { AutomatorWithdraw } from './components/Withdraw';
 import { useAutomatorStore } from './store';
 
 import styles from './index.module.scss';
+import { Helmet } from 'react-helmet-async';
 
 export const AutomatorEl = (props: BaseProps) => {
   const [t] = useTranslation('Automator');
@@ -165,59 +166,65 @@ const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
   );
 
   return (
-    <TopTabs
-      type={'banner-expandable'}
-      className={props.className}
-      banner={
-        <>
-          <h1 className={styles['head-title']}>
-            {ProjectTypeRefs[ProjectType.Automator].icon}
-            {t({
-              enUS: 'Automator: Follow The Best',
-              zhCN: 'Automator: 跟单',
-            })}
-          </h1>
-          {/* <div className={styles['desc']}>
-              {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-            </div> */}
-        </>
-      }
-      options={[]}
-      dark
-      prefix={t({ enUS: 'Product', zhCN: '产品' })}
-      sticky
-    >
-      {!vault ? (
-        <CEmpty
-          className="semi-always-dark"
-          description={t(
-            {
-              enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
-              zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如{{chains}}',
-            },
-            { chains },
-          )}
-        />
-      ) : (
-        <>
-          <div className={styles['form']}>
-            <AutomatorEl />
-          </div>
-          <ProductDesc
-            noMoreInfo
-            // dark={isMobileUI}
-            className={styles['product-desc-wrapper']}
-            prefixTabs={[
+    <>
+      <Helmet>
+        <title>Automator</title>
+        <meta name="description" content="" />
+      </Helmet>    
+      <TopTabs
+        type={'banner-expandable'}
+        className={props.className}
+        banner={
+          <>
+            <h1 className={styles['head-title']}>
+              {ProjectTypeRefs[ProjectType.Automator].icon}
+              {t({
+                enUS: 'Automator: Follow The Best',
+                zhCN: 'Automator: 跟单',
+              })}
+            </h1>
+            {/* <div className={styles['desc']}>
+                {ProjectTypeRefs[ProjectType.Automator].desc(t)}
+              </div> */}
+          </>
+        }
+        options={[]}
+        dark
+        prefix={t({ enUS: 'Product', zhCN: '产品' })}
+        sticky
+      >
+        {!vault ? (
+          <CEmpty
+            className="semi-always-dark"
+            description={t(
               {
-                itemKey: 'more',
-                tab: t({ enUS: 'More Info', zhCN: '更多信息' }),
-                element: <AutomatorProjectDesc vault={vault} />,
+                enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
+                zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如{{chains}}',
               },
-            ]}
+              { chains },
+            )}
           />
-        </>
-      )}
-    </TopTabs>
+        ) : (
+          <>
+            <div className={styles['form']}>
+              <AutomatorEl />
+            </div>
+            <ProductDesc
+              noMoreInfo
+              // dark={isMobileUI}
+              className={styles['product-desc-wrapper']}
+              prefixTabs={[
+                {
+                  itemKey: 'more',
+                  tab: t({ enUS: 'More Info', zhCN: '更多信息' }),
+                  element: <AutomatorProjectDesc vault={vault} />,
+                },
+              ]}
+            />
+          </>
+        )}
+      </TopTabs>
+    </>
   );
 };
 
