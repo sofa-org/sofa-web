@@ -96,9 +96,10 @@ function locationMatches(
     strict?: boolean;
   },
 ) {
-  if (!item.path.replace(/^\/+/, '') && location.pathname !== '/') return false;
+  if (!(item.path || '').replace(/^\/+/, '') && location.pathname !== '/')
+    return false;
   const [, origin = '', path = '', search = '', hash = ''] =
-    item.path.match(/^(https?:\/\/[^/]+)?([^#?]+)?([^#]+)?(.*)?$/) || [];
+    (item.path || '').match(/^(https?:\/\/[^/]+)?([^#?]+)?([^#]+)?(.*)?$/) || [];
 
   if (origin && window.location.origin !== origin) return false;
   if (options?.strict && location.pathname != path) return false;
@@ -406,7 +407,7 @@ export const CommonHeader = (props: {
         className={classNames(
           styles['header'],
           'header',
-          `header-pathname-${location.pathname.replace(/\W+/g, '-').replace(/^-+|-+$/, '')}`,
+          `header-pathname-${(location.pathname || '').replace(/\W+/g, '-').replace(/^-+|-+$/, '')}`,
           {
             [styles['expanded']]: expanded,
             ['expanded']: expanded,

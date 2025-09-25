@@ -1,231 +1,522 @@
-import { useMemo, useState } from 'react';
-import { Tabs } from '@douyinfe/semi-ui';
+import { useEffect, useMemo, useState } from 'react';
+import { Select, Toast, Tooltip } from '@douyinfe/semi-ui';
+import { AutomatorCreatorService } from '@sofa/services/automator-creator';
 import { ProjectType } from '@sofa/services/base-type';
+import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
-import { useTranslation } from '@sofa/services/i18n';
-import { Env } from '@sofa/utils/env';
-import { updateQuery } from '@sofa/utils/history';
-import { useLazyCallback, useQuery } from '@sofa/utils/hooks';
+import { TFunction, useTranslation } from '@sofa/services/i18n';
+import { getErrorMsg } from '@sofa/utils/fns';
+import { useLazyCallback } from '@sofa/utils/hooks';
+import { useRequest } from 'ahooks';
 import classNames from 'classnames';
+import { uniq } from 'lodash-es';
 
-import CEmpty from '@/components/Empty';
 import { useIsMobileUI } from '@/components/MobileOnly';
 import { ProjectTypeRefs } from '@/components/ProductSelector/enums';
 import TopTabs from '@/components/TopTabs';
-import { useWalletStore } from '@/components/WalletConnector/store';
+import {
+  useWalletStore,
+  useWalletUIState,
+} from '@/components/WalletConnector/store';
+import { addI18nResources } from '@/locales';
 
-import { useAutomatorMarketSelector } from '../automator-market/hooks';
-import ProductDesc from '../components/ProductDesc';
+import BadgeBittensor from '../assets/badge-bittensor.png';
 
-import { AutomatorDeposit } from './components/Deposit';
-import { AutomatorOverview } from './components/Overview';
-import { AutomatorProjectDesc } from './components/ProjectDesc';
-import { AutomatorUserInfo } from './components/UserInfo';
-import { AutomatorWithdraw } from './components/Withdraw';
-import { useAutomatorStore } from './store';
+import { Comp as IconInfo } from './assets/icon-info.svg';
+import { Comp as IconPoints } from './assets/icon-points.svg';
+import { Comp as IconShare } from './assets/icon-share.svg';
+import { Comp as IconZero } from './assets/icon-zero.svg';
+import { AutomatorCreateModel } from './index-model';
+import locale from './locale';
+import { useAutomatorCreateStore } from './store';
+
+addI18nResources(locale, 'AutomatorCreate');
+
+import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
+import { Env } from '@sofa/utils/env';
+
+import AsyncButton from '@/components/AsyncButton';
+
+import { useAutomatorCreatorStore } from '../automator-mine/store';
 
 import styles from './index.module.scss';
-import { Helmet } from 'react-helmet-async';
 
-export const AutomatorEl = (props: BaseProps) => {
-  const [t] = useTranslation('Automator');
-  const { tab, v } = useQuery((p) => ({
-    tab: p['automator-trade-tab'] as string,
-    v: p['automator-vault'] as string,
-  }));
-  const { address } = useWalletStore((state) => state);
-  const isMobileUI = useIsMobileUI();
-  const { automator: vault, automators } = useAutomatorMarketSelector();
+const FAQ = (t: TFunction) => {
+  // const [t] = useTranslation('AutomatorCreate');
+  return [
+    {
+      title: t({
+        enUS: 'How does Automator work?',
+        zhCN: 'Automator 是如何工作的?',
+      }),
+      desc: t({
+        enUS: 'Automator involves three key participants: <b>Users</b>, <b>Optivisors</b>, and <b>Market Makers</b>.\n\n1. <b>Users</b>\nUsers can select their preferred Automator and deposit tokens. Under the Optivisor’s expertise, the Automator generates returns, which are distributed among participating users. Additionally, users benefit from incentive $RCH token airdrops as part of their participation.\n\n2. <b>Optivisors</b>\nOptivisors are responsible for creating Automators and executing trading strategies—such as bullish and bearish positions—by interacting with SOFA Vaults. As a reward f inor their expertise, Optivisors earn a share of the profits.\n\n3. <b>Market Makers</b>\nSimilar to other SOFA products, Market Makers provide pricing for SOFA Vaults. Optivisors managers leverage these quotes to allocate Automator funds and participate in SOFA Vault strategies. Once these strategies are settled, profits are distributed accordingly.\nAutomator is an evolution of the SOFA protocol, offering a streamlined and cost-efficient way for users to participate while maximizing their potential returns.',
+        zhCN: 'Automator 涉及三大主要参与者：<b>用户</b>、<b>Optivisors</b>和<b>做市商</b>。\n\n1. <b>用户</b>\n用户可以选择自己喜欢的 Automator 并存入代币。在 Optivisor 的专业指导下，Automator 产生收益，并分配给参与的用户。此外，用户还可以通过参与获得 $RCH 激励代币空投。\n\n2. <b>Optivisors</b>\nOptivisors 负责创建 Automator 并通过与 SOFA Vaults 的互动执行交易策略——如看涨和看跌仓位。作为对他们专业知识的奖励，Optivisors 可以分享一部分利润。\n\n3. <b>做市商</b>\n与其他 SOFA 产品类似，做市商为 SOFA Vaults 提供定价。Optivisors 管理者利用这些报价分配 Automator 资金并参与 SOFA Vaults 策略。一旦这些策略结算，利润将按比例分配。\nAutomator 是 SOFA 协议的发展，提供了一种简化且成本效益高的方式，使用户在最大化潜在收益的同时参与其中。',
+      }),
+    },
 
-  const handleSuccess = useLazyCallback(() => {
-    if (vault && address) {
-      useAutomatorStore.updateUserInfo(vault, address);
-      useWalletStore.updateBalanceByAutomatorVault(vault);
-    }
-  });
-
-  const [mobileUITab, setMobileUITab] = useState<string>(tab);
-  const onTabClick = useLazyCallback((tab: string) => {
-    if (tab) {
-      updateQuery({ 'automator-trade-tab': tab });
-    }
-    if (isMobileUI) {
-      setMobileUITab(tab);
-      if (!tab) {
-        updateQuery({ 'automator-trade-tab': undefined });
-      }
-    }
-  });
-
-  const chainsHasAutomator = useMemo(
-    () =>
-      (Env.isDaily ? [421614] : [1, 42161])
-        .map((it) => ChainMap[it]?.name)
-        .filter(Boolean)
-        .join(', '),
-    [],
-  );
-  return (
-    <>
-      <div
-        className={classNames(
-          styles['section'],
-          styles['section-top'],
-          props.className,
-        )}
-      >
-        {!vault && !automators.length ? (
-          <div className={styles['switch-chain-alert']}>
-            <CEmpty
-              description={
-                tab === 'holding'
-                  ? undefined
-                  : t(
-                      {
-                        enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
-                        zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如 {{chains}}',
-                      },
-                      { chains: chainsHasAutomator },
-                    )
-              }
-            />
-          </div>
-        ) : (
-          <>
-            <AutomatorUserInfo vault={vault} />
-            <div className={styles['left']}>
-              <AutomatorOverview vault={vault} />
-            </div>
-            <div
-              className={classNames(
-                styles['right'],
-                styles[`mobile-tab-${mobileUITab || 'none'}`],
-              )}
-            >
-              <div
-                className={styles['mobile-tab-bg']}
-                onClick={() => onTabClick('')}
-              />
-              <Tabs
-                type="card"
-                size="small"
-                className={styles['tabs']}
-                activeKey={tab === 'redeem' ? 'redeem' : 'deposit'}
-                onTabClick={onTabClick}
-              >
-                <Tabs.TabPane
-                  itemKey="deposit"
-                  tab={
-                    <span
-                      className={classNames(
-                        styles['tab-title'],
-                        styles['deposit'],
-                      )}
-                    >
-                      {t({ enUS: 'Mint', zhCN: '铸造' })}
-                    </span>
-                  }
-                >
-                  <AutomatorDeposit vault={vault} onSuccess={handleSuccess} />
-                </Tabs.TabPane>
-                <Tabs.TabPane
-                  itemKey="redeem"
-                  tab={
-                    <span
-                      className={classNames(
-                        styles['tab-title'],
-                        styles['redeem'],
-                      )}
-                    >
-                      {t({ enUS: 'Redeem', zhCN: '赎回' })}
-                    </span>
-                  }
-                >
-                  <AutomatorWithdraw vault={vault} onSuccess={handleSuccess} />
-                </Tabs.TabPane>
-              </Tabs>
-            </div>
-          </>
-        )}
-      </div>
-    </>
-  );
+    {
+      title: t({
+        enUS: 'What fees will I be charged?',
+        zhCN: '我会被收取哪些费用?',
+      }),
+      desc: t({
+        enUS: 'The protocol charges a 15% service fee on the profits generated by Automators. If no profit is generated, no service fees are charged.\n\nOptivisors can also set a management fee when creating an Automator. This fee applies only to profits but is recorded as a liability during periods of losses. <b>The Optivisor can only collect management fees again once the Automator’s cumulative profits turn positive.</b>',
+        zhCN: '该协议对 Automator 产生的利润收取 15% 的服务费。如果没有产生利润，则不收取服务费。\n\nOptivisors 在创建 Automator 时还可以设定管理费。该费用仅适用于利润，但在亏损期间记录为负债。<b>Optivisor 只有在 Automator 的累计利润转为正数后才能再次收取管理费。</b>',
+      }),
+    },
+    {
+      title: t({
+        enUS: 'How to become an Optivisor and create an Automator?',
+        zhCN: '如何成为 Optivisor 并创建 Automator?',
+      }),
+      desc: t(
+        {
+          enUS: 'Anyone can create an Automator as an Optivisor. However, each address is limited to creating one Automator per chain and deposit token type. To unlock the strategy quota, the Optivisor must burn {{burnAmount}} $RCH tokens.',
+          zhCN: '任何人都可以作为 Optivisor 创建一个 Automator。然而，每个地址在每条链和每种存入代币类型上只能创建一个 Automator。要解锁策略限额，Optivisor 必须燃烧 {{burnAmount}} $RCH 代币。',
+        },
+        {
+          burnAmount: AutomatorCreatorService.rchAmountForBurning,
+        },
+      ),
+    },
+    {
+      title: t({
+        enUS: 'How about the gas fees within the Automator?',
+        zhCN: 'Automator 内部的 Gas 费用如何?',
+      }),
+      desc: t({
+        enUS: 'The Optivisor is responsible for covering all gas fees related to transactions executed within the Automator.',
+        zhCN: 'Optivisor 负责覆盖在 Automator 内执行交易相关的所有 Gas 费用。',
+      }),
+    },
+    {
+      title: t({
+        enUS: 'How can I withdraw my funds after depositing into an Automator?',
+        zhCN: '将资金存入 Automator 后，我如何提现?',
+      }),
+      desc: t({
+        enUS: "Automators operate similarly to funds, incorporating a redemption lock-up period to manage liquidity and ensure effective strategy execution. You can initiate a withdrawal at any time, but you must wait for the <u>Redemption Lock-up period</u> to end before completing the <b>Claim</b> process.\n\nThe redemption lock-up period is determined by the Optivisor during the Automator's creation and can vary based on the specific setup, with a maximum duration of 30 days.",
+        zhCN: 'Automator 的运行方式类似于基金，采用赎回锁定期来管理流动性并确保策略的有效执行。您可以随时提出提现，但您必须等到<u>赎回锁定期</u>结束后才可完成<b>领取</b>过程。\n\n赎回锁定期由 Optivisor 在创建 Automator 时决定，具体时间可能会因具体设置而有所不同，最长为 30 天。',
+      }),
+    },
+    {
+      title: t({
+        enUS: 'What kinds of returns can I expect with an Automator?',
+        zhCN: '使用 Automator 时可以期望什么样的回报?',
+      }),
+      desc: t({
+        enUS: 'Automator returns are composed of three key components:\n\n1. <b>Interest</b>\n- Funds deposited into the Automator are automatically staked in low-risk protocols like Aave or Curve, generating passive interest.\n- These returns are updated in real-time and distributed to users based on their share when withdrawing.\n\n2. <b>Trading PNL</b>\n- Returns generated from the Optivisor’s trading strategies\n- These returns are reflected only after the trading strategy expires, allowing the Optivisor to claim the positions. Users receive their share upon withdrawal.\n\n3. <b>$RCH incentive</b>\n- $RCH token airdrops earned through the Optivisor’s trading activities.\n- Airdrops are distributed daily based on the current holders of the Automator and their respective ownership shares. Users can claim their $RCH tokens directly from the Claim $RCH page.',
+        zhCN: 'Automator 的回报由三个关键部分组成：\n\n1. <b>利息</b>\n- 存入 Automator 的资金会自动质押在 Aave 或 Curve 等低风险协议中，产生被动利息。\n- 这些收益会实时更新，并在用户提现时根据其份额分配给他们。\n\n2. <b>交易盈亏</b>\n- 通过 Optivisor 的交易策略产生的收益\n- 这些收益只有在交易策略到期后才会反映出来，Optivisor 可以认领仓位。用户在提现时会收到他们的份额。\n\n3. <b>$RCH 激励</b>\n- 通过 Optivisor 的交易活动赚取的 $RCH 代币空投。\n- 空投按 Automator 当前持有者及其相应持有份额每日分发。用户可以直接从 领取 $RCH 页面领取他们的 $RCH 代币。',
+      }),
+    },
+    {
+      title: t({
+        enUS: 'What are the risks associated with using an Automator?',
+        zhCN: '使用 Automator 存在哪些风险?',
+      }),
+      desc: t({
+        enUS: 'Automator involves risks, as the Optivisor manages the funds deposited by users to execute options trading strategies and allocate them to low-risk protocols for earning interest. The Optivisor’s decisions play a crucial role in shaping the Automator’s risk and return profile.\n\nSpecifically, the Optivisor decides how to allocate funds between generating returns in low-risk protocols and using either the interest earned or the principal for options trading. The higher the proportion of principal allocated to options trading—rather than relying primarily on interest earnings—the greater the associated risk.\n\nWhen creating an Automator, Optivisors must set a buffer limit for the total funds they manage. For example, if the buffer is set at 10%, the Optivisor can use up to 90% of the total pool for options trading. This buffer acts as a safeguard and ensures disciplined fund allocation. Users can see this buffer percentage for each Automator, enabling them to choose based on their risk preferences—different buffers reflect different risk levels.\n\nSOFA does not enforce risk-free trading, and there is a possibility of losing your principal depending on the Optivisor’s chosen strategy. Please evaluate your risk tolerance carefully before participating and proceed with caution.',
+        zhCN: 'Automator 存在风险，因为 Optivisor 管理用户存入的资金以执行期权交易策略，并将其分配到低风险协议中以赚取利息。Optivisor 的决策在塑造 Automator 的风险和回报配置中起着关键作用。\n\n具体而言，Optivisor 决定如何分配资金在生成低风险协议的收益和选择使用赚取的利息或本金进行期权交易之间。分配更高比例的本金进行期权交易而不是主要依赖利息收益，会增加相关风险。\n\n创建 Automator 时，Optivisors 必须为其管理的总资金设定一个缓冲限额。例如，如果缓冲设定为 10%，Optivisor 最多可以使用 90% 的总池资金进行期权交易。这个缓冲作为一种安全措施，确保了资金分配的纪律性。用户可以看到每个 Automator 的缓冲百分比，从而根据其风险偏好选择——不同的缓冲反映不同的风险水平。\n\nSOFA 不强制进行无风险交易，Optivisor 选择的策略可能会导致您损失本金。请仔细评估您的风险承受能力，在参与之前谨慎行事。',
+      }),
+    },
+    {
+      title: t({
+        enUS: "How is the $RCH airdrop generated and distributed to user's account?",
+        zhCN: '$RCH 代币空投如何生成并分发到用户账户?',
+      }),
+      desc: t({
+        enUS: '$RCH tokens are earned through the Optivisor\'s trading activities and can be claimed by users afterward, just like in other SOFA Vaults. You can check the $RCH airdrop info here: <a target="_blank" href="https://docs.sofa.org/tokenomics/">https://docs.sofa.org/tokenomics/</a>',
+        zhCN: '$RCH 代币通过 Optivisor 的交易活动赚取，随后用户可认领，类似于其他 SOFA Vaults。您可以在这里查看 $RCH 空投信息：<a target="_blank" href="https://docs.sofa.org/tokenomics/">https://docs.sofa.org/tokenomics/</a>',
+      }),
+    },
+  ];
 };
 
-const Automator = (props: BaseProps & { onlyForm?: boolean }) => {
-  const [t] = useTranslation('Automator');
-  const { automator: vault } = useAutomatorMarketSelector();
-
-  const chains = useMemo(
-    () =>
-      (Env.isDaily ? [421614] : [1, 42161])
-        .map((it) => ChainMap[it]?.name)
-        .filter(Boolean)
-        .join(', '),
-    [],
+const AutomatorCreate = () => {
+  const [t] = useTranslation('AutomatorCreate');
+  const location = useLocation();
+  const fromSignalPlus = useMemo(
+    () => /from=SignalPlus/.test(location.search),
+    [location.search],
   );
+  const wallet = useWalletStore((state) => state);
+  const { bringUpConnect } = useWalletUIState();
+  const isMobileUI = useIsMobileUI();
+  const [modelVisible, setModelVisible] = useState(false);
+  const { updatePayload, reset } = useAutomatorCreateStore();
+  const [chainId, setChainId] = useState(0);
+  const [token, setToken] = useState('');
+  const myAutomators = useAutomatorCreatorStore((state) => {
+    const map = state.vaults[`${chainId}-${wallet.address?.toLowerCase()}`];
+    return map && Object.values(map);
+  });
+  useEffect(() => {
+    if (wallet.address)
+      useAutomatorCreatorStore.list(wallet.chainId, wallet.address);
+  }, [wallet.address, wallet.chainId]);
 
+  const [faqExpanded, setFaqExpanded] = useState<Record<number, boolean>>({});
+  const onFaqTitleClicked = useLazyCallback((idx: number) => {
+    if (faqExpanded[idx]) {
+      setFaqExpanded({});
+      return;
+    }
+    setFaqExpanded({ [idx]: true });
+  });
+  useEffect(() => {
+    if (!wallet.address && modelVisible) {
+      setModelVisible(false);
+    }
+  }, [wallet.address, modelVisible]);
+  const { data, loading } = useRequest(
+    async () =>
+      AutomatorCreatorService.automatorFactories({
+        chainId: wallet.chainId,
+        wallet: wallet.address!,
+      }).then((res) => {
+        if (fromSignalPlus) {
+          return res.filter((c) =>
+            [
+              [1, 'USDT'],
+              // [1329, 'USDC'],
+              [42161, 'USDT'],
+              [421614, 'USDC'],
+            ].some((it) => it[0] === c.chainId && it[1] === c.clientDepositCcy),
+          );
+        }
+        return res.filter(
+          (it) => !(it.chainId === 1329 && it.clientDepositCcy === 'USDC'),
+        );
+      }),
+    {
+      refreshDeps: [wallet.address, wallet.chainId],
+      onError: (e) => {
+        console.error(e);
+        Toast.error(getErrorMsg(e));
+      },
+    },
+  );
+  const onStartClick = useLazyCallback(async () => {
+    if (!wallet.address) {
+      bringUpConnect();
+      return;
+    }
+    const existingAutomator = myAutomators?.find(
+      (a) =>
+        a.vaultInfo.depositCcy == token &&
+        a.vaultInfo.creator.toLowerCase() == wallet.address?.toLowerCase() &&
+        a.vaultInfo.chainId == chainId,
+    );
+    if (
+      !Env.isProd &&
+      /automator-create-skip-server-check/.test(location.search)
+    ) {
+      // skip check
+    } else {
+      if (existingAutomator) {
+        Toast.error(
+          t(
+            {
+              enUS: 'You have already created an Automator contract "{{existingAutomatorName}}" with the selected deployed chain and deposit token.',
+              zhCN: '您已基于所选的已部署链和存款代币创建了 "{{existingAutomatorName}}" Automator 合约。',
+            },
+            {
+              existingAutomatorName: existingAutomator.vaultInfo.name,
+            },
+          ),
+        );
+        return;
+      }
+    }
+    if (!data) {
+      return;
+    }
+    const factory = data.find(
+      (c) => c.clientDepositCcy == token && c.chainId == chainId,
+    );
+    if (!factory) {
+      return;
+    }
+    reset();
+    updatePayload({
+      factory,
+    });
+    const [hasBurned, hasCredits, hasAutomator] = await Promise.all([
+      AutomatorCreatorService.hasBurned(factory),
+      AutomatorCreatorService.hasCredits(factory),
+      AutomatorCreatorService.hasAutomatorBeenCreated(factory),
+    ]);
+    if (hasAutomator) {
+      useAutomatorCreateStore.setState({
+        automatorAddress: hasAutomator,
+        rchBurn: 'burned',
+        rchCredits: 'has_credits',
+      });
+    } else if (hasCredits) {
+      // skip the entire burn step
+      useAutomatorCreateStore.setState({
+        rchBurn: 'burned',
+        rchCredits: 'has_credits',
+      });
+    } else if (hasBurned) {
+      // skip the burn step, still awaiting for credit
+      useAutomatorCreateStore.setState({
+        rchBurn: 'burned',
+        rchCredits: 'waiting',
+      });
+    } else {
+      // normal burn
+    }
+    setModelVisible(true);
+  });
   return (
     <>
       <Helmet>
-        <title>Automator</title>
-        <meta name="description" content="" />
-      </Helmet>    
+        <title>Automator - SOFA.org</title>
+        <meta
+          name="description"
+          content="Create your own automator and roll it to earn profits."
+        />
+      </Helmet>
       <TopTabs
         type={'banner-expandable'}
-        className={props.className}
+        className={styles['container']}
+        tabClassName={styles['tabs']}
+        bannerClassName={classNames({
+          [styles['banner-bittensor']]: fromSignalPlus,
+        })}
         banner={
-          <>
-            <h1 className={styles['head-title']}>
+          <h1 className={styles['head-title']}>
+            {!fromSignalPlus && ProjectTypeRefs[ProjectType.Automator].icon}
+            {fromSignalPlus ? (
+              <img
+                className={styles['badge-bittensor']}
+                src={BadgeBittensor}
+                alt="Bittensor"
+              />
+            ) : (
+              t({
+                enUS: 'Create Your Automator Strategies',
+                zhCN: '创建你 Automator 策略',
+              })
+            )}
+          </h1>
+        }
+        dark
+        options={[]}
+      >
+        <div
+          className={classNames(styles['form'], styles['intro'], {
+            [styles['mobile-ui']]: isMobileUI,
+          })}
+        >
+          {fromSignalPlus && (
+            <div className={styles['title-bittensor']}>
               {ProjectTypeRefs[ProjectType.Automator].icon}
               {t({
-                enUS: 'Automator: Follow The Best',
-                zhCN: 'Automator: 跟单',
+                enUS: 'Create A Bittensor Mining Strategy',
+                zhCN: '创建 Bittensor Automator 策略',
               })}
-            </h1>
-            {/* <div className={styles['desc']}>
-                {ProjectTypeRefs[ProjectType.Automator].desc(t)}
-              </div> */}
-          </>
-        }
-        options={[]}
-        dark
-        prefix={t({ enUS: 'Product', zhCN: '产品' })}
-        sticky
-      >
-        {!vault ? (
-          <CEmpty
-            className="semi-always-dark"
-            description={t(
-              {
-                enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',
-                zhCN: '这条链上没有支持的 Automator 合约，请切换到其它的链，比如{{chains}}',
-              },
-              { chains },
-            )}
-          />
-        ) : (
-          <>
-            <div className={styles['form']}>
-              <AutomatorEl />
             </div>
-            <ProductDesc
-              noMoreInfo
-              // dark={isMobileUI}
-              className={styles['product-desc-wrapper']}
-              prefixTabs={[
-                {
-                  itemKey: 'more',
-                  tab: t({ enUS: 'More Info', zhCN: '更多信息' }),
-                  element: <AutomatorProjectDesc vault={vault} />,
-                },
-              ]}
-            />
-          </>
-        )}
+          )}
+          <div className={classNames(styles['chain-and-ccy'])}>
+            <Select
+              className={styles['select-chain']}
+              insetLabel={
+                <span className={styles['select-label']}>
+                  {t({ enUS: 'Automator Chain', zhCN: 'Automator 链' })}
+                </span>
+              }
+              suffix={
+                chainId ? undefined : (
+                  <span className={styles['select-label']}>
+                    {t({ enUS: 'Select', zhCN: '选择' })}
+                  </span>
+                )
+              }
+              loading={loading}
+              onChange={(v) => setChainId(v as number)}
+            >
+              {data &&
+                uniq(data.map((c) => c.chainId)).map((chainId) => (
+                  <Select.Option key={chainId} value={chainId}>
+                    <img
+                      className={styles['logo']}
+                      src={ChainMap[chainId]?.icon}
+                      alt=""
+                    />
+                    <span>{ChainMap[chainId]?.name}</span>
+                  </Select.Option>
+                ))}
+            </Select>
+            <Tooltip
+              key={chainId ? 'chain-selected' : 'chain-not-selected'}
+              trigger={chainId ? 'custom' : undefined}
+              visible={!chainId}
+              content={
+                chainId
+                  ? undefined
+                  : t({
+                      enUS: 'Please select Automator Chain first',
+                      zhCN: '请先选择 Automator 链',
+                    })
+              }
+            >
+              <Select
+                className={styles['select-deposit-token']}
+                insetLabel={
+                  <span className={styles['select-label']}>
+                    {t({ enUS: 'Deposit Token', zhCN: '存入代币' })}
+                  </span>
+                }
+                suffix={
+                  token ? undefined : (
+                    <span className={styles['select-label']}>
+                      {t({ enUS: 'Select', zhCN: '选择' })}
+                    </span>
+                  )
+                }
+                loading={loading}
+                disabled={!chainId}
+                onChange={(v) => setToken(v as string)}
+              >
+                {data &&
+                  uniq(
+                    data
+                      .filter((c) => c.chainId == chainId)
+                      .map((c) => c.clientDepositCcy),
+                  ).map((depositCcy) => (
+                    <Select.Option key={depositCcy} value={depositCcy}>
+                      <img
+                        className={styles['logo']}
+                        src={CCYService.ccyConfigs[depositCcy]?.icon}
+                        alt=""
+                      />
+                      <span>
+                        {CCYService.ccyConfigs[depositCcy]?.name || depositCcy}
+                      </span>
+                    </Select.Option>
+                  ))}
+              </Select>
+            </Tooltip>
+          </div>
+          <Tooltip
+            key={`tt-btn-${chainId}-${token}`}
+            trigger={chainId && token ? 'custom' : undefined}
+            visible={!(chainId && token)}
+            content={
+              !chainId
+                ? t({
+                    enUS: 'Please select Automator Chain',
+                    zhCN: '请选择 Automator 链',
+                  })
+                : !token
+                  ? t({
+                      enUS: 'Please select Deposit Token',
+                      zhCN: '请选择存入代币',
+                    })
+                  : undefined
+            }
+          >
+            <AsyncButton
+              size="large"
+              className={classNames(styles['btn-create'], 'btn-primary')}
+              disabled={!!(wallet.address && !(chainId && token))}
+              onClick={onStartClick}
+            >
+              {!wallet.address
+                ? t({ enUS: 'Connect Wallet', zhCN: '连接钱包' })
+                : t({
+                    enUS: 'Burn RCH & Create Your Automator',
+                    zhCN: '燃烧 RCH 并创建您的 Automator',
+                  })}
+            </AsyncButton>
+          </Tooltip>
+          <div className={styles['tips']}>
+            <IconInfo className={styles['icon-info']} />
+            {t({
+              enUS: 'Note: Each wallet address can only create one Automator with the same deposit token per chain.',
+              zhCN: '注意：每个钱包地址在每条链和每种存入代币组合上只能创建一个 Automator。',
+            })}
+          </div>
+          <ul className={styles['features']}>
+            <li>
+              <IconZero />
+              <div className={styles['title']}>
+                {t({ enUS: 'Zero Trading Fees', zhCN: '零交易费用' })}
+              </div>
+              <div className={styles['desc']}>
+                {t({
+                  enUS: 'Enjoy 0 trading fees when executing trades through your AutoMator.',
+                  zhCN: '通过AutoMator交易享受零交易费用。',
+                })}
+              </div>
+            </li>
+            <li>
+              <IconShare />
+              <div className={styles['title']}>
+                {t({ enUS: 'Profits Sharing', zhCN: '分享利润' })}
+              </div>
+              <div className={styles['desc']}>
+                {t({
+                  enUS: 'Enjoy up to 15% in profit sharing from your Automator subscribers.',
+                  zhCN: '通过订阅您AutoMator的用户可赚取高达15%的利润分成。',
+                })}
+              </div>
+            </li>
+            <li>
+              <IconPoints />
+              <div className={styles['title']}>
+                {t({
+                  enUS: 'Earn Hassle-Free Interest',
+                  zhCN: '赚取无风险利息',
+                })}
+              </div>
+              <div className={styles['desc']}>
+                {t({
+                  enUS: 'Funds in your Automator will grow passively through AAVE/CRV, enjoying riskfree-like returns.',
+                  zhCN: '您在AutoMator中的资金通过AAVE/CRV被动增长，赚取稳定的无风险回报。',
+                })}
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div className={classNames(styles['form'], styles['faq'])}>
+          <h2>{t({ enUS: 'FAQ', zhCN: '常见问题' })}</h2>
+          <ol className={styles['faq-ol']}>
+            {FAQ(t).map((faq, idx) => (
+              <li
+                className={
+                  faqExpanded[idx] ? styles['expended'] : styles['folded']
+                }
+              >
+                <div
+                  className={styles['title']}
+                  onClick={() => onFaqTitleClicked(idx)}
+                >
+                  {faq.title}
+                </div>
+                {faqExpanded[idx] ? (
+                  <div
+                    className={styles['desc']}
+                    dangerouslySetInnerHTML={{
+                      __html: faq.desc.replace(/\n/g, '<br />'),
+                    }}
+                  />
+                ) : undefined}
+              </li>
+            ))}
+          </ol>
+        </div>
       </TopTabs>
+      <AutomatorCreateModel
+        value={modelVisible}
+        onChange={(v) => setModelVisible(v || false)}
+      />
     </>
   );
 };
 
-export default Automator;
+export default AutomatorCreate;
