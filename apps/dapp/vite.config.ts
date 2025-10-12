@@ -6,8 +6,7 @@ import { fileURLToPath, URL } from 'url';
 import { defineConfig, loadEnv } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import svgr from 'vite-plugin-svgr';
-
-import { multiPagePlugin } from './multi-page';
+import { ssr } from 'vite-plugin-ssr/plugin';
 
 const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
@@ -95,7 +94,9 @@ export default defineConfig(({ mode }) => ({
           emitFile: true,
           filename: 'analyze.html',
         }) as never),
-    multiPagePlugin(),
+    ssr({
+      prerender: true,
+    }),
   ],
   build: {
     rollupOptions: {

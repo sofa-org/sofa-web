@@ -35,6 +35,7 @@ import { useHeaderHeight } from './components/Header/index-home';
 import { EnvLinks } from './env-links';
 import { RootDomainPaths, RouteGuard } from './route-guard';
 import { routes } from './routes';
+import { getPageSEO } from './seo-config';
 import { useGlobalState } from './store';
 
 import './index.scss';
@@ -54,7 +55,20 @@ const Root = WasmSuspenseHoc(
       document.body.classList.add('no-scrollbar');
       if (Env.isMobile) document.body.classList.add('is-mobile');
       else document.body.classList.add('is-pc');
-    }, [location.pathname]);
+      // Update page title and meta tags for client-side routing
+      // Combine pathname with search to support query parameter based SEO
+      const fullPath = location.pathname + location.search;
+      const seo = getPageSEO(fullPath);
+      document.title = seo.title;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', seo.description);
+      }
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute('content', seo.keywords || '');
+      }
+    }, [location.pathname, location.search]);
 
     const query = useQuery();
     useEffect(() => {

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "concurrently \"vite\" \"nx run @sofa/alg:watch\"",
-    "build": "tsc && vite build",
+    "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" tsc && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" vite build",
     "analyze": "tsc && cross-env ANALYZE=1 vite build && vite preview --open http://localhost:4173/analyze.html",
     "preview": "vite preview"
   },
@@ -44,6 +44,7 @@
     "echarts": "^5.4.3",
     "ethers": "^6.9.2",
     "gsap": "^3.12.5",
+    "html-to-image": "^1.11.11",
     "i18next": "^23.6.0",
     "localforage": "^1.10.0",
     "locomotive-scroll": "4",
@@ -66,9 +67,9 @@
     "svgo": "^3.0.2",
     "swiper": "^11.0.7",
     "vite-plugin-html": "^3.2.0",
+    "vite-plugin-ssr": "0.4.142",
     "vite-plugin-svgr": "^4.1.0",
-    "zustand": "^4.4.6",
-    "html-to-image": "^1.11.11"
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@livelybone/promise-wait": "^1.2.0",
