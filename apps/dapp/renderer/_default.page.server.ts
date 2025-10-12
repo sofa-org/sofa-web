@@ -57,7 +57,7 @@ function render(pageContext: any) {
 async function prerender() {
   const urls = routes
     .filter(route => route.path !== '/test')
-    .map(route => route.path)  // 只返回 URL 字符串
+    .map(route => route.path)  // return URL strings
 
   return urls
 }

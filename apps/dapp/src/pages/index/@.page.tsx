@@ -1,11 +1,11 @@
-// 通配符路由页面 - 匹配所有路径
-// 实际页面内容由客户端 React Router 处理
+// Wildcard route page — matches all paths
+// The actual page content is handled by React Router on the client
 
 export { Page }
 
 function Page() {
-  // 这个组件只是为了满足 vite-plugin-ssr 的要求
-  // 实际的页面渲染完全由客户端 React Router 处理
-  // 在预渲染阶段，这个组件不会真正渲染，只是提供路由匹配
+  // This component exists only to satisfy vite-plugin-ssr's requirement
+  // The actual page rendering is handled entirely by client-side React Router
+  // During pre-rendering this component is not actually rendered; it only provides route matching
   return null
 }

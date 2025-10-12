@@ -1,4 +1,4 @@
-// 通配符路由配置 - 匹配所有路径
-// 这个文件告诉 vite-plugin-ssr 这个页面组件可以处理任何路径
+// Wildcard route configuration — matches all paths
+// This file tells vite-plugin-ssr that this page component can handle any path
 
 export default '/*'
