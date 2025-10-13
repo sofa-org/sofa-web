@@ -32,6 +32,9 @@ export const routes: {
   path: string;
   Component: ComponentType;
   needGuard?: boolean; // default: true
+  title?: string; // for seo
+  description?: string; // for seo
+  keywords?: string; // for seo
 }[] = [
   {
     path: '/',
@@ -56,6 +59,9 @@ export const routes: {
   {
     path: '/rch',
     Component: RCH,
+    title: 'RCH',
+    description: '这是 RCH 的页面描述',
+    keywords: 'RCH, RCH',
   },
   {
     path: '/points',

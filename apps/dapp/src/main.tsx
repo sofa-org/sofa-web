@@ -1,6 +1,6 @@
-/* eslint-disable react-refresh/only-export-components */
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
+import Helmet from 'react-helmet';
 import { useTranslation as useTranslation_ } from 'react-i18next';
 import {
   createBrowserRouter,
@@ -49,6 +49,11 @@ const Root = WasmSuspenseHoc(
     const timezone = useTimezone((state) => state.timezone);
 
     const location = useLocation();
+    const route = useMemo(
+      () => routes.find((it) => it.path === location.pathname),
+      [location.pathname],
+    );
+
     useEffect(() => {
       document.getElementById('root')?.scrollTo(0, 0);
       document.body.classList.add('no-scrollbar');
@@ -73,6 +78,15 @@ const Root = WasmSuspenseHoc(
         direction={undefined} // 后面增加多语言的时候有用
       >
         <ErrorBoundary style={{ height: '100vh' }}>
+          <Helmet>
+            {route?.title && <title>{route.title}</title>}
+            {route?.description && (
+              <meta name="description" content={route.description} />
+            )}
+            {route?.keywords && (
+              <meta name="keywords" content={route.keywords} />
+            )}
+          </Helmet>
           <Header />
           <main
             className={classNames(
