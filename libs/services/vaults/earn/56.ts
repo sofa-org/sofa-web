@@ -145,5 +145,51 @@ const VaultsForRtCIC = [
     usePermit2: false,
   },
 ];
+const VaultsForRtMNER = [
+  // rtMNERSmartBullVault(BTC/rtMNER)
+  {
+    chainId: 56,
+    vault: '0xCd0e489D8f83Ba71130EEF4D71264a6dbBBae742',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'rtMNER',
+    usePermit2: false,
+  },
+  // rtMNERSmartBearVault(BTC/rtMNER)
+  {
+    chainId: 56,
+    vault: '0x4fBC6710B7C394a8cb19998c3dc541b3D25D36f5',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'rtMNER',
+    usePermit2: false,
+  },
+  // rtMNERSmartBullVault(ETH/rtMNER)
+  {
+    chainId: 56,
+    vault: '0x72eCe83959A1621e1E2798198Ab4CC2EcDE6bf13',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'rtMNER',
+    usePermit2: false,
+  },
+  // rtMNERSmartBearVault(ETH/rtMNER)
+  {
+    chainId: 56,
+    vault: '0xa0fA94f10907a8367D01061C1C80a3298dfBcc35',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.PROTECTED,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'rtMNER',
+    usePermit2: false,
+  },
+];
 
-export default [...vaults, ...VaultsForRtCIC];
+export default [...vaults, ...VaultsForRtCIC, ...VaultsForRtMNER];

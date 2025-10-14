@@ -88,6 +88,7 @@ export const dualVaults = vaults.map((it) => {
       crvUSD: InterestType.CURVE,
       sUSDa: InterestType.AriesMarkets,
       rtCIC: InterestType.CICADA,
+      rtMNER: InterestType.CICADA,
     }[it.depositCcy],
   } as VaultInfo;
 });
