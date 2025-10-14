@@ -49,10 +49,23 @@ const Root = WasmSuspenseHoc(
     const timezone = useTimezone((state) => state.timezone);
 
     const location = useLocation();
+    const query = useQuery();
+
     const route = useMemo(
       () => routes.find((it) => it.path === location.pathname),
       [location.pathname],
     );
+
+    // Dynamically obtain metadata using the project parameter
+    const metaData = useMemo(() => {
+      const project = query['project'] as string;
+      const paramMeta = project ? route?.paramProject?.[project] : undefined;
+      return {
+        title: paramMeta?.title || route?.title,
+        description: paramMeta?.description || route?.description,
+        keywords: paramMeta?.keywords || route?.keywords,
+      };
+    }, [route, query]);
 
     useEffect(() => {
       document.getElementById('root')?.scrollTo(0, 0);
@@ -60,8 +73,6 @@ const Root = WasmSuspenseHoc(
       if (Env.isMobile) document.body.classList.add('is-mobile');
       else document.body.classList.add('is-pc');
     }, [location.pathname]);
-
-    const query = useQuery();
     useEffect(() => {
       const referralCode = (query['referral'] ||
         query['sfg'] ||
@@ -79,12 +90,12 @@ const Root = WasmSuspenseHoc(
       >
         <ErrorBoundary style={{ height: '100vh' }}>
           <Helmet>
-            {route?.title && <title>{route.title}</title>}
-            {route?.description && (
-              <meta name="description" content={route.description} />
+            {metaData.title && <title>{metaData.title}</title>}
+            {metaData.description && (
+              <meta name="description" content={metaData.description} />
             )}
-            {route?.keywords && (
-              <meta name="keywords" content={route.keywords} />
+            {metaData.keywords && (
+              <meta name="keywords" content={metaData.keywords} />
             )}
           </Helmet>
           <Header />

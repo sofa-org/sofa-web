@@ -35,6 +35,14 @@ export const routes: {
   title?: string; // for seo
   description?: string; // for seo
   keywords?: string; // for seo
+  paramProject?: Record<
+    string,
+    {
+      title?: string;
+      description?: string;
+      keywords?: string;
+    }
+  >; // for seo dynamic params
 }[] = [
   {
     path: '/',
@@ -95,6 +103,14 @@ export const routes: {
     description:
       'Trade options products like Earn, Surge, and Dual, and follow Automator strategies on our protocol to get $RCH airdrops.',
     keywords: 'earn, surge, dual, airdrop',
+    paramProject: {
+      Automator: {
+        title: 'Automator - SOFA.org',
+        description:
+          'Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops.',
+        keywords: 'automator, airdrop',
+      },
+    },
   },
   {
     path: '/products/customize',
@@ -102,6 +118,26 @@ export const routes: {
     title: 'Customize - SOFA.org',
     description:
       'Customize DeFi options products tailored to your investment strategy and risk preferences on SOFA platform and get exclusive $RCH airdrops.',
+    paramProject: {
+      Earn: {
+        title: 'Earn - SOFA.org',
+        description:
+          'Earn is a low-risk DeFi options product that offers stable returns and exclusive $RCH airdrops.',
+        keywords: 'earn, airdrop',
+      },
+      Surge: {
+        title: 'Surge - SOFA.org',
+        description:
+          'Surge: a high-risk DeFi options product that delivers high returns and rewards traders with exclusive $RCH airdrops.',
+        keywords: 'surge, airdrop',
+      },
+      Dual: {
+        title: 'Dual - SOFA.org',
+        description:
+          'Discover Dual, an innovative DeFi options product that lets you sell high, buy low, and receive $RCH airdrops for extra trading rewards.',
+        keywords: 'dual, airdrop',
+      },
+    },
   },
   {
     path: '/products/automator',
