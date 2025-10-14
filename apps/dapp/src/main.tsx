@@ -14,6 +14,7 @@ import init from '@sofa/alg';
 import { configReactI18next, t } from '@sofa/services/i18n';
 import { ReferralCode } from '@sofa/services/referral';
 import { Env } from '@sofa/utils/env';
+import { calcVal } from '@sofa/utils/fns';
 import { useQuery } from '@sofa/utils/hooks';
 import { joinUrl } from '@sofa/utils/url';
 import { versionGuardian } from '@sofa/utils/version';
@@ -58,14 +59,18 @@ const Root = WasmSuspenseHoc(
 
     // Dynamically obtain metadata using the project parameter
     const metaData = useMemo(() => {
-      const project = query['project'] as string;
-      const paramMeta = project ? route?.paramProject?.[project] : undefined;
       return {
-        title: paramMeta?.title || route?.title,
-        description: paramMeta?.description || route?.description,
-        keywords: paramMeta?.keywords || route?.keywords,
+        title: calcVal(route?.title, query, location.hash),
+        description: calcVal(route?.description, query, location.hash),
+        keywords: calcVal(route?.keywords, query, location.hash),
       };
-    }, [route, query]);
+    }, [
+      query,
+      route?.title,
+      route?.description,
+      route?.keywords,
+      location.hash,
+    ]);
 
     useEffect(() => {
       document.getElementById('root')?.scrollTo(0, 0);

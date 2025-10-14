@@ -57,9 +57,10 @@ export function multiPagePlugin() {
         }
 
         let html = baseHtml;
-        html = setTitle(html, it.title);
-        html = setMeta(html, 'description', it.description);
-        html = setMeta(html, 'keywords', it.keywords);
+        const calcVal = (d: unknown) => (typeof d === 'function' ? d() : d);
+        html = setTitle(html, calcVal(it.title));
+        html = setMeta(html, 'description', calcVal(it.description));
+        html = setMeta(html, 'keywords', calcVal(it.keywords));
 
         fs.writeFileSync(path.join(targetDir, 'index.html'), html, 'utf-8');
       });

@@ -1,4 +1,5 @@
 import React, { ComponentType } from 'react';
+import { ParsedQs } from 'qs';
 
 const Test = React.lazy(() => import('@/pages/test'));
 const Home = React.lazy(() => import('@/pages/home'));
@@ -32,17 +33,9 @@ export const routes: {
   path: string;
   Component: ComponentType;
   needGuard?: boolean; // default: true
-  title?: string; // for seo
-  description?: string; // for seo
-  keywords?: string; // for seo
-  paramProject?: Record<
-    string,
-    {
-      title?: string;
-      description?: string;
-      keywords?: string;
-    }
-  >; // for seo dynamic params
+  title?: string | ((query?: ParsedQs, hash?: string) => string); // for seo
+  description?: string | ((query?: ParsedQs, hash?: string) => string); // for seo
+  keywords?: string | ((query?: ParsedQs, hash?: string) => string); // for seo
 }[] = [
   {
     path: '/',
@@ -99,44 +92,53 @@ export const routes: {
   {
     path: '/products',
     Component: Products,
-    title: 'Products - SOFA.org',
-    description:
-      'Trade options products like Earn, Surge, and Dual, and follow Automator strategies on our protocol to get $RCH airdrops.',
-    keywords: 'earn, surge, dual, airdrop',
-    paramProject: {
-      Automator: {
-        title: 'Automator - SOFA.org',
-        description:
+    title: (q) => {
+      const map = {
+        Automator: 'Automator - SOFA.org',
+        _: 'Products - SOFA.org',
+      };
+      return map[(q?.project as never) || '_'];
+    },
+    description: (q) => {
+      const map = {
+        Automator:
           'Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops.',
-        keywords: 'automator, airdrop',
-      },
+        _: 'Trade options products like Earn, Surge, and Dual, and follow Automator strategies on our protocol to get $RCH airdrops.',
+      };
+      return map[(q?.project as never) || '_'];
+    },
+    keywords: (q) => {
+      const map = { Automator: '', _: 'earn, surge, dual, airdrop' };
+      return map[(q?.project as never) || '_'];
     },
   },
   {
     path: '/products/customize',
     Component: ProductCustomize,
-    title: 'Customize - SOFA.org',
-    description:
-      'Customize DeFi options products tailored to your investment strategy and risk preferences on SOFA platform and get exclusive $RCH airdrops.',
-    paramProject: {
-      Earn: {
-        title: 'Earn - SOFA.org',
-        description:
-          'Earn is a low-risk DeFi options product that offers stable returns and exclusive $RCH airdrops.',
-        keywords: 'earn, airdrop',
-      },
-      Surge: {
-        title: 'Surge - SOFA.org',
-        description:
+    title: (q) => {
+      const map = {
+        Dual: 'Dual - SOFA.org',
+        Surge: 'Surge - SOFA.org',
+        Earn: 'Earn - SOFA.org',
+      };
+      return map[(q?.project as never) || 'Earn'];
+    },
+    description: (q) => {
+      const map = {
+        Dual: 'Discover Dual, an innovative DeFi options product that lets you sell high, buy low, and receive $RCH airdrops for extra trading rewards.',
+        Surge:
           'Surge: a high-risk DeFi options product that delivers high returns and rewards traders with exclusive $RCH airdrops.',
-        keywords: 'surge, airdrop',
-      },
-      Dual: {
-        title: 'Dual - SOFA.org',
-        description:
-          'Discover Dual, an innovative DeFi options product that lets you sell high, buy low, and receive $RCH airdrops for extra trading rewards.',
-        keywords: 'dual, airdrop',
-      },
+        Earn: 'Earn is a low-risk DeFi options product that offers stable returns and exclusive $RCH airdrops.',
+      };
+      return map[(q?.project as never) || 'Earn'];
+    },
+    keywords: (q) => {
+      const map = {
+        Dual: 'dual, airdrop',
+        Surge: 'surge, airdrop',
+        Earn: 'earn, airdrop',
+      };
+      return map[(q?.project as never) || 'Earn'];
     },
   },
   {

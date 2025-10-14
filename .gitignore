@@ -34,3 +34,5 @@ coverage
 .env.local
 
 .env-ai18n
+
+apps/**/*bot/**
