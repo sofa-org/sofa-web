@@ -97,7 +97,7 @@ export const routes: {
         Automator: 'Automator - SOFA.org',
         _: 'Products - SOFA.org',
       };
-      return map[(q?.project as never) || '_'];
+      return map[q?.project as keyof typeof map] || map._;
     },
     description: (q) => {
       const map = {
@@ -105,11 +105,14 @@ export const routes: {
           'Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops.',
         _: 'Trade options products like Earn, Surge, and Dual, and follow Automator strategies on our protocol to get $RCH airdrops.',
       };
-      return map[(q?.project as never) || '_'];
+      return map[q?.project as keyof typeof map] || map._;
     },
     keywords: (q) => {
-      const map = { Automator: '', _: 'earn, surge, dual, airdrop' };
-      return map[(q?.project as never) || '_'];
+      const map = {
+        Automator: 'automator, airdrop',
+        _: 'earn, surge, dual, airdrop',
+      };
+      return map[q?.project as keyof typeof map] || map._;
     },
   },
   {
