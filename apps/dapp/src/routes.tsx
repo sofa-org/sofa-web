@@ -1,4 +1,5 @@
 import React, { ComponentType } from 'react';
+import { ParsedQs } from 'qs';
 
 const Test = React.lazy(() => import('@/pages/test'));
 const Home = React.lazy(() => import('@/pages/home'));
@@ -32,77 +33,162 @@ export const routes: {
   path: string;
   Component: ComponentType;
   needGuard?: boolean; // default: true
+  title?: string | ((query?: ParsedQs, hash?: string) => string); // for seo
+  description?: string | ((query?: ParsedQs, hash?: string) => string); // for seo
+  keywords?: string | ((query?: ParsedQs, hash?: string) => string); // for seo
 }[] = [
   {
     path: '/',
     Component: Home,
+    title: 'SOFA.org',
+    description:
+      "SOFA.org is a decentralized, nonprofit, open-source technology organization offering protocols for crypto products, especially options. Earn $RCH via protocol use, liquidity provision, and governance. $SOFA enables holders to vote on proposals that shape SOFA.org's future.",
+    keywords:
+      'DeFi, RCH, SOFA, decentralized finance, crypto structured products, blockchain, protocol safety, community rewards, financial technology, governance token, decentralized organization, DeFi education, capital efficiency, nonprofit finance',
   },
   {
-    path: '/test', // 开发
+    path: '/test',
     Component: Test,
   },
   {
     path: '/policy',
     Component: Policy,
+    title: 'Policy - SOFA.org',
   },
   {
     path: '/mechanism',
     Component: Mechanism,
+    title: 'Project - SOFA.org',
+    description: '100% on-chain and tokenized positions.',
   },
   {
     path: '/strengths',
     Component: Advantages,
+    title: 'Capabilities - SOFA.org',
+    description:
+      'The SOFA protocol is our ambitious attempt to establish standards of how financial assets can be atomically settled on-chain, while simultaneously catalyzing DeFi capital liquidity through transferrable Position Tokens.',
   },
   {
     path: '/rch',
     Component: RCH,
+    title: 'RCH - SOFA.org',
+    description:
+      'Earn $RCH via protocol use, liquidity provision, and governance.',
+    keywords: 'RCH, airdrop',
   },
   {
     path: '/points',
     Component: Points,
+    title: 'Points - SOFA.org',
+    description:
+      'Discover the rules for earning $SOFA points on the SOFA protocol. See how interacting with our DeFi products and options qualifies you for $SOFA airdrop.',
+    keywords: 'SOFA points, airdrop',
   },
   {
     path: '/positions',
     Component: Positions,
+    title: 'Positions - SOFA.org',
   },
   {
     path: '/products',
     Component: Products,
+    title: (q) => {
+      const map = {
+        Automator: 'Automator - SOFA.org',
+        _: 'Products - SOFA.org',
+      };
+      return map[q?.project as keyof typeof map] || map._;
+    },
+    description: (q) => {
+      const map = {
+        Automator:
+          'Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops.',
+        _: 'Trade options products like Earn, Surge, and Dual, and follow Automator strategies on our protocol to get $RCH airdrops.',
+      };
+      return map[q?.project as keyof typeof map] || map._;
+    },
+    keywords: (q) => {
+      const map = {
+        Automator: 'automator, airdrop',
+        _: 'earn, surge, dual, airdrop',
+      };
+      return map[q?.project as keyof typeof map] || map._;
+    },
   },
   {
     path: '/products/customize',
     Component: ProductCustomize,
+    title: (q) => {
+      const map = {
+        Dual: 'Dual - SOFA.org',
+        Surge: 'Surge - SOFA.org',
+        Earn: 'Earn - SOFA.org',
+      };
+      return map[(q?.project as never) || 'Earn'];
+    },
+    description: (q) => {
+      const map = {
+        Dual: 'Discover Dual, an innovative DeFi options product that lets you sell high, buy low, and receive $RCH airdrops for extra trading rewards.',
+        Surge:
+          'Surge: a high-risk DeFi options product that delivers high returns and rewards traders with exclusive $RCH airdrops.',
+        Earn: 'Earn is a low-risk DeFi options product that offers stable returns and exclusive $RCH airdrops.',
+      };
+      return map[(q?.project as never) || 'Earn'];
+    },
+    keywords: (q) => {
+      const map = {
+        Dual: 'dual, airdrop',
+        Surge: 'surge, airdrop',
+        Earn: 'earn, airdrop',
+      };
+      return map[(q?.project as never) || 'Earn'];
+    },
   },
   {
     path: '/products/automator',
     Component: Automator,
+    title: 'Automator - SOFA.org',
+    description:
+      'Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops.',
+    keywords: 'automator, airdrop',
   },
   {
     path: '/products/automator/mine',
     Component: AutomatorMine,
+    title: 'My Automators - SOFA.org',
   },
   {
     path: '/products/automator/operate',
     Component: AutomatorOperate,
+    title: 'Operate Automator - SOFA.org',
   },
   {
     path: '/positions/orders',
     Component: OrderHistory,
+    title: 'Order History - SOFA.org',
   },
   {
     path: '/automator/positions',
     Component: AutomatorPositions,
+    title: 'Automator Positions - SOFA.org',
   },
   {
     path: '/products/automator/create',
     Component: AutomatorCreate,
+    title: 'Create Automator - SOFA.org',
+    description: 'Create your own automator and roll it to earn profits.',
   },
   {
     path: '/transactions',
     Component: OrderHistory,
+    title: 'Transactions History - SOFA.org',
   },
   {
     path: '/a',
     Component: AutomatorSharePage,
+    title: 'Automator Sharing - SOFA.org',
+    description:
+      'Follow Automator strategies on our protocol to earn profits and get exclusive $RCH airdrops.',
+    keywords: 'automator, airdrop',
   },
 ];

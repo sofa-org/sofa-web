@@ -1,6 +1,6 @@
-/* eslint-disable react-refresh/only-export-components */
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
+import Helmet from 'react-helmet';
 import { useTranslation as useTranslation_ } from 'react-i18next';
 import {
   createBrowserRouter,
@@ -14,6 +14,7 @@ import init from '@sofa/alg';
 import { configReactI18next, t } from '@sofa/services/i18n';
 import { ReferralCode } from '@sofa/services/referral';
 import { Env } from '@sofa/utils/env';
+import { calcVal } from '@sofa/utils/fns';
 import { useQuery } from '@sofa/utils/hooks';
 import { joinUrl } from '@sofa/utils/url';
 import { versionGuardian } from '@sofa/utils/version';
@@ -49,14 +50,34 @@ const Root = WasmSuspenseHoc(
     const timezone = useTimezone((state) => state.timezone);
 
     const location = useLocation();
+    const query = useQuery();
+
+    const route = useMemo(
+      () => routes.find((it) => it.path === location.pathname),
+      [location.pathname],
+    );
+
+    // Dynamically obtain metadata using the project parameter
+    const metaData = useMemo(() => {
+      return {
+        title: calcVal(route?.title, query, location.hash),
+        description: calcVal(route?.description, query, location.hash),
+        keywords: calcVal(route?.keywords, query, location.hash),
+      };
+    }, [
+      query,
+      route?.title,
+      route?.description,
+      route?.keywords,
+      location.hash,
+    ]);
+
     useEffect(() => {
       document.getElementById('root')?.scrollTo(0, 0);
       document.body.classList.add('no-scrollbar');
       if (Env.isMobile) document.body.classList.add('is-mobile');
       else document.body.classList.add('is-pc');
     }, [location.pathname]);
-
-    const query = useQuery();
     useEffect(() => {
       const referralCode = (query['referral'] ||
         query['sfg'] ||
@@ -73,6 +94,15 @@ const Root = WasmSuspenseHoc(
         direction={undefined} // 后面增加多语言的时候有用
       >
         <ErrorBoundary style={{ height: '100vh' }}>
+          <Helmet>
+            {metaData.title && <title>{metaData.title}</title>}
+            {metaData.description && (
+              <meta name="description" content={metaData.description} />
+            )}
+            {metaData.keywords && (
+              <meta name="keywords" content={metaData.keywords} />
+            )}
+          </Helmet>
           <Header />
           <main
             className={classNames(
