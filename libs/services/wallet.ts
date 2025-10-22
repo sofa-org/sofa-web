@@ -208,7 +208,6 @@ export class WalletService {
     amount: string | number | bigint, // 交易金额，用于判断 allowance 是否够用（应该已经乘以了系数，比如实际为 1,000ETH，应该变成 1,000,000,000）
     signer: ethers.JsonRpcSigner,
     approveTo = PERMIT2_ADDRESS,
-    forceClearAllowance = false, // 是否强制清空 allowance
   ) {
     const collateralContract = new ethers.Contract(
       collateralAddress,
@@ -219,22 +218,24 @@ export class WalletService {
       signer.address,
       approveTo,
     );
-    if (Big(allowance).gte(Big(String(amount))) && !forceClearAllowance) return;
-    console.info('Approve:', {
-      allowance,
-      amount,
-      collateralAddress,
-      approveTo,
-      signer,
-      forceClearAllowance,
-    });
+    if (Big(allowance).gte(Big(String(amount)))) return;
     if (
       Number(allowance) &&
-      (['0xdac17f958d2ee523a2206206994597c13d831ec7'].includes(
-        collateralAddress.toLowerCase(),
-      ) ||
-        forceClearAllowance)
+      [
+        // 在allowance < amount 时，特定的合约需要先把allowance设置成0再approve
+        // USDT
+        '0xdac17f958d2ee523a2206206994597c13d831ec7'.toLowerCase(),
+        // CRV
+        '0xd533a949740bb3306d119cc777fa900ba034cd52'.toLowerCase(),
+      ].includes(collateralAddress.toLowerCase())
     ) {
+      console.info('Approve-Clear:', {
+        allowance,
+        amount,
+        collateralAddress,
+        approveTo,
+        signer,
+      });
       // 这几个合约的 approve 方法只能在 allowance 全部用完才能继续 approve，否则只能清空
       await WalletService.$$approve(
         signer,
@@ -243,6 +244,13 @@ export class WalletService {
         '0x0',
       ); // 清空
     }
+    console.info('Approve:', {
+      allowance,
+      amount,
+      collateralAddress,
+      approveTo,
+      signer,
+    });
     return WalletService.$$approve(
       signer,
       collateralContract,
@@ -281,7 +289,6 @@ export class WalletService {
       amount,
       ctx.signer,
       data.vault.vault,
-      true, // 强制清空 allowance
     );
     const args = (gasLimit?: number) => [
       data.quote.totalCollateral,
