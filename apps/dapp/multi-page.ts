@@ -43,7 +43,7 @@ export function multiPagePlugin() {
           `<meta\\s+[^>]*name=["']${name}["'][^>]*>`,
           'i',
         );
-        const newTag = `<meta name="${name}" content="${safe}" />`;
+        const newTag = `<meta name="${name}" content="${safe}" data-react-helmet="true" />`;
         if (metaRe.test(html)) return html.replace(metaRe, newTag);
         return html.replace(/<\/head>/i, `  ${newTag}\n</head>`);
       };
