@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Spin } from '@douyinfe/semi-ui';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import { PositionsService } from '@sofa/services/positions';
+import { PositionInfo, PositionsService } from '@sofa/services/positions';
 import { ProductType, RiskType } from '@sofa/services/products';
 import { joinUrl } from '@sofa/utils/url';
 import { useRequest } from 'ahooks';
@@ -13,6 +14,7 @@ import { useProjectChange, useRiskSelect } from '@/components/ProductSelector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
 
+import PositionDetailsModal from '../PositionDetails';
 import PositionList from '../PositionList';
 import WonderfulMomentCard from '../WonderfulMomentCard';
 import { RuleDescriptions } from '../WonderfulMomentCard/level';
@@ -48,6 +50,8 @@ const List = (props: {
       onSuccess: (list) => console.info('WonderfulMoment', list),
     },
   );
+  const [selectedPosition, setSelectedPosition] = useState<PositionInfo>();
+
   return (
     <>
       <Spin
@@ -55,7 +59,11 @@ const List = (props: {
         spinning={loading || (!positions && !!address)}
       >
         {positions?.map((it) => (
-          <WonderfulMomentCard position={it} key={it.id} />
+          <WonderfulMomentCard
+            position={it}
+            key={it.id}
+            onClick={() => setSelectedPosition(it)}
+          />
         ))}
         {!positions?.length && !loading && (
           <CEmpty
@@ -83,6 +91,11 @@ const List = (props: {
         </Button>
         <RuleDescriptions />
       </div>
+      <PositionDetailsModal
+        position={selectedPosition}
+        visible={!!selectedPosition}
+        onHide={() => setSelectedPosition(undefined)}
+      />
     </>
   );
 };

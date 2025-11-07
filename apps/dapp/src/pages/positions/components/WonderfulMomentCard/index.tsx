@@ -24,6 +24,7 @@ addI18nResources(locale, 'WonderfulMoment');
 
 export interface WonderfulMomentCardProps {
   position: PositionInfo;
+  onClick?(): void;
 }
 
 const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
@@ -74,7 +75,7 @@ const WonderfulMomentCard = (props: WonderfulMomentCardProps) => {
   );
   if (!levelRef || !productIcon) return <></>;
   return (
-    <div className={styles['card']}>
+    <div className={styles['card']} onClick={props.onClick}>
       <div className={styles['profits']} style={{ background: levelRef.color }}>
         <img
           className={styles['product-icon']}
