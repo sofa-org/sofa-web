@@ -12,7 +12,12 @@ import { pick } from 'lodash-es';
 import { CommonAbis } from './abis/common-abis';
 import type { AutomatorVaultInfo } from './base-type';
 import { ChainMap } from './chains';
-import { ContractsService, RiskType, TransactionStatus } from './contracts';
+import {
+  ContractsService,
+  createEthersContract,
+  RiskType,
+  TransactionStatus,
+} from './contracts';
 import { ProductQuoteResult, ProductType } from './products';
 import { PositionInfoInGraph } from './the-graph';
 import { WalletConnect } from './wallet-connect';
@@ -110,7 +115,7 @@ export class WalletService {
     vaultAddress: string,
     provider: AbstractProvider,
   ): Promise<{ symbol: string; address: string | null }> {
-    const contract = new ethers.Contract(
+    const contract = createEthersContract(
       vaultAddress,
       [CommonAbis.COLLATERAL, CommonAbis.collateral],
       provider,
@@ -120,7 +125,7 @@ export class WalletService {
       .catch(() => contract.COLLATERAL()) // 合约方法改成小写了，但是测试环境还是大写，这里做兼容
       .catch(() => null);
     if (!address) return { symbol: 'ETH', address };
-    const collateralContract = new ethers.Contract(
+    const collateralContract = createEthersContract(
       address,
       [CommonAbis.symbol],
       provider,
@@ -209,7 +214,7 @@ export class WalletService {
     signer: ethers.JsonRpcSigner,
     approveTo = PERMIT2_ADDRESS,
   ) {
-    const collateralContract = new ethers.Contract(
+    const collateralContract = createEthersContract(
       collateralAddress,
       [CommonAbis.allowance, CommonAbis.approve],
       signer,

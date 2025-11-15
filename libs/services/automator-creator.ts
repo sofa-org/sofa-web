@@ -18,7 +18,7 @@ import {
   VaultInfo,
 } from './base-type';
 import { ChainMap, defaultChain } from './chains';
-import { ContractsService } from './contracts';
+import { ContractsService, createEthersContract } from './contracts';
 import { isMockEnabled } from './mock';
 import { TransactionProgress } from './positions';
 import { PositionStatus, TheGraphService } from './the-graph';
@@ -141,7 +141,7 @@ export class AutomatorCreatorService {
         signer,
         AutomatorCreatorService.rchBurnContract.address,
       );
-      const burnContract = new ethers.Contract(
+      const burnContract = createEthersContract(
         AutomatorCreatorService.rchBurnContract.address,
         burnAbis,
         signer,
@@ -268,7 +268,7 @@ export class AutomatorCreatorService {
       const { signer } = await WalletService.connect(vault.chainId);
       if (vault.creator.toLowerCase() !== signer.address.toLowerCase())
         throw new Error('Only owner can mint products');
-      const contract = new ethers.Contract(vault.vault, vault.abis, signer);
+      const contract = createEthersContract(vault.vault, vault.abis, signer);
 
       const signature = await AutomatorCreatorService.signSignatures(
         vault,
@@ -351,7 +351,7 @@ export class AutomatorCreatorService {
     cb({ status: 'Submitting' });
     try {
       const { signer } = await WalletService.connect(vault.chainId);
-      const contract = new ethers.Contract(vault.vault, vault.abis, signer);
+      const contract = createEthersContract(vault.vault, vault.abis, signer);
       const $positionList = positions.reduce(
         (pre, it) => {
           const key = it.vault.toLowerCase();
@@ -422,7 +422,7 @@ export class AutomatorCreatorService {
 
   static async profitsCanBeHarvested(vault: AutomatorVaultInfo) {
     const provider = await WalletService.readonlyConnect(vault.chainId);
-    const contract = new ethers.Contract(vault.vault, vault.abis, provider);
+    const contract = createEthersContract(vault.vault, vault.abis, provider);
     const decimal = ContractsService.vaults.find(
       (it) =>
         it.chainId === vault.chainId && it.depositCcy === vault.vaultDepositCcy,
@@ -447,7 +447,7 @@ export class AutomatorCreatorService {
       const { signer } = await WalletService.connect(vault.chainId);
       if (vault.creator.toLowerCase() !== signer.address.toLowerCase())
         throw new Error('Only owner can harvest');
-      const contract = new ethers.Contract(vault.vault, vault.abis, signer);
+      const contract = createEthersContract(vault.vault, vault.abis, signer);
       const tx = await ContractsService.dirtyCall(
         contract,
         'harvest',
@@ -490,7 +490,7 @@ export class AutomatorCreatorService {
     cb({ status: 'Submitting' });
     try {
       const { signer } = await WalletService.connect(data.factory.chainId);
-      const factory = new ethers.Contract(
+      const factory = createEthersContract(
         data.factory.factoryAddress,
         factoryAbis,
         signer,
@@ -563,7 +563,7 @@ export class AutomatorCreatorService {
 
   public static async hasCredits(factory: AutomatorFactory) {
     const { signer } = await WalletService.connect(factory.chainId);
-    const factoryContract = new ethers.Contract(
+    const factoryContract = createEthersContract(
       factory.factoryAddress,
       factoryAbis,
       signer,
@@ -576,7 +576,7 @@ export class AutomatorCreatorService {
 
   public static async hasAutomatorBeenCreated(factory: AutomatorFactory) {
     const { signer } = await WalletService.connect(factory.chainId);
-    const factoryContract = new ethers.Contract(
+    const factoryContract = createEthersContract(
       factory.factoryAddress,
       factoryAbis,
       signer,

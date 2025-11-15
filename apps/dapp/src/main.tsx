@@ -11,6 +11,7 @@ import {
 } from 'react-router-dom';
 import { ConfigProvider, Modal } from '@douyinfe/semi-ui';
 import init from '@sofa/alg';
+import { BlacklistService } from '@sofa/services/blacklist';
 import { configReactI18next, t } from '@sofa/services/i18n';
 import { ReferralCode } from '@sofa/services/referral';
 import { Env } from '@sofa/utils/env';
@@ -33,6 +34,7 @@ import './global-var';
 import { CampaignEntry } from './components/CampaignEntry';
 import { GlobalModal } from './components/GlobalModal';
 import { useHeaderHeight } from './components/Header/index-home';
+import { useWalletStore } from './components/WalletConnector/store';
 import { EnvLinks } from './env-links';
 import { RootDomainPaths, RouteGuard } from './route-guard';
 import { routes } from './routes';
@@ -86,6 +88,23 @@ const Root = WasmSuspenseHoc(
     }, [query]);
 
     const headerHeight = useHeaderHeight();
+
+    const wallet = useWalletStore((s) => s.address);
+
+    if (BlacklistService.shouldBlock(wallet))
+      return (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            color: '#fff',
+          }}
+        >
+          BLOCKED
+        </div>
+      );
 
     return (
       <ConfigProvider

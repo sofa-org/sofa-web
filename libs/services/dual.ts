@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { dualVaults } from './vaults/dual';
 import { ProductType, VaultInfo } from './base-type';
 import { CCYService } from './ccy';
+import { createEthersContract } from './contracts';
 import * as positions from './positions';
 import { ProductInfo, ProductQuoteResult } from './products';
 import { WalletService } from './wallet';
@@ -162,7 +163,7 @@ export class DualService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     args: any[],
   ) {
-    const contract = new ethers.Contract(
+    const contract = createEthersContract(
       vault.vault,
       vault.abis,
       signerOrProvider,

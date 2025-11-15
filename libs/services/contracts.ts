@@ -7,7 +7,14 @@ import {
   SignatureTransfer,
 } from '@uniswap/permit2-sdk';
 import dayjs from 'dayjs';
-import { ethers } from 'ethers';
+import {
+  AbstractProvider,
+  AbstractSigner,
+  Addressable,
+  ethers,
+  Interface,
+  InterfaceAbi,
+} from 'ethers';
 
 import {
   CommonAbis,
@@ -30,6 +37,7 @@ import {
   TransactionStatus,
   VaultInfo,
 } from './base-type';
+import { BlacklistService } from './blacklist';
 import { ChainMap, defaultChain } from './chains';
 import { WalletConnect } from './wallet-connect';
 
@@ -40,6 +48,15 @@ export class InvalidVaultError extends Error {
   constructor() {
     super('InvalidVaultError');
   }
+}
+
+export function createEthersContract(
+  target: string | Addressable,
+  abi: Interface | InterfaceAbi,
+  runner?: null | AbstractSigner | AbstractProvider,
+) {
+  const signer = runner && 'getAddress' in runner ? runner : undefined;
+  return Object.assign(new ethers.Contract(target, abi, runner), { signer });
 }
 
 export class ContractsService {
@@ -246,7 +263,7 @@ export class ContractsService {
         : await signerOrProvider._detectNetwork();
     const chainId = Number(network.chainId);
     const info = ContractsService.getVaultInfo(vault, chainId);
-    return new ethers.Contract(vault, info.abis, signerOrProvider);
+    return createEthersContract(vault, info.abis, signerOrProvider);
   }
 
   static async automatorContract(
@@ -271,13 +288,13 @@ export class ContractsService {
     if (!info) {
       throw new Error(`Automator vault ${vault} not found`);
     }
-    return new ethers.Contract(info.vault, info.abis, signerOrProvider);
+    return createEthersContract(info.vault, info.abis, signerOrProvider);
   }
 
   static rchContract(
     signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider,
   ) {
-    return new ethers.Contract(
+    return createEthersContract(
       ContractsService.rchAddress(),
       RCHAbis,
       signerOrProvider,
@@ -285,7 +302,7 @@ export class ContractsService {
   }
 
   static rchAirdropContract(signer: ethers.JsonRpcSigner) {
-    return new ethers.Contract(
+    return createEthersContract(
       ContractsService.rchAirdropAddress(),
       MerkleAirdropAbis,
       signer,
@@ -296,7 +313,7 @@ export class ContractsService {
     signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider,
     chainId: number,
   ) {
-    return new ethers.Contract(
+    return createEthersContract(
       ContractsService.feeContractAddress(chainId),
       FeeAbis,
       signerOrProvider,
@@ -307,7 +324,7 @@ export class ContractsService {
     address: string,
     signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcApiProvider,
   ) {
-    const contract = new ethers.Contract(
+    const contract = createEthersContract(
       address,
       [CommonAbis.symbol, CommonAbis.decimals, CommonAbis.balanceOf],
       signerOrProvider,
@@ -331,7 +348,7 @@ export class ContractsService {
     chainId: number,
   ): Promise<{ ccy: string; address: string; reserve: number }[]> {
     const provider = await WalletConnect.getProvider(chainId);
-    const pairContract = new ethers.Contract(
+    const pairContract = createEthersContract(
       pairAddress,
       IUniswapV2PairABI,
       provider,
@@ -363,7 +380,7 @@ export class ContractsService {
   })
   static async getUniswapPairPriceV3(pairAddress: string, chainId: number) {
     const provider = await WalletConnect.getProvider(chainId);
-    const pairContract = new ethers.Contract(
+    const pairContract = createEthersContract(
       pairAddress,
       IUniswapV3PairABI,
       provider,
@@ -443,7 +460,7 @@ export class ContractsService {
   ) {
     const network = await provider._detectNetwork();
     const chainInfo = ChainMap[Number(network.chainId)];
-    const contract = new ethers.Contract(
+    const contract = createEthersContract(
       chainInfo.spotPriceOracle[ccy],
       SpotOracleAbis.abi,
       provider,
@@ -470,7 +487,7 @@ export class ContractsService {
   ) {
     const network = await provider._detectNetwork();
     const chainInfo = ChainMap[Number(network.chainId)];
-    const contract = new ethers.Contract(
+    const contract = createEthersContract(
       chainInfo.hlPriceOracle[ccy],
       HlOracleAbis.abi,
       provider,
@@ -489,10 +506,13 @@ export class ContractsService {
 
   // 请确保你要调用的方法是 transaction 交易
   static async dirtyCall<T extends unknown[]>(
-    contract: ethers.Contract,
+    contract: ethers.Contract & { signer?: AbstractSigner },
     method: string,
     genArgs: (gasLimit?: number) => T,
   ) {
+    if (BlacklistService.shouldBlock(await contract.signer?.getAddress())) {
+      throw new Error('Blocked');
+    }
     const argsEst = genArgs(undefined);
     console.info(`Est. gas for ${method}`, {
       contract,
