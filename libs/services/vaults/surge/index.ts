@@ -1,10 +1,17 @@
 import { ethers } from 'ethers';
+import { get } from 'lodash-es';
 
 import DNTVaultAbis from '../../abis/DNTVault.json';
 import DNTVaultAbis1 from '../../abis/DNTVault-No-Permit2.json';
 import STVaultAbis from '../../abis/SmartTrendVault.json';
 import STVaultAbis1 from '../../abis/SmartTrendVault-No-Permit2.json';
-import { ProductType, ProjectType, RiskType, VaultInfo } from '../../base-type';
+import {
+  ProductType,
+  ProjectType,
+  RiskType,
+  TradeSide,
+  VaultInfo,
+} from '../../base-type';
 import {
   getCollateralDecimal,
   getDepositMinAmount,
@@ -57,5 +64,6 @@ export const surgeVaults = vaults.map((it) => {
     collateralDecimal,
     balanceDecimal: collateralDecimal,
     abis: getSurgeAbis(it),
+    tradeSide: get(it, 'tradeSide') || TradeSide.BUY,
   } as VaultInfo;
 });

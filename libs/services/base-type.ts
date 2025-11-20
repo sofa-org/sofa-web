@@ -58,6 +58,11 @@ export enum AutomatorTransactionStatus {
   CANCELLED = 'CANCELLED',
 }
 
+export enum TradeSide {
+  BUY = 'BUY',
+  SELL = 'SELL',
+}
+
 export interface VaultInfo {
   vault: string; // 合约地址
   chainId: number;
@@ -82,6 +87,7 @@ export interface VaultInfo {
   interestType: InterestType | undefined; // 生息方式，undefined 表示 vault 内部没有生息功能
   abis: ethers.InterfaceAbi;
   earlyClaimable: boolean | undefined;
+  tradeSide: TradeSide; // 老合约都默认为是做产品的买方
 
   tickPrice?: number; // 只有 DUAL 的position里会返回
 }
