@@ -1,6 +1,32 @@
-import { ProductType, RiskType } from '../../base-type';
+import { ProductType, RiskType, TradeSide } from '../../base-type';
 
 const VaultsForAutomator = [
+  // RebaseSmartBullVault(BTC/aUSDC)
+  {
+    chainId: 421614,
+    vault: '0xd529aE3867aa4d375DB7C67183d1FAf739eCb201',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'aUSDC',
+    rchMultiplier: 1,
+    usePermit2: true,
+    tradeDisable: true,
+  },
+  // RebaseSmartBearVault(ETH/aUSDC)
+  {
+    chainId: 421614,
+    vault: '0xA3CDCdCCa1e776207ba774fF1c67360244bd1452',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'aUSDC',
+    rchMultiplier: 1,
+    usePermit2: true,
+    tradeDisable: true,
+  },
   // SmartBullVault(BTC/aArbSepUSDC)
   {
     chainId: 421614,
@@ -55,25 +81,27 @@ const VaultsForAutomator = [
   {
     chainId: 421614,
     vault: '0xc778287a0e8955AF27600Be6abaf299Ad1dAbEc6',
-    productType: ProductType.BearSpread,
+    productType: ProductType.BullSpread,
     riskType: RiskType.RISKY,
     forCcy: 'WBTC',
     domCcy: 'USD',
     depositCcy: 'aUSDC',
     rchMultiplier: 1,
-    usePermit2: true,
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
   },
   // SellSmartBearVault(ETH/aArbSepUSDC)
   {
     chainId: 421614,
     vault: '0x63D433F183E9d60d01DF6EDE93C1c1376cfA1CaE',
-    productType: ProductType.BullSpread,
+    productType: ProductType.BearSpread,
     riskType: RiskType.RISKY,
     forCcy: 'WETH',
     domCcy: 'USD',
     depositCcy: 'aUSDC',
     rchMultiplier: 1,
-    usePermit2: true,
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
   },
 ].map((it) => ({ ...it, onlyForAutomator: true }));
 

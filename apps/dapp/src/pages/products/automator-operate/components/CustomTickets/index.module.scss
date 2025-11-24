@@ -107,11 +107,11 @@
     > .side {
       @include bold;
 
-      &.side-bullspread {
+      &.side-buy {
         color: var(--color-rise);
       }
 
-      &.side-bearspread {
+      &.side-sell {
         color: var(--color-fall);
       }
 
@@ -284,8 +284,6 @@
       background: #f0f0f0 !important;
 
       .semi-select-prefix {
-        @include bold;
-
         color: rgba($color: #000, $alpha: 65%);
       }
 
@@ -333,19 +331,15 @@
         }
       }
     }
+
+    .semi-select.semi-select .semi-select-prefix.semi-select-prefix-text {
+      color: rgba(#000, 0.5) !important;
+    }
   }
 
   &.product {
     display: inline-block;
-
-    .product-selector {
-      height: 36rem;
-      font-size: 14rem;
-      border-radius: 18rem;
-      color: #fff;
-      background: #f0f0f0 !important;
-      margin-right: 6px;
-    }
+    margin-right: 6px;
   }
 
   &.ccy {
@@ -366,6 +360,21 @@
       svg {
         width: 36px;
         height: 24px;
+      }
+    }
+
+    .side-selector {
+      :global {
+        .radio-btn {
+          width: 100px;
+          height: 32px;
+          border-radius: 4px;
+
+          &.radio-active {
+            color: #44c476;
+            background: #f0f0f0;
+          }
+        }
       }
     }
 

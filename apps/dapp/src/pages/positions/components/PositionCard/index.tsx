@@ -456,7 +456,7 @@ const PositionCard = (props: PositionCardProps) => {
           </div>
           <div className={styles['risk-type']}>
             {props.isAutomator
-              ? productTypeRef.label3(t)
+              ? productTypeRef.label3(t, vault.tradeSide)
               : productTypeRef.alias}
             _{vault.forCcy.replace(/^W/i, '')}
             {vault.riskType === RiskType.LEVERAGE && (

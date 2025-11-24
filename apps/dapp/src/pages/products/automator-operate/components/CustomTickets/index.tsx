@@ -1,8 +1,15 @@
-import { Fragment, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import {
+  Fragment,
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Button, DatePicker, Table, Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorDetail } from '@sofa/services/automator';
 import { AutomatorCreatorService } from '@sofa/services/automator-creator';
-import { AutomatorVaultInfo } from '@sofa/services/base-type';
+import { AutomatorVaultInfo, TradeSide } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { RiskType } from '@sofa/services/contracts';
 import { useTranslation } from '@sofa/services/i18n';
@@ -14,8 +21,6 @@ import {
 } from '@sofa/services/products';
 import { amountFormatter } from '@sofa/utils/amount';
 import { day8h, MsIntervals, next8h, pre8h } from '@sofa/utils/expiry';
-import { isLegalNum } from '@sofa/utils/fns';
-import { currQuery } from '@sofa/utils/history';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -26,10 +31,10 @@ import { Comp as IconDel } from '@/assets/icon-del.svg';
 import { Comp as IconPlus } from '@/assets/icon-plus.svg';
 import AmountInput from '@/components/AmountInput';
 import { CCYSelector } from '@/components/CCYSelector';
-import { CSelect } from '@/components/CSelect';
 import PriceRangeInput from '@/components/PriceRangeInput';
 import { ProductTypeSelector } from '@/components/ProductSelector';
 import { ProductTypeRefs } from '@/components/ProductSelector/enums';
+import { RadioBtnGroup } from '@/components/RadioBtnGroup';
 import { Time } from '@/components/TimezoneSelector';
 import { useAutomatorStore } from '@/pages/products/automator/store';
 
@@ -86,6 +91,44 @@ const TicketEditor = (props: CustomTicketProps) => {
     props.product.vault.forCcy || vaults?.[0].vault.forCcy || defaultForCCY,
   );
 
+  const [tradeSide, setTradeSide] = useState<TradeSide>(
+    props.product.vault.tradeSide ?? TradeSide.BUY,
+  );
+
+  const tradeSideOptions = useMemo(() => {
+    const list = !vaults
+      ? []
+      : ProductsService.filterVaults(
+          vaults.map((it) => it.vault),
+          {
+            chainId: props.product.vault.chainId,
+            productType,
+            riskType,
+            forCcy,
+            depositCcy: props.product.vault.depositCcy,
+          },
+        );
+    return [
+      {
+        label: t({ enUS: 'BUY', zhCN: '买' }),
+        value: TradeSide.BUY,
+        disabled: list.every((it) => it.tradeSide !== TradeSide.BUY),
+      },
+      {
+        label: t({ enUS: 'SELL', zhCN: '卖' }),
+        value: TradeSide.SELL,
+        disabled: list.every((it) => it.tradeSide !== TradeSide.SELL),
+      },
+    ];
+  }, [
+    forCcy,
+    productType,
+    props.product.vault.chainId,
+    props.product.vault.depositCcy,
+    t,
+    vaults,
+  ]);
+
   useLayoutEffect(() => {
     if (
       vaults?.length &&
@@ -107,17 +150,11 @@ const TicketEditor = (props: CustomTicketProps) => {
           chainId: props.product.vault.chainId,
           productType,
           riskType,
+          tradeSide,
           forCcy,
           depositCcy: props.product.vault.depositCcy,
         },
       );
-    // console.warn('my-vault', result, {
-    //   chainId: props.product.vault.chainId,
-    //   productType,
-    //   riskType,
-    //   forCcy,
-    //   depositCcy: props.product.vault.depositCcy,
-    // });
     return v
       ? {
           vault: v,
@@ -131,7 +168,7 @@ const TicketEditor = (props: CustomTicketProps) => {
     props.product.vault.chainId,
     props.product.vault.depositCcy,
     productType,
-    riskType,
+    tradeSide,
     forCcy,
   ]);
 
@@ -211,6 +248,10 @@ const TicketEditor = (props: CustomTicketProps) => {
   }, [props.automator.aumByVaultDepositCcy, props.product.depositAmount]);
   if (!vault) return <></>;
 
+  const useBearScenario =
+    (productType == ProductType.BearSpread && tradeSide === TradeSide.BUY) ||
+    (productType == ProductType.BullSpread && tradeSide === TradeSide.SELL);
+
   return (
     <div
       className={classNames(styles['custom-ticket'], styles['active'])}
@@ -222,20 +263,24 @@ const TicketEditor = (props: CustomTicketProps) => {
       <div className={styles['left']}>
         <div className={classNames(styles['form-item'], styles['product'])}>
           <div className={styles['value']}>
-            <CSelect
-              {...props}
-              className={classNames(styles['product-selector'])}
-              dropdownClassName={classNames(styles['product-dropdown'])}
-              optionList={[
-                {
-                  value: 'smart_trend',
-                  label: t({
-                    enUS: 'Smart Trend',
-                    zhCN: '趋势智赢',
-                  }),
-                },
-              ]}
-              value={'smart_trend'}
+            <ProductTypeSelector
+              localState={[productType, setProductType]}
+              optionFilter={(t) => ![ProductType.DNT].includes(t)}
+              optionDisabled={(productType) => {
+                if (!vaults) return true;
+                const possibleVault = ProductsService.findVault(
+                  vaults.map((v) => v.vault),
+                  {
+                    chainId: props.product.vault.chainId,
+                    riskType,
+                    depositCcy: props.product.vault.depositCcy,
+                    forCcy: props.product.vault.forCcy,
+                    productType,
+                  },
+                );
+                // console.log('side', productType, possibleVault);
+                return possibleVault ? false : true;
+              }}
             />
           </div>
         </div>
@@ -291,40 +336,31 @@ const TicketEditor = (props: CustomTicketProps) => {
             {t({ enUS: 'Side', zhCN: '方向' })}
           </div>
           <div className={styles['value']}>
-            <ProductTypeSelector
-              useRadioCard
-              localState={[productType, setProductType]}
-              optionFilter={(t) => ![ProductType.DNT].includes(t)}
-              label={(it) => (
-                <span
-                  className={classNames(styles['product-item'], 'product-item')}
-                >
-                  {it.label2(t)}
-                </span>
-              )}
-              optionDisabled={(productType) => {
-                if (!vaults) return true;
-                const possibleVault = ProductsService.findVault(
-                  vaults.map((v) => v.vault),
-                  {
-                    chainId: props.product.vault.chainId,
-                    riskType,
-                    depositCcy: props.product.vault.depositCcy,
-                    forCcy: props.product.vault.forCcy,
-                    productType,
-                  },
-                );
-                // console.log('side', productType, possibleVault);
-                return possibleVault ? false : true;
-              }}
+            <RadioBtnGroup
+              className={styles['side-selector']}
+              options={tradeSideOptions}
+              value={tradeSide}
+              onChange={(v) => setTradeSide(v as TradeSide)}
             />
             <span className={styles['current-icon']}>
-              {(
-                {
-                  [ProductType.BearSpread]: () => <IconBear />,
-                  [ProductType.BullSpread]: () => <IconBull />,
-                } as Record<ProductType, () => JSX.Element>
-              )[productType]?.()}
+              {
+                (
+                  {
+                    [`${ProductType.BearSpread}-${TradeSide.BUY}`]: (
+                      <IconBear />
+                    ),
+                    [`${ProductType.BearSpread}-${TradeSide.SELL}`]: (
+                      <IconBull />
+                    ),
+                    [`${ProductType.BullSpread}-${TradeSide.BUY}`]: (
+                      <IconBull />
+                    ),
+                    [`${ProductType.BullSpread}-${TradeSide.SELL}`]: (
+                      <IconBear />
+                    ),
+                  } as Record<`${ProductType}-${TradeSide}`, ReactNode>
+                )[`${productType}-${tradeSide}`]
+              }
             </span>
           </div>
         </div>
@@ -452,16 +488,13 @@ const TicketEditor = (props: CustomTicketProps) => {
           <span
             className={classNames(
               styles['side'],
-              styles['side-' + vault.productType.toLowerCase()],
+              styles['side-' + tradeSide.toLowerCase()],
             )}
           >
-            {ProductTypeRefs[vault.productType]?.label2(t)}
+            {tradeSide}
           </span>
           <span className={styles['product']}>
-            {t({
-              enUS: 'Smart Trend',
-              zhCN: '趋势智赢',
-            })}
+            {ProductTypeRefs[productType].label(t)}
           </span>
           <span className={styles['expiry']}>
             {props.product?.expiry ? (
@@ -494,13 +527,9 @@ const TicketEditor = (props: CustomTicketProps) => {
         <div className={styles['scenarios']}>
           <div className={styles['ccy']}>
             <div className={styles['win']}>
-              {productType == ProductType.BearSpread ? (
-                <ScenarioBearWin />
-              ) : (
-                <ScenarioBullWin />
-              )}
+              {useBearScenario ? <ScenarioBearWin /> : <ScenarioBullWin />}
               <span className={styles['price']}>
-                {productType == ProductType.BearSpread ? (
+                {useBearScenario ? (
                   <>
                     {'<'} {amountFormatter(props.product.anchorPrices?.[0])}
                   </>
@@ -528,13 +557,9 @@ const TicketEditor = (props: CustomTicketProps) => {
               <span>{t({ enUS: 'Or', zhCN: '或' })}</span>
             </div>
             <div className={styles['lose']}>
-              {productType == ProductType.BearSpread ? (
-                <ScenarioBearLose />
-              ) : (
-                <ScenarioBullLose />
-              )}
+              {useBearScenario ? <ScenarioBearLose /> : <ScenarioBullLose />}
               <span className={styles['price']}>
-                {productType == ProductType.BearSpread ? (
+                {useBearScenario ? (
                   <>
                     {'>'} {amountFormatter(props.product.anchorPrices?.[1])}
                   </>
@@ -707,22 +732,11 @@ const CustomTickets = (props: {
         columns={[
           {
             title: t({ enUS: 'Product', zhCN: '产品' }),
-            // TODO
-            render: (_, it) =>
-              t({
-                enUS: 'Smart Trend',
-                zhCN: '趋势智赢',
-              }),
+            render: (_, it) => it.vault.productType,
           },
           {
             title: t({ enUS: 'Side', zhCN: '方向' }),
-            render: (_, it) => (
-              <b>
-                {ProductTypeRefs[it.vault.productType]
-                  ?.label2(t)
-                  ?.toUpperCase()}
-              </b>
-            ),
+            render: (_, it) => <b>{it.vault.tradeSide ?? TradeSide.BUY}</b>,
           },
           {
             title: t({ enUS: 'Anchor', zhCN: '锚点' }),
