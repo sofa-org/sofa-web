@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { get } from 'lodash-es';
 
 import AAVEDualVault from '../../abis/AAVEDualVault.json';
 import CrvUSDDualVault from '../../abis/CrvUSDDualVault.json';
@@ -8,6 +9,7 @@ import {
   InterestType,
   ProductType,
   ProjectType,
+  TradeSide,
   VaultInfo,
 } from '../../base-type';
 import {
@@ -80,6 +82,7 @@ export const dualVaults = vaults.map((it) => {
     abis: getDualAbis(
       it as Pick<VaultInfo, 'forCcy' | 'domCcy' | 'depositCcy'>,
     ),
+    tradeSide: get(it, 'tradeSide') || TradeSide.BUY,
     interestType: {
       USDT: InterestType.AAVE,
       USDC: InterestType.AAVE,

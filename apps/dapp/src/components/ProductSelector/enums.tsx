@@ -1,4 +1,8 @@
-import { ProjectType, VisibleRiskType } from '@sofa/services/base-type';
+import {
+  ProjectType,
+  TradeSide,
+  VisibleRiskType,
+} from '@sofa/services/base-type';
 import { TFunction } from '@sofa/services/i18n';
 import {
   ProductType,
@@ -135,17 +139,26 @@ export const RiskTypeRefs = {
   },
 };
 
+const renderSide = (t: TFunction, side: TradeSide) =>
+  side === TradeSide.BUY ? (
+    <span style={{ color: 'var(--color-rise)' }}>
+      {t({ enUS: 'Buy', zhCN: '买' })}
+    </span>
+  ) : (
+    <span style={{ color: 'var(--color-)' }}>
+      {t({ enUS: 'Sell', zhCN: '卖' })}
+    </span>
+  );
+
 export const ProductTypeRefs = {
   [ProductType.BullSpread]: {
     label: (t: TFunction) => t('Bull Trend'),
     label1: (t: TFunction) => t({ enUS: 'Go up', zhCN: '上涨' }),
     label2: (t: TFunction) => t({ enUS: 'Buy', zhCN: '买涨' }),
-    label3: (t: TFunction) => (
+    label3: (t: TFunction, side: TradeSide) => (
       <>
-        <span style={{ color: 'var(--color-rise)' }}>
-          {t({ enUS: 'Buy', zhCN: '买' })}
-        </span>
-        {t({ enUS: 'Smart Trend', zhCN: 'Smart Trend' })}
+        {renderSide(t, side)}
+        {t('Bull Trend')}
       </>
     ),
     desc: (t: TFunction) =>
@@ -283,11 +296,9 @@ export const ProductTypeRefs = {
     label: (t: TFunction) => t('Rangebound'),
     label1: (t: TFunction) => t({ enUS: 'Flat', zhCN: '震荡' }),
     label2: (t: TFunction) => t({ enUS: 'Flat', zhCN: '震荡' }),
-    label3: (t: TFunction) => (
+    label3: (t: TFunction, side: TradeSide) => (
       <>
-        <span style={{ color: 'var(--color-rise)' }}>
-          {t({ enUS: 'Buy', zhCN: '买' })}
-        </span>
+        {renderSide(t, side)}
         {t({ enUS: 'Rangebound', zhCN: 'Rangebound' })}
       </>
     ),
@@ -394,12 +405,11 @@ export const ProductTypeRefs = {
     label: (t: TFunction) => t('Bear Trend'),
     label1: (t: TFunction) => t({ enUS: 'Go down', zhCN: '下跌' }),
     label2: (t: TFunction) => t({ enUS: 'Sell', zhCN: '买跌' }),
-    label3: (t: TFunction) => (
+    label3: (t: TFunction, side: TradeSide) => (
       <>
-        <span style={{ color: 'var(--color-)' }}>
-          {t({ enUS: 'Sell', zhCN: '卖' })}
-        </span>
-        {t({ enUS: 'Smart Trend', zhCN: 'Smart Trend' })}
+        {renderSide(t, side)}
+
+        {t({ enUS: 'Bear Trend', zhCN: 'Bear Trend' })}
       </>
     ),
     desc: (t: TFunction) =>

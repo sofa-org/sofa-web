@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { get } from 'lodash-es';
 
 import LeverageDNTVaultAbis from '../../abis/LeverageDNTVault.json';
 import LeverageSTVaultAbis from '../../abis/LeverageSmartTrendVault.json';
@@ -11,6 +12,7 @@ import {
   ProductType,
   ProjectType,
   RiskType,
+  TradeSide,
   VaultInfo,
 } from '../../base-type';
 import {
@@ -82,6 +84,7 @@ export const earnVaults = vaults.map((it) => {
     balanceDecimal:
       collateralDecimal * (it.riskType === RiskType.PROTECTED ? 1e18 : 1),
     abis: getEarnAbis(it),
+    tradeSide: get(it, 'tradeSide') || TradeSide.BUY,
     interestType: {
       USDT: InterestType.AAVE,
       USDC: InterestType.AAVE,
