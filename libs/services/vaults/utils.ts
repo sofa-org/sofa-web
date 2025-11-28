@@ -1,6 +1,6 @@
 import { Env } from '@sofa/utils/env';
 
-import { ProjectType } from '../base-type';
+import { ProductType, ProjectType, TradeSide, VaultInfo } from '../base-type';
 
 export function getCollateralDecimal(chainId: number, depositCcy: string) {
   const decimal = {
@@ -178,4 +178,15 @@ export function getDepositTickAmount(depositCcy: string, project: ProjectType) {
         rtCIC: 0.05,
         rtMNER: 0.05,
       }[depositCcy];
+}
+
+export function shouldUseBearTrendSettle(
+  vault: Pick<VaultInfo, 'productType' | 'tradeSide'>,
+) {
+  return (
+    (vault.productType == ProductType.BearSpread &&
+      vault.tradeSide === TradeSide.BUY) ||
+    (vault.productType == ProductType.BullSpread &&
+      vault.tradeSide === TradeSide.SELL)
+  );
 }

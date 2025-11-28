@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { ProductType, RiskType } from '@sofa/services/base-type';
 import { PositionInfo } from '@sofa/services/positions';
+import { shouldUseBearTrendSettle } from '@sofa/services/vaults/utils';
 import { amountFormatter } from '@sofa/utils/amount';
 import { simplePlus } from '@sofa/utils/object';
 
@@ -11,7 +12,8 @@ export const TrendImg = (props: { data: Partial<PositionInfo> }) => {
   const product = props.data?.product;
   const anchorPricesTransform = useMemo(() => {
     if (!position.triggerPrice || !product?.anchorPrices) return undefined;
-    if (product.vault.productType === ProductType.BullSpread) {
+    const isBull = !shouldUseBearTrendSettle(product.vault);
+    if (isBull) {
       return position.triggerPrice <= +product.anchorPrices[0]
         ? 'translate(-73,80)'
         : position.triggerPrice >= +product.anchorPrices[1]
@@ -23,11 +25,7 @@ export const TrendImg = (props: { data: Partial<PositionInfo> }) => {
       : position.triggerPrice >= +product.anchorPrices[1]
         ? 'translate(-73,80)'
         : '';
-  }, [
-    position.triggerPrice,
-    product?.anchorPrices,
-    product?.vault.productType,
-  ]);
+  }, [position.triggerPrice, product?.anchorPrices, product?.vault]);
   if (!position.amounts || !product)
     return <div className={styles['trend-img']} />;
   const hasExpired = Number(product.expiry) * 1000 <= Date.now();
@@ -39,10 +37,9 @@ export const TrendImg = (props: { data: Partial<PositionInfo> }) => {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{
-          transform:
-            product.vault.productType === ProductType.BearSpread
-              ? 'rotateY(180deg)'
-              : undefined,
+          transform: shouldUseBearTrendSettle(product.vault)
+            ? 'rotateY(180deg)'
+            : undefined,
         }}
       >
         <path

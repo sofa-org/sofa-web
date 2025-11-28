@@ -1,11 +1,8 @@
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { TradeSide } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
-import {
-  CalculatedInfo,
-  ProductType,
-  RiskType,
-  VaultInfo,
-} from '@sofa/services/products';
+import { ProductType, RiskType, VaultInfo } from '@sofa/services/products';
+import { shouldUseBearTrendSettle } from '@sofa/services/vaults/utils';
 import { amountFormatter, displayPercentage } from '@sofa/utils/amount';
 import { simplePlus } from '@sofa/utils/object';
 import { useSize } from 'ahooks';
@@ -26,6 +23,7 @@ addI18nResources(locale, 'Payoff');
 export interface PayoffChartProps extends BaseProps {
   depositCcy: VaultInfo['depositCcy'];
   productType: ProductType;
+  tradeSide: TradeSide;
   atm?: number;
   anchorPrices: (string | number)[];
   protectedYield?: number;
@@ -94,7 +92,11 @@ export const PayoffChart = (props: PayoffChartProps) => {
 
   const apyList: [{ x: number; value: string | number }, number][] =
     useMemo(() => {
-      if (props.productType === ProductType.BullSpread) {
+      const isBear = shouldUseBearTrendSettle({
+        productType: props.productType,
+        tradeSide: props.tradeSide,
+      });
+      if (props.productType !== ProductType.DNT && !isBear) {
         return [
           [{ x: 0, value: 0 }, baseApy],
           [{ x: 1 / 3, value: props.anchorPrices[0] }, baseApy],
@@ -102,7 +104,7 @@ export const PayoffChart = (props: PayoffChartProps) => {
           [{ x: 1, value: Infinity }, maxApy],
         ];
       }
-      if (props.productType === ProductType.BearSpread) {
+      if (props.productType !== ProductType.DNT && isBear) {
         return [
           [{ x: 0, value: 0 }, maxApy],
           [{ x: 1 / 3, value: props.anchorPrices[0] }, maxApy],
@@ -118,7 +120,13 @@ export const PayoffChart = (props: PayoffChartProps) => {
         [{ x: 2 / 3, value: props.anchorPrices[1] }, baseApy],
         [{ x: 1, value: Infinity }, baseApy],
       ];
-    }, [baseApy, maxApy, props.anchorPrices, props.productType]);
+    }, [
+      baseApy,
+      maxApy,
+      props.anchorPrices,
+      props.productType,
+      props.tradeSide,
+    ]);
 
   const maxYield = usePayoffStore(
     (state) =>

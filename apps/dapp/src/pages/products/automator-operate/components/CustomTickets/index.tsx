@@ -19,6 +19,7 @@ import {
   ProductType,
   VaultInfo,
 } from '@sofa/services/products';
+import { shouldUseBearTrendSettle } from '@sofa/services/vaults/utils';
 import { amountFormatter } from '@sofa/utils/amount';
 import { day8h, MsIntervals, next8h, pre8h } from '@sofa/utils/expiry';
 import { useAsyncMemo, useLazyCallback } from '@sofa/utils/hooks';
@@ -248,9 +249,7 @@ const TicketEditor = (props: CustomTicketProps) => {
   }, [props.automator.aumByVaultDepositCcy, props.product.depositAmount]);
   if (!vault) return <></>;
 
-  const useBearScenario =
-    (productType == ProductType.BearSpread && tradeSide === TradeSide.BUY) ||
-    (productType == ProductType.BullSpread && tradeSide === TradeSide.SELL);
+  const useBearScenario = shouldUseBearTrendSettle({ productType, tradeSide });
 
   return (
     <div

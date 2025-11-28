@@ -192,6 +192,7 @@ const DepositModalContent = (
               className={styles['payoff-chart']}
               depositCcy={data.vault.realDepositCcy ?? data.vault.depositCcy}
               productType={data.vault.productType}
+              tradeSide={data.vault.tradeSide}
               anchorPrices={data.anchorPrices}
               protectedYield={Number(apyInfo?.min)}
               enhancedYield={
