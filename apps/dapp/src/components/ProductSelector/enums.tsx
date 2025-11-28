@@ -145,7 +145,7 @@ const renderSide = (t: TFunction, side: TradeSide) =>
       {t({ enUS: 'Buy', zhCN: '买' })}
     </span>
   ) : (
-    <span style={{ color: 'var(--color-)' }}>
+    <span style={{ color: 'var(--color-fall)' }}>
       {t({ enUS: 'Sell', zhCN: '卖' })}
     </span>
   );

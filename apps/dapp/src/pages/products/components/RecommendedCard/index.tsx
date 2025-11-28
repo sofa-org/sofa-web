@@ -144,6 +144,7 @@ export const RecommendedCardItem = (props: {
           domCcy={it.vault.domCcy}
           riskType={it.vault.riskType}
           productType={it.vault.productType}
+          tradeSide={it.vault.tradeSide}
           forCcy={it.vault.forCcy}
           depositCcy={it.vault.realDepositCcy ?? it.vault.depositCcy}
           depositAmount={+it.amounts.own}

@@ -12,6 +12,8 @@ import { simplePlus } from '@sofa/utils/object';
 import Big from 'big.js';
 import { omit, pick, uniq, uniqBy } from 'lodash-es';
 
+import { shouldUseBearTrendSettle } from './vaults/utils';
+import { TradeSide } from './base-type';
 import {
   ContractsService,
   ProductType,
@@ -578,11 +580,12 @@ export class ProductsService {
   static calcProbability(
     productType: ProductType,
     probabilities: WinningProbabilities,
+    tradeSide: TradeSide,
   ) {
     if (productType === ProductType.DNT)
       return probabilities.probDntStayInRange;
-    if (productType === ProductType.BullSpread)
-      return probabilities.probBullTrendItmLowerStrike;
+    const isBull = shouldUseBearTrendSettle({ productType, tradeSide });
+    if (isBull) return probabilities.probBullTrendItmLowerStrike;
     return probabilities.probBearTrendItmUpperStrike;
   }
 

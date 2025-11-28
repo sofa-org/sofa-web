@@ -475,6 +475,7 @@ export const ProductCustomize = (props: BaseProps & { onlyForm?: boolean }) => {
                     className={styles['chart']}
                     depositCcy={baseCcy}
                     productType={quoteInfo.vault.productType}
+                    tradeSide={quoteInfo.vault.tradeSide}
                     anchorPrices={quoteInfo.anchorPrices}
                     protectedYield={Number(apyInfo?.min)}
                     enhancedYield={simplePlus(
