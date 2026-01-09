@@ -42,7 +42,7 @@ export const routes: {
     Component: Home,
     title: 'SOFA.org',
     description:
-      "SOFA.org is a decentralized, nonprofit, open-source technology organization offering protocols for crypto products, especially options. Earn $RCH via protocol use, liquidity provision, and governance. $SOFA enables holders to vote on proposals that shape SOFA.org's future.",
+      'SOFA.org is a decentralized, nonprofit, open-source organization building DeFi protocols for crypto structured products and options. Earn RCH tokens via protocol use. $SOFA holders vote on governance proposals.',
     keywords:
       'DeFi, RCH, SOFA, decentralized finance, crypto structured products, blockchain, protocol safety, community rewards, financial technology, governance token, decentralized organization, DeFi education, capital efficiency, nonprofit finance',
   },
@@ -59,21 +59,22 @@ export const routes: {
     path: '/mechanism',
     Component: Mechanism,
     title: 'Project - SOFA.org',
-    description: '100% on-chain and tokenized positions.',
+    description:
+      'Mechanism: 100% on-chain DeFi structured products and crypto options with tokenized positions (ERC-1155), market-maker liquidity, and transparent settlement.',
   },
   {
     path: '/strengths',
     Component: Advantages,
     title: 'Capabilities - SOFA.org',
     description:
-      'The SOFA protocol is our ambitious attempt to establish standards of how financial assets can be atomically settled on-chain, while simultaneously catalyzing DeFi capital liquidity through transferrable Position Tokens.',
+      'Capabilities: On-chain vaults enable atomic settlement and mint ERC-1155 Position Tokens, transferable collateral that unlocks liquidity across DeFi and CeFi.',
   },
   {
     path: '/rch',
     Component: RCH,
     title: 'RCH - SOFA.org',
     description:
-      'Earn $RCH via protocol use, liquidity provision, and governance.',
+      'RCH is SOFA.org’s utility rewards token. Earn via trade mining, protocol use, and liquidity in DeFi structured products & options. Claim daily airdrops.',
     keywords: 'RCH, airdrop',
   },
   {
@@ -81,7 +82,7 @@ export const routes: {
     Component: Points,
     title: 'Points - SOFA.org',
     description:
-      'Discover the rules for earning $SOFA points on the SOFA protocol. See how interacting with our DeFi products and options qualifies you for $SOFA airdrop.',
+      'SOFA Points: Earn points by trading SOFA DeFi products, holding RCH, and joining games & community tasks. Check $SOFA airdrop eligibility.',
     keywords: 'SOFA points, airdrop',
   },
   {
@@ -102,8 +103,8 @@ export const routes: {
     description: (q) => {
       const map = {
         Automator:
-          'Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops.',
-        _: 'Trade options products like Earn, Surge, and Dual, and follow Automator strategies on our protocol to get $RCH airdrops.',
+          'SOFA Automator: Follow Optivisor-managed DeFi options strategies or create your own. Earn passive yields with gas-saving automation and daily $RCH airdrops.',
+        _: 'Trade SOFA DeFi options products (Earn, Surge, Dual) or follow Automator strategies to earn $RCH rewards—daily airdrops allocated by on-chain trading volume.',
       };
       return map[q?.project as keyof typeof map] || map._;
     },
@@ -128,10 +129,10 @@ export const routes: {
     },
     description: (q) => {
       const map = {
-        Dual: 'Discover Dual, an innovative DeFi options product that lets you sell high, buy low, and receive $RCH airdrops for extra trading rewards.',
+        Dual: 'SOFA Dual: Buy low or sell high with automated on-chain execution for DeFi options. Earn yield plus $RCH rewards even if your trade doesn’t execute.',
         Surge:
-          'Surge: a high-risk DeFi options product that delivers high returns and rewards traders with exclusive $RCH airdrops.',
-        Earn: 'Earn is a low-risk DeFi options product that offers stable returns and exclusive $RCH airdrops.',
+          'SOFA Surge: High-upside on-chain DeFi structured products for BTC/ETH options (Rangebound, Bull/Bear Trend). Trade to earn daily $RCH airdrops.',
+        Earn: 'SOFA Earn: Lower-risk on-chain DeFi options structured products for BTC/ETH (Rangebound, Bull Trend, Bear Trend). Earn base yield with downside protection plus daily $RCH airdrops.',
       };
       return map[(q?.project as never) || 'Earn'];
     },
@@ -149,7 +150,7 @@ export const routes: {
     Component: Automator,
     title: 'Automator - SOFA.org',
     description:
-      'Automator is a DeFi product to follow top strategies or create your own to earn profits and receive exclusive $RCH airdrops.',
+      'SOFA Automator: Follow Optivisor-managed DeFi options strategies or create your own. Earn passive yields with gas-saving automation and daily $RCH airdrops.',
     keywords: 'automator, airdrop',
   },
   {
@@ -176,7 +177,8 @@ export const routes: {
     path: '/products/automator/create',
     Component: AutomatorCreate,
     title: 'Create Automator - SOFA.org',
-    description: 'Create your own automator and roll it to earn profits.',
+    description:
+      'Create a SOFA Automator as an Optivisor: build and roll on-chain options strategies to earn a share of profits plus $RCH airdrop rewards.',
   },
   {
     path: '/transactions',
@@ -188,7 +190,7 @@ export const routes: {
     Component: AutomatorSharePage,
     title: 'Automator Sharing - SOFA.org',
     description:
-      'Follow Automator strategies on our protocol to earn profits and get exclusive $RCH airdrops.',
+      'Follow top Automator strategies to earn passive yields and daily $RCH airdrops on SOFA.org.',
     keywords: 'automator, airdrop',
   },
 ];
