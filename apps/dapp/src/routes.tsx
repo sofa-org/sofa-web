@@ -42,7 +42,7 @@ export const routes: {
     Component: Home,
     title: 'SOFA.org',
     description:
-      'SOFA.org is a decentralized, nonprofit, open-source organization building DeFi protocols for crypto structured products and options. Earn RCH tokens via protocol use. $SOFA holders vote on governance proposals.',
+      'SOFA.org is a nonprofit, open-source organization building DeFi protocols for crypto structured products and options. Earn RCH token airdrops via protocol use. $SOFA holders vote on governance proposals.',
     keywords:
       'DeFi, RCH, SOFA, decentralized finance, crypto structured products, blockchain, protocol safety, community rewards, financial technology, governance token, decentralized organization, DeFi education, capital efficiency, nonprofit finance',
   },
@@ -129,7 +129,7 @@ export const routes: {
     },
     description: (q) => {
       const map = {
-        Dual: 'SOFA Dual: Buy low or sell high with automated on-chain execution for DeFi options. Earn yield plus $RCH rewards even if your trade doesn’t execute.',
+        Dual: 'SOFA Dual: Buy low or sell high with automated on-chain execution for DeFi options. Earn yield and daily $RCH airdrops even if your trade doesn’t execute.',
         Surge:
           'SOFA Surge: High-upside on-chain DeFi structured products for BTC/ETH options (Rangebound, Bull/Bear Trend). Trade to earn daily $RCH airdrops.',
         Earn: 'SOFA Earn: Lower-risk on-chain DeFi options structured products for BTC/ETH (Rangebound, Bull Trend, Bear Trend). Earn base yield with downside protection plus daily $RCH airdrops.',
