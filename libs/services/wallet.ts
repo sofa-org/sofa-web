@@ -600,19 +600,42 @@ export class WalletService {
     hash: string,
     chainId: number,
   ): Promise<
-    | { status: TransactionStatus.FAILED }
+    | { status: TransactionStatus.FAILED; error?: unknown }
     | {
         status: TransactionStatus.SUCCESS;
         logs: ethers.Log[];
       }
   > {
+    const timeoutMs = 60 * 1000;
+    const startAt = Date.now();
     const poll = async () => {
+      if (Date.now() - startAt > timeoutMs) {
+        return {
+          status: TransactionStatus.FAILED,
+          error: new Error('Tx timeout'),
+        } as const;
+      }
       console.info('Get transaction result of hash', { hash, chainId });
       const provider = await WalletService.readonlyConnect(+chainId);
       const receipt = await provider.getTransactionReceipt(hash);
       if (!receipt) return { status: TransactionStatus.PENDING } as const;
-      if (Number(receipt.status) !== 1)
+      if (Number(receipt.status) !== 1) {
+        try {
+          const tx = await provider.getTransaction(hash);
+          if (tx?.to) {
+            await provider.call({
+              to: tx.to,
+              from: tx.from,
+              data: tx.data,
+              value: tx.value,
+              blockTag: receipt.blockNumber,
+            });
+          }
+        } catch (error) {
+          return { status: TransactionStatus.FAILED, error } as const;
+        }
         return { status: TransactionStatus.FAILED } as const;
+      }
       return {
         status: TransactionStatus.SUCCESS,
         logs: receipt.logs,
