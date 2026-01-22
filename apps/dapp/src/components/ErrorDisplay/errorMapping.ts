@@ -116,12 +116,12 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     'ru-RU': 'Неверная подпись. Запросите новую котировку',
   },
   SIGNATURE_CONSUMED: {
-    'en-US': 'Too many requests. Please try again later',
-    'zh-CN': '操作过于频繁，请稍后重试',
-    'zh-HK': '操作過於頻繁，請稍後再試',
-    'zh-TW': '操作過於頻繁，請稍後再試',
-    'ja-JP': '操作が頻繁すぎます。しばらくしてから再試行してください',
-    'ru-RU': 'Слишком частые операции. Повторите попытку позже',
+    'en-US': 'Too many requests or duplicate product parameters',
+    'zh-CN': '请求过于频繁或产品参数重复',
+    'zh-HK': '請求過於頻繁或產品參數重複',
+    'zh-TW': '請求過於頻繁或產品參數重複',
+    'ja-JP': 'リクエストが多すぎるか、製品パラメータが重複しています',
+    'ru-RU': 'Слишком много запросов или параметры продукта дублируются',
   },
   ALREADY_CLAIMED: {
     'en-US': 'This reward has already been claimed',
