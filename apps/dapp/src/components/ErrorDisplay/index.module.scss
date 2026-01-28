@@ -1,0 +1,120 @@
+.error-display {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.summary {
+  margin: 0;
+  width: 100%;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+.toggle {
+  @include flex-center;
+  @include pointer;
+
+  justify-content: flex-start;
+  gap: 4px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #666;
+  user-select: none;
+
+  &:hover {
+    color: #000;
+  }
+}
+
+.arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.copy-btn {
+  @include flex-center;
+  @include pointer;
+
+  margin-left: 8px;
+  padding: 2px;
+  color: #666;
+  border-radius: 2px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+
+  &:hover {
+    color: #2d6fb9;
+    background: rgba(#2d6fb9, 0.1);
+  }
+
+  &.copied {
+    color: #44c476;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.details {
+  width: 100%;
+  margin: 8px 0 0;
+  box-sizing: border-box;
+}
+
+.ids-line {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.raw-error {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  margin: 0;
+  padding: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(#000, 0.25) rgba(#000, 0.05);
+  color: #666;
+  background: rgba(#000, 0.03);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+
+  // Force scrollbar visibility on webkit browsers (Chrome, Safari)
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(#000, 0.05);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(#000, 0.2);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(#000, 0.3);
+    }
+  }
+}
+
+.raw-error-text {
+  white-space: pre-wrap;
+}

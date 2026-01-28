@@ -519,8 +519,8 @@ export class PositionsService {
   static async depositResult(
     hash: string,
     chainId: number,
-  ): Promise<PositionStatus> {
-    if (!hash) return PositionStatus.PENDING;
+  ): Promise<{ status: PositionStatus; error?: unknown }> {
+    if (!hash) return { status: PositionStatus.PENDING };
     return WalletService.transactionResult(hash, chainId).then(async (s) => {
       const status = await (async () => {
         if (s.status === TransactionStatus.FAILED) return PositionStatus.FAILED;
@@ -533,7 +533,8 @@ export class PositionsService {
         return PositionStatus.MINTED;
       })();
       PositionUpdateTime.set({ timeMs: Date.now() });
-      return status;
+      const error = s.status === TransactionStatus.FAILED ? s.error : undefined;
+      return { status, error };
     });
   }
 
@@ -563,13 +564,23 @@ export class PositionsService {
             ],
           ],
         });
-        const status = await PositionsService.depositResult(
+        const { status, error } = await PositionsService.depositResult(
           hash,
           params.vault.chainId,
         );
         safeRun(cb, {
           status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
-          details: [[key, { status, hash, ids: [params.quote.quoteId] }]],
+          details: [
+            [
+              key,
+              {
+                status,
+                hash,
+                ids: [params.quote.quoteId],
+                ...(error ? { error } : {}),
+              },
+            ],
+          ],
         });
       })
       .catch((error) => {
@@ -651,13 +662,18 @@ export class PositionsService {
               },
             ] as const;
           const chainId = +key.split('-')[1];
-          const status = await PositionsService.depositResult(
+          const { status, error } = await PositionsService.depositResult(
             info.hash,
             chainId,
           );
           return [
             key,
-            { status, hash: info.hash, ids: info.quoteIds },
+            {
+              status,
+              hash: info.hash,
+              ids: info.quoteIds,
+              ...(error ? { error } : {}),
+            },
           ] as const;
         }),
       );

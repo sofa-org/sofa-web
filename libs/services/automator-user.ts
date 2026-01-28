@@ -245,17 +245,29 @@ export class AutomatorUserService {
               ],
             ],
           });
-          const status = await WalletService.transactionResult(
+          const res = await WalletService.transactionResult(
             hash,
             vault.chainId,
-          ).then((res) =>
+          );
+          const status =
             res.status === TransactionStatus.FAILED
               ? statusMap.failed
-              : statusMap.success,
-          );
+              : statusMap.success;
+          const error =
+            res.status === TransactionStatus.FAILED ? res.error : undefined;
           safeRun(cb, {
             status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
-            details: [[key, { status, hash, ids: [] }]],
+            details: [
+              [
+                key,
+                {
+                  status,
+                  hash,
+                  ids: [],
+                  ...(error ? { error } : {}),
+                },
+              ],
+            ],
           });
         })
         .catch((error) => {

@@ -169,8 +169,10 @@ export class AutomatorCreatorService {
         tx,
         AutomatorCreatorService.rchBurnContract.chainId,
       );
-      if (succ.status === TransactionStatus.FAILED)
+      if (succ.status === TransactionStatus.FAILED) {
+        if (succ.error) throw succ.error;
         throw new Error(`Burn failed(tx: ${tx})`);
+      }
       cb({
         status: 'QueryResult',
         details: [
@@ -320,8 +322,11 @@ export class AutomatorCreatorService {
       });
 
       const res = await WalletService.transactionResult(tx, vault.chainId);
-      if (res.status === TransactionStatus.FAILED)
+      if (res.status === TransactionStatus.FAILED) {
+        if (res.error) throw res.error;
         throw new Error(`Mint Failed(tx: ${tx})`);
+      }
+
       cb({
         status: 'Success',
         details: Object.entries(vaultQuotes).map((v) => [
@@ -397,8 +402,10 @@ export class AutomatorCreatorService {
         ]),
       });
       const res = await WalletService.transactionResult(tx, vault.chainId);
-      if (res.status === TransactionStatus.FAILED)
+      if (res.status === TransactionStatus.FAILED) {
+        if (res.error) throw res.error;
         throw new Error(`Burn Failed(tx: ${tx})`);
+      }
       cb({
         status: 'Success',
         details: Object.entries(vaultQuotes).map((v) => [
@@ -461,8 +468,10 @@ export class AutomatorCreatorService {
         ],
       });
       const res = await WalletService.transactionResult(tx, vault.chainId);
-      if (res.status === TransactionStatus.FAILED)
+      if (res.status === TransactionStatus.FAILED) {
+        if (res.error) throw res.error;
         throw new Error(`Burn Failed(tx: ${tx})`);
+      }
       cb({
         status: 'Success',
         details: [
@@ -520,8 +529,10 @@ export class AutomatorCreatorService {
         tx,
         data.factory.chainId,
       );
-      if (res.status === TransactionStatus.FAILED)
+      if (res.status === TransactionStatus.FAILED) {
+        if (res.error) throw res.error;
         throw new Error(`Failed to create automator(tx: ${tx})`);
+      }
       cb({
         status: 'Success',
         details: [[`--`, { ids: [], status: PositionStatus.MINTED, hash: tx }]],

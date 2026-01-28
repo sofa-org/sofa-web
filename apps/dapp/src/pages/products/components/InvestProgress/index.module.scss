@@ -1,4 +1,10 @@
 .chain {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+
   img {
     width: 14px;
   }
@@ -35,6 +41,14 @@
   height: 4px;
   border-radius: 2px;
   background: currentcolor;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .deposit-progress-table {

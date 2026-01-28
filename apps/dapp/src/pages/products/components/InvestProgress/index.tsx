@@ -8,7 +8,7 @@ import {
   PositionsService,
   TransactionProgress,
 } from '@sofa/services/positions';
-import { calcVal, getErrorMsg } from '@sofa/utils/fns';
+import { calcVal } from '@sofa/utils/fns';
 import { toArray } from '@sofa/utils/object';
 import { useSize } from 'ahooks';
 import classNames from 'classnames';
@@ -16,8 +16,8 @@ import classNames from 'classnames';
 import { Comp as IconRight } from '@/assets/icon-right.svg';
 import { Comp as IconWrong } from '@/assets/icon-wrong.svg';
 import Address from '@/components/Address';
+import { ErrorDisplay } from '@/components/ErrorDisplay';
 import { HashDisplay } from '@/components/HashDisplay';
-import { MsgDisplay } from '@/components/MsgDisplay';
 import { addI18nResources } from '@/locales';
 
 import locale from './locale';
@@ -108,7 +108,7 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
             if (!ref) return '-';
             return (
               <span
-                className="flex-center"
+                className={classNames('flex-center', styles['status'])}
                 style={{ justifyContent: 'flex-start' }}
               >
                 <span
@@ -123,16 +123,17 @@ export const InvestProgress = forwardRef<ProgressRef, ProgressProps>(
         {
           title: t('Failed Reason'),
           key: 'error',
-          render: (_, it) => {
-            const msg = getErrorMsg(it[1].error);
-            if (!msg) return '-';
-            return (
-              <>
-                {t('QuoteIds')}: {it[1].ids.join(', ')}
-                <MsgDisplay style={{ maxWidth: 250 }}>{msg}</MsgDisplay>
-              </>
-            );
-          },
+          render: (_, it) => (
+            <ErrorDisplay
+              error={it[1].error}
+              context={{
+                vault: it[0].split('-')[0],
+                chainId: Number(it[0].split('-')[1]),
+                idsLabel: t('QuoteIds'),
+                ids: it[1].ids,
+              }}
+            />
+          ),
         },
       ] as XRequired<
         ColumnProps<NonNullable<TransactionProgress['details']>[0]>,
