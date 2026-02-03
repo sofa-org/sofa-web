@@ -5,19 +5,17 @@
 
 // ========== Error Pattern Mapping ==========
 const ERROR_PATTERNS: Array<{ pattern: RegExp; key: string }> = [
+  // Allowance insufficient
+  { pattern: /allowance/i, key: 'INSUFFICIENT_ALLOWANCE' }, //insufficient allowance
+
   // Balance / Funds insufficient
   { pattern: /insufficient funds/i, key: 'INSUFFICIENT_FUNDS' },
-  { pattern: /transfer amount exceeds balance/i, key: 'INSUFFICIENT_BALANCE' },
-  { pattern: /exceeds balance/i, key: 'INSUFFICIENT_BALANCE' },
+  { pattern: /exceeds balance/i, key: 'INSUFFICIENT_BALANCE' }, //transfer amount exceeds balance
   { pattern: /SafeERC20/i, key: 'INSUFFICIENT_BALANCE' },
   {
     pattern: /balance.*(not enough|insufficient)/i,
     key: 'INSUFFICIENT_BALANCE',
   },
-
-  // Allowance insufficient
-  { pattern: /insufficient allowance/i, key: 'INSUFFICIENT_ALLOWANCE' },
-  { pattern: /allowance/i, key: 'INSUFFICIENT_ALLOWANCE' },
 
   // User actions
   { pattern: /user rejected/i, key: 'USER_REJECTED' },
@@ -76,12 +74,12 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     'ru-RU': 'Недостаточно средств для газа',
   },
   INSUFFICIENT_BALANCE: {
-    'en-US': 'Insufficient balance',
-    'zh-CN': '代币余额不足',
-    'zh-HK': '代幣餘額不足',
-    'zh-TW': '代幣餘額不足',
-    'ja-JP': 'トークン残高が不足しています',
-    'ru-RU': 'Недостаточный баланс токенов',
+    'en-US': 'Maker insufficient balance',
+    'zh-CN': 'Maker 代币余额不足',
+    'zh-HK': 'Maker 代幣餘額不足',
+    'zh-TW': 'Maker 代幣餘額不足',
+    'ja-JP': 'Makerのトークン残高が不足しています',
+    'ru-RU': 'Недостаточный баланс токенов у Maker',
   },
   INSUFFICIENT_ALLOWANCE: {
     'en-US': 'Token allowance not enough, please approve first',
@@ -116,12 +114,15 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     'ru-RU': 'Неверная подпись. Запросите новую котировку',
   },
   SIGNATURE_CONSUMED: {
-    'en-US': 'Too many requests or duplicate product parameters',
-    'zh-CN': '请求过于频繁或产品参数重复',
-    'zh-HK': '請求過於頻繁或產品參數重複',
-    'zh-TW': '請求過於頻繁或產品參數重複',
-    'ja-JP': 'リクエストが多すぎるか、製品パラメータが重複しています',
-    'ru-RU': 'Слишком много запросов или параметры продукта дублируются',
+    'en-US':
+      'Duplicate transaction detected. Please review the parameters and try again later',
+    'zh-CN': '检测到重复交易，请检查参数后稍后再试',
+    'zh-HK': '檢測到重複交易，請檢查參數後稍後再試',
+    'zh-TW': '偵測到重複交易，請檢查參數後稍後再試',
+    'ja-JP':
+      '重複した取引が検出されました。パラメータを確認のうえ、しばらくしてから再試行してください',
+    'ru-RU':
+      'Обнаружена дублирующаяся транзакция. Проверьте параметры и попробуйте позже',
   },
   ALREADY_CLAIMED: {
     'en-US': 'This reward has already been claimed',
