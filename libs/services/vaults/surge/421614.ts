@@ -51,6 +51,30 @@ const VaultsForAutomator = [
     rchMultiplier: 1,
     usePermit2: true,
   },
+  // SellSmartBullVault(BTC/aArbSepUSDC)
+  {
+    chainId: 421614,
+    vault: '0xc778287a0e8955AF27600Be6abaf299Ad1dAbEc6',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'aUSDC',
+    rchMultiplier: 1,
+    usePermit2: true,
+  },
+  // SellSmartBearVault(ETH/aArbSepUSDC)
+  {
+    chainId: 421614,
+    vault: '0x63D433F183E9d60d01DF6EDE93C1c1376cfA1CaE',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'aUSDC',
+    rchMultiplier: 1,
+    usePermit2: true,
+  },
 ].map((it) => ({ ...it, onlyForAutomator: true }));
 
 const Vaults = [...VaultsForAutomator];
