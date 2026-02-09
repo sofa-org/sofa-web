@@ -120,9 +120,9 @@ export class WalletConnect {
 
     web3modal = ejectPromise<ReturnType<typeof createWeb3Modal>>();
     // @ts-ignore
-    await modal.initPromise;
+    await Promise.race([modal.initPromise, wait(1000)]);
     // @ts-ignore
-    await modal.walletConnectProviderInitPromise;
+    await Promise.race([modal.walletConnectProviderInitPromise, wait(1000)]);
     await wait(100);
     web3modal.resolve(modal);
 
