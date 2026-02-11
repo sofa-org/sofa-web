@@ -363,6 +363,8 @@ export class MarketService {
       !it || !createdAt || Date.now() - createdAt > MsIntervals.s * 10,
   })
   static async $getPPSNow(params: { fromCcy: string; toCcy: string }) {
+    if (params.fromCcy.includes('USD') && params.toCcy.includes('USD'))
+      return { ...params, dateTime: Date.now(), exchangeRate: 1 } as PPSEntry;
     return http
       .get<unknown, HttpResponse<PPSEntry>>(`/rfq/exchange-rate`, { params })
       .then((res) => res.value);
