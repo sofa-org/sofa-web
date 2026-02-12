@@ -1,4 +1,4 @@
-import { ProductType, RiskType } from '../../base-type';
+import { ProductType, RiskType, TradeSide } from '../../base-type';
 
 const USDTVaults = [
   // SmartBullVault(USDT)
@@ -228,6 +228,54 @@ const aUSDTVaultsForAutomator = [
     depositCcy: 'aUSDT',
     rchMultiplier: 1,
     usePermit2: false,
+  },
+  // SellRebaseSmartBullVault(ETH/aUSDT) | 收益曲线向下
+  {
+    chainId: 1,
+    vault: '0x4a42a325C5Ec31F6a6eb547B00ce6Bf6f2c057F2',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
+  },
+  // SellRebaseSmartBullVault(BTC/aUSDT) | 收益曲线向下
+  {
+    chainId: 1,
+    vault: '0x81ed11567B73043ad7F05d4531Ba431811029452',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
+  },
+  // SellRebaseSmartBearVault(ETH/aUSDT) | 收益曲线向上
+  {
+    chainId: 1,
+    vault: '0x69Bd97280e3e3597b42b0c9e01000812EAd5af6E',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
+  },
+  // SellRebaseSmartBearVault(BTC/aUSDT) | 收益曲线向上
+  {
+    chainId: 1,
+    vault: '0xE8F4CEf205aDCae6521da662954Ebc6fe4497968',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'aUSDT',
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
   },
 ].map((it) => ({ ...it, onlyForAutomator: true }));
 
