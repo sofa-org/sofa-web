@@ -349,7 +349,7 @@ export const ChainMap: Record<
       vaultGraphUrl:
         'https://api.studio.thegraph.com/query/88939/vaults-for-Automator-test/version/latest',
       automatorTheGraphUrl:
-        'https://api.studio.thegraph.com/query/88939/automator-arbitrum-sepolia/version/latest',
+        'https://api.goldsky.com/api/public/project_cmb8ummwjbjyw01vuayl1htoo/subgraphs/automator-burner-sepolia/0.0.2/gn',
       usdtAddress: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
       rchAddress: '',
       rchAirdropAddress: '',
