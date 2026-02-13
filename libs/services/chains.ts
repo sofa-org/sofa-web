@@ -316,7 +316,7 @@ export const ChainMap: Record<
       feeContractAddress: '0x1B487bC2F326F08397b0e6c5E861632B1515a118',
       automatorFeeContractAddress: '0xA0C1921F1c65d18E1Ef92C351183C6b3a6c46621',
       rchBurnForAutomatorGraphUrl:
-        'https://api.studio.thegraph.com/query/62216/automator-burner-sepolia/version/latest',
+        'https://api.goldsky.com/api/public/project_cmb8ummwjbjyw01vuayl1htoo/subgraphs/automator-burner-sepolia/0.0.2/gn',
       hlPriceOracle: {
         BTC: '0x3DD6A9d9bcB17Da01590b83577B4C7D27574F17C',
         ETH: '0x3D9a5ffBd25b17fA6CB34118Dbf9CEaAf18f261f',
@@ -349,7 +349,7 @@ export const ChainMap: Record<
       vaultGraphUrl:
         'https://api.studio.thegraph.com/query/88939/vaults-for-Automator-test/version/latest',
       automatorTheGraphUrl:
-        'https://api.goldsky.com/api/public/project_cmb8ummwjbjyw01vuayl1htoo/subgraphs/automator-burner-sepolia/0.0.2/gn',
+        'https://api.studio.thegraph.com/query/88939/automator-arbitrum-sepolia/version/latest',
       usdtAddress: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
       rchAddress: '',
       rchAirdropAddress: '',
