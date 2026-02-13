@@ -257,7 +257,7 @@ const aUSDTVaultsForAutomator = [
   {
     chainId: 1,
     vault: '0x69Bd97280e3e3597b42b0c9e01000812EAd5af6E',
-    productType: ProductType.BullSpread,
+    productType: ProductType.BearSpread,
     riskType: RiskType.RISKY,
     forCcy: 'WETH',
     domCcy: 'USD',
@@ -269,7 +269,7 @@ const aUSDTVaultsForAutomator = [
   {
     chainId: 1,
     vault: '0xE8F4CEf205aDCae6521da662954Ebc6fe4497968',
-    productType: ProductType.BullSpread,
+    productType: ProductType.BearSpread,
     riskType: RiskType.RISKY,
     forCcy: 'WBTC',
     domCcy: 'USD',
