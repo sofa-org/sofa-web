@@ -11,6 +11,7 @@ const vaults = [
     domCcy: 'USD',
     depositCcy: 'aUSDC',
     usePermit2: false,
+    tradeDisable: true,
   },
   // RebaseSmartBullVault(BTC/aUSDC)
   {
@@ -22,6 +23,7 @@ const vaults = [
     domCcy: 'USD',
     depositCcy: 'aUSDC',
     usePermit2: false,
+    tradeDisable: true,
   },
   // RebaseSmartBearVault(ETH/aUSDC)
   {
@@ -33,6 +35,7 @@ const vaults = [
     domCcy: 'USD',
     depositCcy: 'aUSDC',
     usePermit2: false,
+    tradeDisable: true,
   },
   // RebaseSmartBearVault(BTC/aUSDC)
   {
@@ -44,6 +47,7 @@ const vaults = [
     domCcy: 'USD',
     depositCcy: 'aUSDC',
     usePermit2: false,
+    tradeDisable: true,
   },
 ].map((it) => ({ ...it, onlyForAutomator: true }));
 

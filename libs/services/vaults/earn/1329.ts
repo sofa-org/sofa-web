@@ -60,6 +60,7 @@ const SUSDaVaults = [
     depositCcy: 'USDC',
     realDepositCcy: 'USDC.n',
     usePermit2: false,
+    tradeDisable: true,
   },
   // SmartBearAAVEVault(ETH/USDC)
   {
@@ -72,6 +73,7 @@ const SUSDaVaults = [
     depositCcy: 'USDC',
     realDepositCcy: 'USDC.n',
     usePermit2: false,
+    tradeDisable: true,
   },
   // SmartBullAAVEVault(BTC/USDC)
   {
@@ -84,6 +86,7 @@ const SUSDaVaults = [
     depositCcy: 'USDC',
     realDepositCcy: 'USDC.n',
     usePermit2: false,
+    tradeDisable: true,
   },
   // SmartBearAAVEVault(BTC/USDC)
   {
@@ -96,6 +99,7 @@ const SUSDaVaults = [
     depositCcy: 'USDC',
     realDepositCcy: 'USDC.n',
     usePermit2: false,
+    tradeDisable: true,
   },
   // SmartBullAAVEVault(ETH/NativeUSDC)
   {
