@@ -156,6 +156,7 @@ const VaultsForRtMNER = [
     domCcy: 'USD',
     depositCcy: 'rtMNER',
     usePermit2: false,
+    tradeDisable: true,
   },
   // rtMNERSmartBearVault(BTC/rtMNER)
   {
@@ -167,6 +168,7 @@ const VaultsForRtMNER = [
     domCcy: 'USD',
     depositCcy: 'rtMNER',
     usePermit2: false,
+    tradeDisable: true,
   },
   // rtMNERSmartBullVault(ETH/rtMNER)
   {
@@ -178,6 +180,7 @@ const VaultsForRtMNER = [
     domCcy: 'USD',
     depositCcy: 'rtMNER',
     usePermit2: false,
+    tradeDisable: true,
   },
   // rtMNERSmartBearVault(ETH/rtMNER)
   {
@@ -189,6 +192,7 @@ const VaultsForRtMNER = [
     domCcy: 'USD',
     depositCcy: 'rtMNER',
     usePermit2: false,
+    tradeDisable: true,
   },
 ];
 
