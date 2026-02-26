@@ -40,6 +40,10 @@ const ERROR_PATTERNS: Array<{ pattern: RegExp; key: string }> = [
   { pattern: /Automator: invalid maker/, key: 'INVALID_SIGNATURE' },
 
   // Gas related
+  {
+    pattern: /max fee per gas less than block base fee/i,
+    key: 'GAS_UNDERPRICED',
+  },
   { pattern: /nonce.*too low/i, key: 'NONCE_TOO_LOW' },
   { pattern: /replacement.*underpriced/i, key: 'GAS_UNDERPRICED' },
   { pattern: /gas.*too low/i, key: 'GAS_TOO_LOW' },
@@ -173,12 +177,12 @@ const ERROR_MESSAGES: Record<string, Record<string, string>> = {
     'ru-RU': 'Транзакция уже обработана, обновите страницу',
   },
   GAS_UNDERPRICED: {
-    'en-US': 'Gas price too low, please retry',
-    'zh-CN': 'Gas 价格过低，请重试',
-    'zh-HK': 'Gas 價格過低，請重試',
-    'zh-TW': 'Gas 價格過低，請重試',
-    'ja-JP': 'ガス価格が低すぎます。再試行してください',
-    'ru-RU': 'Цена газа слишком низкая, повторите попытку',
+    'en-US': 'Gas price too low, please increase gas price and retry',
+    'zh-CN': 'Gas 费用过低，请提高 Gas 价格后重试',
+    'zh-HK': 'Gas 費用過低，請提高 Gas 價格後重試',
+    'zh-TW': 'Gas 費用過低，請提高 Gas 價格後重試',
+    'ja-JP': 'ガス価格が低すぎます。ガス価格を引き上げて再試行してください',
+    'ru-RU': 'Цена газа слишком низкая, увеличьте цену газа и повторите',
   },
   GAS_TOO_LOW: {
     'en-US': 'Gas limit too low, please retry',
