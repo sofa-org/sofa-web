@@ -3,6 +3,8 @@ import IconCRV from './assets/icon-crv.svg?url';
 import IconCrvUSD from './assets/icon-crvusd.png';
 import IconETH from './assets/icon-eth.svg?url';
 import IconRCH from './assets/icon-rch.png';
+import IconRTCIC from './assets/icon-rtcic.jpg';
+import IconRTMNER from './assets/icon-rtmner.png';
 import IconSTETH from './assets/icon-steth.svg?url';
 import IconsUSDa from './assets/icon-susda.png?url';
 import IconUSD from './assets/icon-usd.svg?url';
@@ -101,6 +103,18 @@ export class CCYService {
       name: 'USDa',
       icon: IconUSDa,
       color: '#FFA800',
+      precision: 4,
+    },
+    rtCIC: {
+      name: 'rtCIC',
+      icon: IconRTCIC,
+      color: '#4A2DB5',
+      precision: 4,
+    },
+    rtMNER: {
+      name: 'rtMNER',
+      icon: IconRTMNER,
+      color: '#2F4EA8',
       precision: 4,
     },
   };
