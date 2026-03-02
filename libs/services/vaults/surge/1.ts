@@ -328,6 +328,58 @@ const zRCHVaultsForAutomator = [
     rchMultiplier: 1,
     usePermit2: false,
   },
+  // SellSimpleSmartBullVault(ETH/zRCH) | 收益曲线向下
+  {
+    chainId: 1,
+    vault: '0xCe8EC0A440019d696B45A209c1FDb91a9f1EDc51',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'zRCH',
+    rchMultiplier: 1,
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
+  },
+  // SellSimpleSmartBullVault(BTC/zRCH) | 收益曲线向下
+  {
+    chainId: 1,
+    vault: '0x362950D5eBba5714ec78a5DC024b8386500379A0',
+    productType: ProductType.BullSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'zRCH',
+    rchMultiplier: 1,
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
+  },
+  // SellSimpleSmartBearVault(ETH/zRCH) | 收益曲线向上
+  {
+    chainId: 1,
+    vault: '0x9c3386DBd53e593C0ee667d962aEe41ceE0Cf043',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WETH',
+    domCcy: 'USD',
+    depositCcy: 'zRCH',
+    rchMultiplier: 1,
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
+  },
+  // SellSimpleSmartBearVault(BTC/zRCH) | 收益曲线向上
+  {
+    chainId: 1,
+    vault: '0xFeb0441aB16A26880955d43C8e63b90CD7b95FDf',
+    productType: ProductType.BearSpread,
+    riskType: RiskType.RISKY,
+    forCcy: 'WBTC',
+    domCcy: 'USD',
+    depositCcy: 'zRCH',
+    rchMultiplier: 1,
+    usePermit2: false,
+    tradeSide: TradeSide.SELL,
+  },
 ].map((it) => ({ ...it, onlyForAutomator: true }));
 
 const vaults = [
