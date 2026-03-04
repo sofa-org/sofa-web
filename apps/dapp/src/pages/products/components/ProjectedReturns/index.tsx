@@ -1,8 +1,8 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react';
-import { Radio, RadioGroup } from '@douyinfe/semi-ui';
+import { ReactNode, useMemo } from 'react';
 import { ProductType, RiskType, VaultInfo } from '@sofa/services/base-type';
 import { useTranslation } from '@sofa/services/i18n';
 import { PositionInfo } from '@sofa/services/positions';
+import { shouldUseBearTrendSettle } from '@sofa/services/vaults/utils';
 import {
   amountFormatter,
   cvtAmountsInCcy,
@@ -163,8 +163,17 @@ const Right = (props: BaseProps & { data: Partial<PositionInfo> }) => {
     depositLabel: isRisky ? t('Purchase Amount') : t('Deposit Amount'),
     aliasType: isRisky ? 'multiplier' : 'yield',
   } as const;
+  const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
+    product.vault.productType,
+  );
+  const scenarioProductType =
+    isTrend && shouldUseBearTrendSettle(product.vault)
+      ? ProductType.BearSpread
+      : isTrend
+        ? ProductType.BullSpread
+        : product.vault.productType;
   const returnSituationsDesc =
-    ProductTypeRefs[product.vault.productType].returnSituationsDesc(t);
+    ProductTypeRefs[scenarioProductType].returnSituationsDesc(t);
   const rchMultiplier = Number(position.oddsInfo?.rch) || 0;
   const maxMultiplier = [
     Number(position.oddsInfo?.max) || 0,
@@ -174,9 +183,6 @@ const Right = (props: BaseProps & { data: Partial<PositionInfo> }) => {
     Number(position.oddsInfo?.min) || 0,
     rchMultiplier,
   ] as [number, number];
-  const isTrend = [ProductType.BearSpread, ProductType.BullSpread].includes(
-    product.vault.productType,
-  );
   const isRangebound = [ProductType.DNT].includes(product.vault.productType);
   const hasExpired = Number(product.expiry) * 1000 <= Date.now();
   const showScenario = {

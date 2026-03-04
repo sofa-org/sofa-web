@@ -10,6 +10,7 @@ import {
   TransactionInfo,
 } from '@sofa/services/positions';
 import { PositionStatus } from '@sofa/services/the-graph';
+import { shouldUseBearTrendSettle } from '@sofa/services/vaults/utils';
 import { amountFormatter } from '@sofa/utils/amount';
 import { displayExpiry, next8h } from '@sofa/utils/expiry';
 import { displayTenor, formatDuration } from '@sofa/utils/time';
@@ -468,8 +469,19 @@ const PositionDetailsModal = (
   const product = position?.product;
   const riskTypeRef =
     product?.vault.riskType && RiskTypeRefs[product.vault.riskType];
+  const isTrend = product?.vault.productType
+    ? [ProductType.BearSpread, ProductType.BullSpread].includes(
+        product.vault.productType,
+      )
+    : false;
+  const displayProductType =
+    isTrend && product?.vault.tradeSide
+      ? shouldUseBearTrendSettle(product.vault)
+        ? ProductType.BearSpread
+        : ProductType.BullSpread
+      : product?.vault.productType;
   const productTypeRef =
-    product?.vault.productType && ProductTypeRefs[product.vault.productType];
+    displayProductType && ProductTypeRefs[displayProductType];
 
   // const leverageInfo = useAsyncMemo(
   //   async () =>
