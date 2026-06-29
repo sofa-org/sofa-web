@@ -1,16 +1,20 @@
 import {
-  MouseEvent,
-  ReactNode,
+  type ComponentType,
+  type MouseEvent,
+  type ReactNode,
   useLayoutEffect,
   useRef,
   useState,
 } from 'react';
+import type { DraggableProps } from 'react-draggable';
 import Draggable from 'react-draggable';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useSize } from 'ahooks';
 import classNames from 'classnames';
 
 import styles from './index.module.scss';
+
+const DraggableComponent = Draggable as ComponentType<Partial<DraggableProps>>;
 
 export interface ProgressBarProps extends BaseProps {
   type?: '1' | '2' | '3';
@@ -72,7 +76,7 @@ const ProgressBar = (props: ProgressBarProps) => {
         }}
       />
       {props.type === '2' && !!wrapperSize?.width && (
-        <Draggable
+        <DraggableComponent
           axis="x"
           disabled={!!props.disabled}
           position={{
@@ -98,7 +102,7 @@ const ProgressBar = (props: ProgressBarProps) => {
           }}
         >
           <div className={styles['slider']} ref={slider} />
-        </Draggable>
+        </DraggableComponent>
       )}
       {props.children}
     </div>
