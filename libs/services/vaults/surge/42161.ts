@@ -59,6 +59,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 1,
     usePermit2: true,
+    tradeDisable: true,
   },
   // DNTVault(WBTC/USDT)
   {
@@ -71,6 +72,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 1,
     usePermit2: true,
+    tradeDisable: true,
   },
 ];
 

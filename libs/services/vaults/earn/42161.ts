@@ -88,6 +88,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // PrincipalDNTVault(WBTC/USDT)
   {
@@ -100,6 +101,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // LeverageBearSpreadVault(USDT)
   {
@@ -160,6 +162,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // LeverageDNTVault(WBTC/USDT)
   {
@@ -172,6 +175,7 @@ const USDTVaults = [
     depositCcy: 'USDT',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // AAVESmartBullVault(ETH/USDT)
   {
@@ -239,6 +243,7 @@ const USDCVaults = [
     depositCcy: 'USDC',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // AAVEDNTVault(WBTC/USDC)
   {
@@ -251,6 +256,7 @@ const USDCVaults = [
     depositCcy: 'USDC',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // SmartBullAAVEVault(ETH/USDC)
   {
@@ -311,6 +317,7 @@ const USDCVaults = [
     depositCcy: 'USDC',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // LeverageDNTVault(WBTC/USDC)
   {
@@ -323,6 +330,7 @@ const USDCVaults = [
     depositCcy: 'USDC',
     rchMultiplier: 20,
     usePermit2: false,
+    tradeDisable: true,
   },
   // LeverageBullSpreadVault(ETH/USDC)
   {
