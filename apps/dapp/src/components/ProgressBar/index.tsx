@@ -74,7 +74,7 @@ const ProgressBar = (props: ProgressBarProps) => {
       {props.type === '2' && !!wrapperSize?.width && (
         <Draggable
           axis="x"
-          disabled={props.disabled}
+          disabled={!!props.disabled}
           position={{
             x: tempVal * (wrapperSize.width - (sliderSize?.width || 20)),
             y: 0,
