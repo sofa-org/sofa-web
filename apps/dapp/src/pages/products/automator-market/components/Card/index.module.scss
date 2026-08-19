@@ -161,7 +161,8 @@
 
 .yield,
 .size,
-.creator {
+.creator,
+.holding {
   @include flex-column-center;
 
   align-items: flex-start;
@@ -255,7 +256,8 @@
   }
 
   .creator,
-  .size {
+  .size,
+  .holding {
     .value {
       font-weight: 510;
     }
@@ -280,7 +282,8 @@
 @mixin rewrite {
   .yield,
   .size,
-  .creator {
+  .creator,
+  .holding {
     @include flex-center;
 
     justify-content: space-between;

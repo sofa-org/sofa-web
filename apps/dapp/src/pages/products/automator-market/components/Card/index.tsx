@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorInfo } from '@sofa/services/automator';
+import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
@@ -30,6 +31,7 @@ export interface AutomatorCardProps {
   onShareClicked: (v: AutomatorInfo) => void;
   mode: 'card' | 'featured';
   switchChain?: boolean;
+  userPosition?: AutomatorUserPosition;
 }
 
 export const AutomatorCard = (props: AutomatorCardProps) => {
@@ -137,29 +139,50 @@ export const AutomatorCard = (props: AutomatorCardProps) => {
         </div>
       </div>
       {props.info.vaultInfo.creator && (
-        <>
-          <div className={styles['creator']}>
-            <div className={styles['label']}>
-              {t({ enUS: `Optivisor's`, zhCN: '主理人份额' })}
-            </div>
-            <div className={styles['value']}>
-              <AmountDisplay
-                amount={props.info.creatorAmountByClientDepositCcy || 0}
-                ccy={props.info.vaultInfo.depositCcy}
-              />
-              <span className={styles['unit']}>
-                {props.info.vaultInfo.realDepositCcy ??
-                  props.info.vaultInfo.depositCcy}
-              </span>
-              <span className={styles['percent']}>
-                {displayPercentage(
-                  Number(props.info?.creatorAmountByVaultDepositCcy) /
-                    Number(props.info?.aumByVaultDepositCcy),
-                )}
-              </span>
-            </div>
+        <div className={styles['creator']}>
+          <div className={styles['label']}>
+            {t({ enUS: `Optivisor's`, zhCN: '主理人份额' })}
           </div>
-        </>
+          <div className={styles['value']}>
+            <AmountDisplay
+              amount={props.info.creatorAmountByClientDepositCcy || 0}
+              ccy={props.info.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {props.info.vaultInfo.realDepositCcy ??
+                props.info.vaultInfo.depositCcy}
+            </span>
+            <span className={styles['percent']}>
+              {displayPercentage(
+                Number(props.info?.creatorAmountByVaultDepositCcy) /
+                  Number(props.info?.aumByVaultDepositCcy),
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+      {props.userPosition && (
+        <div className={styles['holding']}>
+          <div className={styles['label']}>
+            {t({ enUS: 'My Holding', zhCN: '我的持仓' })}
+          </div>
+          <div className={styles['value']}>
+            <AmountDisplay
+              amount={props.userPosition.amountByClientDepositCcy || 0}
+              ccy={props.info.vaultInfo.depositCcy}
+            />
+            <span className={styles['unit']}>
+              {props.info.vaultInfo.realDepositCcy ??
+                props.info.vaultInfo.depositCcy}
+            </span>
+            <span className={styles['percent']}>
+              {displayPercentage(
+                Number(props.userPosition.amountByVaultDepositCcy) /
+                  Number(props.info.aumByVaultDepositCcy),
+              )}
+            </span>
+          </div>
+        </div>
       )}
       <div className={styles['footer']}>
         <div className={styles['risk']}>
