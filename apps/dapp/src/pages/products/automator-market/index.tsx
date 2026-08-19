@@ -89,24 +89,32 @@ const Index = () => {
       );
   }, [wallet.address, wallet.chainId]);
 
-  const holding = useAutomatorStore((state) => {
-    const list = Object.values(state.userInfos)
+  const currentWallet = wallet.address?.toLowerCase();
+  const holding = useAutomatorStore((state) =>
+    Object.values(state.userInfos)
       .map((it) => it.server)
-      .filter(Boolean);
-    if (!list) return undefined;
-    return list.filter((it) =>
-      Number(it?.amountByVaultDepositCcy),
-    ) as AutomatorUserPosition[];
-  });
+      .filter(
+        (it): it is AutomatorUserPosition =>
+          !!it &&
+          it.vaultInfo.chainId === wallet.chainId &&
+          it.wallet.toLowerCase() === currentWallet &&
+          Number(it.amountByVaultDepositCcy) > 0,
+      ),
+  );
+
+  const holdingByVault = useMemo(
+    () => arrToDict(holding || [], (it) => it.vaultInfo.vault.toLowerCase()),
+    [holding],
+  );
 
   const lists = useMemo(() => {
     if (!data || (tab === 'holding' && !holding)) return undefined;
-    const bool = arrToDict(holding || [], (it) =>
-      it.vaultInfo.vault.toLowerCase(),
-    );
     const map = data.reduce(
       (pre, it) => {
-        if (tab === 'holding' && !bool[it.vaultInfo.vault.toLowerCase()])
+        if (
+          tab === 'holding' &&
+          !holdingByVault[it.vaultInfo.vault.toLowerCase()]
+        )
           return pre;
         const vault = it.vaultInfo;
         if (!vault) return pre;
@@ -117,7 +125,7 @@ const Index = () => {
       {} as Record<AutomatorVaultInfo['depositCcy'], AutomatorInfo[]>,
     );
     return Object.entries(map);
-  }, [data, holding, tab]);
+  }, [data, holding, holdingByVault, tab]);
 
   const loading = (tab === 'holding' ? !holding : !data) && !lists?.length;
 
@@ -211,6 +219,11 @@ const Index = () => {
                   mode="card"
                   modalController={modalController}
                   showShareBtn={true}
+                  userPosition={
+                    tab === 'holding'
+                      ? holdingByVault[a.vaultInfo.vault.toLowerCase()]
+                      : undefined
+                  }
                   onShareClicked={(v) => {
                     setCurrentShareInfo(v);
                     if (tab === 'holding') {
