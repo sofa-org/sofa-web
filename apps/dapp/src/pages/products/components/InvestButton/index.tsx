@@ -22,7 +22,6 @@ import { arrToDict, simplePlus } from '@sofa/utils/object';
 import classNames from 'classnames';
 
 import AsyncButton from '@/components/AsyncButton';
-import { pokerRightsReminder } from '@/components/RightsReminder';
 import WalletConnector from '@/components/WalletConnector';
 import { useWalletStore } from '@/components/WalletConnector/store';
 import { addI18nResources } from '@/locales';
@@ -262,8 +261,6 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
             delRfq(it[0]);
           }
         });
-        if (vault.riskType === RiskType.RISKY && !vault.onlyForAutomator)
-          pokerRightsReminder();
         useWalletStore.updateBalanceByVault(props.vault);
       }
       if (/Success/i.test(progress.status)) {
