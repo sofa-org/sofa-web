@@ -166,9 +166,7 @@ window.$router = createBrowserRouter([
   {
     path: '*',
     Component: () => {
-      if (
-        /fest-competition|rch-game-center|rch-celebrity/.test(location.pathname)
-      ) {
+      if (/rch-game-center|rch-celebrity/.test(location.pathname)) {
         window.location.href = joinUrl(
           EnvLinks.config.VITE_CAMPAIGN_LINK,
           location.pathname,

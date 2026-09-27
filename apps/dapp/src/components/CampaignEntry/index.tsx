@@ -20,13 +20,7 @@ const CampaignEntryEl = () => {
     { pollingInterval: 10000, refreshDeps: [address] },
   );
 
-  const { data: data1 } = useRequest(
-    async () => (!address ? undefined : CampaignService.getJokerInfo(address)),
-    { pollingInterval: 10000, refreshDeps: [address] },
-  );
-
-  const notify = !!data?.unDrawnTimes || !!data1?.undrawn;
-  const jumpToJoker = !data?.unDrawnTimes && !!data1?.undrawn;
+  const notify = !!data?.unDrawnTimes;
 
   return (
     <div className={styles['campaign-entry']}>
@@ -34,10 +28,7 @@ const CampaignEntryEl = () => {
         className={classNames(styles['treasure'], {
           [styles['active']]: notify,
         })}
-        href={joinUrl(
-          EnvLinks.config.VITE_CAMPAIGN_LINK,
-          jumpToJoker ? '/fest-competition' : '?open-wheel=1',
-        )}
+        href={joinUrl(EnvLinks.config.VITE_CAMPAIGN_LINK, '?open-wheel=1')}
       >
         <span />
       </a>
