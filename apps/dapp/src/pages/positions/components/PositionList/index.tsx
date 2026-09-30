@@ -151,22 +151,30 @@ const List = (props: {
     }));
     const cb = (it: TransactionProgress) => {
       claimProgressRef.current?.update(it);
-      if (['Success', 'Partial Failed'].includes(it.status)) {
-        const successIds = it.details?.flatMap((d) => {
-          if (d[1].status === PositionStatus.CLAIMED) return d[1].ids;
-          return [];
-        });
-        if (successIds) {
-          mutate(
-            (pre) =>
-              pre && {
-                ...pre,
-                list: pre?.list.map((it) =>
-                  successIds.includes(it.id) ? { ...it, claimed: true } : it,
-                ),
-              },
+      const claimedKeys = new Set(
+        it.details?.flatMap(([key, detail]) => {
+          if (detail.status !== PositionStatus.CLAIMED) return [];
+          const [vault, chainId] = key.split('-');
+          return detail.ids.map(
+            (id) => `${+chainId}-${vault.toLowerCase()}-${id}`,
           );
-        }
+        }),
+      );
+      if (claimedKeys.size) {
+        mutate(
+          (pre) =>
+            pre && {
+              ...pre,
+              list: pre.list.map((position) => {
+                const { chainId, vault } = position.product.vault;
+                return claimedKeys.has(
+                  `${chainId}-${vault.toLowerCase()}-${position.id}`,
+                )
+                  ? { ...position, claimed: true }
+                  : position;
+              }),
+            },
+        );
       }
     };
     if (props.automator)
@@ -290,9 +298,7 @@ const List = (props: {
               className={styles['deposit-ccy-group']}
             >
               {e[1]?.map((it) =>
-                it.claimed && !props.claimed ? (
-                  <Fragment key={it.id} />
-                ) : (
+                it.claimed && !props.claimed ? null : (
                   <PositionCard
                     position={it}
                     onStatusChange={(status) => handleStatusChange(status, it)}

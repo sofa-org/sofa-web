@@ -7,7 +7,9 @@
   "files": [
     "**/*.ts"
   ],
-  "scripts": {},
+  "scripts": {
+    "test": "vitest run"
+  },
   "nx": {
     "tags": [
       "type:shared"

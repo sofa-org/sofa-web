@@ -1,7 +1,7 @@
 import { defaultChain } from '@sofa/services/chains';
 import { AirdropRecord, AirdropStatus, RCHService } from '@sofa/services/rch';
-import { WalletService } from '@sofa/services/wallet';
 import { isTransactionConfirmationPendingError } from '@sofa/services/transaction-confirmation';
+import { WalletService } from '@sofa/services/wallet';
 import { simplePlus } from '@sofa/utils/object';
 import { computed } from '@sofa/utils/zustand';
 import { createWithEqualityFn } from 'zustand/traditional';
@@ -68,21 +68,32 @@ export const useRCHState = Object.assign(
             state.selectedAirdropKeys.includes(it.timestamp),
           );
       if (!claimableList?.length) throw new Error('No RCH for claiming');
+      const claimableKeys = new Set(claimableList.map((it) => it.timestamp));
       await WalletService.connect(defaultChain.chainId);
-      useWalletStore.connect(defaultChain.chainId);
+      await useWalletStore.connect(defaultChain.chainId);
+      const currentClaimableList = useRCHState
+        .getState()
+        .claimableList()
+        ?.filter((it) => claimableKeys.has(it.timestamp));
+      if (!currentClaimableList?.length) throw new Error('No RCH for claiming');
+      const submittedKeys = new Set(
+        currentClaimableList.map((it) => it.timestamp),
+      );
       useRCHState.setState((pre) => ({
         ...pre,
         myAirdropList: pre.myAirdropList?.map(($it) =>
+          submittedKeys.has($it.timestamp) &&
           $it.status === AirdropStatus.Unclaimed
             ? { ...$it, status: AirdropStatus.Claiming }
             : $it,
         ),
       }));
-      return RCHService.claimAirdrop(claimableList).catch((err) => {
+      return RCHService.claimAirdrop(currentClaimableList).catch((err) => {
         if (isTransactionConfirmationPendingError(err)) throw err;
         useRCHState.setState((pre) => ({
           ...pre,
           myAirdropList: pre.myAirdropList?.map(($it) =>
+            submittedKeys.has($it.timestamp) &&
             $it.status === AirdropStatus.Claiming
               ? { ...$it, status: AirdropStatus.Unclaimed }
               : $it,

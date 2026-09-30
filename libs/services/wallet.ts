@@ -19,8 +19,14 @@ import {
 } from './contracts';
 import { ProductQuoteResult, ProductType } from './products';
 import { PositionInfoInGraph } from './the-graph';
+import {
+  registerPendingTransactionConfirmation,
+  removePendingTransactionConfirmation,
+  TransactionConfirmationPendingError,
+  updatePendingTransactionConfirmation,
+  withConfirmationAttemptTimeout,
+} from './transaction-confirmation';
 import { WalletConnect } from './wallet-connect';
-import { registerPendingTransactionConfirmation, removePendingTransactionConfirmation, TransactionConfirmationPendingError, updatePendingTransactionConfirmation, withConfirmationAttemptTimeout } from './transaction-confirmation';
 
 export interface BurnProductParams {
   positionId: PositionInfoInGraph['productId'];
@@ -30,6 +36,11 @@ export interface BurnProductParams {
   isMaker: number;
   collateralAtRiskPercentage?: string | number;
 }
+
+type BurnBatchResult = { positionIds: string[] } & (
+  | { hash: string; error?: never }
+  | { hash?: never; error: unknown }
+);
 
 export interface MintProductParams {
   expiry: number;
@@ -613,8 +624,11 @@ export class WalletService {
     while (Date.now() - startAt < timeoutMs) {
       const remaining = timeoutMs - (Date.now() - startAt);
       try {
-        const receipt = await withConfirmationAttemptTimeout(
-          WalletService.readonlyConnect(+chainId).then((provider) => provider.getTransactionReceipt(hash)),
+        const { provider, receipt } = await withConfirmationAttemptTimeout(
+          WalletService.readonlyConnect(+chainId).then(async (provider) => ({
+            provider,
+            receipt: await provider.getTransactionReceipt(hash),
+          })),
           Math.min(10_000, remaining),
         );
         latestReadFailed = false;
@@ -626,51 +640,90 @@ export class WalletService {
         })();
         if (receipt && receiptStatus === 1) {
           removePendingTransactionConfirmation(hash, +chainId);
-          return { status: TransactionStatus.SUCCESS, logs: receipt.logs };
+          return { status: TransactionStatus.SUCCESS, logs: [...receipt.logs] };
         }
         if (receipt && receiptStatus === 0) {
           removePendingTransactionConfirmation(hash, +chainId);
+          const diagnosisDeadline = Math.min(
+            startAt + timeoutMs,
+            Date.now() + 5000,
+          );
+          const diagnosisTimeout = diagnosisDeadline - Date.now();
+          if (diagnosisTimeout > 0) {
+            try {
+              await withConfirmationAttemptTimeout(
+                (async () => {
+                  const tx = await provider.getTransaction(hash);
+                  if (tx?.to && Date.now() < diagnosisDeadline) {
+                    await provider.call({
+                      to: tx.to,
+                      from: tx.from,
+                      data: tx.data,
+                      value: tx.value,
+                      blockTag: receipt.blockNumber,
+                    });
+                  }
+                })(),
+                diagnosisTimeout,
+              );
+            } catch (error) {
+              // Diagnosis cannot change the failure already established by the receipt.
+              if (ethers.isError(error, 'CALL_EXCEPTION'))
+                return { status: TransactionStatus.FAILED, error };
+            }
+          }
           return { status: TransactionStatus.FAILED };
         }
-      } catch (error) { latestReadFailed = true; lastError = error; }
+      } catch (error) {
+        latestReadFailed = true;
+        lastError = error;
+      }
       const remainingAfterRead = timeoutMs - (Date.now() - startAt);
-      if (remainingAfterRead > 0) await new Promise((resolve) => setTimeout(resolve, Math.min(1000, remainingAfterRead)));
+      if (remainingAfterRead > 0)
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.min(1000, remainingAfterRead)),
+        );
     }
     const reason = latestReadFailed ? 'rpc-unavailable' : 'timeout';
     updatePendingTransactionConfirmation(hash, +chainId, reason);
-    throw new TransactionConfirmationPendingError(hash, +chainId, reason, { cause: lastError });
+    throw new TransactionConfirmationPendingError(hash, +chainId, reason, {
+      cause: lastError,
+    });
   }
 
   private static async $burnBatch(
     contract: ethers.Contract,
     data: BurnProductParams[],
     claimCcy?: CCY | USDS,
-  ): Promise<string[]> {
+  ): Promise<BurnBatchResult[]> {
     const maxCount = 300;
-    const $params = data.map((it) =>
-      pick(it, [
-        'term',
-        'expiry',
-        'anchorPrices',
-        'isMaker',
-        'collateralAtRiskPercentage',
-      ]),
-    );
-    const fn = async (params: typeof $params) => {
-      if (!params.length) return '';
-      return ContractsService.dirtyCall(
-        contract,
-        claimCcy === 'ETH' ? 'ethBurnBatch' : 'burnBatch',
-        (gasLimit?: number) => [
-          params,
-          ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
-        ],
-      );
-    };
     return Promise.all(
-      [...Array(Math.ceil($params.length / maxCount))]
-        .map((_, i) => $params.slice(i * maxCount, (i + 1) * maxCount))
-        .map((params) => fn(params)),
+      [...Array(Math.ceil(data.length / maxCount))].map(async (_, i) => {
+        const batch = data.slice(i * maxCount, (i + 1) * maxCount);
+        const positionIds = batch.map((it) => it.positionId);
+        const params = batch.map((it) =>
+          pick(it, [
+            'term',
+            'expiry',
+            'anchorPrices',
+            'isMaker',
+            'collateralAtRiskPercentage',
+          ]),
+        );
+        try {
+          const hash = await ContractsService.dirtyCall(
+            contract,
+            claimCcy === 'ETH' ? 'ethBurnBatch' : 'burnBatch',
+            (gasLimit?: number) => [
+              params,
+              ...(gasLimit ? [{ gasLimit }] : [{ blockTag: 'pending' }]),
+            ],
+          );
+          return { hash, positionIds };
+        } catch (error) {
+          return { error, positionIds };
+        }
+      }),
     );
   }
 
@@ -681,7 +734,7 @@ export class WalletService {
     error?: { msg: string; details: string };
     value: (readonly [
       string /* `${vault.toLowerCase()}-${chainId}-${claimCcy}` */,
-      { hash?: string[]; error?: unknown; positionIds: string[] },
+      BurnBatchResult,
     ])[];
   }> {
     if (!data.length) return { code: 0, value: [] };
@@ -721,35 +774,26 @@ export class WalletService {
     return Promise.all(
       Object.entries(groups)
         .sort((a, b) => b[1].redeemableAmount - a[1].redeemableAmount)
-        .map(
-          async ([key, it]) =>
-            [
-              key,
-              await WalletService.$burnBatch(it.contract, it.params)
-                .then((hash) => ({
-                  hash,
-                  positionIds: it.params.map((it) => it.positionId),
-                }))
-                .catch((error) => ({
-                  error,
-                  positionIds: it.params.map((it) => it.positionId),
-                })),
-            ] as const,
-        ),
-    ).then((res) => {
-      const failedVaults = res.filter((it) => 'error' in it[1]) as [
-        string,
-        { error: unknown; positionIds: string[] },
-      ][];
-      if (failedVaults.length) {
-        const allFailed = failedVaults.length === res.length;
+        .map(async ([key, it]) => {
+          const batches = await WalletService.$burnBatch(
+            it.contract,
+            it.params,
+            it.claimCcy,
+          );
+          return batches.map((batch) => [key, batch] as const);
+        }),
+    ).then((groups) => {
+      const res = groups.flat();
+      const failedBatches = res.filter((it) => 'error' in it[1]);
+      if (failedBatches.length) {
+        const allFailed = failedBatches.length === res.length;
         return {
           code: allFailed ? 1 : 2,
           error: {
             msg: allFailed
               ? 'None of the positions were successfully burned'
               : 'Part of the positions were burned failed',
-            details: failedVaults
+            details: failedBatches
               .map((it) => `vault(${it[0]}): ${getErrorMsg(it[1].error)}`)
               .join('\n'),
           },

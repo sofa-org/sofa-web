@@ -246,25 +246,24 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       });
     };
     const judgeConsumed = (progress: TransactionProgress) => {
-      if (/failed/i.test(progress.status)) {
-        progress.details?.forEach((it) => {
-          if (/signature consumed/i.test(getErrorMsg(it[1].error))) {
-            delRfq(it[0]);
-          }
-        });
-      }
+      progress.details?.forEach((it) => {
+        if (
+          it[1].status === PositionStatus.FAILED &&
+          /signature consumed/i.test(getErrorMsg(it[1].error))
+        ) {
+          delRfq(it[0]);
+        }
+      });
     };
     const judgeSuccess = (progress: TransactionProgress) => {
-      if (progress.status === 'ConfirmationPending') return;
-      if (/Success|Partial/i.test(progress.status)) {
-        progress.details?.forEach((it) => {
-          if (it[1].status === PositionStatus.MINTED) {
-            delRfq(it[0]);
-          }
-        });
+      const minted = progress.details?.filter(
+        (it) => it[1].status === PositionStatus.MINTED,
+      );
+      if (minted?.length) {
+        minted.forEach((it) => delRfq(it[0]));
         useWalletStore.updateBalanceByVault(props.vault);
       }
-      if (/Success/i.test(progress.status)) {
+      if (progress.status === 'Success') {
         if (vault.riskType === RiskType.RISKY)
           useProductsState.clearCart(vault);
         waitUntil(() => !progressRef.current?.visible, {
