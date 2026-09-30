@@ -23,6 +23,7 @@ import { isMockEnabled } from './mock';
 import { TransactionProgress } from './positions';
 import { PositionStatus, TheGraphService } from './the-graph';
 import { WalletService } from './wallet';
+import { isTransactionConfirmationPendingError } from './transaction-confirmation';
 
 export interface OriginAutomatorCreateParams {
   chainId: number; // 链ID
@@ -189,6 +190,10 @@ export class AutomatorCreatorService {
 
       return tx;
     } catch (e) {
+      if (isTransactionConfirmationPendingError(e)) {
+        cb({ status: 'ConfirmationPending', details: [[`--`, { ids: ['QueryReceipt'], status: PositionStatus.PENDING, confirmation: { hash: e.hash, chainId: e.chainId, reason: e.reason } }]] });
+        throw e;
+      }
       cb({
         status: 'SubmitFailed',
         details: [[`--`, { ids: [], status: PositionStatus.FAILED, error: e }]],
@@ -214,6 +219,10 @@ export class AutomatorCreatorService {
         details: [[`--`, { ids: [], status: PositionStatus.MINTED }]],
       });
     } catch (e) {
+      if (isTransactionConfirmationPendingError(e)) {
+        cb({ status: 'ConfirmationPending', details: [[`--`, { ids: [], status: PositionStatus.PENDING, confirmation: { hash: e.hash, chainId: e.chainId, reason: e.reason } }]] });
+        throw e;
+      }
       cb({
         status: 'SubmitFailed',
         details: [[`--`, { ids: [], status: PositionStatus.FAILED, error: e }]],
@@ -266,6 +275,7 @@ export class AutomatorCreatorService {
     products: Parameters<typeof WalletService.mint>[0][],
   ) {
     cb({ status: 'Submitting' });
+    let vaultQuotes: Record<string, (string | number)[]> = {};
     try {
       const { signer } = await WalletService.connect(vault.chainId);
       if (vault.creator.toLowerCase() !== signer.address.toLowerCase())
@@ -299,7 +309,7 @@ export class AutomatorCreatorService {
         (gasLimit) => [productList, signature, { gasLimit }],
       );
 
-      const vaultQuotes = products.reduce(
+      vaultQuotes = products.reduce(
         (pre, it) => {
           const key = `${it.vault.vault.toLowerCase()}-${it.vault.chainId}-${
             it.vault.depositCcy
@@ -335,6 +345,10 @@ export class AutomatorCreatorService {
         ]),
       });
     } catch (e) {
+      if (isTransactionConfirmationPendingError(e)) {
+        cb({ status: 'ConfirmationPending', details: Object.entries(vaultQuotes).map(([key, ids]) => [key, { ids, status: PositionStatus.PENDING, confirmation: { hash: e.hash, chainId: e.chainId, reason: e.reason } }]) });
+        throw e;
+      }
       cb({
         status: 'SubmitFailed',
         details: [
@@ -354,6 +368,7 @@ export class AutomatorCreatorService {
     positions: Parameters<typeof WalletService.burn>[0][],
   ) {
     cb({ status: 'Submitting' });
+    let vaultQuotes: Record<string, (string | number)[]> = {};
     try {
       const { signer } = await WalletService.connect(vault.chainId);
       const contract = createEthersContract(vault.vault, vault.abis, signer);
@@ -376,7 +391,7 @@ export class AutomatorCreatorService {
       const positionList = Object.entries($positionList).map(
         ([vault, products]) => ({ vault, products }),
       );
-      const vaultQuotes = positions.reduce(
+      vaultQuotes = positions.reduce(
         (pre, it) => {
           const key = `${it.vault.toLowerCase()}-${it.chainId}-${it.claimCcy}`;
           if (!pre[key]) pre[key] = [];
@@ -414,6 +429,10 @@ export class AutomatorCreatorService {
         ]),
       });
     } catch (e) {
+      if (isTransactionConfirmationPendingError(e)) {
+        cb({ status: 'ConfirmationPending', details: Object.entries(vaultQuotes).map(([key, ids]) => [key, { ids, status: PositionStatus.PENDING, confirmation: { hash: e.hash, chainId: e.chainId, reason: e.reason } }]) });
+        throw e;
+      }
       cb({
         status: 'SubmitFailed',
         details: [
@@ -479,6 +498,10 @@ export class AutomatorCreatorService {
         ],
       });
     } catch (e) {
+      if (isTransactionConfirmationPendingError(e)) {
+        cb({ status: 'ConfirmationPending', details: [[`${vault.vault}-${vault.chainId}-${vault.depositCcy}`, { ids: [], status: PositionStatus.PENDING, confirmation: { hash: e.hash, chainId: e.chainId, reason: e.reason } }]] });
+        throw e;
+      }
       cb({
         status: 'SubmitFailed',
         details: [
@@ -564,6 +587,10 @@ export class AutomatorCreatorService {
       }
       return automatorAddressArr[0];
     } catch (e) {
+      if (isTransactionConfirmationPendingError(e)) {
+        cb({ status: 'ConfirmationPending', details: [[`--`, { ids: ['QueryReceipt'], status: PositionStatus.PENDING, confirmation: { hash: e.hash, chainId: e.chainId, reason: e.reason } }]] });
+        throw e;
+      }
       cb({
         status: 'SubmitFailed',
         details: [[`--`, { ids: [], status: PositionStatus.FAILED, error: e }]],

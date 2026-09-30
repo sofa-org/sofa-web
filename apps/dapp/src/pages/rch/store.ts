@@ -1,6 +1,7 @@
 import { defaultChain } from '@sofa/services/chains';
 import { AirdropRecord, AirdropStatus, RCHService } from '@sofa/services/rch';
 import { WalletService } from '@sofa/services/wallet';
+import { isTransactionConfirmationPendingError } from '@sofa/services/transaction-confirmation';
 import { simplePlus } from '@sofa/utils/object';
 import { computed } from '@sofa/utils/zustand';
 import { createWithEqualityFn } from 'zustand/traditional';
@@ -78,6 +79,7 @@ export const useRCHState = Object.assign(
         ),
       }));
       return RCHService.claimAirdrop(claimableList).catch((err) => {
+        if (isTransactionConfirmationPendingError(err)) throw err;
         useRCHState.setState((pre) => ({
           ...pre,
           myAirdropList: pre.myAirdropList?.map(($it) =>

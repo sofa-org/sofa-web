@@ -21,6 +21,7 @@ import {
 } from './positions';
 import { PositionStatus } from './the-graph';
 import { WalletService } from './wallet';
+import { isTransactionConfirmationPendingError } from './transaction-confirmation';
 
 // server 返回的结构
 export interface OriginAutomatorUserPosition {
@@ -230,8 +231,10 @@ export class AutomatorUserService {
       const key = `${vault.vault.toLowerCase()}-${vault.chainId}-${
         vault.depositCcy
       }`;
+      let submittedHash: string | undefined;
       return transactionCall(vault, ...args)
         .then(async (hash) => {
+          submittedHash = hash;
           safeRun(cb, {
             status: 'QueryResult',
             details: [
@@ -256,7 +259,7 @@ export class AutomatorUserService {
           const error =
             res.status === TransactionStatus.FAILED ? res.error : undefined;
           safeRun(cb, {
-            status: status === PositionStatus.FAILED ? 'All Failed' : 'Success',
+            status: res.status === TransactionStatus.FAILED ? 'All Failed' : 'Success',
             details: [
               [
                 key,
@@ -272,6 +275,10 @@ export class AutomatorUserService {
         })
         .catch((error) => {
           console.error(error);
+          if (isTransactionConfirmationPendingError(error)) {
+            safeRun(cb, { status: 'ConfirmationPending', details: [[key, { status: statusMap.before, ...(submittedHash ? { hash: submittedHash } : {}), ids: [], confirmation: { hash: error.hash, chainId: error.chainId, reason: error.reason } }]] });
+            return;
+          }
           safeRun(cb, {
             status: 'SubmitFailed',
             details: [

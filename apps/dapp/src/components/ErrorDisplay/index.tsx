@@ -8,6 +8,8 @@ import { Comp as IconCopy } from '@/assets/icon-copy.svg';
 import { addI18nResources } from '@/locales';
 
 import { getErrorSummary } from './errorMapping';
+import { isTransactionConfirmationPendingError } from '@sofa/services/transaction-confirmation';
+import { HashDisplay } from '../HashDisplay';
 import locale from './locale';
 
 import styles from './index.module.scss';
@@ -39,6 +41,14 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = (props) => {
   const [t, { language }] = useTranslation('ErrorDisplay');
 
   const rawError = getErrorMsg(error);
+  if (isTransactionConfirmationPendingError(error)) {
+    return (
+      <div className={styles['summary']}>
+        {t('A transaction is awaiting confirmation. Check its status before trying again.')}{' '}
+        <HashDisplay chainId={error.chainId}>{error.hash}</HashDisplay>
+      </div>
+    );
+  }
   const summary = getErrorSummary(rawError, language);
 
   const idsLabel = context?.idsLabel;

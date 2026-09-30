@@ -23,6 +23,7 @@ import { isMockEnabled } from '@sofa/services/mock';
 import { displayPercentage } from '@sofa/utils/amount';
 import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
+import { isTransactionConfirmationPendingError } from '@sofa/services/transaction-confirmation';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { pollingUntil } from '@sofa/utils/http';
 import { formatHighlightedText } from '@sofa/utils/string';
@@ -30,8 +31,11 @@ import classNames from 'classnames';
 import { copy } from 'clipboard';
 
 import AsyncButton from '@/components/AsyncButton';
+import { HashDisplay } from '@/components/HashDisplay';
 import { useIsMobileUI } from '@/components/MobileOnly';
+import pendingLocale from '@/components/PendingTransactionConfirmations/locale';
 import { useWalletStore } from '@/components/WalletConnector/store';
+import { addI18nResources } from '@/locales';
 
 import { useAutomatorCreatorStore } from '../automator-mine/store';
 
@@ -45,6 +49,8 @@ import {
 import { AutomatorRiskExposures } from './util';
 
 import styles from './index-model.module.scss';
+
+addI18nResources(pendingLocale, 'PendingTransactionConfirmations');
 
 const steps: {
   arrived: (store: AutomatorCreateStoreType) => boolean;
@@ -86,6 +92,7 @@ const steps: {
 ];
 const StepStart = () => {
   const [t] = useTranslation('AutomatorCreate');
+  const [tPending] = useTranslation('PendingTransactionConfirmations');
   const { chainId, address } = useWalletStore();
   const { payload } = useAutomatorCreateStore();
   const burn = useLazyCallback(async () => {
@@ -126,7 +133,16 @@ const StepStart = () => {
       });
     } catch (e) {
       console.error('error burn rch for automator creation', e);
-      Toast.error(getErrorMsg(e));
+      if (isTransactionConfirmationPendingError(e))
+        Toast.warning({
+          content: (
+            <>
+              {tPending('A transaction is awaiting confirmation. Check its status before trying again.')}{' '}
+              <HashDisplay chainId={e.chainId}>{e.hash}</HashDisplay>
+            </>
+          ),
+        });
+      else Toast.error(getErrorMsg(e));
     }
   });
   return (
@@ -176,6 +192,7 @@ const StepBurning = () => {
 const StepForm = () => {
   const api = useRef<FormApi>();
   const [t] = useTranslation('AutomatorCreate');
+  const [tPending] = useTranslation('PendingTransactionConfirmations');
   const { payload, updatePayload } = useAutomatorCreateStore();
   const { address, chainId } = useWalletStore();
   const isMobileUI = useIsMobileUI();
@@ -264,7 +281,16 @@ const StepForm = () => {
       });
     } catch (e) {
       console.error(e);
-      Toast.error(getErrorMsg(e));
+      if (isTransactionConfirmationPendingError(e)) {
+        Toast.warning({
+          content: (
+            <>
+              {tPending('A transaction is awaiting confirmation. Check its status before trying again.')}{' '}
+              <HashDisplay chainId={e.chainId}>{e.hash}</HashDisplay>
+            </>
+          ),
+        });
+      } else Toast.error(getErrorMsg(e));
       useAutomatorCreateStore.setState({
         automatorCreating: false,
       });

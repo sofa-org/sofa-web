@@ -1,5 +1,6 @@
 export default {
   'en-US': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': 'A transaction is awaiting confirmation. Check its status before trying again.',
     'Submitting...': 'Submitting...',
     Vault: 'Vault',
     Chain: 'Chain',
@@ -33,6 +34,7 @@ export default {
     Total: 'Total',
   },
   'ja-JP': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': 'トランザクションの確認待ちです。再試行する前に、状況をご確認ください。',
     Vault: 'ヴォルト',
     Chain: 'チェーン',
     'Transaction Hash': 'トランザクションハッシュ',
@@ -56,6 +58,7 @@ export default {
     Total: '合計',
   },
   'ru-RU': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': 'Транзакция ожидает подтверждения. Проверьте её статус, прежде чем повторять действие.',
     Vault: 'Хранилище',
     Chain: 'Цепь',
     'Transaction Hash': 'Хэш транзакции',
@@ -79,6 +82,7 @@ export default {
     Total: 'Итого',
   },
   'zh-CN': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': '有一笔交易仍在等待确认。请先查看交易状态，再决定是否重试。',
     'Submitting...': '正在提交...',
     Vault: '金库',
     Chain: '链',
@@ -112,6 +116,7 @@ export default {
     Total: '总计',
   },
   'zh-HK': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': '有一筆交易仍在等待確認。請先查看交易狀態，再決定是否重試。',
     Vault: '金庫',
     Chain: '鏈',
     'Transaction Hash': '交易哈希',
@@ -135,6 +140,7 @@ export default {
     Total: '總計',
   },
   'zh-TW': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': '有一筆交易仍在等待確認。請先查看交易狀態，再決定是否重試。',
     Vault: '金庫',
     Chain: '鏈',
     'Transaction Hash': '交易哈希',

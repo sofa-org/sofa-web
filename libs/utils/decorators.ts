@@ -136,7 +136,8 @@ export function asyncCache(options?: CacheRequestOptions<'ASYNC'>) {
       const id = genId(name, args, this);
       if (!id) return oldRequest.apply(this, args);
       const cacheValue = await getCacheValue(id);
-      if (until(cacheValue?.value, cacheValue?.createdAt, id, this, args)) {
+      // Resolve async predicates before deciding whether to refresh or use cache.
+      if (await until(cacheValue?.value, cacheValue?.createdAt, id, this, args)) {
         return promiseOnPending(
           async () => {
             const val = await oldRequest.apply(this, args);
