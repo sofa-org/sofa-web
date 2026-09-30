@@ -152,8 +152,11 @@ export const PositionClaimProgress = forwardRef<
         title: t('Transaction Hash'),
         key: 'hash',
         render: (_, it) =>
-          toArray(it[1]?.hash).map((hash) => (
-            <HashDisplay key={hash} chainId={props.chainId}>
+          [...new Set([
+            ...toArray(it[1]?.hash),
+            ...(it[1]?.confirmation ? [it[1].confirmation.hash] : []),
+          ])].map((hash) => (
+            <HashDisplay key={hash} chainId={hash === it[1]?.confirmation?.hash ? it[1].confirmation.chainId : props.chainId}>
               {hash}
             </HashDisplay>
           )) || '-',
@@ -276,6 +279,12 @@ export const PositionClaimProgress = forwardRef<
           {renderTable(900)}
         </div>,
       ];
+    }
+    if (progress.status === 'ConfirmationPending') {
+      return [900, <div className={styles['claim-progress']}>
+        <span className={styles['claim-progress-title']}>{t('A transaction is awaiting confirmation. Check its status before trying again.')}</span>
+        {renderTable(900)}
+      </div>];
     }
     if (progress.status === 'All Failed') {
       return [

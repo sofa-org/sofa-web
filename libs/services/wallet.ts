@@ -1,6 +1,5 @@
 import { asyncRetry, asyncShare } from '@sofa/utils/decorators';
 import { getErrorMsg, isNullLike } from '@sofa/utils/fns';
-import { pollingUntil } from '@sofa/utils/http';
 import { reMsgError } from '@sofa/utils/object';
 import { sentry } from '@sofa/utils/sentry';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
@@ -21,6 +20,7 @@ import {
 import { ProductQuoteResult, ProductType } from './products';
 import { PositionInfoInGraph } from './the-graph';
 import { WalletConnect } from './wallet-connect';
+import { registerPendingTransactionConfirmation, removePendingTransactionConfirmation, TransactionConfirmationPendingError, updatePendingTransactionConfirmation, withConfirmationAttemptTimeout } from './transaction-confirmation';
 
 export interface BurnProductParams {
   positionId: PositionInfoInGraph['productId'];
@@ -67,7 +67,6 @@ export class WalletService {
         return res;
       })
       .catch((err) => {
-        WalletService.disconnect();
         if (/-32002/.test(getErrorMsg(err)) || err?.code === -32002) {
           throw reMsgError(
             err,
@@ -198,11 +197,11 @@ export class WalletService {
       ],
     );
     const network = await signer.provider._detectNetwork();
-    const succ = await WalletService.transactionResult(
+    const result = await WalletService.transactionResult(
       hash,
       Number(network.chainId),
-    ).then((res) => res.status === TransactionStatus.SUCCESS);
-    if (!succ)
+    );
+    if (result.status !== TransactionStatus.SUCCESS)
       throw new Error(
         `Please approve ${approveTo} to proceed with the transaction`,
       );
@@ -606,54 +605,40 @@ export class WalletService {
         logs: ethers.Log[];
       }
   > {
-    const timeoutMs = 60 * 1000;
+    const timeoutMs = 60_000;
     const startAt = Date.now();
-    const poll = async () => {
-      if (Date.now() - startAt > timeoutMs) {
-        return {
-          status: TransactionStatus.FAILED,
-          error: new Error('Tx timeout'),
-        } as const;
-      }
-      console.info('Get transaction result of hash', { hash, chainId });
-      const provider = await WalletService.readonlyConnect(+chainId);
-      const receipt = await provider.getTransactionReceipt(hash);
-      if (!receipt) return { status: TransactionStatus.PENDING } as const;
-      if (Number(receipt.status) !== 1) {
-        try {
-          const tx = await provider.getTransaction(hash);
-          if (tx?.to) {
-            await provider.call({
-              to: tx.to,
-              from: tx.from,
-              data: tx.data,
-              value: tx.value,
-              blockTag: receipt.blockNumber,
-            });
-          }
-        } catch (error) {
-          return { status: TransactionStatus.FAILED, error } as const;
+    registerPendingTransactionConfirmation(hash, +chainId, startAt);
+    let latestReadFailed = false;
+    let lastError: unknown;
+    while (Date.now() - startAt < timeoutMs) {
+      const remaining = timeoutMs - (Date.now() - startAt);
+      try {
+        const receipt = await withConfirmationAttemptTimeout(
+          WalletService.readonlyConnect(+chainId).then((provider) => provider.getTransactionReceipt(hash)),
+          Math.min(10_000, remaining),
+        );
+        latestReadFailed = false;
+        const receiptStatus = (() => {
+          const status: unknown = receipt?.status;
+          if (status === 1 || status === '1' || status === '0x1') return 1;
+          if (status === 0 || status === '0' || status === '0x0') return 0;
+          return undefined;
+        })();
+        if (receipt && receiptStatus === 1) {
+          removePendingTransactionConfirmation(hash, +chainId);
+          return { status: TransactionStatus.SUCCESS, logs: receipt.logs };
         }
-        return { status: TransactionStatus.FAILED } as const;
-      }
-      return {
-        status: TransactionStatus.SUCCESS,
-        logs: receipt.logs,
-      } as const;
-    };
-    return pollingUntil(
-      () => poll().catch(() => ({ status: TransactionStatus.PENDING })),
-      (s) => s.status !== TransactionStatus.PENDING,
-      1000,
-    ).then(
-      (res) =>
-        res[res.length - 1] as
-          | { status: TransactionStatus.FAILED }
-          | {
-              status: TransactionStatus.SUCCESS;
-              logs: ethers.Log[];
-            },
-    );
+        if (receipt && receiptStatus === 0) {
+          removePendingTransactionConfirmation(hash, +chainId);
+          return { status: TransactionStatus.FAILED };
+        }
+      } catch (error) { latestReadFailed = true; lastError = error; }
+      const remainingAfterRead = timeoutMs - (Date.now() - startAt);
+      if (remainingAfterRead > 0) await new Promise((resolve) => setTimeout(resolve, Math.min(1000, remainingAfterRead)));
+    }
+    const reason = latestReadFailed ? 'rpc-unavailable' : 'timeout';
+    updatePendingTransactionConfirmation(hash, +chainId, reason);
+    throw new TransactionConfirmationPendingError(hash, +chainId, reason, { cause: lastError });
   }
 
   private static async $burnBatch(

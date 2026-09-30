@@ -31,6 +31,7 @@ import {
   TransactionInfoInGraph,
 } from './the-graph';
 import { WalletService } from './wallet';
+import { isTransactionConfirmationPendingError } from './transaction-confirmation';
 
 export interface PositionParams {
   chainId?: number; //
@@ -148,6 +149,7 @@ export interface TransactionProgress {
   status:
     | 'Submitting'
     | 'SubmitFailed'
+    | 'ConfirmationPending'
     | 'QueryResult'
     | 'Success'
     | 'Partial Failed'
@@ -159,6 +161,7 @@ export interface TransactionProgress {
       status: PositionStatus;
       hash?: string | string[];
       error?: unknown;
+      confirmation?: { hash: string; chainId: number; reason: 'timeout' | 'rpc-unavailable' };
     },
   ])[];
 }
@@ -585,6 +588,10 @@ export class PositionsService {
       })
       .catch((error) => {
         console.error(error);
+        if (isTransactionConfirmationPendingError(error)) {
+          safeRun(cb, { status: 'ConfirmationPending', details: [[key, { status: PositionStatus.PENDING, ids: [params.quote.quoteId], confirmation: { hash: error.hash, chainId: error.chainId, reason: error.reason } }]] });
+          return;
+        }
         safeRun(cb, {
           status: 'SubmitFailed',
           details: [
@@ -641,7 +648,7 @@ export class PositionsService {
               it[0],
               {
                 ...it[1],
-                status: it[1].error
+                status: it[1].error && !isTransactionConfirmationPendingError(it[1].error)
                   ? PositionStatus.FAILED
                   : PositionStatus.PENDING,
                 ids: it[1].quoteIds,
@@ -656,16 +663,28 @@ export class PositionsService {
             return [
               key,
               {
-                status: PositionStatus.FAILED,
+                status: isTransactionConfirmationPendingError(info?.error)
+                  ? PositionStatus.PENDING
+                  : PositionStatus.FAILED,
                 error: info?.error,
                 ids: info?.quoteIds,
+                ...(isTransactionConfirmationPendingError(info?.error)
+                  ? { confirmation: { hash: info.error.hash, chainId: info.error.chainId, reason: info.error.reason } }
+                  : {}),
               },
             ] as const;
           const chainId = +key.split('-')[1];
-          const { status, error } = await PositionsService.depositResult(
-            info.hash,
-            chainId,
-          );
+          let status: PositionStatus;
+          let error: unknown;
+          let confirmation: { hash: string; chainId: number; reason: 'timeout' | 'rpc-unavailable' } | undefined;
+          try {
+            ({ status, error } = await PositionsService.depositResult(info.hash, chainId));
+          } catch (err) {
+            if (!isTransactionConfirmationPendingError(err)) throw err;
+            status = PositionStatus.PENDING;
+            error = err;
+            confirmation = { hash: err.hash, chainId: err.chainId, reason: err.reason || 'timeout' };
+          }
           return [
             key,
             {
@@ -673,11 +692,14 @@ export class PositionsService {
               hash: info.hash,
               ids: info.quoteIds,
               ...(error ? { error } : {}),
+              ...(confirmation ? { confirmation } : {}),
             },
           ] as const;
         }),
       );
-      safeRun(cb, { status: map[hashes.code], details });
+      const pending = details.some(([, detail]) => detail.confirmation);
+      const failed = details.filter(([, detail]) => detail.status === PositionStatus.FAILED).length;
+      safeRun(cb, { status: pending ? 'ConfirmationPending' : details.length > 0 && failed === details.length ? 'All Failed' : failed ? 'Partial Failed' : 'Success', details });
     });
   }
 
@@ -714,6 +736,10 @@ export class PositionsService {
       })
       .catch((error) => {
         console.error(error);
+        if (isTransactionConfirmationPendingError(error)) {
+          safeRun(cb, { status: 'ConfirmationPending', details: [[key, { status: PositionStatus.PENDING, ids: [params.positionId], confirmation: { hash: error.hash, chainId: error.chainId, reason: error.reason } }]] });
+          return;
+        }
         safeRun(cb, {
           status: 'SubmitFailed',
           details: [
@@ -750,7 +776,7 @@ export class PositionsService {
               {
                 ...it[1],
                 ids: it[1].positionIds,
-                status: it[1].error
+                status: it[1].error && !isTransactionConfirmationPendingError(it[1].error)
                   ? PositionStatus.FAILED
                   : PositionStatus.PENDING,
               },
@@ -764,23 +790,28 @@ export class PositionsService {
             return [
               key,
               {
-                status: PositionStatus.FAILED,
+                status: isTransactionConfirmationPendingError(info?.error) ? PositionStatus.PENDING : PositionStatus.FAILED,
                 error: info?.error,
                 ids: info.positionIds,
+                ...(isTransactionConfirmationPendingError(info?.error) ? { confirmation: { hash: info.error.hash, chainId: info.error.chainId, reason: info.error.reason } } : {}),
               },
             ] as const;
           const chainId = +key.split('-')[1];
-          const status = await PositionsService.claimResult(
-            info.hash[0],
-            chainId,
-          );
-          return [
-            key,
-            { status, hash: info.hash, ids: info.positionIds },
-          ] as const;
+          const outcomes = await Promise.all(info.hash.map(async (hash) => {
+            try { return { hash, status: await PositionsService.claimResult(hash, chainId) }; }
+            catch (error) {
+              if (!isTransactionConfirmationPendingError(error)) return { hash, status: PositionStatus.FAILED, error };
+              return { hash, status: PositionStatus.PENDING, confirmation: { hash, chainId, reason: error.reason }, error };
+            }
+          }));
+          const confirmation = outcomes.find((item) => 'confirmation' in item)?.confirmation;
+          const status = confirmation ? PositionStatus.PENDING : outcomes.every((item) => item.status === PositionStatus.CLAIMED) ? PositionStatus.CLAIMED : PositionStatus.FAILED;
+          return [key, { status, hash: info.hash, ids: info.positionIds, ...(confirmation ? { confirmation, error: outcomes.find((item) => 'confirmation' in item)?.error } : {}) }] as const;
         }),
       );
-      safeRun(cb, { status: map[hashes.code], details });
+      const pending = details.some(([, detail]) => detail.confirmation);
+      const failed = details.filter(([, detail]) => detail.status === PositionStatus.FAILED).length;
+      safeRun(cb, { status: pending ? 'ConfirmationPending' : details.length > 0 && failed === details.length ? 'All Failed' : failed ? 'Partial Failed' : 'Success', details });
     });
   }
 
@@ -792,7 +823,7 @@ export class PositionsService {
     return WalletService.transactionResult(hash, chainId).then(async (s) => {
       const status = await (async () => {
         if (s.status === TransactionStatus.FAILED)
-          return PositionStatus.EXPIRED;
+          return PositionStatus.FAILED;
         // await pollingUntil(
         //   () =>
         //     TheGraphService.transactions({ chainId, hash }).catch(console.warn),

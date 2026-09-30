@@ -13,6 +13,7 @@ import AsyncButton from '../AsyncButton';
 
 import locale from './locale';
 import { useWalletStore, useWalletUIState } from './store';
+import { PendingTransactionConfirmations } from '../PendingTransactionConfirmations';
 
 import styles from './index.module.scss';
 
@@ -82,6 +83,7 @@ const WalletConnector = (
         footer={null}
       >
         <Address address={wallet.address!} className={styles['address']} />
+        <PendingTransactionConfirmations visible={connectVisible} />
         <AsyncButton
           size={'large'}
           block

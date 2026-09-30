@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('./storage', () => ({
   get: vi.fn(),
@@ -14,11 +14,16 @@ import {
   beforeRunAsync,
   cache,
   catchErrorAsync,
+  DecoratorMemoryCache,
   once,
   paramsCvt,
   paramsCvtNew,
   shareSubscribe,
 } from '../decorators'; // Update the import path to your decorators file
+
+beforeEach(() => {
+  DecoratorMemoryCache.clear();
+});
 
 describe('cache decorator', () => {
   it('caches function results', () => {
@@ -62,6 +67,92 @@ describe('asyncCache decorator', () => {
     const instance = new TestClass();
     await expect(instance.testMethod()).resolves.toBe('result');
     // Further logic to test async caching behavior goes here
+  });
+
+  it('awaits async false predicates and returns the cached value on hits', async () => {
+    const shouldRefresh = vi.fn(async (value: unknown) => value === undefined);
+    class TestClass {
+      calls = 0;
+      @asyncCache({ until: shouldRefresh })
+      async testMethod() {
+        return ++this.calls;
+      }
+    }
+
+    const instance = new TestClass();
+    await expect(instance.testMethod()).resolves.toBe(1);
+    await expect(instance.testMethod()).resolves.toBe(1);
+    expect(instance.calls).toBe(1);
+    expect(shouldRefresh).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes when an async predicate resolves true', async () => {
+    const shouldRefresh = vi.fn(
+      async (value: unknown) => value === undefined || value === 1,
+    );
+    class TestClass {
+      calls = 0;
+      @asyncCache({ until: shouldRefresh })
+      async testMethod() {
+        return ++this.calls;
+      }
+    }
+
+    const instance = new TestClass();
+    await expect(instance.testMethod()).resolves.toBe(1);
+    await expect(instance.testMethod()).resolves.toBe(2);
+    expect(instance.calls).toBe(2);
+  });
+
+  it('preserves synchronous predicate behavior', async () => {
+    const shouldRefresh = vi.fn((_value: unknown) => _value === undefined);
+    class TestClass {
+      calls = 0;
+      @asyncCache({ until: shouldRefresh })
+      async testMethod() {
+        return ++this.calls;
+      }
+    }
+
+    const instance = new TestClass();
+    await expect(instance.testMethod()).resolves.toBe(1);
+    await expect(instance.testMethod()).resolves.toBe(1);
+    expect(instance.calls).toBe(1);
+  });
+
+  it('coalesces concurrent refreshes with an async predicate', async () => {
+    let resolveWork!: (value: number) => void;
+    class TestClass {
+      calls = 0;
+      @asyncCache({ until: async () => true })
+      testMethod() {
+        this.calls++;
+        return new Promise<number>((resolve) => {
+          resolveWork = resolve;
+        });
+      }
+    }
+
+    const instance = new TestClass();
+    const first = instance.testMethod();
+    const second = instance.testMethod();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(instance.calls).toBe(1);
+    resolveWork(42);
+    await expect(Promise.all([first, second])).resolves.toEqual([42, 42]);
+  });
+
+  it('propagates rejected predicates to the caller', async () => {
+    const error = new Error('predicate failed');
+    class TestClass {
+      @asyncCache({ until: async () => { throw error; } })
+      async testMethod() {
+        return 'result';
+      }
+    }
+
+    await expect(new TestClass().testMethod()).rejects.toBe(error);
   });
 });
 

@@ -4,10 +4,7 @@ import { asyncCache, asyncShare } from '@sofa/utils/decorators';
 import { Env } from '@sofa/utils/env';
 import { getErrorMsg } from '@sofa/utils/fns';
 import { reMsgError } from '@sofa/utils/object';
-import {
-  EIP6963ProviderDetail,
-  getProviderByEip6963,
-} from '@sofa/utils/wallet/eip-6963';
+import { getProviderByEip6963 } from '@sofa/utils/wallet/eip-6963';
 import { WalletTgSdk } from '@uxuycom/web3-tg-sdk';
 import { createWeb3Modal, defaultConfig } from '@web3modal/ethers';
 import {
@@ -209,51 +206,13 @@ export class WalletConnect {
     );
   }
 
-  @asyncCache({
-    until: async (pre, t, _, __, [chainId]) => {
-      if (!pre || !t) return true;
-      const network = await (pre as JsonRpcProvider)._detectNetwork();
-      return Number(network.chainId) !== chainId;
-    },
-  })
+  @asyncCache()
   static async getProvider(chainId: number) {
-    const modal = await WalletConnect.getModal();
-    const modalProvider = modal.getWalletProvider();
-    // @ts-ignore
-    const providers: EIP6963ProviderDetail[] = modal.EIP6963Providers;
-    if (
-      modalProvider &&
-      providers.every((it) => it.provider !== modalProvider)
-    ) {
-      providers.push({
-        info: {
-          name: 'walletConnect',
-          icon: '',
-          rdns: '',
-          uuid: nanoid(),
-        },
-        provider: modalProvider,
-      });
-    }
-    let provider: BrowserProvider | undefined;
-    for (let i = 0; i < (providers?.length || 0); i += 1) {
-      const p = new BrowserProvider(providers![i].provider);
-      const network = await p._detectNetwork();
-      if (Number(network.chainId) === chainId) {
-        provider = p;
-        break;
-      }
-    }
-    console.info('Get Read Only Provider', {
-      chainId,
-      provider,
-      providers,
-      modal,
-    });
-    if (provider) return provider;
-    const p = new JsonRpcProvider(ChainMap[chainId].rpcUrl, chainId);
-    await p._detectNetwork();
-    return p;
+    checkChainId(chainId);
+    const rpcUrl = ChainMap[chainId].rpcUrl;
+    if (!rpcUrl)
+      throw new Error(`Missing RPC URL configuration for chain ${chainId}`);
+    return new JsonRpcProvider(rpcUrl, chainId);
   }
 
   @asyncShare()
@@ -293,8 +252,40 @@ export class WalletConnect {
     'originProvider' | 'provider' | 'signer'
   > & {
     chainId: number;
+    rawProvider?: Eip1193Provider;
     disconnect(): void;
   };
+  private static _generation = 0;
+  private static _connectedRaw?: Eip1193Provider;
+  private static _disconnectedRaw?: Eip1193Provider;
+  private static _disconnectHandler?: () => void;
+  private static _connectPromises = new Map<string, Promise<any>>();
+  private static _rawProviderIds = new WeakMap<object, number>();
+  private static _nextRawProviderId = 0;
+
+  private static clearWallet() {
+    WalletConnect._generation += 1;
+    const raw = WalletConnect._connectedRaw as any;
+    if (raw && WalletConnect._disconnectHandler) {
+      if (raw.removeListener) raw.removeListener('disconnect', WalletConnect._disconnectHandler);
+      else raw.off?.('disconnect', WalletConnect._disconnectHandler);
+    }
+    WalletConnect._connectedRaw = undefined;
+    WalletConnect._disconnectHandler = undefined;
+    WalletConnect._wallet = undefined;
+  }
+  private static async getSelectedRaw(modal: Awaited<ReturnType<typeof WalletConnect.getModal>>) {
+    if (Env.isMobile && !Env.isTelegram) {
+      const matches = await getProviderByEip6963();
+      if (matches?.length === 1) return matches[0].provider;
+    }
+    return modal.getWalletProvider();
+  }
+  private static isCurrentSubscribedProvider(provider: Eip1193Provider) {
+    return WalletConnect._disconnectedRaw !== provider &&
+      (!WalletConnect._connectedRaw || WalletConnect._connectedRaw === provider) &&
+      (!WalletConnect._wallet || WalletConnect._wallet.rawProvider === provider);
+  }
   static async connect(
     chainId: number,
     switchNetwork = true,
@@ -303,15 +294,88 @@ export class WalletConnect {
       disconnect(): void;
     }
   > {
-    if (WalletConnect._wallet && WalletConnect._wallet.chainId === chainId) {
-      return WalletConnect._wallet;
-    }
     checkChainId(chainId);
+    const operationGeneration = WalletConnect._generation;
     const modal = await WalletConnect.getModal();
+    const selected = await WalletConnect.getSelectedRaw(modal);
+    if (operationGeneration !== WalletConnect._generation)
+      throw new Error('Wallet connection was cancelled');
+    let providerId = 'none';
+    if (selected && (typeof selected === 'object' || typeof selected === 'function')) {
+      let id = WalletConnect._rawProviderIds.get(selected as object);
+      if (id === undefined) {
+        id = ++WalletConnect._nextRawProviderId;
+        WalletConnect._rawProviderIds.set(selected as object, id);
+      }
+      providerId = String(id);
+    }
+    const key = `${providerId}:${chainId}:${switchNetwork}:${operationGeneration}`;
+    const pending = WalletConnect._connectPromises.get(key);
+    if (pending) return pending;
+    const request = WalletConnect.connectInternal(chainId, switchNetwork, operationGeneration);
+    WalletConnect._connectPromises.set(key, request);
+    try {
+      return await request;
+    } finally {
+      if (WalletConnect._connectPromises.get(key) === request)
+        WalletConnect._connectPromises.delete(key);
+    }
+  }
+
+  private static async connectInternal(
+    chainId: number,
+    switchNetwork: boolean,
+    generation: number,
+  ): Promise<
+    XRequired<Connector, 'originProvider' | 'provider' | 'signer'> & { disconnect(): void }
+  > {
+    checkChainId(chainId);
+    let requestGeneration = generation;
+    const cached = WalletConnect._wallet;
+    if (cached) {
+      try {
+        const modal = await WalletConnect.getModal();
+        const selected = await WalletConnect.getSelectedRaw(modal);
+        const raw = cached.rawProvider;
+        if (generation !== WalletConnect._generation || selected !== raw) throw new Error('Wallet selection changed');
+        const [networkResult, accountsResult] = raw
+          ? await Promise.all([
+              raw.request({ method: 'eth_chainId' }),
+              raw.request({ method: 'eth_accounts' }),
+            ])
+          : [undefined, undefined];
+        const currentChain =
+          networkResult === undefined
+            ? Number((await cached.provider.getNetwork()).chainId)
+            : Number(networkResult);
+        const accounts = Array.isArray(accountsResult)
+          ? (accountsResult as string[])
+          : [];
+        const address = await cached.signer.getAddress();
+        const selectedAfterValidation = await WalletConnect.getSelectedRaw(modal);
+        if (
+          generation === WalletConnect._generation && cached === WalletConnect._wallet &&
+          selectedAfterValidation === raw &&
+          currentChain === chainId &&
+          cached.chainId === chainId &&
+          accounts[0]?.toLowerCase() === address.toLowerCase()
+        ) return cached;
+      } catch {
+        if (generation !== WalletConnect._generation)
+          throw new Error('Wallet connection was cancelled');
+      }
+      if (generation !== WalletConnect._generation)
+        throw new Error('Wallet connection was cancelled');
+      if (WalletConnect._wallet === cached) WalletConnect.clearWallet();
+      requestGeneration = WalletConnect._generation;
+    }
+    const modal = await WalletConnect.getModal();
+    if (requestGeneration !== WalletConnect._generation) throw new Error('Wallet connection was cancelled');
 
     if (Env.isMobile && !Env.isTelegram) {
       const providers = await getProviderByEip6963();
       if (providers?.length === 1) {
+        const attemptGeneration = requestGeneration;
         const originProvider = providers[0].provider;
         await new BrowserProvider(originProvider).getSigner();
         const provider = await (async () => {
@@ -322,16 +386,38 @@ export class WalletConnect {
           return p;
         })();
         const signer = await provider.getSigner();
+        const currentProviders = await getProviderByEip6963();
+        if (attemptGeneration !== WalletConnect._generation || currentProviders?.length !== 1 || currentProviders[0].provider !== originProvider) throw new Error('Wallet selection changed during connection');
         modal.close();
         WalletConnect._wallet = {
           id: 'injected',
           type: 'injected',
           originProvider,
+          rawProvider: originProvider,
           provider,
           signer,
           chainId,
-          disconnect: () => modal.disconnect(),
+          disconnect: () => {
+            WalletConnect.clearWallet();
+            void modal.disconnect();
+          },
         };
+        WalletConnect._generation += 1;
+        const connectedGeneration = WalletConnect._generation;
+        const previousRaw = WalletConnect._connectedRaw as any;
+        if (previousRaw && WalletConnect._disconnectHandler) {
+          if (previousRaw.removeListener) previousRaw.removeListener('disconnect', WalletConnect._disconnectHandler);
+          else previousRaw.off?.('disconnect', WalletConnect._disconnectHandler);
+        }
+        WalletConnect._connectedRaw = originProvider;
+        WalletConnect._disconnectedRaw = undefined;
+        WalletConnect._disconnectHandler = () => {
+          if (WalletConnect._connectedRaw === originProvider && WalletConnect._generation === connectedGeneration) {
+            WalletConnect._disconnectedRaw = originProvider;
+            WalletConnect.clearWallet();
+          }
+        };
+        (originProvider as any).on?.('disconnect', WalletConnect._disconnectHandler);
         return WalletConnect._wallet;
       }
 
@@ -376,26 +462,14 @@ export class WalletConnect {
       });
     }
 
-    const originProvider =
-      modal.getWalletProvider() ||
-      (modal.getIsConnected() &&
-        (await (async () => {
-          const providers = await getProviderByEip6963();
-          if (providers?.length) {
-            const index = (name: string) =>
-              /metamask/i.test(name) ? 0 : /okx/i.test(name) ? 1 : 2;
-            return providers.sort(
-              (a, b) => index(a.info.name) - index(b.info.name),
-            )[0].provider;
-          }
-          return window.ethereum as never;
-        })()));
+    const originProvider = modal.getWalletProvider();
 
     if (!originProvider) throw new Error('Connect failed: User rejected');
 
     // @ts-ignore
     const connectors = modal.getConnectors();
     const connector = connectors.find((it) => it.provider === originProvider)!;
+    const attemptGeneration = requestGeneration;
     const provider = await (async () => {
       let p = new BrowserProvider(originProvider);
       if (switchNetwork) await WalletConnect.switchNetwork(p, chainId);
@@ -404,44 +478,88 @@ export class WalletConnect {
       return p;
     })();
     const signer = await provider.getSigner();
+    if (attemptGeneration !== WalletConnect._generation || modal.getWalletProvider() !== originProvider) throw new Error('Wallet selection changed during connection');
     modal.close();
     WalletConnect._wallet = {
       ...connector,
       imageUrl: connector?.imageUrl || iconWalletConnect,
       originProvider: originProvider,
+      rawProvider: originProvider,
       chainId,
       provider,
       signer,
-      disconnect: () => modal.disconnect(),
+      disconnect: () => {
+        WalletConnect.clearWallet();
+        void modal.disconnect();
+      },
     };
+    WalletConnect._generation += 1;
+    const connectedGeneration = WalletConnect._generation;
+    const previousRaw = WalletConnect._connectedRaw as any;
+    if (previousRaw && WalletConnect._disconnectHandler) {
+      if (previousRaw.removeListener) previousRaw.removeListener('disconnect', WalletConnect._disconnectHandler);
+      else previousRaw.off?.('disconnect', WalletConnect._disconnectHandler);
+    }
+    WalletConnect._connectedRaw = originProvider;
+    WalletConnect._disconnectedRaw = undefined;
+    WalletConnect._disconnectHandler = () => {
+      if (WalletConnect._connectedRaw === originProvider && WalletConnect._generation === connectedGeneration) {
+        WalletConnect._disconnectedRaw = originProvider;
+        WalletConnect.clearWallet();
+      }
+    };
+    (originProvider as any).on?.('disconnect', WalletConnect._disconnectHandler);
     return WalletConnect._wallet;
   }
 
   static async disconnect() {
+    WalletConnect.clearWallet();
     const modal = await WalletConnect.getModal();
     await modal.disconnect();
-    WalletConnect._wallet = undefined;
   }
 
   static async subscribeNetworkChange(cb: (chainId: number) => void) {
     const provider = await WalletConnect.$getModalProvider();
     if (!provider) return () => {};
-    let preNetwork = await new BrowserProvider(provider)._detectNetwork();
-    cb(Number(preNetwork.chainId));
+    let preChainId = (await new BrowserProvider(provider)._detectNetwork())
+      .chainId;
+    let eventEpoch = 0;
+    let active = true;
+    cb(Number(preChainId));
     const handler = (chain: string) => {
-      cb(Number(chain));
+      eventEpoch += 1;
+      if (!active || !WalletConnect.isCurrentSubscribedProvider(provider)) return;
+      const next = Number(chain);
+      if (next !== Number(preChainId) && WalletConnect._wallet?.rawProvider === provider) {
+        WalletConnect.clearWallet();
+      }
+      preChainId = BigInt(next);
+      cb(next);
     };
     if ('on' in provider) {
       // @ts-ignore
       provider.on('chainChanged', handler);
     }
-    const timer = setInterval(async () => {
-      const n = await new BrowserProvider(provider)._detectNetwork();
-      if (n.chainId !== preNetwork.chainId) cb(Number(n.chainId));
-      preNetwork = n;
+    const timer = setInterval(() => {
+      void (async () => {
+        const epoch = eventEpoch;
+        try {
+          const n = await new BrowserProvider(provider)._detectNetwork();
+          if (!active || epoch !== eventEpoch || !WalletConnect.isCurrentSubscribedProvider(provider)) return;
+          if (n.chainId !== preChainId) {
+            if (WalletConnect._wallet?.rawProvider === provider) {
+              WalletConnect.clearWallet();
+            }
+            cb(Number(n.chainId));
+          }
+          preChainId = n.chainId;
+        } catch { /* provider may be temporarily unavailable */ }
+      })();
     }, 3000);
     return () => {
-      clearTimeout(timer);
+      active = false;
+      eventEpoch += 1;
+      clearInterval(timer);
       // @ts-ignore
       if ('off' in provider) provider.off('chainChanged', handler);
     };
@@ -451,6 +569,7 @@ export class WalletConnect {
     const provider = await WalletConnect.$getModalProvider();
     if (!provider) return () => {};
     const p = new BrowserProvider(provider);
+    let active = true;
     const getAddress = async () => {
       const result = await p.send('eth_accounts', []);
       const accounts: string[] = result.result || result || [];
@@ -458,7 +577,10 @@ export class WalletConnect {
     };
     let address = await getAddress();
     const handler = (accounts: string[]) => {
-      WalletConnect._wallet = undefined;
+      if (!active || !WalletConnect.isCurrentSubscribedProvider(provider)) return;
+      if (WalletConnect._wallet?.rawProvider === provider) {
+        WalletConnect.clearWallet();
+      }
       cb(accounts[0]?.toLowerCase());
     };
     handler([address]);
@@ -466,14 +588,17 @@ export class WalletConnect {
       // @ts-ignore
       provider.on('accountsChanged', handler);
     }
-    const timer = setInterval(async () => {
-      const $address = await getAddress();
-      if ($address?.toLowerCase() !== address?.toLowerCase())
-        handler([$address]);
-      address = $address;
+    const timer = setInterval(() => {
+      void getAddress().then(($address) => {
+        if (!active || !WalletConnect.isCurrentSubscribedProvider(provider)) return;
+        if ($address?.toLowerCase() !== address?.toLowerCase())
+          handler([$address]);
+        address = $address;
+      }).catch(() => {});
     }, 3000);
     return () => {
-      clearTimeout(timer);
+      active = false;
+      clearInterval(timer);
       // @ts-ignore
       if ('off' in provider) provider.off('accountsChanged', handler);
     };

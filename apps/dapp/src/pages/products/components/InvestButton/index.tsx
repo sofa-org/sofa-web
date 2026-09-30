@@ -255,6 +255,7 @@ export const ProductInvestButton = (props: ProductInvestButtonProps) => {
       }
     };
     const judgeSuccess = (progress: TransactionProgress) => {
+      if (progress.status === 'ConfirmationPending') return;
       if (/Success|Partial/i.test(progress.status)) {
         progress.details?.forEach((it) => {
           if (it[1].status === PositionStatus.MINTED) {

@@ -92,8 +92,11 @@ export const AutomatorProgress = forwardRef<ProgressRef, ProgressProps>(
           title: t('Transaction Hash'),
           key: 'hash',
           render: (_, it) =>
-            toArray(it[1]?.hash).map(($it) => (
-              <HashDisplay chainId={props.chainId} key={$it}>
+            [...new Set([
+              ...toArray(it[1]?.hash),
+              ...(it[1]?.confirmation ? [it[1].confirmation.hash] : []),
+            ])].map(($it) => (
+              <HashDisplay chainId={$it === it[1]?.confirmation?.hash ? it[1].confirmation.chainId : props.chainId} key={$it}>
                 {$it}
               </HashDisplay>
             )),
@@ -203,6 +206,12 @@ export const AutomatorProgress = forwardRef<ProgressRef, ProgressProps>(
             {renderTable(900)}
           </div>,
         ];
+      }
+      if (progress.status === 'ConfirmationPending') {
+        return [900, <div className={styles['deposit-progress']}>
+          <span className={styles['deposit-progress-title']}>{t('A transaction is awaiting confirmation. Check its status before trying again.')}</span>
+          {renderTable(900)}
+        </div>];
       }
       if (progress.status === 'Partial Failed') {
         return [

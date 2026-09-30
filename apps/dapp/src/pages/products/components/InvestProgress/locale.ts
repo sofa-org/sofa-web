@@ -1,5 +1,6 @@
 export default {
   'en-US': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': 'A transaction is awaiting confirmation. Check its status before trying again.',
     'Submitting...': 'Submitting...',
     Vault: 'Vault',
     Chain: 'Chain',
@@ -23,6 +24,7 @@ export default {
     QuoteIds: 'QuoteIds',
   },
   'ja-JP': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': 'トランザクションの確認待ちです。再試行する前に、状況をご確認ください。',
     'Submitting...': '提出中...',
     Vault: 'ヴォルト',
     Chain: 'チェーン',
@@ -39,6 +41,7 @@ export default {
       '預金成功。<a href="{{url}}">ポジションページにアクセス</a>して成功記録を確認',
   },
   'ru-RU': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': 'Транзакция ожидает подтверждения. Проверьте её статус, прежде чем повторять действие.',
     'Submitting...': 'Отправка...',
     Vault: 'Хранилище',
     Chain: 'Сеть',
@@ -55,6 +58,7 @@ export default {
       'Депозит успешен. <a href="{{url}}">Перейдите на страницу позиции</a>, чтобы увидеть ваши успешные записи',
   },
   'zh-CN': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': '有一笔交易仍在等待确认。请先查看交易状态，再决定是否重试。',
     'Submitting...': '正在提交...',
     Vault: '金库',
     Chain: '链',
@@ -78,6 +82,7 @@ export default {
     QuoteIds: '报价编号',
   },
   'zh-HK': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': '有一筆交易仍在等待確認。請先查看交易狀態，再決定是否重試。',
     'Submitting...': '正在提交...',
     Vault: '金庫',
     Chain: '鏈',
@@ -94,6 +99,7 @@ export default {
       '存款成功。<a href="{{url}}">前往倉位頁面</a>查看您的成功記錄',
   },
   'zh-TW': {
+    'A transaction is awaiting confirmation. Check its status before trying again.': '有一筆交易仍在等待確認。請先查看交易狀態，再決定是否重試。',
     'Submitting...': '正在提交...',
     Vault: '金庫',
     Chain: '鏈',
