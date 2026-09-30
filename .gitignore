@@ -36,3 +36,5 @@ coverage
 .env-ai18n
 
 apps/**/*bot/**
+
+AGENTS.md

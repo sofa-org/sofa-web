@@ -28,7 +28,7 @@ const ERROR_PATTERNS: Array<{ pattern: RegExp; key: string }> = [
   { pattern: /Vault: deadline/, key: 'MINT_FAILED_TIMEOUT' },
   { pattern: /Vault: invalid maker signature/, key: 'INVALID_SIGNATURE' },
   { pattern: /Vault: signature consumed/, key: 'SIGNATURE_CONSUMED' },
-  { pattern: /missing revert data.*estimateGas/i, key: 'SIGNATURE_CONSUMED' },
+  { pattern: /missing revert data.*estimateGas/i, key: 'UNPREDICTABLE_GAS' },
   { pattern: /already claimed/i, key: 'ALREADY_CLAIMED' },
   { pattern: /automator already exists/, key: 'AUTOMATOR_ALREADY_EXISTS' },
   { pattern: /insufficient credits/, key: 'INSUFFICIENT_CREDITS' },
