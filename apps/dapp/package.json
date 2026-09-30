@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "concurrently \"vite\" \"nx run @sofa/alg:watch\"",
     "build": "tsc && vite build",
+    "test": "vitest run",
     "analyze": "tsc && cross-env ANALYZE=1 vite build && vite preview --open http://localhost:4173/analyze.html",
     "preview": "vite preview"
   },
@@ -81,6 +82,7 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react-swc": "^3.3.2",
+    "jsdom": "^24.0.0",
     "rollup-plugin-visualizer": "^5.9.2",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"

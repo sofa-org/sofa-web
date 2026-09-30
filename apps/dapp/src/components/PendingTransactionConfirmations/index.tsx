@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@douyinfe/semi-ui';
+import { Button, Toast } from '@douyinfe/semi-ui';
 import { TransactionStatus } from '@sofa/services/base-type';
 import { ChainMap } from '@sofa/services/chains';
 import { useTranslation } from '@sofa/services/i18n';
 import {
   getPendingTransactionConfirmations,
   PendingTransactionConfirmation,
-  removePendingTransactionConfirmation,
+  subscribePendingTransactionConfirmations,
 } from '@sofa/services/transaction-confirmation';
 import { WalletService } from '@sofa/services/wallet';
 
@@ -25,12 +25,12 @@ export const PendingTransactionConfirmations = ({
   const [t] = useTranslation('PendingTransactionConfirmations');
   const [items, setItems] = useState<PendingTransactionConfirmation[]>([]);
   const [checking, setChecking] = useState<string>();
-  const [confirmed, setConfirmed] = useState<Record<string, 'success' | 'failed'>>(
-    {},
-  );
   const refresh = () => setItems(getPendingTransactionConfirmations());
   useEffect(() => {
-    if (visible) refresh();
+    if (!visible) return;
+    const unsubscribe = subscribePendingTransactionConfirmations(refresh);
+    refresh();
+    return unsubscribe;
   }, [visible]);
   if (!visible || !items.length) return null;
   return (
@@ -58,49 +58,33 @@ export const PendingTransactionConfirmations = ({
                 t('Chain {{chainId}}', { chainId: item.chainId })}{' '}
               · <HashDisplay chainId={item.chainId}>{item.hash}</HashDisplay>
             </div>
-            <div>
-              {confirmed[key]
-                ? t(
-                    confirmed[key] === 'success'
-                      ? 'Confirmed successful'
-                      : 'Confirmed failed',
-                  )
-                : t('Awaiting confirmation')}
-            </div>
-            {!confirmed[key] && (
-              <Button
-                size="small"
-                loading={checking === key}
-                disabled={!!checking}
-                onClick={async () => {
-                  setChecking(key);
-                  try {
-                    const result = await WalletService.transactionResult(
-                      item.hash,
-                      item.chainId,
-                    );
-                    removePendingTransactionConfirmation(
-                      item.hash,
-                      item.chainId,
-                    );
-                    setConfirmed((pre) => ({
-                      ...pre,
-                      [key]:
-                        result.status === TransactionStatus.SUCCESS
-                          ? 'success'
-                          : 'failed',
-                    }));
-                  } catch {
-                    // A status check never resumes the original action.
-                    refresh();
-                  } finally {
-                    setChecking(undefined);
+            <div>{t('Awaiting confirmation')}</div>
+            <Button
+              size="small"
+              loading={checking === key}
+              disabled={!!checking}
+              onClick={async () => {
+                setChecking(key);
+                try {
+                  const result = await WalletService.transactionResult(
+                    item.hash,
+                    item.chainId,
+                  );
+                  if (result.status === TransactionStatus.SUCCESS) {
+                    Toast.success(t('Confirmed successful'));
+                  } else {
+                    Toast.error(t('Confirmed failed'));
                   }
-                }}
-              >
-                {t('Check status')}
-              </Button>
-            )}
+                } catch {
+                  // A status check never resumes the original action.
+                  refresh();
+                } finally {
+                  setChecking(undefined);
+                }
+              }}
+            >
+              {t('Check status')}
+            </Button>
           </div>
         );
       })}

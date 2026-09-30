@@ -72,6 +72,30 @@ pnpm nx run dapp:build --[env] --verbose
 pnpm nx run dapp:[other build command] --[env] --verbose
 ```
 
+## Tests
+
+Run the utils, services, and dapp tests from the repository root:
+
+```bash
+pnpm test
+```
+
+Each package has its own test script and Nx target. To run a package's tests individually:
+
+```bash
+pnpm nx run @sofa/utils:test
+pnpm nx run @sofa/services:test
+pnpm nx run dapp:test
+```
+
+Run the transaction regression tests and type checks directly without Nx:
+
+```bash
+pnpm --filter @sofa/services test
+pnpm --filter dapp test
+pnpm --filter dapp exec tsc --noEmit
+```
+
 ## Deploy
 
 Prepare:
