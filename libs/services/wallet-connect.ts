@@ -151,10 +151,6 @@ export class WalletConnect {
     provider: JsonRpcProvider | BrowserProvider,
     chainId: number,
   ) {
-    const currNetwork = await provider._detectNetwork();
-    if (Number(currNetwork.chainId) === chainId) return;
-    console.error(`Switch network to ${chainId}`);
-
     const networkData = {
       chainId: `0x${ChainMap[chainId].chainId.toString(16)}`,
       chainName: ChainMap[chainId].name,
@@ -162,6 +158,18 @@ export class WalletConnect {
       nativeCurrency: ChainMap[chainId].nativeCurrency,
       blockExplorerUrls: [ChainMap[chainId].explorerUrl],
     };
+
+    const verifyTargetChain = async () => {
+      const actualChain = Number(await provider.send('eth_chainId', []));
+      if (actualChain !== chainId)
+        throw new Error(
+          `Failed to switch to network - ${ChainMap[chainId].name}(${chainId}): wallet remains on chain ${actualChain}`,
+        );
+    };
+
+    const currentChain = Number(await provider.send('eth_chainId', []));
+    if (currentChain === chainId) return;
+    console.error(`Switch network to ${chainId}`);
 
     try {
       await provider.send('wallet_switchEthereumChain', [
@@ -180,6 +188,18 @@ export class WalletConnect {
               `Failed to add network - ${ChainMap[chainId].name}(${chainId}): ${m}`,
           );
         }
+        try {
+          await provider.send('wallet_switchEthereumChain', [
+            { chainId: networkData.chainId },
+          ]);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (retrySwitchError: any) {
+          throw reMsgError(
+            retrySwitchError.error || retrySwitchError,
+            (m) =>
+              `Failed to switch to network - ${ChainMap[chainId].name}(${chainId}): ${m}`,
+          );
+        }
       } else {
         throw reMsgError(
           switchError.error || switchError,
@@ -188,6 +208,7 @@ export class WalletConnect {
         );
       }
     }
+    await verifyTargetChain();
   }
 
   static async getValidConnectors(): Promise<
@@ -386,8 +407,14 @@ export class WalletConnect {
           return p;
         })();
         const signer = await provider.getSigner();
-        const currentProviders = await getProviderByEip6963();
+        const [currentProviders, actualChain] = switchNetwork
+          ? await Promise.all([
+              getProviderByEip6963(),
+              originProvider.request({ method: 'eth_chainId' }),
+            ])
+          : [await getProviderByEip6963(), undefined];
         if (attemptGeneration !== WalletConnect._generation || currentProviders?.length !== 1 || currentProviders[0].provider !== originProvider) throw new Error('Wallet selection changed during connection');
+        if (switchNetwork && Number(actualChain) !== chainId) throw new Error(`Wallet is on chain ${Number(actualChain)}; expected ${chainId}`);
         modal.close();
         WalletConnect._wallet = {
           id: 'injected',
@@ -479,6 +506,13 @@ export class WalletConnect {
     })();
     const signer = await provider.getSigner();
     if (attemptGeneration !== WalletConnect._generation || modal.getWalletProvider() !== originProvider) throw new Error('Wallet selection changed during connection');
+    if (switchNetwork) {
+      const actualChain = Number(await originProvider.request({ method: 'eth_chainId' }));
+      if (attemptGeneration !== WalletConnect._generation || modal.getWalletProvider() !== originProvider)
+        throw new Error('Wallet selection changed during connection');
+      if (actualChain !== chainId)
+        throw new Error(`Wallet is on chain ${actualChain}; expected ${chainId}`);
+    }
     modal.close();
     WalletConnect._wallet = {
       ...connector,
