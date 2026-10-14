@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { HorizontalTicker } from 'react-infinite-ticker';
 import { Rnd } from 'react-rnd';
+import { useTranslation } from '@sofa/services/i18n';
 import { amountFormatter } from '@sofa/utils/amount';
 import { useLazyCallback } from '@sofa/utils/hooks';
 import { useLocalStorageState, usePrevious } from 'ahooks';
@@ -14,14 +15,18 @@ import { Comp as IconArrowUp } from '@/assets/icon-arrow-up.svg';
 import { Comp as IconBTC } from '@/assets/icon-btc.svg';
 import { Comp as IconETH } from '@/assets/icon-eth.svg';
 import IconRCH from '@/assets/icon-rch.png';
+import { addI18nResources } from '@/locales';
 
 import 'swiper/css';
 
 import { MobileOnly, useIsMobileUI } from '../MobileOnly';
 
+import locale from './locale';
 import { useIndexPrices } from './store';
 
 import styles from './index.module.scss';
+
+addI18nResources(locale, 'IndexPrices');
 
 const ccyList = [
   { ccy: 'BTC' as CCY, icon: IconBTC, precision: 2 },
@@ -33,28 +38,51 @@ const ccyList = [
   },
 ];
 
-const IndexPrice = (props: { ccy: CCY }) => {
-  const price = useIndexPrices((state) => state.prices[props.ccy]);
+export const IndexPrice = (props: { ccy: CCY }) => {
+  const [t] = useTranslation('IndexPrices');
+  const quote = useIndexPrices((state) => state.quotes[props.ccy]);
+  const price = quote?.price;
   const ccyInfo = useMemo(
     () => ccyList.find((it) => it.ccy === props.ccy),
     [props.ccy],
   );
   const prePrice = usePrevious(price);
+  const direction =
+    price !== undefined &&
+    prePrice !== undefined &&
+    !quote?.error &&
+    price !== prePrice
+      ? price > prePrice
+        ? 'up'
+        : 'down'
+      : undefined;
   return (
     <div
       className={classNames(
         styles['index-price'],
         'index-price',
-        Number(price) >= Number(prePrice) ? styles['up'] : styles['down'],
+        direction && styles[direction],
         price === undefined ? styles['loading'] : undefined,
       )}
     >
       {ccyInfo?.icon && <ccyInfo.icon className={styles['icon-ccy']} />}
       {ccyInfo?.ccy}
       <span className={styles['price']}>
-        ${amountFormatter(price, ccyInfo?.precision)}
+        {price === undefined
+          ? '--'
+          : `$${amountFormatter(price, ccyInfo?.precision)}`}
       </span>
-      {Number(price) >= Number(prePrice) ? <IconArrowUp /> : <IconArrowDown />}
+      {price !== undefined && quote?.error && (
+        <span
+          className={styles['stale-label']}
+          role="status"
+          title={t('Not updated')}
+        >
+          {t('Not updated')}
+        </span>
+      )}
+      {direction === 'up' && <IconArrowUp />}
+      {direction === 'down' && <IconArrowDown />}
     </div>
   );
 };

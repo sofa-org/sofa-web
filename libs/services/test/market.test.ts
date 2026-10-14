@@ -15,12 +15,275 @@ vi.mock('../wallet-connect', () => ({
 import { DecoratorMemoryCache } from '@sofa/utils/decorators';
 import { http } from '@sofa/utils/http';
 
+import { defaultChain } from '../chains';
 import { MarketService } from '../market';
+import { WalletConnect } from '../wallet-connect';
+
+const pendingRequests: Array<() => void> = [];
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: Error) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  void promise.catch(() => {});
+  pendingRequests.push(() => reject(new Error('Test cleanup')));
+  return { promise, resolve, reject };
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
   DecoratorMemoryCache.clear();
   vi.stubGlobal('asyncStorage', { get: vi.fn(), set: vi.fn() });
+});
+
+describe('independent price subscriptions', () => {
+  let subscription: Subscription | undefined;
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(100000);
+    vi.mocked(http.get).mockImplementation(async (url) => {
+      if (url.includes('exchange-rate'))
+        return {
+          value: {
+            fromCcy: 'RCH',
+            toCcy: 'USD',
+            exchangeRate: 0.5,
+            dateTime: 100,
+          },
+        };
+      return { value: { price: url.includes('BTC') ? '60000' : '2000' } };
+    });
+    const provider =
+      deferred<Awaited<ReturnType<typeof WalletConnect.getProvider>>>();
+    vi.mocked(WalletConnect.getProvider).mockReturnValue(provider.promise);
+  });
+  afterEach(async () => {
+    await subscription?.unsubscribe();
+    defaultChain.zRCHAddress = undefined;
+    defaultChain.stRCHAddress = undefined;
+    pendingRequests.splice(0).forEach((reject) => reject());
+    await vi.advanceTimersByTimeAsync(0);
+  });
+
+  it('publishes RCH and ETH while BTC and RPC are pending, without publishing a partial snapshot', async () => {
+    const btc = deferred<{ value: { price: string } }>();
+    const normalGet = vi.mocked(http.get).getMockImplementation()!;
+    vi.mocked(http.get).mockImplementation((url, config) =>
+      url.includes('BTC') ? btc.promise : normalGet(url, config),
+    );
+    const snapshot = vi.fn();
+    const update = vi.fn();
+    subscription = MarketService.subscribeIndexPx(snapshot, update);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(update).toHaveBeenCalledWith({
+      ccy: 'RCH',
+      type: 'success',
+      quote: { price: 0.5, updatedAt: 100000 },
+    });
+    expect(update).toHaveBeenCalledWith({
+      ccy: 'ETH',
+      type: 'success',
+      quote: { price: 2000, updatedAt: 100000 },
+    });
+    expect(snapshot).not.toHaveBeenCalled();
+    expect(
+      vi
+        .mocked(http.get)
+        .mock.calls.filter(([url]) => url.includes('exchange-rate')),
+    ).toHaveLength(1);
+    btc.resolve({ value: { price: '60000' } });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ ccy: 'BTC', type: 'success' }),
+    );
+  });
+
+  it('keeps polling healthy coins while a timed-out RPC is still pending', async () => {
+    const update = vi.fn();
+    subscription = MarketService.subscribeIndexPx(vi.fn(), update);
+    await vi.advanceTimersByTimeAsync(31000);
+    expect(WalletConnect.getProvider).toHaveBeenCalledTimes(1);
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ ccy: 'scrvUSD', type: 'error' }),
+    );
+    expect(
+      update.mock.calls.filter(
+        ([event]) => event.ccy === 'RCH' && event.type === 'success',
+      ).length,
+    ).toBeGreaterThan(1);
+  });
+
+  it('reports a single coin failure and recovers on the next poll', async () => {
+    const normalGet = vi.mocked(http.get).getMockImplementation()!;
+    vi.mocked(http.get).mockImplementation(async (url, config) => {
+      if (url.includes('BTC') || config?.params?.ids === 'bitcoin')
+        throw new Error('BTC offline');
+      return normalGet(url, config);
+    });
+    const update = vi.fn();
+    subscription = MarketService.subscribeIndexPx(vi.fn(), update);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ ccy: 'BTC', type: 'error' }),
+    );
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ ccy: 'RCH', type: 'success' }),
+    );
+    vi.mocked(http.get).mockImplementation(normalGet);
+    await vi.advanceTimersByTimeAsync(10000);
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ ccy: 'BTC', type: 'success' }),
+    );
+  });
+
+  it('retains all currencies in full snapshots and recomputes derived quotes when base prices change', async () => {
+    defaultChain.zRCHAddress = '0x0000000000000000000000000000000000000001';
+    defaultChain.stRCHAddress = '0x0000000000000000000000000000000000000002';
+    const call = vi.fn(async ({ to }: { to: string }) => {
+      const value =
+        to === defaultChain.zRCHAddress
+          ? 100n
+          : to === defaultChain.stRCHAddress
+            ? 200n
+            : 1100000000000000000n;
+      return `0x${value.toString(16).padStart(64, '0')}`;
+    });
+    vi.mocked(WalletConnect.getProvider).mockResolvedValue({
+      call,
+    } as unknown as Awaited<ReturnType<typeof WalletConnect.getProvider>>);
+    const snapshot = vi.fn();
+    const update = vi.fn();
+    subscription = MarketService.subscribeIndexPx(snapshot, update);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(snapshot).toHaveBeenCalledWith({
+      BTC: 60000,
+      WBTC: 60000,
+      ETH: 2000,
+      WETH: 2000,
+      stETH: 2000,
+      RCH: 0.5,
+      zRCH: 1,
+      crvUSD: 1,
+      scrvUSD: 1.1,
+      USDT: 1,
+      USDC: 1,
+    });
+    expect(update).toHaveBeenCalledWith({
+      ccy: 'zRCH',
+      type: 'success',
+      quote: { price: 1, updatedAt: 100000 },
+    });
+    const normalGet = vi.mocked(http.get).getMockImplementation()!;
+    vi.mocked(http.get).mockImplementation((url, config) =>
+      url.includes('exchange-rate')
+        ? Promise.resolve({ value: { exchangeRate: 0.75, dateTime: 110 } })
+        : normalGet(url, config),
+    );
+    await vi.advanceTimersByTimeAsync(10000);
+    expect(update).toHaveBeenCalledWith({
+      ccy: 'zRCH',
+      type: 'success',
+      quote: { price: 1.5, updatedAt: 110000 },
+    });
+  });
+
+  it('preserves legacy RPC fallback in full snapshots without reporting it as a fresh derived quote', async () => {
+    vi.mocked(WalletConnect.getProvider).mockRejectedValue(
+      new Error('RPC unavailable'),
+    );
+    const snapshot = vi.fn();
+    const update = vi.fn();
+    subscription = MarketService.subscribeIndexPx(snapshot, update);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(snapshot).toHaveBeenCalledWith(
+      expect.objectContaining({ scrvUSD: 1, RCH: 0.5 }),
+    );
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ ccy: 'scrvUSD', type: 'error' }),
+    );
+    expect(
+      update.mock.calls.some(
+        ([event]) => event.ccy === 'scrvUSD' && event.type === 'success',
+      ),
+    ).toBe(false);
+  });
+
+  it('keeps a derived quote loading while its PPS refresh is pending', async () => {
+    const refresh = deferred<string>();
+    const call = vi
+      .fn()
+      .mockResolvedValueOnce(
+        `0x${1100000000000000000n.toString(16).padStart(64, '0')}`,
+      )
+      .mockReturnValue(refresh.promise);
+    vi.mocked(WalletConnect.getProvider).mockResolvedValue({
+      call,
+    } as unknown as Awaited<ReturnType<typeof WalletConnect.getProvider>>);
+    const update = vi.fn();
+    subscription = MarketService.subscribeIndexPx(vi.fn(), update);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ ccy: 'scrvUSD', type: 'success' }),
+    );
+    update.mockClear();
+    await vi.advanceTimersByTimeAsync(10000);
+    const events = update.mock.calls
+      .map(([event]) => event)
+      .filter((event) => event.ccy === 'scrvUSD');
+    expect(events[events.length - 1].type).toBe('loading');
+    expect(events.some((event) => event.type === 'success')).toBe(false);
+  });
+
+  it('shares a pending zRCH RPC leg when the other leg rejects', async () => {
+    defaultChain.zRCHAddress = '0x0000000000000000000000000000000000000001';
+    defaultChain.stRCHAddress = '0x0000000000000000000000000000000000000002';
+    const balance = deferred<string>();
+    const call = vi.fn(({ to }: { to: string }) => {
+      if (to === defaultChain.zRCHAddress)
+        return Promise.reject(new Error('Supply RPC unavailable'));
+      if (to === defaultChain.stRCHAddress) return balance.promise;
+      return Promise.resolve(
+        `0x${1100000000000000000n.toString(16).padStart(64, '0')}`,
+      );
+    });
+    vi.mocked(WalletConnect.getProvider).mockResolvedValue({
+      call,
+    } as unknown as Awaited<ReturnType<typeof WalletConnect.getProvider>>);
+    const snapshot = vi.fn();
+    subscription = MarketService.subscribeIndexPx(snapshot, vi.fn());
+    await vi.advanceTimersByTimeAsync(30000);
+    expect(snapshot).toHaveBeenCalledWith(
+      expect.objectContaining({ zRCH: 0.5 }),
+    );
+    expect(
+      call.mock.calls.filter(
+        ([request]) => request.to === defaultChain.stRCHAddress,
+      ),
+    ).toHaveLength(1);
+  });
+
+  it('does not emit or poll after unsubscribe, even when a request resolves later', async () => {
+    const response = deferred<{ value: { price: string } }>();
+    vi.mocked(http.get).mockImplementation((url) =>
+      url.includes('exchange-rate')
+        ? Promise.resolve({ value: { exchangeRate: 0.5 } })
+        : response.promise,
+    );
+    const snapshot = vi.fn();
+    const update = vi.fn();
+    subscription = MarketService.subscribeIndexPx(snapshot, update);
+    await vi.advanceTimersByTimeAsync(0);
+    await subscription.unsubscribe();
+    const count = update.mock.calls.length;
+    const requests = vi.mocked(http.get).mock.calls.length;
+    response.resolve({ value: { price: '60000' } });
+    await vi.advanceTimersByTimeAsync(30000);
+    expect(update).toHaveBeenCalledTimes(count);
+    expect(snapshot).not.toHaveBeenCalled();
+    expect(http.get).toHaveBeenCalledTimes(requests);
+  });
 });
 
 afterEach(() => {

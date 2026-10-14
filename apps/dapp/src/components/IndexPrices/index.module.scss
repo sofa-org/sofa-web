@@ -85,6 +85,19 @@
     padding: 0 0 0 2px;
   }
 
+  .price {
+    white-space: nowrap;
+  }
+
+  .stale-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    opacity: 0.7;
+  }
+
   &.loading {
     > svg:last-child {
       display: none;
