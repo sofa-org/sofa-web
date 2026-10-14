@@ -7,22 +7,43 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+export interface IndexPriceState {
+  price?: number;
+  loading: boolean;
+  updatedAt?: number;
+  error?: string;
+}
+
 export const useIndexPrices = Object.assign(
   create(() => ({
     prices: {} as PRecord<CCY | USDS, number>,
+    quotes: {} as PRecord<CCY | USDS, IndexPriceState>,
   })),
   {
     subscribePrices: () =>
-      MarketService.subscribeIndexPx((d) => {
-        return useIndexPrices.setState((pre) => ({
-          prices: {
-            ...d,
-            WETH: d.ETH || pre.prices.ETH,
-            stETH: d.ETH || pre.prices.ETH,
-            WBTC: d.BTC || pre.prices.BTC,
-          },
-        }));
-      }),
+      MarketService.subscribeIndexPx(
+        (prices) =>
+          useIndexPrices.setState((pre) => ({
+            prices: { ...pre.prices, ...prices },
+          })),
+        (update) =>
+          useIndexPrices.setState((pre) => {
+            const previous = pre.quotes[update.ccy];
+            const quote: IndexPriceState =
+              update.type === 'success'
+                ? { ...update.quote, loading: false, error: undefined }
+                : update.type === 'error'
+                  ? { ...previous, loading: false, error: update.error }
+                  : { ...previous, loading: true };
+            const quotes = { ...pre.quotes, [update.ccy]: quote };
+            if (update.ccy === 'BTC') quotes.WBTC = quote;
+            if (update.ccy === 'ETH') {
+              quotes.WETH = quote;
+              quotes.stETH = quote;
+            }
+            return { quotes };
+          }),
+      ),
   },
 );
 

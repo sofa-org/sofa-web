@@ -1,8 +1,8 @@
-import { singleton } from '@livelybone/singleton';
+import { promiseOnPending, singleton } from '@livelybone/singleton';
 import { applyMock, asyncCache, asyncRetry } from '@sofa/utils/decorators';
 import { Env } from '@sofa/utils/env';
 import { MsIntervals } from '@sofa/utils/expiry';
-import { jsonSafeParse } from '@sofa/utils/fns';
+import { getErrorMsg, jsonSafeParse } from '@sofa/utils/fns';
 import { http } from '@sofa/utils/http';
 import { separateTimeByInterval } from '@sofa/utils/time';
 import { WsClients } from '@sofa/utils/ws';
@@ -37,12 +37,21 @@ interface PPSEntry {
   toCcy: string;
   dateTime: number;
   exchangeRate: number;
+  fetchedAt: number;
 }
 
 export interface PriceQuote {
   price: number;
   updatedAt: number;
 }
+
+export type IndexPriceUpdate =
+  | { ccy: string; type: 'loading' }
+  | { ccy: string; type: 'success'; quote: PriceQuote }
+  | { ccy: string; type: 'error'; error: string };
+
+const indexPriceInterval = 10000;
+const indexPriceWaitTimeout = 15000;
 
 const indexPriceRequestOptions = {
   timeout: 5000,
@@ -204,6 +213,30 @@ export class MarketService {
     return (await MarketService.fetchCoinGeckoQuote(ccy)).price;
   }
 
+  private static async fetchSofaQuote(ccy: string): Promise<PriceQuote> {
+    const entry = await MarketService.$getPPSNow({
+      fromCcy: ccy,
+      toCcy: 'USD',
+    });
+    return {
+      price: parseIndexPrice(entry.exchangeRate),
+      updatedAt: entry.fetchedAt,
+    };
+  }
+
+  @asyncCache({
+    until: (value, time) =>
+      !value || !time || Date.now() - time >= indexPriceInterval,
+  })
+  private static async fetchPPSQuote(
+    ccy: 'scrvUSD' | 'zRCH',
+  ): Promise<PriceQuote> {
+    const price = await (ccy === 'scrvUSD'
+      ? MarketService.getPPSOfScrv()
+      : MarketService.getPPSOfZRCH());
+    return { price: parseIndexPrice(price), updatedAt: Date.now() };
+  }
+
   static $fetchIndexPx() {
     return Promise.all(
       (['BTC', 'ETH'] as const).map(($ccy) =>
@@ -214,29 +247,33 @@ export class MarketService {
 
   static fetchIndexPx<T extends CCY>(): Promise<Record<T | USDS, number>> {
     return Promise.all([
-      MarketService.getPPSOfScrv().catch(() => 1),
-      MarketService.getPPSOfZRCH().catch(() => 1),
+      MarketService.fetchPPSQuote('scrvUSD')
+        .then((quote) => quote.price)
+        .catch(() => 1),
+      MarketService.fetchPPSQuote('zRCH')
+        .then((quote) => quote.price)
+        .catch(() => 1),
       MarketService.$fetchIndexPx(),
       MarketService.getPPS({
         fromCcy: 'RCH',
         toCcy: 'USD',
         includeNow: true,
-      }).then((res) => ({ RCH: res.now })),
+      }).then((res) => ({ RCH: parseIndexPrice(res.now) })),
       MarketService.getPPS({
         fromCcy: 'crvUSD',
         toCcy: 'USD',
         includeNow: true,
-      }).then((res) => ({ crvUSD: res.now })),
+      }).then((res) => ({ crvUSD: parseIndexPrice(res.now) })),
       MarketService.getPPS({
         fromCcy: 'USDT',
         toCcy: 'USD',
         includeNow: true,
-      }).then((res) => ({ USDT: res.now })),
+      }).then((res) => ({ USDT: parseIndexPrice(res.now) })),
       MarketService.getPPS({
         fromCcy: 'USDC',
         toCcy: 'USD',
         includeNow: true,
-      }).then((res) => ({ USDC: res.now })),
+      }).then((res) => ({ USDC: parseIndexPrice(res.now) })),
     ]).then(([scrvPPS, zrchPPS, ...prices]) => {
       const obj = prices.reduce(
         (pre, it) => Object.assign(pre, it),
@@ -253,22 +290,128 @@ export class MarketService {
     });
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#individual-symbol-ticker-streams
   static subscribeIndexPx<T extends CCY>(
     callback: (px: Record<T | USDS, number>) => void,
+    onUpdate?: (update: IndexPriceUpdate) => void,
   ): Subscription {
-    // const topic = `${ccy}USDT@miniticker`.toLowerCase();
-    // return Object.assign(
-    //   MarketService.binanceWs.subscribe(topic, callback, 'SUBSCRIBE'),
-    //   {
-    //     unsubscribe: () =>
-    //       MarketService.binanceWs.unsubscribe(topic, callback, 'UNSUBSCRIBE'),
-    //   },
-    // );
-    const fetch = () => MarketService.fetchIndexPx().then(callback);
-    const timer = setInterval(() => fetch(), 10000);
-    return Object.assign(fetch(), {
-      unsubscribe: () => Promise.resolve().then(() => clearInterval(timer)),
+    let active = true;
+    let snapshotPending = false;
+    const pending = new Set<string>();
+    const deadlines = new Set<ReturnType<typeof setTimeout>>();
+    const quotes: Partial<Record<string, PriceQuote>> = {};
+    const errors: Partial<Record<string, string>> = {};
+    const derived = { scrvUSD: 'crvUSD', zRCH: 'RCH' } as const;
+    const notify = (update: IndexPriceUpdate) => {
+      if (active) onUpdate?.(update);
+    };
+    const publishDerived = (changedCcy: string) => {
+      for (const ccy of ['scrvUSD', 'zRCH'] as const) {
+        const base = derived[ccy];
+        if (changedCcy !== ccy && changedCcy !== base) continue;
+        const error = errors[ccy] || errors[base];
+        if (error) {
+          notify({ ccy, type: 'error', error });
+        } else if (
+          !pending.has(ccy) &&
+          !pending.has(base) &&
+          quotes[ccy] &&
+          quotes[base]
+        ) {
+          const price = quotes[ccy]!.price * quotes[base]!.price;
+          if (!Number.isFinite(price) || price <= 0) {
+            notify({ ccy, type: 'error', error: 'Invalid index price' });
+          } else {
+            notify({
+              ccy,
+              type: 'success',
+              quote: {
+                price,
+                updatedAt: Math.min(
+                  quotes[ccy]!.updatedAt,
+                  quotes[base]!.updatedAt,
+                ),
+              },
+            });
+          }
+        }
+      }
+    };
+    const fetchers: Record<string, () => Promise<PriceQuote>> = {
+      BTC: () => MarketService.fetchIndexQuote('BTC'),
+      ETH: () => MarketService.fetchIndexQuote('ETH'),
+      RCH: () => MarketService.fetchSofaQuote('RCH'),
+      crvUSD: () => MarketService.fetchSofaQuote('crvUSD'),
+      USDT: () => MarketService.fetchSofaQuote('USDT'),
+      USDC: () => MarketService.fetchSofaQuote('USDC'),
+      scrvUSD: () => MarketService.fetchPPSQuote('scrvUSD'),
+      zRCH: () => MarketService.fetchPPSQuote('zRCH'),
+    };
+    const fetchQuote = async (
+      ccy: string,
+      fetcher: () => Promise<PriceQuote>,
+    ) => {
+      if (pending.has(ccy)) return;
+      pending.add(ccy);
+      notify({ ccy, type: 'loading' });
+      for (const [derivedCcy, baseCcy] of Object.entries(derived)) {
+        if (ccy === baseCcy) notify({ ccy: derivedCcy, type: 'loading' });
+      }
+      const fail = (error: string) => {
+        errors[ccy] = error;
+        notify({ ccy, type: 'error', error });
+        publishDerived(ccy);
+      };
+      const deadline = setTimeout(() => {
+        // Keep the pending lock until the underlying request actually settles.
+        fail('Price request timed out');
+      }, indexPriceWaitTimeout);
+      deadlines.add(deadline);
+      try {
+        const quote = await fetcher();
+        if (!active) return;
+        quotes[ccy] = quote;
+        delete errors[ccy];
+        if (!(ccy in derived)) notify({ ccy, type: 'success', quote });
+      } catch (error) {
+        if (active) fail(getErrorMsg(error) || 'Price unavailable');
+      } finally {
+        pending.delete(ccy);
+        clearTimeout(deadline);
+        deadlines.delete(deadline);
+        if (active) publishDerived(ccy);
+      }
+    };
+    const fetchSnapshot = async () => {
+      if (snapshotPending) return;
+      snapshotPending = true;
+      try {
+        const prices = await MarketService.fetchIndexPx<T>();
+        if (active) callback(prices);
+      } catch {
+        // Preserve the last complete snapshot; per-coin events report failures.
+      } finally {
+        snapshotPending = false;
+      }
+    };
+    const poll = () => {
+      if (!active) return;
+      if (onUpdate) {
+        for (const [ccy, fetcher] of Object.entries(fetchers))
+          void fetchQuote(ccy, fetcher);
+      }
+      void fetchSnapshot();
+    };
+    const timer = setInterval(poll, indexPriceInterval);
+    poll();
+    // This promise acknowledges subscription setup, not the first price batch.
+    return Object.assign(Promise.resolve(), {
+      unsubscribe: () => {
+        active = false;
+        clearInterval(timer);
+        deadlines.forEach(clearTimeout);
+        deadlines.clear();
+        return Promise.resolve();
+      },
     });
   }
 
@@ -394,25 +537,46 @@ export class MarketService {
       provider,
     );
     const [zRCHTotalSupply, balanceOfStRCH] = await Promise.all([
-      zRCHContract.totalSupply().then((res) => String(res)),
-      stRCHContract
-        .balanceOf(defaultChain.zRCHAddress)
-        .then((res) => String(res)),
+      // A rejected sibling must not cause a still-pending RPC to be sent again.
+      promiseOnPending(
+        () => zRCHContract.totalSupply().then((res) => String(res)),
+        {
+          id: `index-pps-supply-${defaultChain.chainId}-${defaultChain.zRCHAddress}`,
+        },
+      ),
+      promiseOnPending(
+        () =>
+          stRCHContract
+            .balanceOf(defaultChain.zRCHAddress)
+            .then((res) => String(res)),
+        {
+          id: `index-pps-balance-${defaultChain.chainId}-${defaultChain.stRCHAddress}-${defaultChain.zRCHAddress}`,
+        },
+      ),
     ]);
     if (!+zRCHTotalSupply) return 1;
     return Big(balanceOfStRCH).div(zRCHTotalSupply).toString();
   }
 
   @asyncCache({
+    id: (_, [params]) => {
+      const { fromCcy, toCcy } = params as { fromCcy: string; toCcy: string };
+      return `pps-now-${fromCcy}-${toCcy}`;
+    },
     until: (it, createdAt) =>
-      !it || !createdAt || Date.now() - createdAt > MsIntervals.s * 10,
+      !it || !createdAt || Date.now() - createdAt >= MsIntervals.s * 10,
   })
   static async $getPPSNow(params: { fromCcy: string; toCcy: string }) {
     if (params.fromCcy.includes('USD') && params.toCcy.includes('USD'))
-      return { ...params, dateTime: Date.now(), exchangeRate: 1 } as PPSEntry;
+      return {
+        ...params,
+        dateTime: Date.now(),
+        exchangeRate: 1,
+        fetchedAt: Date.now(),
+      } as PPSEntry;
     return http
       .get<unknown, HttpResponse<PPSEntry>>(`/rfq/exchange-rate`, { params })
-      .then((res) => res.value);
+      .then((res) => ({ ...res.value, fetchedAt: Date.now() }));
   }
 
   @asyncCache({
