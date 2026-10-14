@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Tooltip } from '@douyinfe/semi-ui';
 import { AutomatorInfo } from '@sofa/services/automator';
-import { AutomatorUserPosition } from '@sofa/services/automator-user';
+import { OriginAutomatorUserPosition } from '@sofa/services/automator-user';
 import { CCYService } from '@sofa/services/ccy';
 import { useTranslation } from '@sofa/services/i18n';
 import { displayPercentage } from '@sofa/utils/amount';
@@ -31,7 +31,10 @@ export interface AutomatorCardProps {
   onShareClicked: (v: AutomatorInfo) => void;
   mode: 'card' | 'featured';
   switchChain?: boolean;
-  userPosition?: AutomatorUserPosition;
+  userPosition?: Pick<
+    OriginAutomatorUserPosition,
+    'amountByClientDepositCcy' | 'amountByVaultDepositCcy'
+  >;
 }
 
 export const AutomatorCard = (props: AutomatorCardProps) => {

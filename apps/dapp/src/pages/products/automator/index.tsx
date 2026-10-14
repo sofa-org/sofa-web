@@ -38,6 +38,7 @@ export const AutomatorEl = (props: BaseProps) => {
 
   const handleSuccess = useLazyCallback(() => {
     if (vault && address) {
+      void useAutomatorStore.getUserInfoList(vault.chainId, address);
       useAutomatorStore.updateUserInfo(vault, address);
       useWalletStore.updateBalanceByAutomatorVault(vault);
     }
