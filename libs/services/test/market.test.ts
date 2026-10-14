@@ -89,3 +89,113 @@ describe('CoinGecko fallback', () => {
     );
   });
 });
+
+describe('BTC/ETH source selection', () => {
+  it.each(['BTC', 'ETH'] as const)(
+    'prefers Binance for %s and skips fallback sources',
+    async (ccy) => {
+      vi.mocked(http.get).mockResolvedValue({
+        value: { symbol: `${ccy}USDT`, price: '60000' },
+      });
+      await expect(MarketService.$$fetchIndexPx(ccy)).resolves.toBe(60000);
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith(
+        `https://data-api.binance.vision/api/v3/ticker/price?symbol=${ccy}USDT`,
+        expect.objectContaining({
+          timeout: 5000,
+          'axios-retry': { retries: 0 },
+        }),
+      );
+    },
+  );
+
+  it('falls back to Coinbase when Binance returns an invalid price', async () => {
+    vi.mocked(http.get)
+      .mockResolvedValueOnce({ value: { price: '' } })
+      .mockResolvedValueOnce({ value: { price: '61000' } });
+    await expect(MarketService.$$fetchIndexPx('BTC')).resolves.toBe(61000);
+    expect(vi.mocked(http.get).mock.calls.map(([url]) => url)).toEqual([
+      'https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT',
+      'https://api.exchange.coinbase.com/products/BTC-USDT/ticker',
+    ]);
+  });
+
+  it('tries CoinGecko after both exchange sources fail', async () => {
+    vi.mocked(http.get)
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce({ value: { ethereum: { usd: 2100 } } });
+    await expect(MarketService.$$fetchIndexPx('ETH')).resolves.toBe(2100);
+    expect(
+      vi.mocked(http.get).mock.calls.map(([url]) => new URL(url).hostname),
+    ).toEqual([
+      'data-api.binance.vision',
+      'api.exchange.coinbase.com',
+      'api.coingecko.com',
+    ]);
+  });
+
+  it('rejects when every source is unavailable', async () => {
+    vi.mocked(http.get).mockRejectedValue(new Error('offline'));
+    await expect(MarketService.$$fetchIndexPx('BTC')).rejects.toThrow(
+      'offline',
+    );
+    expect(http.get).toHaveBeenCalledTimes(3);
+  });
+
+  it('moves to Coinbase after the bounded Binance request times out', async () => {
+    vi.useFakeTimers();
+    vi.mocked(http.get).mockImplementation((url, options) => {
+      if (url.includes('binance'))
+        return new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), options?.timeout),
+        );
+      return Promise.resolve({ value: { price: '61000' } });
+    });
+    const result = MarketService.$$fetchIndexPx('BTC');
+    await vi.advanceTimersByTimeAsync(5000);
+    await expect(result).resolves.toBe(61000);
+    expect(http.get).toHaveBeenCalledTimes(2);
+  });
+
+  it('shares concurrent calls and retains the actual cache timestamp', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(100000);
+    vi.mocked(http.get).mockResolvedValue({ value: { price: '60000' } });
+    const [first, concurrent] = await Promise.all([
+      MarketService.fetchIndexQuote('BTC'),
+      MarketService.fetchIndexQuote('BTC'),
+    ]);
+    expect(first).toEqual({ price: 60000, updatedAt: 100000 });
+    expect(concurrent).toEqual(first);
+    expect(http.get).toHaveBeenCalledTimes(1);
+    vi.setSystemTime(105000);
+    expect(await MarketService.fetchIndexQuote('BTC')).toEqual(first);
+    vi.setSystemTime(110001);
+    expect(await MarketService.fetchIndexQuote('BTC')).toEqual({
+      price: 60000,
+      updatedAt: 110001,
+    });
+    expect(http.get).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not give cached CoinGecko prices a new timestamp', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(100000);
+    vi.mocked(http.get).mockImplementation(async (url) => {
+      if (!url.includes('coingecko')) throw new Error('offline');
+      return { value: { bitcoin: { usd: 60000 } } };
+    });
+    await MarketService.fetchIndexQuote('BTC');
+    vi.setSystemTime(111000);
+    expect(await MarketService.fetchIndexQuote('BTC')).toEqual({
+      price: 60000,
+      updatedAt: 100000,
+    });
+    expect(
+      vi
+        .mocked(http.get)
+        .mock.calls.filter(([url]) => url.includes('coingecko')),
+    ).toHaveLength(1);
+  });
+});
