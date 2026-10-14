@@ -10,6 +10,7 @@ import { AutomatorService } from '@sofa/services/automator';
 import {
   AutomatorUserPosition,
   AutomatorUserService,
+  OriginAutomatorUserPosition,
 } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo } from '@sofa/services/base-type';
 import { MsIntervals } from '@sofa/utils/expiry';
@@ -21,6 +22,14 @@ import { createWithEqualityFn } from 'zustand/traditional';
 type K = `${AutomatorVaultInfo['chainId']}-${AutomatorVaultInfo['vault']}-${
   string /* address */
 }`;
+
+export interface AutomatorUserPositionListState {
+  data?: OriginAutomatorUserPosition[];
+  loading: boolean;
+  error?: string;
+}
+
+const userPositionListRequests = new Map<string, symbol>();
 
 export interface AutomatorDepositData {
   amount?: string | number;
@@ -53,6 +62,7 @@ export const useAutomatorStore = Object.assign(
           >;
         }
       >,
+      userPositionLists: {} as Record<string, AutomatorUserPositionListState>,
       depositData: {} as Record<K, AutomatorDepositData>,
       redeemData: {} as Record<K, AutomatorRedeemData>,
     }),
@@ -187,40 +197,60 @@ export const useAutomatorStore = Object.assign(
         useAutomatorStore._subscribePerformancesTimer = null;
       };
     },
-    getUserInfoList: async (chainId: number, wallet: string) => {
-      return Promise.all([
-        AutomatorUserService.userPositionList({
-          chainId,
-          wallet,
-          status: AutomatorDepositStatus.ACTIVE,
-        }),
-        AutomatorUserService.userPositionList({
-          chainId,
-          wallet,
-          status: AutomatorDepositStatus.CLOSED,
-        }),
-      ]).then((list) => {
-        useAutomatorStore.setState((pre) => {
-          const userInfos = Object.fromEntries(
-            list.flat().map((it) => {
-              const k = `${
-                it.vaultInfo.chainId
-              }-${it.vaultInfo.vault.toLowerCase()}-` as const;
-              return [k, { ...pre.userInfos[k], server: it }];
-            }),
-          );
-          return {
-            userInfos: { ...pre.userInfos, ...userInfos },
-          };
-        });
-      });
+    getUserInfoList: async (
+      chainId: number,
+      wallet: string,
+      options?: { skipPending?: boolean },
+    ) => {
+      return Promise.all(
+        [AutomatorDepositStatus.ACTIVE, AutomatorDepositStatus.CLOSED].map(
+          async (status) => {
+            const key = `${chainId}-${wallet.toLowerCase()}-${status}`;
+            if (options?.skipPending && userPositionListRequests.has(key))
+              return;
+            const request = Symbol();
+            userPositionListRequests.set(key, request);
+            const update = (patch: Partial<AutomatorUserPositionListState>) => {
+              if (userPositionListRequests.get(key) !== request) return;
+              useAutomatorStore.setState((pre) => ({
+                userPositionLists: {
+                  ...pre.userPositionLists,
+                  [key]: {
+                    ...pre.userPositionLists[key],
+                    loading: false,
+                    ...patch,
+                  },
+                },
+              }));
+            };
+            update({ loading: true, error: undefined });
+            try {
+              const data = await AutomatorUserService.fetchUserPositionList({
+                chainId,
+                wallet,
+                status,
+              });
+              // Publish each status immediately; prices and the other status are optional.
+              update({ data, loading: false });
+            } catch (error) {
+              update({ loading: false, error: getErrorMsg(error) });
+            } finally {
+              if (userPositionListRequests.get(key) === request)
+                userPositionListRequests.delete(key);
+            }
+          },
+        ),
+      );
     },
     _subscribeUserInfoListTimer: null as ReturnType<typeof setInterval> | null,
     subscribeUserInfoList: (chainId: number, wallet: string) => {
       if (!useAutomatorStore._subscribeUserInfoListTimer) {
         useAutomatorStore.getUserInfoList(chainId, wallet);
         useAutomatorStore._subscribeUserInfoListTimer = setInterval(
-          () => useAutomatorStore.getUserInfoList(chainId, wallet),
+          () =>
+            useAutomatorStore.getUserInfoList(chainId, wallet, {
+              skipPending: true,
+            }),
           MsIntervals.min,
         );
       }

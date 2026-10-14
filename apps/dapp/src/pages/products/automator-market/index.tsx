@@ -6,7 +6,6 @@ import {
   AutomatorInfo,
   AutomatorService,
 } from '@sofa/services/automator';
-import { AutomatorUserPosition } from '@sofa/services/automator-user';
 import { AutomatorVaultInfo, ProjectType } from '@sofa/services/base-type';
 import { CCYService } from '@sofa/services/ccy';
 import { ChainMap } from '@sofa/services/chains';
@@ -90,27 +89,46 @@ const Index = () => {
   }, [wallet.address, wallet.chainId]);
 
   const currentWallet = wallet.address?.toLowerCase();
-  const holding = useAutomatorStore((state) =>
-    Object.values(state.userInfos)
-      .map((it) => it.server)
-      .filter(
-        (it): it is AutomatorUserPosition =>
-          !!it &&
-          it.vaultInfo.chainId === wallet.chainId &&
-          it.wallet.toLowerCase() === currentWallet &&
-          Number(it.amountByVaultDepositCcy) > 0,
-      ),
-  );
+  const [activeHoldings, closedHoldings] = useAutomatorStore((state) => [
+    state.userPositionLists[`${wallet.chainId}-${currentWallet}-ACTIVE`],
+    state.userPositionLists[`${wallet.chainId}-${currentWallet}-CLOSED`],
+  ]);
 
-  const holdingByVault = useMemo(
-    () => arrToDict(holding || [], (it) => it.vaultInfo.vault.toLowerCase()),
-    [holding],
-  );
+  const holdingByVault = useMemo(() => {
+    // ACTIVE wins even when its balance is zero, so CLOSED cannot revive it.
+    const holdings = arrToDict(
+      [...(closedHoldings?.data || []), ...(activeHoldings?.data || [])].filter(
+        (it) =>
+          it.chainId === wallet.chainId &&
+          it.wallet.toLowerCase() === currentWallet,
+      ),
+      (it) => it.automatorVault.toLowerCase(),
+    );
+    return Object.fromEntries(
+      Object.entries(holdings).filter(
+        ([, it]) => Number(it.amountByVaultDepositCcy) > 0,
+      ),
+    );
+  }, [
+    activeHoldings?.data,
+    closedHoldings?.data,
+    wallet.chainId,
+    currentWallet,
+  ]);
+
+  const holdingsError =
+    tab === 'holding' &&
+    !!wallet.address &&
+    !!(activeHoldings?.error || closedHoldings?.error);
+  const holdingsLoading =
+    !!wallet.address &&
+    [activeHoldings, closedHoldings].some((it) => !it || it.loading);
 
   const lists = useMemo(() => {
-    if (!data || (tab === 'holding' && !holding)) return undefined;
+    if (!data) return undefined;
     const map = data.reduce(
       (pre, it) => {
+        if (!it?.vaultInfo) return pre;
         if (
           tab === 'holding' &&
           !holdingByVault[it.vaultInfo.vault.toLowerCase()]
@@ -125,9 +143,11 @@ const Index = () => {
       {} as Record<AutomatorVaultInfo['depositCcy'], AutomatorInfo[]>,
     );
     return Object.entries(map);
-  }, [data, holding, holdingByVault, tab]);
+  }, [data, holdingByVault, tab]);
 
-  const loading = (tab === 'holding' ? !holding : !data) && !lists?.length;
+  const loading =
+    !lists?.length &&
+    (!data || (tab === 'holding' && holdingsLoading && !holdingsError));
 
   const [modal, modalController] = useAutomatorModal();
 
@@ -203,6 +223,27 @@ const Index = () => {
       <ChainList dark />
       <CreateBtn />
       <Spin wrapperClassName={styles['cards-wrapper']} spinning={loading}>
+        {holdingsError && (
+          <div className={styles['holdings-error']} role="alert">
+            <span>
+              {t({
+                enUS: 'Some holdings could not be loaded. Previously loaded holdings are kept when available.',
+                zhCN: '部分持仓加载失败，已加载的持仓会继续显示。',
+              })}
+            </span>
+            <Button
+              onClick={() => {
+                if (wallet.address)
+                  void useAutomatorStore.getUserInfoList(
+                    wallet.chainId,
+                    wallet.address,
+                  );
+              }}
+            >
+              {t({ enUS: 'Retry', zhCN: '重试' })}
+            </Button>
+          </div>
+        )}
         {lists?.map((it) => {
           return (
             <div className={styles['cards']} key={it[0]}>
@@ -244,12 +285,17 @@ const Index = () => {
             </div>
           );
         })}
-        {!lists?.length && !loading && (
+        {!lists?.length && !loading && !holdingsError && (
           <CEmpty
             className="semi-always-dark"
             description={
               tab === 'holding'
-                ? undefined
+                ? wallet.address
+                  ? undefined
+                  : t({
+                      enUS: 'Connect your wallet to view your holdings',
+                      zhCN: '连接钱包以查看持仓',
+                    })
                 : t(
                     {
                       enUS: 'There are no supported Automator contracts on this chain. Please switch to another chain, such as {{chains}}',

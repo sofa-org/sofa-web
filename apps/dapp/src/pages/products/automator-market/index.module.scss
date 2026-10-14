@@ -42,6 +42,15 @@
   margin: 0 0 40px;
 }
 
+.holdings-error {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+  color: #fff;
+}
+
 .title {
   @include flex-center;
 

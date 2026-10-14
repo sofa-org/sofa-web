@@ -20,8 +20,8 @@ import {
   TransactionProgress,
 } from './positions';
 import { PositionStatus } from './the-graph';
-import { WalletService } from './wallet';
 import { isTransactionConfirmationPendingError } from './transaction-confirmation';
+import { WalletService } from './wallet';
 
 // server 返回的结构
 export interface OriginAutomatorUserPosition {
@@ -117,18 +117,24 @@ export class AutomatorUserService {
     return AutomatorUserService.cvtUserPosition(it, vaults, prices);
   }
 
-  static async userPositionList(params: {
+  static async fetchUserPositionList(params: {
     chainId: number;
     wallet: string;
     status: AutomatorDepositStatus;
   }) {
+    return http
+      .get<
+        unknown,
+        HttpResponse<OriginAutomatorUserPosition[]>
+      >(`/users/automator/list`, { params })
+      .then((res) => res.value);
+  }
+
+  static async userPositionList(
+    params: Parameters<typeof AutomatorUserService.fetchUserPositionList>[0],
+  ) {
     const [list, vaults, prices] = await Promise.all([
-      http
-        .get<
-          unknown,
-          HttpResponse<OriginAutomatorUserPosition[]>
-        >(`/users/automator/list`, { params })
-        .then((res) => res.value),
+      AutomatorUserService.fetchUserPositionList(params),
       AutomatorService.automatorList({ chainId: params.chainId }),
       MarketService.fetchIndexPx(),
     ]);
@@ -259,7 +265,10 @@ export class AutomatorUserService {
           const error =
             res.status === TransactionStatus.FAILED ? res.error : undefined;
           safeRun(cb, {
-            status: res.status === TransactionStatus.FAILED ? 'All Failed' : 'Success',
+            status:
+              res.status === TransactionStatus.FAILED
+                ? 'All Failed'
+                : 'Success',
             details: [
               [
                 key,
@@ -276,7 +285,24 @@ export class AutomatorUserService {
         .catch((error) => {
           console.error(error);
           if (isTransactionConfirmationPendingError(error)) {
-            safeRun(cb, { status: 'ConfirmationPending', details: [[key, { status: statusMap.before, ...(submittedHash ? { hash: submittedHash } : {}), ids: [], confirmation: { hash: error.hash, chainId: error.chainId, reason: error.reason } }]] });
+            safeRun(cb, {
+              status: 'ConfirmationPending',
+              details: [
+                [
+                  key,
+                  {
+                    status: statusMap.before,
+                    ...(submittedHash ? { hash: submittedHash } : {}),
+                    ids: [],
+                    confirmation: {
+                      hash: error.hash,
+                      chainId: error.chainId,
+                      reason: error.reason,
+                    },
+                  },
+                ],
+              ],
+            });
             return;
           }
           safeRun(cb, {
