@@ -39,6 +39,16 @@ interface PPSEntry {
   exchangeRate: number;
 }
 
+export interface PriceQuote {
+  price: number;
+  updatedAt: number;
+}
+
+const indexPriceRequestOptions = {
+  timeout: 5000,
+  'axios-retry': { retries: 0 },
+};
+
 function parseIndexPrice(value: unknown): number {
   if (
     (typeof value !== 'number' && typeof value !== 'string') ||
@@ -130,27 +140,40 @@ export class MarketService {
 
   @asyncCache({
     persist: true,
-    until: (v, t) => !v || !t || Date.now() - t > 10000,
-    id: (_, [ccy]) => `index-price-${ccy || ''}_USDT`,
+    until: (v, t) => !v || !t || Date.now() - t >= 10000,
+    id: (_, [ccy]) => `index-quote-v1-${ccy}_USDT`,
   })
-  static $$fetchIndexPx<T extends 'BTC' | 'ETH'>(ccy: T) {
-    const map = {
-      BTC: 'BTC-USDT',
-      ETH: 'ETH-USDT',
-    };
-    return http
-      .get<
-        unknown,
-        HttpResponse<{ price: string }>
-      >(`https://api.exchange.coinbase.com/products/${map[ccy]}/ticker`)
-      .then((res) => +res.value.price);
+  static async fetchIndexQuote(ccy: 'BTC' | 'ETH'): Promise<PriceQuote> {
+    for (const url of [
+      `https://data-api.binance.vision/api/v3/ticker/price?symbol=${ccy}USDT`,
+      `https://api.exchange.coinbase.com/products/${ccy}-USDT/ticker`,
+    ]) {
+      try {
+        const res = await http.get<unknown, HttpResponse<{ price?: unknown }>>(
+          url,
+          indexPriceRequestOptions,
+        );
+        return {
+          price: parseIndexPrice(res.value?.price),
+          updatedAt: Date.now(),
+        };
+      } catch {
+        // Try the next source for transport errors and invalid prices alike.
+      }
+    }
+    return MarketService.fetchCoinGeckoQuote(ccy);
+  }
+
+  static async $$fetchIndexPx(ccy: 'BTC' | 'ETH'): Promise<number> {
+    return (await MarketService.fetchIndexQuote(ccy)).price;
   }
 
   @asyncCache({
     persist: true,
     until: (it, t) => !it || !t || Date.now() - t > MsIntervals.min * 3,
+    id: (_, [ccy]) => `coingecko-quote-v1-${ccy}_USD`,
   })
-  static async fetchPxFromCoinGecko(ccy: string): Promise<number> {
+  private static async fetchCoinGeckoQuote(ccy: string): Promise<PriceQuote> {
     const ids: Record<string, string> = {
       BTC: 'bitcoin',
       ETH: 'ethereum',
@@ -167,21 +190,24 @@ export class MarketService {
       .get<unknown, HttpResponse<Record<string, { usd?: unknown }>>>(
         'https://api.coingecko.com/api/v3/simple/price',
         {
+          ...indexPriceRequestOptions,
           params: { ids: ids[ccy], vs_currencies: 'usd' },
         },
       )
-      .then((res) => parseIndexPrice(res.value?.[ids[ccy]]?.usd));
+      .then((res) => ({
+        price: parseIndexPrice(res.value?.[ids[ccy]]?.usd),
+        updatedAt: Date.now(),
+      }));
+  }
+
+  static async fetchPxFromCoinGecko(ccy: string): Promise<number> {
+    return (await MarketService.fetchCoinGeckoQuote(ccy)).price;
   }
 
   static $fetchIndexPx() {
     return Promise.all(
       (['BTC', 'ETH'] as const).map(($ccy) =>
-        MarketService.$$fetchIndexPx($ccy)
-          .then((price) => [$ccy, price])
-          .catch(async () => [
-            $ccy,
-            await MarketService.fetchPxFromCoinGecko($ccy),
-          ]),
+        MarketService.$$fetchIndexPx($ccy).then((price) => [$ccy, price]),
       ),
     ).then((res) => Object.fromEntries(res));
   }
