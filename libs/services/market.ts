@@ -39,6 +39,18 @@ interface PPSEntry {
   exchangeRate: number;
 }
 
+function parseIndexPrice(value: unknown): number {
+  if (
+    (typeof value !== 'number' && typeof value !== 'string') ||
+    (typeof value === 'string' && !value.trim()) ||
+    !Number.isFinite(Number(value)) ||
+    Number(value) <= 0
+  ) {
+    throw new Error('Invalid index price');
+  }
+  return Number(value);
+}
+
 export class MarketService {
   static get binanceWs() {
     return singleton(
@@ -138,24 +150,27 @@ export class MarketService {
     persist: true,
     until: (it, t) => !it || !t || Date.now() - t > MsIntervals.min * 3,
   })
-  static async fetchPxFromCoinGecko(ccy: string) {
-    const fallbackUrls: Record<string, string> = {
-      BTC: 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=0',
-      ETH: 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=0',
-      RCH: 'https://api.coingecko.com/api/v3/coins/rch-token/market_chart?vs_currency=usd&days=0',
-      crvUSD:
-        'https://api.coingecko.com/api/v3/coins/crvusd/market_chart?vs_currency=usd&days=0',
-      USDT: 'https://api.coingecko.com/api/v3/coins/tether/market_chart?vs_currency=usd&days=0',
-      USDC: 'https://api.coingecko.com/api/v3/coins/usd-coin/market_chart?vs_currency=usd&days=0',
-      CRV: 'https://api.coingecko.com/api/v3/coins/curve-dao-token/market_chart?vs_currency=usd&days=0',
+  static async fetchPxFromCoinGecko(ccy: string): Promise<number> {
+    const ids: Record<string, string> = {
+      BTC: 'bitcoin',
+      ETH: 'ethereum',
+      RCH: 'rch-token',
+      crvUSD: 'crvusd',
+      USDT: 'tether',
+      USDC: 'usd-coin',
+      CRV: 'curve-dao-token',
     };
-    if (!fallbackUrls[ccy]) return [ccy, undefined];
+    if (!Object.prototype.hasOwnProperty.call(ids, ccy)) {
+      throw new Error(`Unsupported currency: ${ccy}`);
+    }
     return http
-      .get<
-        unknown,
-        HttpResponse<{ prices: [number, number][] }>
-      >(fallbackUrls[ccy])
-      .then((res) => res.value.prices[0][1]);
+      .get<unknown, HttpResponse<Record<string, { usd?: unknown }>>>(
+        'https://api.coingecko.com/api/v3/simple/price',
+        {
+          params: { ids: ids[ccy], vs_currencies: 'usd' },
+        },
+      )
+      .then((res) => parseIndexPrice(res.value?.[ids[ccy]]?.usd));
   }
 
   static $fetchIndexPx() {
@@ -163,7 +178,10 @@ export class MarketService {
       (['BTC', 'ETH'] as const).map(($ccy) =>
         MarketService.$$fetchIndexPx($ccy)
           .then((price) => [$ccy, price])
-          .catch(() => [$ccy, MarketService.fetchPxFromCoinGecko($ccy)]),
+          .catch(async () => [
+            $ccy,
+            await MarketService.fetchPxFromCoinGecko($ccy),
+          ]),
       ),
     ).then((res) => Object.fromEntries(res));
   }
